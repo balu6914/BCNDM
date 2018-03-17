@@ -1,0 +1,156 @@
+---
+title: Monetasa
+subtitle: Decentralized data marketplace based on blockchain
+author:
+  - name: Drasko Draskovic
+    affiliation: Monetasa
+    email: <drasko@monetasa.com>
+  - name: George Saleh
+    affiliation: Monetasa
+    email: <george@monetasa.com>
+date: December 28, 2017
+colorlinks: true
+header-includes:
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead[CO,CE]{}
+  - \fancyfoot[CO,CE]{}
+  - \fancyfoot[LE,RO]{\thepage}
+  - \usepackage{fontawesome}
+  - \usepackage{tikz}
+  - \usetikzlibrary{calc}
+  - \usepackage{booktabs}
+  - \usepackage{tabularx}
+numbersections: true
+titlepage: true
+link-citations: true
+references:
+  - id: keyIBM
+    author:
+     - family: IBM Marketing
+    issued: 2017
+    title: 10 Key Marketing Trends for 2017
+    URL: https://www-01.ibm.com/common/ssi/cgi-bin/ssialias?htmlfid=WRL12345USEN
+  - id: cos
+    author:
+      - family: Kwon
+        given: Jae
+      - family: Buchman
+        given: Ethan
+    title: Cosmos - Internet of Blockchains
+    URL: https://cosmos.network/
+  - id: bft
+    author:
+      - family: Wikipedia - The Free Encyclopedia
+    title: Byzantine Fault Tolerance
+    URL: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
+  - id: bcdb
+    title: "BigchainDB: A Scalable Blockchain Database"
+    author:
+      - family: McConaghy
+        given: Trent
+    URL: https://www.bigchaindb.com/whitepaper/bigchaindb-whitepaper.pdf
+  - id: tendr
+    author:
+      - family: Kwon
+        given: Jae
+      - family: Buchman
+        given: Ethan
+    issued: 2014
+    title: Tendermint
+    URL: https://tendermint.com/
+  - id: shard
+    title: "Shard (database architecture)"
+    author:
+    - family: Wikipedia - The Free Encyclopedia
+    URL: https://en.wikipedia.org/wiki/Shard_(database_architecture)
+  - id: cbase
+    title: Coinbase
+    URL: https://www.coinbase.com
+  - id: idc
+    title: "Worldwide Semiannual Big Data and Analytics Spending Guide"
+    issued: 2015
+    author:
+      - family: IDC
+    URL: https://www.idc.com/getdoc.jsp?containerId=prUS41826116
+  - id: mck
+    title: "The Innternet of Things - Mapping The Value Beyond The Hype"
+    issued: 2015
+    author:
+      - family: McKinsey Global Institute
+    URL: https://www.mckinsey.com/business-functions/digital-mckinsey/our-insights/the-internet-of-things-the-value-of-digitizing-the-physical-world
+  - id: ibmSaf
+    title: "IBM X-Force Threat Intelligence Index"
+    issued: 2017
+    author:
+      - family: IBM X-Force
+    URL: http://www-03.ibm.com/press/us/en/pressrelease/51946.wss
+  - id: gdpr
+    title: "General Data Protection Regulation"
+    author:
+    - family: Wikipedia - The Free Encyclopedia
+    URL: https://en.wikipedia.org/wiki/General_Data_Protection_Regulation
+  - id: storj
+    title: "Storj - A Peer-to-Peer Cloud Storage Network"
+    issued: 2016
+    author:
+      - family: Wilkinson
+        given: Shawn
+    URL: https://storj.io/
+  - id: sia
+    title: "Sia: Simple Decentralized Storage"
+    issued: 2014
+    author:
+      - family: Vorick
+        given: David
+      - family: Champine
+        given: Luke
+    URL: https://sia.tech/
+  - id: golem
+    title: "Golem"
+    URL: https://golem.network/
+  - id: sonm
+    title: "SONM -  Supercomputer Organized By Network Mining"
+    issued: 2017
+    author:
+      - family: SONM Team
+    URL: https://sonm.io/
+  - id: bhz
+    title: "Blue Horizon"
+    author:
+      - family: IBM
+    URL: https://bluehorizon.network
+  - id: mfx
+    title: "Mainflux IoT Platform"
+    issued: 2015
+    author:
+      - family: Draskovic
+        given: Drasko
+      - family: Isidorovic
+        given: Janko
+      - family: Mijic
+        given: Dejan
+      - family: Marcetic
+        given: Nikola
+    URL: https://www.mainflux.com
+  - id: senml
+    title: "Media Types for Sensor Measurement Lists (SenML)"
+    issued: 2017
+    institute: Universitaet Bremen TZI
+    author:
+      - family: Jennings
+        given: Carl
+      - family: Shelby
+        given: Zach
+    URL: https://tools.ietf.org/html/draft-ietf-core-senml-12
+  - id: cbor
+    title: "Concise Binary Object Representation (CBOR)"
+    issued: 2017
+    institute: Universitaet Bremen TZI
+    author:
+      - family: Bormann
+        given: Carl
+      - family: Hoffman
+        given: Peter
+    URL: https://tools.ietf.org/html/rfc7049
+---

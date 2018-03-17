@@ -1,0 +1,7 @@
+#pandoc -s --listings -H listings-setup.tex --normalize --toc -f markdown -t latex whitpaper.md -o test.pdf -V geometry:margin=1in metadata.yaml
+#pandoc -s --toc -f markdown -t latex whitepaper.md -o whitepaper.pdf metadata.yaml
+#pandoc --filter pandoc-citeproc --csl american-physics-society.csl -s --toc whitepaper.md -o whitepaper.pdf metadata.yaml
+pandoc --filter pandoc-citeproc -s --toc -V lof -V lot whitepaper.md -o monetasa_whitepaper.pdf --template template.tex --listings --csl ieee-with-url.csl metadata.yaml
+
+# HTML
+pandoc -s -f markdown_github -t html whitepaper.md > test.html

@@ -1,0 +1,312 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Bigsense
+  description: An API for Blocksense with BigchainDB.
+schemes:
+  - https
+host: '127.0.0.1:8080'
+basePath: /api
+securityDefinitions:
+  UserSecurity:
+    type: basic
+security:
+  - UserSecurity: []
+paths:
+  /status:
+    get:
+      description: Reports a backend WSGI server status
+      responses:
+        '200':
+          description: Status "OK"
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+  /users:
+    post:
+      description: Create a new user in the database
+      parameters:
+        - name: user
+          in: body
+          description: creates a new user in the database
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Successfully created a new user
+    get:
+      description: Obtain an information about a single user
+      parameters:
+        - $ref: '#/parameters/JWTAuthorization'
+      responses:
+        '200':
+          description: Successfully created a new user
+          schema:
+            $ref: '#/definitions/UserData'
+  /jwt:
+    post:
+      description: >-
+        JWT tokens are used to compose Authorization header entry value as
+        Bearer {jwt} for the requests that need an authorization
+      parameters:
+        - name: user
+          in: body
+          description: target user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Successfully returned user's JWT
+          schema:
+            type: object
+            required:
+              - token
+            properties:
+              token:
+                type: string
+  /streams:
+    post:
+      description: Create a new stream in the database
+      parameters:
+        - $ref: '#/parameters/JWTAuthorization'
+        - name: Stream
+          in: body
+          description: tmp
+          schema:
+            type: object
+            required:
+              - name
+              - type
+              - description
+              - url
+              - price
+              - long
+              - lat
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              description:
+                type: string
+              url:
+                type: string
+              price:
+                type: number
+                format: float
+              long:
+                type: number
+                format: float
+              lat:
+                type: number
+                format: float
+      responses:
+        '200':
+          description: Successfully returned a stream
+  '/streams/{stream_id}':
+    get:
+      description: Obtain an information about a stream from its unique id
+      parameters:
+        - name: stream_id
+          description: unique steam id
+          in: path
+          type: string
+          required: true
+        - $ref: '#/parameters/JWTAuthorization'
+      responses:
+        '200':
+          description: Successfully returned a stream
+          schema:
+            $ref: '#/definitions/StreamData'
+  /streams/search:
+    get:
+      description: Geolocate a stream
+      parameters:
+        - $ref: '#/parameters/JWTAuthorization'
+        - name: geo
+          description: Geolocation coord
+          in: query
+          type: string
+        - name: x0
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: y0
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: x1
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: y1
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: x2
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: y2
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: x3
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+        - name: y3
+          description: Geolocation coord
+          in: query
+          type: number
+          format: float
+      responses:
+        '200':
+          description: Successfully geofenced a stream
+          schema:
+            $ref: '#/definitions/StreamData'
+  /streams/purch:
+    post:
+      description: Purchase a stream
+      parameters:
+        - $ref: '#/parameters/JWTAuthorization'
+        - name: purch_info
+          in: body
+          schema:
+            $ref: '#/definitions/Stream'
+      responses:
+        '200':
+          description: Successfully purchased a stream
+          schema: {}
+  /transfer/buy:
+    post:
+      description: Buy tokens
+      parameters:
+        - $ref: '#/parameters/JWTAuthorization'
+        - name: tokens
+          in: body
+          schema:
+            type: object
+            required:
+              - tokens
+            properties:
+              tokens:
+                type: number
+                format: float
+      responses:
+        '200':
+          description: Successfully purchased a stream
+          schema: {}
+definitions:
+  User:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  UserData:
+    type: object
+    required:
+      - _id
+      - balance
+      - email
+      - subscriptions
+    properties:
+      _id:
+        type: object
+        required:
+          - $oid
+        properties:
+          $oid:
+            type: string
+      balance:
+        type: string
+      email:
+        type: string
+      subscriptions:
+        type: array
+        items:
+          type: object
+          required:
+            - $oid
+          properties:
+            $oid:
+              type: string
+  Stream:
+    type: object
+    required:
+      - id
+      - hours
+    properties:
+      id:
+        type: string
+      hours:
+        type: number
+        format: float
+  StreamData:
+    type: object
+    required:
+      - data
+    properties:
+      data:
+        type: object
+        required:
+          - _id
+          - description
+          - name
+          - owner
+          - price
+          - type
+          - long
+          - lat
+        properties:
+          _id:
+            type: object
+            required:
+              - $oid
+            properties:
+              $oid:
+                type: string
+          description:
+            type: string
+          name:
+            type: string
+          owner:
+            type: object
+            required:
+              - $oid
+            properties:
+              $oid:
+                type: string
+          price:
+            type: number
+            format: float
+          type:
+            type: string
+          long:
+            type: number
+            format: float
+          lat:
+            type: number
+            format: float
+parameters:
+  JWTAuthorization:
+    name: Authorization
+    in: query
+    type: string
+    description: Obtain information about a user from the database

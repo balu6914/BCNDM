@@ -1,0 +1,417 @@
+{
+	"info": {
+		"name": "Bigsense",
+		"_postman_id": "2fdb2cd6-744a-1bae-d51b-4f81b8bfd5f0",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Status",
+			"description": "",
+			"item": [
+				{
+					"name": "status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "localhost:8080/status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"status"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "blocksense@nokia.com",
+					"item": [
+						{
+							"name": "blocksense token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"blocksense@nokia.com\",\n\t\"password\":\"nokiaSuperSecret\"\n}"
+								},
+								"url": {
+									"raw": "localhost:8080/api/token",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "blocksense users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiYmxvY2tzZW5zZUBub2tpYS5jb20ifSwiaWF0IjoxNTEzMTc0NjU0LCJuYmYiOjE1MTMxNzQ2NTQsImV4cCI6MTUxMzI2MTA1NH0.gwA4Q3u6Dp9-2O75suWPYfpsCe6lcIoS6I_pxYHE4G0"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "localhost:8080/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "normal_user",
+					"item": [
+						{
+							"name": "users",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"john.doe@email.com\",\n\t\"password\":\"john.doe\"\n}"
+								},
+								"url": {
+									"raw": "localhost:8080/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"john.doe@email.com\",\n\t\"password\":\"john.doe\"\n}"
+								},
+								"url": {
+									"raw": "localhost:8080/api/token",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxMzE3NTIyMSwibmJmIjoxNTEzMTc1MjIxLCJleHAiOjE1MTMyNjE2MjF9.WZanrqnoHO8rsR_TNWGJB_qdOWjwh_zzjcWKuvQRK9s"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "localhost:8080/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Streams",
+			"item": [
+				{
+					"name": "streams",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxNTY1OTQ2MCwibmJmIjoxNTE1NjU5NDYwLCJleHAiOjE1MTU3NDU4NjB9.RoZ9QvsDsv82mQnMPsi2ryyaAD56jkZQtqbvzdVCSL4"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Stream 05\",\n\t\"type\":\"data type\",\n\t\"description\": \"a continous stream of data\",\n\t\"url\": \"/stream/02\",\n\t\"price\": 2,\n    \"long\": 25.123,\n    \"lat\": 35.123\t\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/streams",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"streams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "streams",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxMjUwMDI5MSwibmJmIjoxNTEyNTAwMjkxLCJleHAiOjE1MTI1ODY2OTF9.R990zrq7KrGL7hvN4M8I_BdBOej2squnVxIEqg2zEzA"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"car wheel rotations\",\n\t\"type\":\"counter readings\",\n\t\"description\": \"reads the number of car wheel rotations per minute\",\n\t\"url\": \"/car/wheel/rotations\",\n\t\"price\": 2\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/streams/5a201d93e6c760446d7fd260",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"streams",
+								"5a201d93e6c760446d7fd260"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxNTY1OTQ2MCwibmJmIjoxNTE1NjU5NDYwLCJleHAiOjE1MTU3NDU4NjB9.RoZ9QvsDsv82mQnMPsi2ryyaAD56jkZQtqbvzdVCSL4"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"car wheel rotations\",\n\t\"type\":\"counter readings\",\n\t\"description\": \"reads the number of car wheel rotations per minute\",\n\t\"url\": \"/car/wheel/rotations\",\n\t\"price\": 2\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/streams/search?type=geo&x0=20&y0=20&x1=30&y1=20&x2=20&y2=40&x3=30&y3=40",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"streams",
+								"search"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "geo",
+									"equals": true
+								},
+								{
+									"key": "x0",
+									"value": "20",
+									"equals": true
+								},
+								{
+									"key": "y0",
+									"value": "20",
+									"equals": true
+								},
+								{
+									"key": "x1",
+									"value": "30",
+									"equals": true
+								},
+								{
+									"key": "y1",
+									"value": "20",
+									"equals": true
+								},
+								{
+									"key": "x2",
+									"value": "20",
+									"equals": true
+								},
+								{
+									"key": "y2",
+									"value": "40",
+									"equals": true
+								},
+								{
+									"key": "x3",
+									"value": "30",
+									"equals": true
+								},
+								{
+									"key": "y3",
+									"value": "40",
+									"equals": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscriptions",
+			"description": "",
+			"item": [
+				{
+					"name": "streams/purch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxMjUwMTI3NSwibmJmIjoxNTEyNTAxMjc1LCJleHAiOjE1MTI1ODc2NzV9.kyUm7KjP-2qwFdM7GHCJqTXyv-jPUSUrWaQYacjFdsw"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"5a201d93e6c760446d7fd260\",\n\t\"hours\": 2\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/streams/purch",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"streams",
+								"purch"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Buy tokens",
+			"description": "",
+			"item": [
+				{
+					"name": "transfer/buy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImVtYWlsIjoiam9obi5kb2VAZW1haWwuY29tIn0sImlhdCI6MTUxMzE3NTIyMSwibmJmIjoxNTEzMTc1MjIxLCJleHAiOjE1MTMyNjE2MjF9.WZanrqnoHO8rsR_TNWGJB_qdOWjwh_zzjcWKuvQRK9s"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"tokens\": 5\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/transfer/buy",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"transfer",
+								"buy"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
