@@ -1,4 +1,4 @@
-package auth
+package monetasa
 
 import "github.com/mainflux/mainflux/writer"
 
