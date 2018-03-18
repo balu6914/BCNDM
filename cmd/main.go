@@ -8,15 +8,10 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/drasko/go-auth/auth"
-	"github.com/drasko/go-auth/auth/api"
-	"github.com/drasko/go-auth/bcrypt"
-	"github.com/drasko/go-auth/jwt"
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/mainflux/mainflux/writer/cassandra"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -51,7 +46,7 @@ func main() {
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	db, err := gorm.Open("postgres", "auth.db")
+	db, err := gorm.Open("postgres", "monetasa.db")
 	if err != nil {
 		logger.Log("error", err)
 		os.Exit(1)
