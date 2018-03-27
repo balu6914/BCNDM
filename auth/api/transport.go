@@ -10,10 +10,8 @@ import (
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
-	"github.com/mainflux/mainflux"
-	adapter "github.com/drasko/go-auth-kit/http"
+	adapter "github.com/drasko/go-auth-kit"
 	manager "github.com/mainflux/mainflux/manager/client"
-	"github.com/mainflux/mainflux/writer"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

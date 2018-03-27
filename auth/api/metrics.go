@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/metrics"
-	"github.com/mainflux/mainflux/http"
 	"github.com/mainflux/mainflux/writer"
+	"gitlab.com/drasko/monetasa/auth"
 )
 
 var _ auth.Service = (*metricService)(nil)

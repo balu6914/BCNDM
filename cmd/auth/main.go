@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
@@ -13,6 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/drasko/monetasa/auth/api"
 )
 
 const (
@@ -38,27 +38,27 @@ func getenv(key, fallback string) string {
 
 func main() {
 	cfg := config{
-		Port:       port,
-		PotgresURL: getenv(envPostgresURL, defPotgresURL),
+		Port:        port,
+		AuthURL:     getenv(envPostgresURL, defPostgresURL),
+		PostgresURL: getenv(envPostgresURL, defPostgresURL),
 	}
 
 	var logger log.Logger
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	db, err := gorm.Open("postgres", "monetasa.db")
+	ms, err := connectToMongo(cfg)
 	if err != nil {
-		logger.Log("error", err)
-		os.Exit(1)
+		logger.Error("Failed to connect to Mongo.", zap.Error(err))
+		return
 	}
-	defer db.Close()
+	defer ms.Close()
 
-	users := postgres.NewUserRepository(session)
-	hasher := bcrypt.NewHasher()
-	idp := jwt.NewIdentityProvider(cfg.Secret)
+	repo := mongo.NewRepository(ms)
+	//auth.InitMongoRepository(repo)
+
 
 	var svc auth.Service
-	svc = auth.NewService(users, hasher, idp)
 	svc = api.NewLoggingService(logger, svc)
 
 	fields := []string{"method"}
