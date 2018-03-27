@@ -4,8 +4,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
-	"github.com/drasko/go-auth-kit/http"
-	"github.com/drasko/go-auth-kit/writer"
+	"gitlab.com/drasko/monetasa/auth"
 )
 
 var _ auth.Service = (*loggingService)(nil)
