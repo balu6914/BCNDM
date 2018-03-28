@@ -9,8 +9,6 @@ import (
 
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"gitlab.com/drasko/monetasa/auth/api"
 )
