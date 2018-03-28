@@ -1,45 +1,37 @@
-package postgres
+package mongo
 
 import (
 	"fmt"
 
 	"gitlab.com/blocksense/monetasa/auth"
+	"gopkg.in/mgo.v2"
 )
 
-const errDuplicate string = "unique_violation"
+// DBName - DB name
+// CollectionName - Collection name
+const (
+	DBName         string = "monetasa"
+	CollectionName string = "auth"
+)
 
-type connection struct {
-	ClientID  string `gorm:"primary_key"`
-	ChannelID string `gorm:"primary_key"`
-}
-
-func (c connection) TableName() string {
-	return "channel_clients"
-}
-
-// Connect creates a connection to the PostgreSQL instance. A non-nil error
+// Connect creates a connection to the MongoDB instance. A non-nil error
 // is returned to indicate failure.
-func Connect(host, port, name, user, pass string) (*gorm.DB, error) {
-	t := "host=%s port=%s user=%s dbname=%s password=%s sslmode=disable"
-	url := fmt.Sprintf(t, host, port, user, name, pass)
-
-  cfg := config{
-		AuthPort: 					 p,
-		AuthHost: 					 env(envAuthHost, authHost),
-		MongoURL:            env(envMongoURL, defMongoURL),
-		MongoUser:           defMongoUsername,
-		MongoPass:           defMongoPassword,
-		MongoDatabase:       defMongoDatabase,
-		MongoPort:           defMongoPort,
-		MongoConnectTimeout: defMongoConnectTimeout,
-		MongoSocketTimeout:  defMongoSocketTimeout,
+func Connect(cfg *config) (*mgo.Session, error) {
+	mongoDBDialInfo := &mgo.DialInfo{
+		Addrs:    []string{cfg.MongoURL + ":" + strconv.Itoa(cfg.MongoPort)},
+		Timeout:  time.Duration(cfg.MongoConnectTimeout) * time.Millisecond,
+		Database: cfg.MongoDatabase,
+		Username: cfg.MongoUser,
+		Password: cfg.MongoPass,
 	}
 
-  ms, err := connectToMongo(cfg)
+	ms, err := mgo.DialWithInfo(mongoDBDialInfo)
 	if err != nil {
-		logger.Error("Failed to connect to Mongo.", zap.Error(err))
-		return
+		return nil, err
 	}
-	defer ms.Close()
 
+	ms.SetSocketTimeout(time.Duration(cfg.MongoSocketTimeout) * time.Millisecond)
+	ms.SetMode(mgo.Monotonic, true)
+
+	return ms, nil
 }
