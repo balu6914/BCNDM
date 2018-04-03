@@ -27,6 +27,14 @@ type Service interface {
 	// non-nil error value is returned.
 	Register(User) error
 
+	// Update updates user account. In case of the failed update, a
+	// non-nil error value is returned.
+	Update(User) error
+
+	// Deletedeletes user account. In case of the failed deletion, a
+	// non-nil error value is returned.
+	Delete(User) error
+
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are
 	// identified by the non-nil error values in the response.

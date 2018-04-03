@@ -11,7 +11,7 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	adapter "github.com/drasko/go-auth-kit"
-	manager "github.com/mainflux/mainflux/manager/client"
+	"monetasa/monetasa"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -81,7 +81,7 @@ func MakeHandler(svc adapter.Service, mc manager.ManagerClient) http.Handler {
 		opts...,
 	))
 
-	r.GetFunc("/version", mainflux.Version())
+	r.GetFunc("/version", monetasa.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r

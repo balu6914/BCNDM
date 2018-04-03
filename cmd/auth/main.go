@@ -10,13 +10,11 @@ import (
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"gitlab.com/drasko/monetasa/auth/api"
+	"monetasa/auth"
 )
 
 const (
 	port           int    = 8080
-	defPostgresURL string = "http://localhost:8180"
-	envPostgresURL string = "MONETASA_POSTGRES_URL"
 )
 
 type config struct {

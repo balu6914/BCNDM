@@ -28,6 +28,15 @@ type UserRepository interface {
 	// operation failure.
 	Save(User) error
 
-	// One retrieves user by its unique identifier (i.e. email).
+	// One retrieves user by its unique identifier.
 	One(string) (User, error)
+
+	// All retrieves all users.
+	All(string) (User, error)
+
+	// Update updates user by its unique identifier.
+	Update(string) (User, error)
+
+	// Remove removes user by its unique identifier.
+	Remove(string) (User, error)
 }

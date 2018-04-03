@@ -3,7 +3,7 @@ package mongo
 import (
 	"fmt"
 
-	"gitlab.com/blocksense/monetasa/auth"
+	"monetasa/auth"
 	"gopkg.in/mgo.v2"
 )
 

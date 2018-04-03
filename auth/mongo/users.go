@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"gitlab.com/blocksense/monetasa/auth"
+	"monetasa/auth"
 	"gopkg.in/mgo.v2"
 )
 
@@ -30,31 +30,31 @@ func (ur *userRepository) Save(user auth.User) error {
 }
 
 func (ur *userRepository) Update(id string) error {
-	query := bson.M{"id": id}
-	update := bson.M{"$set": body}
-	if err := c.Update(query, update); err != nil {
+  query := bson.M{"id": id}
+  update := bson.M{"$set": body}
+  if err := c.Update(query, update); err != nil {
 		return err
 	}
 
-	return nil
+  return nil
 }
 
 func (ur *userRepository) One(id string) (auth.User, error) {
 	user := auth.User{}
 
-	if err := c.Find(bson.M{"id": id}).One(&user); err != nil {
-		if err == mgo.ErrNotFound {
-			return user, auth.ErrNotFound
-		}
+  if err := c.Find(bson.M{"id": id}).One(&user); err != nil {
+    if err == mgo.ErrNotFound {
+      return user, auth.ErrNotFound
+    }
 
-		return user, err
-	}
+    return user, err
+  }
 
 	return user, nil
 }
 
 func (ur *userRepository) All() (auth.User[], error) {
-	users := []auth.User{}
+  users := []auth.User{}
 
 	if err := c.Find(nil).All(&users); err != nil {
 		return users, err
@@ -64,9 +64,9 @@ func (ur *userRepository) All() (auth.User[], error) {
 }
 
 func (ur *userRepository) Remove(id string) error {
-	if err := c.Remove(bson.M{"id": id}); err != nil {
-		return err
-	}
+  if err := c.Remove(bson.M{"id": id}); err != nil {
+    return err
+  }
 
 	return nil
 }
