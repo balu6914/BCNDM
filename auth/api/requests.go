@@ -1,8 +1,8 @@
 package api
 
 import (
+	"monetasa/auth"
 	"github.com/asaskevich/govalidator"
-	"monetasa/monetasa"
 )
 
 type apiReq interface {
@@ -29,26 +29,13 @@ func (req identityReq) validate() error {
 	return nil
 }
 
-type addClientReq struct {
-	key    string
-	client auth.Client
-}
-
-func (req addClientReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	return req.client.Validate()
-}
-
-type updateClientReq struct {
+type updateReq struct {
 	key    string
 	id     string
-	client auth.Client
+	user auth.User
 }
 
-func (req updateClientReq) validate() error {
+func (req updateReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
 	}
@@ -57,46 +44,15 @@ func (req updateClientReq) validate() error {
 		return auth.ErrNotFound
 	}
 
-	return req.client.Validate()
+	return req.user.Validate()
 }
 
-type createChannelReq struct {
-	key     string
-	channel auth.Channel
-}
-
-func (req createChannelReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	return nil
-}
-
-type updateChannelReq struct {
-	key     string
-	id      string
-	channel auth.Channel
-}
-
-func (req updateChannelReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.id) {
-		return auth.ErrNotFound
-	}
-
-	return nil
-}
-
-type viewResourceReq struct {
+type viewReq struct {
 	key string
 	id  string
 }
 
-func (req viewResourceReq) validate() error {
+func (req viewReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
 	}
@@ -108,13 +64,13 @@ func (req viewResourceReq) validate() error {
 	return nil
 }
 
-type listResourcesReq struct {
+type listReq struct {
 	key    string
 	size   int
 	offset int
 }
 
-func (req listResourcesReq) validate() error {
+func (req listReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
 	}
@@ -124,22 +80,4 @@ func (req listResourcesReq) validate() error {
 	}
 
 	return auth.ErrMalformedEntity
-}
-
-type connectionReq struct {
-	key      string
-	chanId   string
-	clientId string
-}
-
-func (req connectionReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.chanId) && !govalidator.IsUUID(req.clientId) {
-		return auth.ErrNotFound
-	}
-
-	return nil
 }

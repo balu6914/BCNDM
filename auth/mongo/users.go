@@ -2,24 +2,30 @@ package mongo
 
 import (
 	"monetasa/auth"
+
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var _ auth.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
-	db *gorm.DB
+	db *mgo.Session
 }
 
 // NewUserRepository instantiates a PostgreSQL implementation of user
 // repository.
-func NewUserRepository(db *gorm.DB) auth.UserRepository {
+func NewUserRepository(db *mgo.Session) auth.UserRepository {
 	return &userRepository{db}
 }
 
 func (ur *userRepository) Save(user auth.User) error {
-	if err := ur.db.Insert(user); err != nil {
-		if mgo.IsDup(err) && errDuplicate == pqErr.Code.Name() {
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	if err := c.Insert(user); err != nil {
+		if mgo.IsDup(err) {
 			return auth.ErrConflict
 		}
 
@@ -29,32 +35,44 @@ func (ur *userRepository) Save(user auth.User) error {
 	return nil
 }
 
-func (ur *userRepository) Update(id string) error {
-  query := bson.M{"id": id}
-  update := bson.M{"$set": body}
-  if err := c.Update(query, update); err != nil {
+func (ur *userRepository) Update(id string, user auth.User) error {
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	query := bson.M{"id": id}
+	update := bson.M{"$set": user}
+	if err := c.Update(query, update); err != nil {
 		return err
 	}
 
-  return nil
+	return nil
 }
 
 func (ur *userRepository) One(id string) (auth.User, error) {
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
 	user := auth.User{}
 
-  if err := c.Find(bson.M{"id": id}).One(&user); err != nil {
-    if err == mgo.ErrNotFound {
-      return user, auth.ErrNotFound
-    }
+	if err := c.Find(bson.M{"id": id}).One(&user); err != nil {
+		if err == mgo.ErrNotFound {
+			return user, auth.ErrNotFound
+		}
 
-    return user, err
-  }
+		return user, err
+	}
 
 	return user, nil
 }
 
-func (ur *userRepository) All() (auth.User[], error) {
-  users := []auth.User{}
+func (ur *userRepository) All() ([]auth.User, error) {
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	users := []auth.User{}
 
 	if err := c.Find(nil).All(&users); err != nil {
 		return users, err
@@ -64,9 +82,13 @@ func (ur *userRepository) All() (auth.User[], error) {
 }
 
 func (ur *userRepository) Remove(id string) error {
-  if err := c.Remove(bson.M{"id": id}); err != nil {
-    return err
-  }
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	if err := c.Remove(bson.M{"id": id}); err != nil {
+		return err
+	}
 
 	return nil
 }

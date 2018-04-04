@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	issuer   string        = "mainflux"
+	issuer   string        = "monetasa"
 	duration time.Duration = 10 * time.Hour
 )
 
@@ -32,16 +32,6 @@ func (idp *jwtIdentityProvider) TemporaryKey(id string) (string, error) {
 		Issuer:    issuer,
 		IssuedAt:  now.Unix(),
 		ExpiresAt: exp.Unix(),
-	}
-
-	return idp.jwt(claims)
-}
-
-func (idp *jwtIdentityProvider) PermanentKey(id string) (string, error) {
-	claims := jwt.StandardClaims{
-		Subject:  id,
-		Issuer:   issuer,
-		IssuedAt: time.Now().UTC().Unix(),
 	}
 
 	return idp.jwt(claims)

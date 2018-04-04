@@ -9,7 +9,7 @@ type authService struct {
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, clients ClientRepository, channels ChannelRepository, hasher Hasher, idp IdentityProvider) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
 	return &authService{
 		users:    users,
 		hasher:   hasher,
@@ -40,7 +40,7 @@ func (ms *authService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *authService) Update(key string, user User) error {
+func (ms *authService) Update(key string, id string, user User) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -50,22 +50,20 @@ func (ms *authService) Update(key string, user User) error {
 		return ErrUnauthorizedAccess
 	}
 
-	client.Owner = sub
-
-	return ms.clients.Update(client)
+	return ms.users.Update(id, user)
 }
 
 func (ms *authService) View(key string, id string) (User, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
-		return Client{}, err
+		return User{}, err
 	}
 
 	if _, err := ms.users.One(sub); err != nil {
-		return Client{}, ErrUnauthorizedAccess
+		return User{}, ErrUnauthorizedAccess
 	}
 
-	return ms.clients.One(sub, id)
+	return ms.users.One(id)
 }
 
 func (ms *authService) List(key string) ([]User, error) {
@@ -78,10 +76,10 @@ func (ms *authService) List(key string) ([]User, error) {
 		return nil, ErrUnauthorizedAccess
 	}
 
-	return ms.clients.All(sub), nil
+	return ms.users.All()
 }
 
-func (ms *authService) Remove(key string, id string) error {
+func (ms *authService) Delete(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -91,7 +89,16 @@ func (ms *authService) Remove(key string, id string) error {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.clients.Remove(sub, id)
+	return ms.users.Remove(id)
+}
+
+func (ms *authService) Identity(key string) (string, error) {
+	client, err := ms.idp.Identity(key)
+	if err != nil {
+		return "", err
+	}
+
+	return client, nil
 }
 
 func (ms *authService) CanAccess(key, channel string) (string, error) {
@@ -100,9 +107,9 @@ func (ms *authService) CanAccess(key, channel string) (string, error) {
 		return "", err
 	}
 
-	if !ms.channels.HasClient(channel, client) {
-		return "", ErrUnauthorizedAccess
-	}
+	//if !ms.channels.HasClient(channel, client) {
+	//	return "", ErrUnauthorizedAccess
+	//}
 
 	return client, nil
 }

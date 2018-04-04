@@ -1,7 +1,8 @@
 package bcrypt
 
 import (
-	"monetasa/monetasa/auth"
+	"monetasa/auth"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
