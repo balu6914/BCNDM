@@ -5,7 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-var _ manager.UserRepository = (*userRepository)(nil)
+var _ auth.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
 	db *gorm.DB

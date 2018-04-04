@@ -40,7 +40,7 @@ func (ms *authService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *authService) Update(user User) error {
+func (ms *authService) Update(key string, user User) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (ms *authService) Update(user User) error {
 	return ms.clients.Update(client)
 }
 
-func (ms *authService) View(key, id string) (User, error) {
+func (ms *authService) View(key string, id string) (User, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Client{}, err
@@ -81,7 +81,7 @@ func (ms *authService) List(key string) ([]User, error) {
 	return ms.clients.All(sub), nil
 }
 
-func (ms *authService) Remove(key, id string) error {
+func (ms *authService) Remove(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -92,15 +92,6 @@ func (ms *authService) Remove(key, id string) error {
 	}
 
 	return ms.clients.Remove(sub, id)
-}
-
-func (ms *authService) Identity(key string) (string, error) {
-	client, err := ms.idp.Identity(key)
-	if err != nil {
-		return "", err
-	}
-
-	return client, nil
 }
 
 func (ms *authService) CanAccess(key, channel string) (string, error) {
