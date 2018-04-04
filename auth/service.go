@@ -31,9 +31,17 @@ type Service interface {
 	// non-nil error value is returned.
 	Update(User) error
 
+	// ViewClient retrieves data about the client identified with the provided
+	// ID, that belongs to the user identified by the provided key.
+	View(string) (User, error)
+
+	// ListClients retrieves data about all clients that belongs to the user
+	// identified by the provided key.
+	List() ([]User, error)
+
 	// Deletedeletes user account. In case of the failed deletion, a
 	// non-nil error value is returned.
-	Delete(User) error
+	Delete(string) error
 
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are

@@ -3,15 +3,53 @@ package api
 import (
 	"context"
 
+	"monetasa/auth"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/mainflux/mainflux/http"
-	"github.com/mainflux/mainflux/writer"
 )
 
-func sendMessageEndpoint(svc http.Service) endpoint.Endpoint {
+func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		msg := request.(writer.RawMessage)
-		err := svc.Publish(msg)
-		return nil, err
+		req := request.(userReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		err := svc.Register(req.user)
+		return tokenRes{}, err
+	}
+}
+
+func loginEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(userReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		token, err := svc.Login(req.user)
+		if err != nil {
+			return nil, err
+		}
+
+		return tokenRes{token}, nil
+	}
+}
+
+func addClientEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(addClientReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		id, err := svc.AddClient(req.key, req.client)
+		if err != nil {
+			return nil, err
+		}
+
+		return clientRes{id: id, created: true}, nil
 	}
 }
