@@ -2,7 +2,7 @@ package auth
 
 var _ Service = (*authService)(nil)
 
-type managerService struct {
+type authService struct {
 	users    UserRepository
 	hasher   Hasher
 	idp      IdentityProvider
@@ -10,14 +10,14 @@ type managerService struct {
 
 // New instantiates the domain service implementation.
 func New(users UserRepository, clients ClientRepository, channels ChannelRepository, hasher Hasher, idp IdentityProvider) Service {
-	return &managerService{
+	return &authService{
 		users:    users,
 		hasher:   hasher,
 		idp:      idp,
 	}
 }
 
-func (ms *managerService) Register(user User) error {
+func (ms *authService) Register(user User) error {
 	hash, err := ms.hasher.Hash(user.Password)
 	if err != nil {
 		return ErrMalformedEntity
@@ -27,7 +27,7 @@ func (ms *managerService) Register(user User) error {
 	return ms.users.Save(user)
 }
 
-func (ms *managerService) Login(user User) (string, error) {
+func (ms *authService) Login(user User) (string, error) {
 	dbUser, err := ms.users.One(user.Email)
 	if err != nil {
 		return "", ErrUnauthorizedAccess
@@ -40,7 +40,7 @@ func (ms *managerService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *managerService) Update(user User) error {
+func (ms *authService) Update(user User) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (ms *managerService) Update(user User) error {
 	return ms.clients.Update(client)
 }
 
-func (ms *managerService) View(key, id string) (User, error) {
+func (ms *authService) View(key, id string) (User, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Client{}, err
@@ -68,7 +68,7 @@ func (ms *managerService) View(key, id string) (User, error) {
 	return ms.clients.One(sub, id)
 }
 
-func (ms *managerService) List(key string) ([]User, error) {
+func (ms *authService) List(key string) ([]User, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (ms *managerService) List(key string) ([]User, error) {
 	return ms.clients.All(sub), nil
 }
 
-func (ms *managerService) Remove(key, id string) error {
+func (ms *authService) Remove(key, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (ms *managerService) Remove(key, id string) error {
 	return ms.clients.Remove(sub, id)
 }
 
-func (ms *managerService) Identity(key string) (string, error) {
+func (ms *authService) Identity(key string) (string, error) {
 	client, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
@@ -103,7 +103,7 @@ func (ms *managerService) Identity(key string) (string, error) {
 	return client, nil
 }
 
-func (ms *managerService) CanAccess(key, channel string) (string, error) {
+func (ms *authService) CanAccess(key, channel string) (string, error) {
 	client, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err

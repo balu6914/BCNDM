@@ -1,18 +1,18 @@
 package bcrypt
 
 import (
-	"github.com/mainflux/mainflux/manager"
+	"monetasa/monetasa/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 
 const cost int = 10
 
-var _ manager.Hasher = (*bcryptHasher)(nil)
+var _ auth.Hasher = (*bcryptHasher)(nil)
 
 type bcryptHasher struct{}
 
-// NewHasher instantiates a bcrypt-based hasher implementation.
-func NewHasher() manager.Hasher {
+// New instantiates a bcrypt-based hasher implementation.
+func New() auth.Hasher {
 	return &bcryptHasher{}
 }
 

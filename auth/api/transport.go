@@ -19,11 +19,11 @@ var (
 	errMalformedData      error = errors.New("malformed SenML data")
 	errUnknownType        error = errors.New("unknown content type")
 	errUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
-	auth                  manager.ManagerClient
+	auth                  auth.AuthClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc adapter.Service, mc manager.ManagerClient) http.Handler {
+func MakeHandler(svc adapter.Service, mc auth.AuthClient) http.Handler {
 	auth = mc
 
 	opts := []kithttp.ServerOption{
@@ -34,13 +34,6 @@ func MakeHandler(svc adapter.Service, mc manager.ManagerClient) http.Handler {
 
 	r.Get("/users", kithttp.NewServer(
 		getUsersEndpoint(svc),
-		decodeRequest,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/users/:id", kithttp.NewServer(
-		getUserEndpoint(svc),
 		decodeRequest,
 		encodeResponse,
 		opts...,
@@ -165,7 +158,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusBadRequest)
 	case errUnknownType:
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-	case manager.ErrUnauthorizedAccess:
+	case auth.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)

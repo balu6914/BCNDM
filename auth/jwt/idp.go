@@ -4,7 +4,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/mainflux/mainflux/manager"
+	"monetasa/auth"
 )
 
 const (
@@ -12,14 +12,14 @@ const (
 	duration time.Duration = 10 * time.Hour
 )
 
-var _ manager.IdentityProvider = (*jwtIdentityProvider)(nil)
+var _ auth.IdentityProvider = (*jwtIdentityProvider)(nil)
 
 type jwtIdentityProvider struct {
 	secret string
 }
 
-// NewIdentityProvider instantiates a JWT identity provider.
-func NewIdentityProvider(secret string) manager.IdentityProvider {
+// New instantiates a JWT identity provider.
+func New(secret string) auth.IdentityProvider {
 	return &jwtIdentityProvider{}
 }
 
@@ -55,19 +55,19 @@ func (idp *jwtIdentityProvider) jwt(claims jwt.StandardClaims) (string, error) {
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 	token, err := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, manager.ErrUnauthorizedAccess
+			return nil, auth.ErrUnauthorizedAccess
 		}
 
 		return []byte(idp.secret), nil
 	})
 
 	if err != nil {
-		return "", manager.ErrUnauthorizedAccess
+		return "", auth.ErrUnauthorizedAccess
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return claims["sub"].(string), nil
 	}
 
-	return "", manager.ErrUnauthorizedAccess
+	return "", auth.ErrUnauthorizedAccess
 }

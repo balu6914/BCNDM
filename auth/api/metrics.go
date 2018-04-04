@@ -4,8 +4,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/metrics"
-	"monetasa/monetasa/auth"
-	"gitlab.com/drasko/monetasa/auth"
+	"monetasa/auth"
 )
 
 var _ auth.Service = (*metricService)(nil)
@@ -43,7 +42,7 @@ func (ms *metricsMiddleware) Login(user auth.User) (string, error) {
 	return ms.svc.Login(user)
 }
 
-func (ms *metricsMiddleware) Update(user manager.User) error {
+func (ms *metricsMiddleware) Update(user auth.User) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "update").Add(1)
 		ms.latency.With("method", "update").Observe(time.Since(begin).Seconds())
@@ -52,19 +51,19 @@ func (ms *metricsMiddleware) Update(user manager.User) error {
 	return ms.svc.UpdateClient(key, user)
 }
 
-func (ms *metricsMiddleware) View(id string) (manager.User, error) {
+func (ms *metricsMiddleware) View(id string) (auth.User, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "view_client").Add(1)
-		ms.latency.With("method", "view_client").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "view").Add(1)
+		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
 	return ms.svc.ViewClient(id)
 }
 
-func (ms *metricsMiddleware) List() ([]manager.User, error) {
+func (ms *metricsMiddleware) List() ([]auth.User, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "list_clients").Add(1)
-		ms.latency.With("method", "list_clients").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "list").Add(1)
+		ms.latency.With("method", "list").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
 	return ms.svc.ListClients(key)
