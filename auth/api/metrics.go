@@ -3,24 +3,26 @@ package api
 import (
 	"time"
 
-	"github.com/go-kit/kit/metrics"
 	"monetasa/auth"
+
+	"github.com/go-kit/kit/metrics"
 )
 
-var _ auth.Service = (*metricService)(nil)
+var _ auth.Service = (*metricsMiddleware)(nil)
 
-type metricService struct {
+type metricsMiddleware struct {
 	counter metrics.Counter
 	latency metrics.Histogram
-	svc auth.Service
+	svc     auth.Service
 }
 
-// NewMetricService instruments adapter by tracking request count and latency.
-func NewMetricService(counter metrics.Counter, latency metrics.Histogram, s auth.Service) auth.Service {
-	return &metricService{
+// MetricsMiddleware instruments core service by tracking request count and
+// latency.
+func MetricsMiddleware(svc auth.Service, counter metrics.Counter, latency metrics.Histogram) auth.Service {
+	return &metricsMiddleware{
 		counter: counter,
 		latency: latency,
-		Service: s,
+		svc:     svc,
 	}
 }
 
@@ -42,34 +44,34 @@ func (ms *metricsMiddleware) Login(user auth.User) (string, error) {
 	return ms.svc.Login(user)
 }
 
-func (ms *metricsMiddleware) Update(user auth.User) error {
+func (ms *metricsMiddleware) Update(key, id string, user auth.User) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "update").Add(1)
 		ms.latency.With("method", "update").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.UpdateClient(key, user)
+	return ms.svc.Update(key, id, user)
 }
 
-func (ms *metricsMiddleware) View(id string) (auth.User, error) {
+func (ms *metricsMiddleware) View(key, id string) (auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view").Add(1)
 		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.ViewClient(id)
+	return ms.svc.View(key, id)
 }
 
-func (ms *metricsMiddleware) List() ([]auth.User, error) {
+func (ms *metricsMiddleware) List(key string) ([]auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "list").Add(1)
 		ms.latency.With("method", "list").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.ListClients(key)
+	return ms.svc.List(key)
 }
 
-func (ms *metricsMiddleware) Delete(id string) error {
+func (ms *metricsMiddleware) Delete(key, id string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "remove").Add(1)
 		ms.latency.With("method", "remove").Observe(time.Since(begin).Seconds())
@@ -78,10 +80,20 @@ func (ms *metricsMiddleware) Delete(id string) error {
 	return ms.svc.Delete(key, id)
 }
 
-func (ms *metricsMiddleware) CanAccess(key string, id string) (string, error) {
+func (ms *metricsMiddleware) Identity(key string) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "identity").Add(1)
+		ms.latency.With("method", "identity").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.Identity(key)
+}
+
+func (ms *metricsMiddleware) CanAccess(key, id string) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "can_access").Add(1)
 		ms.latency.With("method", "can_access").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
 	return ms.svc.CanAccess(key, id)
+}

@@ -1,28 +1,28 @@
 package mongo
 
 import (
-	"fmt"
+	"time"
 
-	"monetasa/auth"
 	"gopkg.in/mgo.v2"
 )
 
 // DBName - DB name
 // CollectionName - Collection name
 const (
-	DBName         string = "monetasa"
-	CollectionName string = "auth"
+	dbName         string = "monetasa"
+	collectionName string = "auth"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error
 // is returned to indicate failure.
-func Connect(cfg *config) (*mgo.Session, error) {
+func Connect(addr string, tout int, socketTout int, db string,
+											user string, pass string) (*mgo.Session, error) {
 	mongoDBDialInfo := &mgo.DialInfo{
-		Addrs:    []string{cfg.MongoURL + ":" + strconv.Itoa(cfg.MongoPort)},
-		Timeout:  time.Duration(cfg.MongoConnectTimeout) * time.Millisecond,
-		Database: cfg.MongoDatabase,
-		Username: cfg.MongoUser,
-		Password: cfg.MongoPass,
+		Addrs:    []string{addr},
+		Timeout:  time.Duration(tout) * time.Millisecond,
+		Database: db,
+		Username: user,
+		Password: pass,
 	}
 
 	ms, err := mgo.DialWithInfo(mongoDBDialInfo)
@@ -30,7 +30,7 @@ func Connect(cfg *config) (*mgo.Session, error) {
 		return nil, err
 	}
 
-	ms.SetSocketTimeout(time.Duration(cfg.MongoSocketTimeout) * time.Millisecond)
+	ms.SetSocketTimeout(time.Duration(socketTout) * time.Millisecond)
 	ms.SetMode(mgo.Monotonic, true)
 
 	return ms, nil

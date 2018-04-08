@@ -2,7 +2,7 @@ package auth
 
 import "github.com/asaskevich/govalidator"
 
-// User represents a Mainflux user account. Each user is identified given its
+// User represents a Monetasa user account. Each user is identified given its
 // email and password.
 type User struct {
 	Email    string `json:"email"`
@@ -32,11 +32,11 @@ type UserRepository interface {
 	One(string) (User, error)
 
 	// All retrieves all users.
-	All(string) ([]User, error)
+	All() ([]User, error)
 
 	// Update updates user by its unique identifier.
-	Update(string) (User, error)
+	Update(string, User) (error)
 
 	// Remove removes user by its unique identifier.
-	Remove(string) (User, error)
+	Remove(string) (error)
 }

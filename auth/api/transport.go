@@ -2,28 +2,21 @@ package api
 
 import (
 	"context"
-	"errors"
 	"io"
 	"io/ioutil"
+	"monetasa"
 	"net/http"
 	"strings"
 
+	"monetasa/auth"
+
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
-	adapter "github.com/drasko/go-auth-kit"
-	"monetasa/monetasa"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var (
-	errMalformedData      error = errors.New("malformed SenML data")
-	errUnknownType        error = errors.New("unknown content type")
-	errUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
-	auth                  auth.AuthClient
-)
-
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc adapter.Service, mc auth.AuthClient) http.Handler {
+func MakeHandler(svc auth.Service, mc auth.AuthClient) http.Handler {
 	auth = mc
 
 	opts := []kithttp.ServerOption{
