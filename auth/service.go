@@ -17,6 +17,12 @@ var (
 
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound error = errors.New("non-existent entity")
+
+	ErrUnknownType error = errors.New("unknown type")
+
+	ErrMalformedData error = errors.New("malformed data")
+
+	ErrUnsupportedContentType error = errors.New("unsupported content type")
 )
 
 

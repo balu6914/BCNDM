@@ -101,15 +101,11 @@ func (ms *authService) Identity(key string) (string, error) {
 	return client, nil
 }
 
-func (ms *authService) CanAccess(key, channel string) (string, error) {
+func (ms *authService) CanAccess(key string, channel string) (string, error) {
 	client, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
 	}
-
-	//if !ms.channels.HasClient(channel, client) {
-	//	return "", ErrUnauthorizedAccess
-	//}
 
 	return client, nil
 }

@@ -10,34 +10,35 @@ import (
 	"monetasa/auth"
 	"monetasa/auth/mongo"
 	"monetasa/auth/api"
-	"monetasa/auth/mongo"
 	"monetasa/auth/bcrypt"
 	"monetasa/auth/jwt"
+	log "monetasa/logger"
 
-	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (
-	port           					int    = 8080
+	port                    int    = 8080
 	defMongoURL            	string = "0.0.0.0"
-	defMongoUser       			string = ""
-	defMongoPass       			string = ""
+	defMongoUser            string = ""
+	defMongoPass            string = ""
 	defMongoDatabase       	string = "auth"
 	defMongoPort           	int    = 27017
 	defMongoConnectTimeout 	int    = 5000
 	defMongoSocketTimeout  	int    = 5000
+	defAuthURL              string = "0.0.0.0"
+	defSecret               string = "manager"
 
-	envMongoURL string = "MONETASA_AUTH_MONGO_URL"
-	envAuthURL string = "MONETASA_AUTH_URL"
+	envMongoURL             string = "MONETASA_AUTH_MONGO_URL"
+	envAuthURL              string = "MONETASA_AUTH_URL"
+	envSecret               string = "MONETASA_AUTH_SECRET"
 )
 
 type config struct {
-	Port        int
-	AuthURL     string
-	PostgresURL string
-
+	Port                int
+	AuthURL             string
+	PostgresURL         string
 	MongoURL            string
 	MongoUser           string
 	MongoPass           string
@@ -45,6 +46,7 @@ type config struct {
 	MongoPort           int
 	MongoConnectTimeout int
 	MongoSocketTimeout  int
+	Secret              string
 }
 
 func getenv(key, fallback string) string {
@@ -58,25 +60,24 @@ func getenv(key, fallback string) string {
 
 func main() {
 	cfg := config{
-		Port: 								port,
-		AuthURL: 							getenv(envMongoURL, defMongoURL),
-		MongoURL:							getenv(envAuthURL, defAuthURL),
-		MongoUser: 						defMongoUser,
-		MongoPass: 						defMongoPass,
-		MongoDatabase: 				defMongoDatabase,
-		MongoPort: 						defMongoPort,
-		MongoConnectTimeout:	defMongoConnectTimeout,
-		MongoSocketTimeout: 	defMongoSocketTimeout,
+		Port:                 port,
+		AuthURL:              getenv(envAuthURL, defAuthURL),
+		MongoURL:             getenv(envMongoURL, defMongoURL),
+		MongoUser:            defMongoUser,
+		MongoPass:            defMongoPass,
+		MongoDatabase:        defMongoDatabase,
+		MongoPort:            defMongoPort,
+		MongoConnectTimeout:  defMongoConnectTimeout,
+		MongoSocketTimeout:   defMongoSocketTimeout,
+		Secret:               getenv(envSecret, defSecret),
 	}
 
-	var logger log.Logger
-	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger := log.New(os.Stdout)
 
 	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
 														cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
 	if err != nil {
-		logger.Error("Failed to connect to Mongo.", zap.Error(err))
+		logger.Error("Failed to connect to Mongo.")
 		os.Exit(1)
 	}
 	defer ms.Close()
@@ -85,13 +86,12 @@ func main() {
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.Secret)
 
-	svc := manager.New(users, hasher, idp)
-
-	var svc auth.Service
-	svc = api.NewLoggingService(logger, svc)
+	svc := auth.New(users, hasher, idp)
+	svc = api.LoggingMiddleware(svc, logger)
 
 	fields := []string{"method"}
-	svc = api.NewMetricService(
+	svc = api.MetricsMiddleware(
+		svc,
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "auth",
 			Subsystem: "api",
@@ -104,7 +104,6 @@ func main() {
 			Name:      "request_latency_microseconds",
 			Help:      "Total duration of requests in microseconds.",
 		}, fields),
-		svc,
 	)
 
 	errs := make(chan error, 2)
@@ -120,5 +119,6 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
-	logger.Log("terminated", <-errs)
+	err = <-errs
+	logger.Error(fmt.Sprintf("Manager service terminated: %s", err))
 }
