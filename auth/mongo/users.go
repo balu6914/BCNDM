@@ -49,14 +49,14 @@ func (ur *userRepository) Update(id string, user auth.User) error {
 	return nil
 }
 
-func (ur *userRepository) One(id string) (auth.User, error) {
+func (ur *userRepository) One(email string) (auth.User, error) {
 	s := ur.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
 	user := auth.User{}
 
-	if err := c.Find(bson.M{"id": id}).One(&user); err != nil {
+	if err := c.Find(bson.M{"email": email}).One(&user); err != nil {
 		if err == mgo.ErrNotFound {
 			return user, auth.ErrNotFound
 		}
