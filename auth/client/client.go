@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"moentasa/auth"
+	"monetasa/auth"
 	"github.com/sony/gobreaker"
 )
 

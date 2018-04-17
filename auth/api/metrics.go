@@ -53,13 +53,13 @@ func (ms *metricsMiddleware) Update(key, id string, user auth.User) error {
 	return ms.svc.Update(key, id, user)
 }
 
-func (ms *metricsMiddleware) View(key, id string) (auth.User, error) {
+func (ms *metricsMiddleware) View(key string) (auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view").Add(1)
 		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.View(key, id)
+	return ms.svc.View(key)
 }
 
 func (ms *metricsMiddleware) List(key string) ([]auth.User, error) {

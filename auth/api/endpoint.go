@@ -55,13 +55,13 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 
 func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewReq)
+		req := request.(identityReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		user, err := svc.View(req.key, req.id)
+		user, err := svc.View(req.key)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func identityEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return identityRes{id: id}, nil
+		return identityRes{Email: id}, nil
 	}
 }
 
@@ -138,6 +138,6 @@ func canAccessEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return identityRes{id: id}, nil
+		return identityRes{Email: id}, nil
 	}
 }

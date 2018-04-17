@@ -17,6 +17,12 @@ var (
 
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound error = errors.New("non-existent entity")
+
+	ErrUnknownType error = errors.New("unknown type")
+
+	ErrMalformedData error = errors.New("malformed data")
+
+	ErrUnsupportedContentType error = errors.New("unsupported content type")
 )
 
 
@@ -33,7 +39,7 @@ type Service interface {
 
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
-	View(string, string) (User, error)
+	View(string) (User, error)
 
 	// ListClients retrieves data about all clients that belongs to the user
 	// identified by the provided key.

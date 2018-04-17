@@ -30,8 +30,8 @@ func (req identityReq) validate() error {
 }
 
 type updateReq struct {
-	key    string
-	id     string
+	key  string
+	id   string
 	user auth.User
 }
 
