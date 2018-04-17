@@ -102,7 +102,7 @@ func (ms *authService) Identity(key string) (string, error) {
 	return user, nil
 }
 
-func (ms *authService) CanAccess(key string, channel string) (string, error) {
+func (ms *authService) CanAccess(key, channel string) (string, error) {
 	client, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
