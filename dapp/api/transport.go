@@ -3,281 +3,159 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
-	"github.com/mainflux/mainflux"
-	"github.com/mainflux/mainflux/manager"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"monetasa/dapp"
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc manager.Service) http.Handler {
-	opts := []kithttp.ServerOption{
-		kithttp.ServerErrorEncoder(encodeError),
-	}
-
+func MakeHandler(sr StreamRepository) http.Handler {
 	r := bone.New()
 
-	r.Post("/users", kithttp.NewServer(
-		registrationEndpoint(svc),
-		decodeCredentials,
-		encodeResponse,
-		opts...,
+	r.Get("/status", kithttp.NewServer(
+		statusEndpoint(),
+		decodeStatusRequest,
+		encodeStatusResponse,
 	))
 
-	r.Post("/tokens", kithttp.NewServer(
-		loginEndpoint(svc),
-		decodeCredentials,
-		encodeResponse,
-		opts...,
+	r.Post("/streams", kithttp.NewServer(
+		saveStreamEndpoint(sr),
+		decodeSaveStreamRequest,
+		encodeSaveStreamResponse,
 	))
 
-	r.Post("/clients", kithttp.NewServer(
-		addClientEndpoint(svc),
-		decodeClientCreation,
-		encodeResponse,
-		opts...,
+	r.Put("/streams/:name", kithttp.NewServer(
+		updateStreamEndpoint(sr),
+		decodeUpdateStreamRequest,
+		encodeUpdateStreamResponse,
 	))
 
-	r.Put("/clients/:id", kithttp.NewServer(
-		updateClientEndpoint(svc),
-		decodeClientUpdate,
-		encodeResponse,
-		opts...,
+	// r.Get("/streams/search", kithttp.NewServer(
+	// 	searchStreamEndpoint(sr),
+	// 	decodeSearchStreamRequest,
+	// 	encodeSearchStreamResponse,
+	// ))
+
+	r.Get("/streams/:name", kithttp.NewServer(
+		oneStreamEndpoint(sr),
+		decodeOneStreamRequest,
+		encodeOneStreamResponse,
 	))
 
-	r.Delete("/clients/:id", kithttp.NewServer(
-		removeClientEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
+	r.Delete("/streams", kithttp.NewServer(
+		removeStreamEndpoint(sr),
+		decodeRemoveStreamRequest,
+		encodeRemoveStreamResponse,
 	))
 
-	r.Get("/clients/:id", kithttp.NewServer(
-		viewClientEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/clients", kithttp.NewServer(
-		listClientsEndpoint(svc),
-		decodeList,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Post("/channels", kithttp.NewServer(
-		createChannelEndpoint(svc),
-		decodeChannelCreation,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Put("/channels/:id", kithttp.NewServer(
-		updateChannelEndpoint(svc),
-		decodeChannelUpdate,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Delete("/channels/:id", kithttp.NewServer(
-		removeChannelEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels/:id", kithttp.NewServer(
-		viewChannelEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels", kithttp.NewServer(
-		listChannelsEndpoint(svc),
-		decodeList,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Put("/channels/:chanId/clients/:clientId", kithttp.NewServer(
-		connectEndpoint(svc),
-		decodeConnection,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Delete("/channels/:chanId/clients/:clientId", kithttp.NewServer(
-		disconnectEndpoint(svc),
-		decodeConnection,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/access-grant", kithttp.NewServer(
-		identityEndpoint(svc),
-		decodeIdentity,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels/:id/access-grant", kithttp.NewServer(
-		canAccessEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.GetFunc("/version", mainflux.Version())
-	r.Handle("/metrics", promhttp.Handler())
+	// r.Post("/streams/purch", kithttp.NewServer(
+	// 	purchaseStreamEndpoint(sr),
+	// 	decodePurchaseStreamRequest,
+	// 	encodePurchaseStreamResponse,
+	// ))
 
 	return r
 }
 
-func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
-	req := identityReq{
-		key: r.Header.Get("Authorization"),
-	}
-
-	return req, nil
+func decodeStatusRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return nil, nil
 }
 
-func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
-	var user manager.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		return nil, err
-	}
-
-	return userReq{user}, nil
-}
-
-func decodeClientCreation(_ context.Context, r *http.Request) (interface{}, error) {
-	var client manager.Client
-	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
-		return nil, err
-	}
-
-	req := addClientReq{
-		key:    r.Header.Get("Authorization"),
-		client: client,
-	}
-
-	return req, nil
-}
-
-func decodeClientUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var client manager.Client
-	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
-		return nil, err
-	}
-
-	req := updateClientReq{
-		key:    r.Header.Get("Authorization"),
-		id:     bone.GetValue(r, "id"),
-		client: client,
-	}
-
-	return req, nil
-}
-
-func decodeChannelCreation(_ context.Context, r *http.Request) (interface{}, error) {
-	var channel manager.Channel
-	if err := json.NewDecoder(r.Body).Decode(&channel); err != nil {
-		return nil, err
-	}
-
-	req := createChannelReq{
-		key:     r.Header.Get("Authorization"),
-		channel: channel,
-	}
-
-	return req, nil
-}
-
-func decodeChannelUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var channel manager.Channel
-	if err := json.NewDecoder(r.Body).Decode(&channel); err != nil {
-		return nil, err
-	}
-
-	req := updateChannelReq{
-		key:     r.Header.Get("Authorization"),
-		id:      bone.GetValue(r, "id"),
-		channel: channel,
-	}
-
-	return req, nil
-}
-
-func decodeView(_ context.Context, r *http.Request) (interface{}, error) {
-	req := viewResourceReq{
-		key: r.Header.Get("Authorization"),
-		id:  bone.GetValue(r, "id"),
-	}
-
-	return req, nil
-}
-
-func decodeList(_ context.Context, r *http.Request) (interface{}, error) {
-	req := listResourcesReq{
-		key:    r.Header.Get("Authorization"),
-		size:   10,
-		offset: 0,
-	}
-
-	return req, nil
-}
-
-func decodeConnection(_ context.Context, r *http.Request) (interface{}, error) {
-	req := connectionReq{
-		key:      r.Header.Get("Authorization"),
-		chanId:   bone.GetValue(r, "chanId"),
-		clientId: bone.GetValue(r, "clientId"),
-	}
-
-	return req, nil
-}
-
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", contentType)
-
-	if ar, ok := response.(apiRes); ok {
-		for k, v := range ar.headers() {
-			w.Header().Set(k, v)
-		}
-
-		w.WriteHeader(ar.code())
-
-		if ar.empty() {
-			return nil
-		}
-	}
-
+func encodeStatusResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
-func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", contentType)
-
-	switch err {
-	case manager.ErrMalformedEntity:
-		w.WriteHeader(http.StatusBadRequest)
-	case manager.ErrUnauthorizedAccess:
-		w.WriteHeader(http.StatusForbidden)
-	case manager.ErrNotFound:
-		w.WriteHeader(http.StatusNotFound)
-	case manager.ErrConflict:
-		w.WriteHeader(http.StatusConflict)
-	default:
-		if _, ok := err.(*json.SyntaxError); ok {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		w.WriteHeader(http.StatusInternalServerError)
+func decodeSaveStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req saveStreamReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
 	}
+	return req, nil
+}
+
+func encodeSaveStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	fmt.Println("encodeSaveStreamResponse response: ", response)
+	return json.NewEncoder(w).Encode(response)
+}
+
+func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req saveStreamReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	req.Name = bone.GetValue(r, "name")
+	return req, nil
+}
+
+func encodeUpdateStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	fmt.Println("encodeSaveStreamResponse response: ", response)
+	return json.NewEncoder(w).Encode(response)
+}
+
+func decodeOneStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req oneStreamReq
+	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	// 	return nil, err
+	// }
+	req.Name = bone.GetValue(r, "name")
+	return req, nil
+}
+
+func encodeOneStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
+func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req searchStreamReq
+	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	// 	return nil, err
+	// }
+	q := r.URL.Query()
+
+	req.Type = q["type"][0]
+	req.x0, _ = strconv.Atoi(q["x0"][0])
+	req.y0, _ = strconv.Atoi(q["y0"][0])
+	req.x1, _ = strconv.Atoi(q["x1"][0])
+	req.y1, _ = strconv.Atoi(q["y1"][0])
+	req.x2, _ = strconv.Atoi(q["x2"][0])
+	req.y2, _ = strconv.Atoi(q["y2"][0])
+	req.x3, _ = strconv.Atoi(q["x3"][0])
+	req.y3, _ = strconv.Atoi(q["y3"][0])
+
+	fmt.Println("decodeSearchStreamRequest")
+	fmt.Println(req)
+	return req, nil
+}
+
+func encodeSearchStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
+func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req removeStreamReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func encodeRemoveStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
+func decodePurchaseStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req purchaseStreamReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func encodePurchaseStreamResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
 }
