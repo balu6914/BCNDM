@@ -22,8 +22,36 @@ func MakeHandler(svc auth.Service) http.Handler {
 
 	r := bone.New()
 
-	r.Post("/users", kithttp.NewServer(
+	r.Post("/user", kithttp.NewServer(
 		registrationEndpoint(svc),
+		decodeCredentials,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/user", kithttp.NewServer(
+		viewEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Put("/user", kithttp.NewServer(
+		updateEndpoint(svc),
+		decodeCredentials,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Delete("/user", kithttp.NewServer(
+		deleteEndpoint(svc),
+		decodeCredentials,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/users", kithttp.NewServer(
+		listEndpoint(svc),
 		decodeCredentials,
 		encodeResponse,
 		opts...,

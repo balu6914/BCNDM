@@ -16,21 +16,19 @@ type apiRes interface {
 }
 
 type identityRes struct {
-	id string
-}
-
-func (res identityRes) headers() map[string]string {
-	return map[string]string{
-		"X-user-id": res.id,
-	}
+	Email string `json:"email,omitempty"`
 }
 
 func (res identityRes) code() int {
 	return http.StatusOK
 }
 
+func (res identityRes) headers() map[string]string {
+	return map[string]string{}
+}
+
 func (res identityRes) empty() bool {
-	return true
+	return res.Email == ""
 }
 
 type tokenRes struct {

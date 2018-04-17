@@ -61,9 +61,9 @@ func (lm *loggingMiddleware) Update(key string, id string, user auth.User) (err 
 	return lm.svc.Update(key, id, user)
 }
 
-func (lm *loggingMiddleware) View(key string, id string) (user auth.User, err error) {
+func (lm *loggingMiddleware) View(key string) (user auth.User, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method view for key %s and user %s took %s to complete", key, id, time.Since(begin))
+		message := fmt.Sprintf("Method view for key %s and took %s to complete", key, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -71,7 +71,7 @@ func (lm *loggingMiddleware) View(key string, id string) (user auth.User, err er
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.View(key, id)
+	return lm.svc.View(key)
 }
 
 func (lm *loggingMiddleware) List(key string) (useres []auth.User, err error) {

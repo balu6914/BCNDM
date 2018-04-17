@@ -53,17 +53,18 @@ func (ms *authService) Update(key string, id string, user User) error {
 	return ms.users.Update(id, user)
 }
 
-func (ms *authService) View(key string, id string) (User, error) {
+func (ms *authService) View(key string) (User, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return User{}, err
 	}
 
-	if _, err := ms.users.One(sub); err != nil {
+	user, err := ms.users.One(sub);
+	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
 
-	return ms.users.One(id)
+	return user, nil
 }
 
 func (ms *authService) List(key string) ([]User, error) {
@@ -93,12 +94,12 @@ func (ms *authService) Delete(key string, id string) error {
 }
 
 func (ms *authService) Identity(key string) (string, error) {
-	client, err := ms.idp.Identity(key)
+	user, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
 	}
 
-	return client, nil
+	return user, nil
 }
 
 func (ms *authService) CanAccess(key string, channel string) (string, error) {
