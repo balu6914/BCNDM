@@ -1,0 +1,30 @@
+# cryptogen config which generate crypto-config folder
+
+OrdererOrgs:
+#---------------------------------------------------------
+# Orderer
+# --------------------------------------------------------
+- Name: Orderer
+  Domain: monetasa.com
+  CA:
+      Country: US
+      Province: California
+      Locality: San Francisco
+  #   OrganizationalUnit: Hyperledger Fabric
+  #   StreetAddress: address for org # default nil
+  #   PostalCode: postalCode for org # default nil
+  # ------------------------------------------------------
+  # "Specs" - See PeerOrgs below for complete description
+# -----------------------------------------------------
+  Specs:
+    - Hostname: orderer
+# -------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+ # ------------------------------------------------------
+PeerOrgs:
+# -----------------------------------------------------
+# Org1
+# ----------------------------------------------------
+- Name: SampleOrg
+  Domain: Sampleorg.monetasa.com
+  EnableNodeOUs: true
