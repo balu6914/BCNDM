@@ -28,7 +28,7 @@ const (
 	defMongoConnectTimeout 	int    = 5000
 	defMongoSocketTimeout  	int    = 5000
 	defAuthURL              string = "0.0.0.0"
-	defSecret               string = "manager"
+	defSecret               string = "monetasa"
 
 	envMongoURL             string = "MONETASA_AUTH_MONGO_URL"
 	envAuthURL              string = "MONETASA_AUTH_URL"
@@ -120,5 +120,5 @@ func main() {
 	}()
 
 	err = <-errs
-	logger.Error(fmt.Sprintf("Manager service terminated: %s", err))
+	logger.Error(fmt.Sprintf("Auth service terminated: %s", err))
 }
