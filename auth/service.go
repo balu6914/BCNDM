@@ -47,7 +47,7 @@ type Service interface {
 
 	// Delete deletes user account. In case of the failed deletion, a
 	// non-nil error value is returned.
-	Delete(string, string) error
+	Delete(string) error
 
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are

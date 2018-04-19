@@ -45,7 +45,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 
 	r.Delete("/user", kithttp.NewServer(
 		deleteEndpoint(svc),
-		decodeCredentials,
+		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))

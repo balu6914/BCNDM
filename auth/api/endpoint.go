@@ -89,18 +89,13 @@ func listEndpoint(svc auth.Service) endpoint.Endpoint {
 
 func deleteEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewReq)
+		req := request.(identityReq)
 
-		err := req.validate()
-		if err == auth.ErrNotFound {
-			return removeRes{}, nil
-		}
-
-		if err != nil {
+		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		if err = svc.Delete(req.key, req.id); err != nil {
+		if err := svc.Delete(req.key); err != nil {
 			return nil, err
 		}
 

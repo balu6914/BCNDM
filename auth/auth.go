@@ -91,17 +91,18 @@ func (ms *authService) List(key string) ([]User, error) {
 	return ms.users.All()
 }
 
-func (ms *authService) Delete(key string, id string) error {
+func (ms *authService) Delete(key string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	if _, err := ms.users.One(sub); err != nil {
+	user, err := ms.users.One(sub)
+	if err != nil {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.users.Remove(id)
+	return ms.users.Remove(user.Email)
 }
 
 func (ms *authService) Identity(key string) (string, error) {

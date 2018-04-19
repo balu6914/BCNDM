@@ -87,9 +87,9 @@ func (lm *loggingMiddleware) List(key string) (useres []auth.User, err error) {
 	return lm.svc.List(key)
 }
 
-func (lm *loggingMiddleware) Delete(key string, id string) (err error) {
+func (lm *loggingMiddleware) Delete(key string) (err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method remove for key %s and user %s took %s to complete", key, id, time.Since(begin))
+		message := fmt.Sprintf("Method remove for key %s took %s to complete", key, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -97,7 +97,7 @@ func (lm *loggingMiddleware) Delete(key string, id string) (err error) {
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.Delete(key, id)
+	return lm.svc.Delete(key)
 }
 
 
