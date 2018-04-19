@@ -35,12 +35,12 @@ func (ur *userRepository) Save(user auth.User) error {
 	return nil
 }
 
-func (ur *userRepository) Update(id string, user auth.User) error {
+func (ur *userRepository) Update(user auth.User) error {
 	s := ur.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
-	query := bson.M{"id": id}
+	query := bson.M{"email": user.Email}
 	update := bson.M{"$set": user}
 	if err := c.Update(query, update); err != nil {
 		return err
@@ -81,12 +81,12 @@ func (ur *userRepository) All() ([]auth.User, error) {
 	return users, nil
 }
 
-func (ur *userRepository) Remove(id string) error {
+func (ur *userRepository) Remove(email string) error {
 	s := ur.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
-	if err := c.Remove(bson.M{"id": id}); err != nil {
+	if err := c.Remove(bson.M{"email": email}); err != nil {
 		return err
 	}
 
