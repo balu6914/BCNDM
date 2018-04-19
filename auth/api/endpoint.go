@@ -111,12 +111,12 @@ func identityEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, auth.ErrUnauthorizedAccess
 		}
 
-		id, err := svc.Identity(req.key)
+		email, err := svc.Identity(req.key)
 		if err != nil {
 			return nil, err
 		}
 
-		return identityRes{Email: id}, nil
+		return identityRes{Email: email}, nil
 	}
 }
 
