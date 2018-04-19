@@ -62,7 +62,6 @@ func (res removeRes) empty() bool {
 }
 
 type userRes struct {
-	id      string
 	created bool
 }
 
@@ -75,12 +74,6 @@ func (res userRes) code() int {
 }
 
 func (res userRes) headers() map[string]string {
-	if res.created {
-		return map[string]string{
-			"Location": fmt.Sprint("/users/", res.id),
-		}
-	}
-
 	return map[string]string{}
 }
 

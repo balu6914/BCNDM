@@ -40,17 +40,28 @@ func (ms *authService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *authService) Update(key string, id string, user User) error {
+func (ms *authService) Update(key string, user User) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	if _, err := ms.users.One(sub); err != nil {
+	u, err := ms.users.One(sub)
+	if  err != nil {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.users.Update(id, user)
+	if u.Email != user.Email {
+		return ErrUnauthorizedAccess
+	}
+
+	hash, err := ms.hasher.Hash(user.Password)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	user.Password = hash
+
+	return ms.users.Update(user)
 }
 
 func (ms *authService) View(key string) (User, error) {
@@ -80,17 +91,18 @@ func (ms *authService) List(key string) ([]User, error) {
 	return ms.users.All()
 }
 
-func (ms *authService) Delete(key string, id string) error {
+func (ms *authService) Delete(key string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	if _, err := ms.users.One(sub); err != nil {
+	user, err := ms.users.One(sub)
+	if err != nil {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.users.Remove(id)
+	return ms.users.Remove(user.Email)
 }
 
 func (ms *authService) Identity(key string) (string, error) {
@@ -102,11 +114,13 @@ func (ms *authService) Identity(key string) (string, error) {
 	return user, nil
 }
 
-func (ms *authService) CanAccess(key, channel string) (string, error) {
-	client, err := ms.idp.Identity(key)
+func (ms *authService) CanAccess(key string) (string, error) {
+	email, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
 	}
 
-	return client, nil
+	println("EMAILLLLLLL")
+	println(email)
+	return email, nil
 }

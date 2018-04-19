@@ -35,7 +35,7 @@ type Service interface {
 
 	// Update updates user account. In case of the failed update, a
 	// non-nil error value is returned.
-	Update(string, string, User) error
+	Update(string, User) error
 
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
@@ -47,7 +47,7 @@ type Service interface {
 
 	// Delete deletes user account. In case of the failed deletion, a
 	// non-nil error value is returned.
-	Delete(string, string) error
+	Delete(string) error
 
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are
@@ -59,5 +59,5 @@ type Service interface {
 
 	// CanAccess determines whether the channel can be accessed using the
 	// provided key.
-	CanAccess(string, string) (string, error)
+	CanAccess(string) (string, error)
 }

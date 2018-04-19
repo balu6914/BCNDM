@@ -31,17 +31,12 @@ func (req identityReq) validate() error {
 
 type updateReq struct {
 	key  string
-	id   string
 	user auth.User
 }
 
 func (req updateReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.id) {
-		return auth.ErrNotFound
 	}
 
 	return req.user.Validate()
