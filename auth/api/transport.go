@@ -50,13 +50,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/users", kithttp.NewServer(
-		listEndpoint(svc),
-		decodeCredentials,
-		encodeResponse,
-		opts...,
-	))
-
 	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
