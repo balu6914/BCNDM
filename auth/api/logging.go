@@ -114,9 +114,9 @@ func (lm *loggingMiddleware) Identity(key string) (id string, err error) {
 	return lm.svc.Identity(key)
 }
 
-func (lm *loggingMiddleware) CanAccess(key string, id string) (pub string, err error) {
+func (lm *loggingMiddleware) CanAccess(key string) (pub string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method can_access for key %s, channel %s and publisher %s took %s to complete", key, id, pub, time.Since(begin))
+		message := fmt.Sprintf("Method can_access for key %s took %s to complete", key, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -124,5 +124,5 @@ func (lm *loggingMiddleware) CanAccess(key string, id string) (pub string, err e
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.CanAccess(key, id)
+	return lm.svc.CanAccess(key)
 }

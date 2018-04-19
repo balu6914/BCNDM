@@ -59,5 +59,5 @@ type Service interface {
 
 	// CanAccess determines whether the channel can be accessed using the
 	// provided key.
-	CanAccess(string, string) (string, error)
+	CanAccess(string) (string, error)
 }

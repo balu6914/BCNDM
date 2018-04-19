@@ -114,11 +114,13 @@ func (ms *authService) Identity(key string) (string, error) {
 	return user, nil
 }
 
-func (ms *authService) CanAccess(key, channel string) (string, error) {
-	client, err := ms.idp.Identity(key)
+func (ms *authService) CanAccess(key string) (string, error) {
+	email, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
 	}
 
-	return client, nil
+	println("EMAILLLLLLL")
+	println(email)
+	return email, nil
 }
