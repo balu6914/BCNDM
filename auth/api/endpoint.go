@@ -45,11 +45,11 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.Update(req.key, req.id, req.user); err != nil {
+		if err := svc.Update(req.key, req.user); err != nil {
 			return nil, err
 		}
 
-		return userRes{id: req.id, created: false}, nil
+		return userRes{created: true}, nil
 	}
 }
 

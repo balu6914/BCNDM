@@ -38,7 +38,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 
 	r.Put("/user", kithttp.NewServer(
 		updateEndpoint(svc),
-		decodeCredentials,
+		decodeUpdate,
 		encodeResponse,
 		opts...,
 	))
@@ -96,6 +96,24 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 	}
 
 	return userReq{user}, nil
+}
+
+func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, auth.ErrUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	req := updateReq{
+		key: r.Header.Get("Authorization"),
+		user: user,
+	}
+
+	return req, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {

@@ -35,12 +35,12 @@ func (ur *userRepository) Save(user auth.User) error {
 	return nil
 }
 
-func (ur *userRepository) Update(id string, user auth.User) error {
+func (ur *userRepository) Update(user auth.User) error {
 	s := ur.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
-	query := bson.M{"id": id}
+	query := bson.M{"email": user.Email}
 	update := bson.M{"$set": user}
 	if err := c.Update(query, update); err != nil {
 		return err

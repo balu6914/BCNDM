@@ -40,17 +40,28 @@ func (ms *authService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *authService) Update(key string, id string, user User) error {
+func (ms *authService) Update(key string, user User) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	if _, err := ms.users.One(sub); err != nil {
+	u, err := ms.users.One(sub)
+	if  err != nil {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.users.Update(id, user)
+	if u.Email != user.Email {
+		return ErrUnauthorizedAccess
+	}
+
+	hash, err := ms.hasher.Hash(user.Password)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	user.Password = hash
+
+	return ms.users.Update(user)
 }
 
 func (ms *authService) View(key string) (User, error) {

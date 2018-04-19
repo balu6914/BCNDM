@@ -35,7 +35,7 @@ type Service interface {
 
 	// Update updates user account. In case of the failed update, a
 	// non-nil error value is returned.
-	Update(string, string, User) error
+	Update(string, User) error
 
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
