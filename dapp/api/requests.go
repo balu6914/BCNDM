@@ -1,17 +1,18 @@
 package api
 
-type saveStreamReq struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	URL         string `json:"url"`
-	Price       int    `json:"price"`
+type modifyStreamReq struct {
+	Id          string
+	Name        string `json:"name,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Description string `json:"description,omitempty"`
+	URL         string `json:"url,omitempty"`
+	Price       int    `json:"price,omitempty"`
 	// owner       User
 	// longlat     Location
 }
 
-type oneStreamReq struct {
-	Name string
+type readStreamReq struct {
+	Id string
 }
 
 type searchStreamReq struct {
@@ -26,12 +27,7 @@ type searchStreamReq struct {
 	y3   int
 }
 
-type removeStreamReq struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 type purchaseStreamReq struct {
-	Name  string `json:"name"`
-	Hours int    `json:"hours"`
+	Id    string
+	Hours int `json:"hours"`
 }

@@ -8,19 +8,19 @@ import (
 	"monetasa/dapp"
 )
 
-func statusEndpoint() endpoint.Endpoint {
+func versionEndpoint() endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		res := statusRes{
-			Status: "ok",
+		res := versionRes{
+			Version: "0.1.0",
 		}
 		return res, nil
 	}
 }
 
-func saveStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
+func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(saveStreamReq)
-		s := Stream{
+		req := request.(modifyStreamReq)
+		s := dapp.Stream{
 			Name:        req.Name,
 			Type:        req.Type,
 			Description: req.Description,
@@ -29,54 +29,60 @@ func saveStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
 		}
 		s, err := svc.Save(s)
 
-		res := saveStreamRes{
-			Name:        s.Name,
-			Type:        s.Type,
-			Description: s.Description,
-			URL:         s.URL,
-			Price:       s.Price,
+		res := modifyStreamRes{
+			Status: "success",
 		}
 		return res, err
 	}
 }
 
-func updateStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
+func updateStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(saveStreamReq)
-		s := Stream{
+		req := request.(modifyStreamReq)
+		s := dapp.Stream{
 			Name:        req.Name,
 			Type:        req.Type,
 			Description: req.Description,
 			URL:         req.URL,
 			Price:       req.Price,
 		}
-		err := svc.Update(req.Name, s)
+		err := svc.Update(req.Id, s)
 
 		if err != nil {
 			return nil, err
 		}
-		res := saveStreamRes{
-			Name:        s.Name,
-			Type:        s.Type,
-			Description: s.Description,
-			URL:         s.URL,
-			Price:       s.Price,
+		res := modifyStreamRes{
+			Status: "success",
 		}
 		return res, nil
 	}
 }
 
-func oneStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
+func oneStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(oneStreamReq)
-		s, err := svc.One(req.Name)
-		res := oneStreamRes{
+		req := request.(readStreamReq)
+		s, err := svc.One(req.Id)
+		res := readStreamRes{
 			Name:        s.Name,
 			Type:        s.Type,
 			Description: s.Description,
 			Price:       s.Price,
 		}
 		return res, err
+	}
+}
+
+func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(modifyStreamReq)
+		err := svc.Remove(req.Id)
+		if err != nil {
+			return nil, err
+		}
+		res := modifyStreamRes{
+			Status: "success",
+		}
+		return res, nil
 	}
 }
 
@@ -94,20 +100,6 @@ func oneStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
 // 		return res, err
 // 	}
 // }
-
-func removeStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(removeStreamReq)
-		err := svc.Remove(req.Name)
-		if err != nil {
-			return nil, err
-		}
-		res := removeStreamRes{
-			Status: "ok",
-		}
-		return res, nil
-	}
-}
 
 // func purchaseStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
 // 	return func(_ context.Context, request interface{}) (interface{}, error) {

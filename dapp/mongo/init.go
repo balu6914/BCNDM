@@ -10,7 +10,7 @@ import (
 // CollectionName - Collection name
 const (
 	dbName         string = "monetasa"
-	collectionName string = "api"
+	collectionName string = "dapp"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error

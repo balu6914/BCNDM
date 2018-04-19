@@ -5,26 +5,41 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
-	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
+
+	"monetasa/dapp/api"
+	"monetasa/dapp/mongo"
 )
 
 const (
-	port           int    = 8080
-	defPostgresURL string = "http://localhost:8180"
-	envPostgresURL string = "MONETASA_POSTGRES_URL"
+	port       int    = 8081
+	defDappURL string = "0.0.0.0"
+
+	defMongoURL            string = "0.0.0.0"
+	defMongoUser           string = ""
+	defMongoPass           string = ""
+	defMongoDatabase       string = "monetasa"
+	defMongoPort           int    = 27017
+	defMongoConnectTimeout int    = 5000
+	defMongoSocketTimeout  int    = 5000
+
+	envMongoURL string = "MONETASA_DAPP_MONGO_URL"
+	envDappURL  string = "MONETASA_DAPP_URL"
 )
 
 type config struct {
-	Port        int
-	AuthURL     string
-	PostgresURL string
+	Port    int
+	dappURL string
+
+	MongoURL            string
+	MongoUser           string
+	MongoPass           string
+	MongoDatabase       string
+	MongoPort           int
+	MongoConnectTimeout int
+	MongoSocketTimeout  int
 }
 
 func getenv(key, fallback string) string {
@@ -38,51 +53,37 @@ func getenv(key, fallback string) string {
 
 func main() {
 	cfg := config{
-		Port:       port,
-		PotgresURL: getenv(envPostgresURL, defPotgresURL),
+		Port:                port,
+		dappURL:             getenv(envDappURL, defDappURL),
+		MongoURL:            getenv(envMongoURL, defMongoURL),
+		MongoUser:           defMongoUser,
+		MongoPass:           defMongoPass,
+		MongoDatabase:       defMongoDatabase,
+		MongoPort:           defMongoPort,
+		MongoConnectTimeout: defMongoConnectTimeout,
+		MongoSocketTimeout:  defMongoSocketTimeout,
 	}
 
 	var logger log.Logger
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	db, err := gorm.Open("postgres", "monetasa.db")
+	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
+		cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
 	if err != nil {
-		logger.Log("error", err)
+		// logger.Error("Failed to connect to Mongo.", zap.Error(err))
 		os.Exit(1)
 	}
-	defer db.Close()
+	defer ms.Close()
 
-	users := postgres.NewUserRepository(session)
-	hasher := bcrypt.NewHasher()
-	idp := jwt.NewIdentityProvider(cfg.Secret)
-
-	var svc auth.Service
-	svc = auth.NewService(users, hasher, idp)
-	svc = api.NewLoggingService(logger, svc)
-
-	fields := []string{"method"}
-	svc = api.NewMetricService(
-		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-			Namespace: "monetasa",
-			Subsystem: "api",
-			Name:      "request_count",
-			Help:      "Number of requests received.",
-		}, fields),
-		kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
-			Namespace: "monetasa",
-			Subsystem: "api",
-			Name:      "request_latency_microseconds",
-			Help:      "Total duration of requests in microseconds.",
-		}, fields),
-		svc,
-	)
+	sr := mongo.NewStreamRepository(ms)
+	// sr = api.LoggingMiddleware(sr, logger)
 
 	errs := make(chan error, 2)
 
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
-		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
+		errs <- http.ListenAndServe(p, api.MakeHandler(sr))
 	}()
 
 	go func() {

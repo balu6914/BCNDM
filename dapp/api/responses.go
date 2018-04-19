@@ -4,21 +4,17 @@ import (
 	"monetasa/dapp"
 )
 
-type statusRes struct {
+const contentType = "application/json; charset=utf-8"
+
+type versionRes struct {
+	Version string `json:"version"`
+}
+
+type modifyStreamRes struct {
 	Status string `json:"status"`
 }
 
-type saveStreamRes struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	URL         string `json:"url"`
-	Price       int    `json:"price"`
-	// owner       User
-	// longlat     Location
-}
-
-type oneStreamRes struct {
+type readStreamRes struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	Description string `json:"description"`
@@ -27,9 +23,5 @@ type oneStreamRes struct {
 
 type searchStreamRes struct {
 	// Streams []Stream `json:"streams"`
-	Streams []Stream
-}
-
-type removeStreamRes struct {
-	Status string `json:"status"`
+	Streams []dapp.Stream
 }
