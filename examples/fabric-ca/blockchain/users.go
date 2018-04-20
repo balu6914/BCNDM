@@ -1,4 +1,4 @@
-package users
+package blockchain
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 )
 
 // Add new user to fabric network
-func (bc *BcNetwork) CreateUser() (response string, err error) {
+func (bc *FabricSetup) CreateUser() (response string, err error) {
 
-	sdk := bc.Fabric.Sdk
+	sdk := bc.sdk
 
 	ctxProvider := sdk.Context()
 

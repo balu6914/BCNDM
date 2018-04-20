@@ -1,4 +1,4 @@
-package users
+package blockchain
 
 import (
 	"monetasa/examples/blockchain"

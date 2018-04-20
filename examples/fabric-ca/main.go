@@ -2,14 +2,8 @@ package main
 
 import (
 	"fmt"
-	"monetasa/examples/blockchain"
-	"monetasa/examples/fabric-ca/users"
+	"monetasa/examples/fabric-ca/blockchain"
 )
-
-// BC network instance
-type bcNetwork struct {
-	Fabric *blockchain.FabricSetup
-}
 
 func main() {
 
@@ -36,13 +30,13 @@ func main() {
 	 * [err fabric-ca err response]
 	 * user user Object
 	 */
-	user, err := users.Create(fSetup)
+	bc := blockchain.FabricSetup.CreateUser()
+	user, err := bc.CreateUser()
 	if err != nil {
 		fmt.Println("Unable to create a user in the fabric-ca %v\n", err)
 	}
 
-	fmt.Printf(user)
-	fmt.Println("User created!: %v\n", err)
+	fmt.Println("User created!: %v\n", user)
 
 	/**
 	 * Fetch this user from Fabric Network by passing a  email
