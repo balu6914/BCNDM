@@ -3,17 +3,17 @@ package auth
 var _ Service = (*authService)(nil)
 
 type authService struct {
-	users    UserRepository
-	hasher   Hasher
-	idp      IdentityProvider
+	users  UserRepository
+	hasher Hasher
+	idp    IdentityProvider
 }
 
 // New instantiates the domain service implementation.
 func New(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
 	return &authService{
-		users:    users,
-		hasher:   hasher,
-		idp:      idp,
+		users:  users,
+		hasher: hasher,
+		idp:    idp,
 	}
 }
 
@@ -47,7 +47,7 @@ func (ms *authService) Update(key string, user User) error {
 	}
 
 	u, err := ms.users.One(sub)
-	if  err != nil {
+	if err != nil {
 		return ErrUnauthorizedAccess
 	}
 
@@ -70,25 +70,12 @@ func (ms *authService) View(key string) (User, error) {
 		return User{}, err
 	}
 
-	user, err := ms.users.One(sub);
+	user, err := ms.users.One(sub)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
 
 	return user, nil
-}
-
-func (ms *authService) List(key string) ([]User, error) {
-	sub, err := ms.idp.Identity(key)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := ms.users.One(sub); err != nil {
-		return nil, ErrUnauthorizedAccess
-	}
-
-	return ms.users.All()
 }
 
 func (ms *authService) Delete(key string) error {
@@ -120,7 +107,5 @@ func (ms *authService) CanAccess(key string) (string, error) {
 		return "", err
 	}
 
-	println("EMAILLLLLLL")
-	println(email)
 	return email, nil
 }

@@ -2,10 +2,10 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"monetasa"
 	"net/http"
-	"encoding/json"
 
 	"monetasa/auth"
 
@@ -102,7 +102,7 @@ func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	req := updateReq{
-		key: r.Header.Get("Authorization"),
+		key:  r.Header.Get("Authorization"),
 		user: user,
 	}
 

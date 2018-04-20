@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"monetasa/auth"
@@ -94,24 +93,5 @@ func (res viewRes) headers() map[string]string {
 }
 
 func (res viewRes) empty() bool {
-	return false
-}
-
-type listRes struct {
-	Users []auth.User `json:"users"`
-	count   int
-}
-
-func (res listRes) code() int {
-	return http.StatusOK
-}
-
-func (res listRes) headers() map[string]string {
-	return map[string]string{
-		"X-Count": fmt.Sprintf("%d", res.count),
-	}
-}
-
-func (res listRes) empty() bool {
 	return false
 }

@@ -25,7 +25,6 @@ var (
 	ErrUnsupportedContentType error = errors.New("unsupported content type")
 )
 
-
 // Service specifies an API that must be fullfiled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
@@ -40,10 +39,6 @@ type Service interface {
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
 	View(string) (User, error)
-
-	// ListClients retrieves data about all clients that belongs to the user
-	// identified by the provided key.
-	List(string) ([]User, error)
 
 	// Delete deletes user account. In case of the failed deletion, a
 	// non-nil error value is returned.
