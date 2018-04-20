@@ -1,18 +1,70 @@
 package api
 
-type modifyStreamReq struct {
-	Id          string
-	Name        string `json:"name,omitempty"`
-	Type        string `json:"type,omitempty"`
-	Description string `json:"description,omitempty"`
-	URL         string `json:"url,omitempty"`
-	Price       int    `json:"price,omitempty"`
-	// owner       User
-	// longlat     Location
+import (
+	"github.com/asaskevich/govalidator"
+
+	"monetasa/dapp"
+)
+
+type apiReq interface {
+	validate() error
+}
+
+type createStreamReq struct {
+	Stream dapp.Stream
+}
+
+func (req createStreamReq) validate() error {
+	return req.Stream.Validate()
+}
+
+type updateStreamReq struct {
+	Id     string
+	Stream dapp.Stream
+}
+
+func (req updateStreamReq) validate() error {
+	if req.Id == "" {
+		return dapp.ErrMalformedData
+	}
+
+	if !govalidator.IsHexadecimal(req.Id) {
+		return dapp.ErrMalformedData
+	}
+
+	return req.Stream.Validate()
 }
 
 type readStreamReq struct {
 	Id string
+}
+
+func (req readStreamReq) validate() error {
+	if req.Id == "" {
+		return dapp.ErrMalformedData
+	}
+
+	if !govalidator.IsHexadecimal(req.Id) {
+		return dapp.ErrMalformedData
+	}
+
+	return nil
+}
+
+type deleteStreamReq struct {
+	Id string
+}
+
+func (req deleteStreamReq) validate() error {
+	if req.Id == "" {
+		return dapp.ErrMalformedData
+	}
+
+	if !govalidator.IsHexadecimal(req.Id) {
+		return dapp.ErrMalformedData
+	}
+
+	return nil
 }
 
 type searchStreamReq struct {

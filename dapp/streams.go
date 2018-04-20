@@ -1,5 +1,33 @@
 package dapp
 
+import (
+	"errors"
+	"github.com/asaskevich/govalidator"
+)
+
+var (
+	// ErrConflict indicates usage of the existing email during account
+	// registration.
+	ErrConflict error = errors.New("email already taken")
+
+	// ErrMalformedEntity indicates malformed entity specification (e.g.
+	// invalid username or password).
+	ErrMalformedEntity error = errors.New("malformed entity specification")
+
+	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
+	// when accessing a protected resource.
+	ErrUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
+
+	// ErrNotFound indicates a non-existent entity request.
+	ErrNotFound error = errors.New("non-existent entity")
+
+	ErrUnknownType error = errors.New("unknown type")
+
+	ErrMalformedData error = errors.New("malformed data")
+
+	ErrUnsupportedContentType error = errors.New("unsupported content type")
+)
+
 type Location struct {
 	Longitude float32
 	Latitude  float32
@@ -15,11 +43,25 @@ type Stream struct {
 	// Longlat     Location
 }
 
+// Validate returns an error if user representation is invalid.
+func (s *Stream) Validate() error {
+	if s.Name == "" || s.Type == "" ||
+		s.Description == "" || s.URL == "" {
+		return ErrMalformedEntity
+	}
+
+	if !govalidator.IsURL(s.URL) {
+		return ErrMalformedEntity
+	}
+
+	return nil
+}
+
 // StreamRepository specifies a stream persistence API.
 type StreamRepository interface {
 	// Save persists the stream. A non-nil error is returned to indicate
 	// operation failure.
-	Save(Stream) (Stream, error)
+	Save(Stream) error
 
 	// Update performs an update of an existing stream. A non-nil error is
 	// returned to indicate operation failure.

@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	// "fmt"
 	"github.com/go-kit/kit/endpoint"
 
 	"monetasa/dapp"
@@ -19,70 +18,79 @@ func versionEndpoint() endpoint.Endpoint {
 
 func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyStreamReq)
-		s := dapp.Stream{
-			Name:        req.Name,
-			Type:        req.Type,
-			Description: req.Description,
-			URL:         req.URL,
-			Price:       req.Price,
-		}
-		s, err := svc.Save(s)
+		req := request.(createStreamReq)
 
-		res := modifyStreamRes{
-			Status: "success",
+		if err := req.validate(); err != nil {
+			return nil, err
 		}
-		return res, err
+
+		err := svc.Save(req.Stream)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return createStreamRes{}, nil
 	}
 }
 
 func updateStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyStreamReq)
-		s := dapp.Stream{
-			Name:        req.Name,
-			Type:        req.Type,
-			Description: req.Description,
-			URL:         req.URL,
-			Price:       req.Price,
+		req := request.(updateStreamReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
 		}
-		err := svc.Update(req.Id, s)
+
+		err := svc.Update(req.Id, req.Stream)
 
 		if err != nil {
 			return nil, err
 		}
-		res := modifyStreamRes{
-			Status: "success",
-		}
-		return res, nil
+
+		return modifyStreamRes{}, nil
 	}
 }
 
 func oneStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(readStreamReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
 		s, err := svc.One(req.Id)
+
+		if err != nil {
+			return nil, err
+		}
+
 		res := readStreamRes{
 			Name:        s.Name,
 			Type:        s.Type,
 			Description: s.Description,
 			Price:       s.Price,
 		}
-		return res, err
+		return res, nil
 	}
 }
 
 func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyStreamReq)
+		req := request.(deleteStreamReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
 		err := svc.Remove(req.Id)
+
 		if err != nil {
 			return nil, err
 		}
-		res := modifyStreamRes{
-			Status: "success",
-		}
-		return res, nil
+
+		return modifyStreamRes{}, nil
 	}
 }
 

@@ -20,7 +20,7 @@ func LoggingMiddleware(svc dapp.StreamRepository, logger log.Logger) dapp.Stream
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) Save(stream dapp.Stream) (str dapp.Stream, err error) {
+func (lm *loggingMiddleware) Save(stream dapp.Stream) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method save for stream %s took %s to complete", stream.Name, time.Since(begin))
 		if err != nil {

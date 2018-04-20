@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"io"
 	// "fmt"
 	"net/http"
 	// "strconv"
@@ -10,7 +11,6 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 
-	"monetasa/auth"
 	"monetasa/dapp"
 )
 
@@ -31,14 +31,14 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 
 	r.Post("/streams", kithttp.NewServer(
 		saveStreamEndpoint(sr),
-		decodeModifyStreamRequest,
+		decodeCreateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
 	r.Put("/streams/:id", kithttp.NewServer(
 		updateStreamEndpoint(sr),
-		decodeModifyStreamRequest,
+		decodeUpdateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
@@ -52,7 +52,7 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 
 	r.Delete("/streams/:id", kithttp.NewServer(
 		removeStreamEndpoint(sr),
-		decodeModifyStreamRequest,
+		decodeDeleteStreamRequest,
 		encodeResponse,
 		opts...,
 	))
@@ -78,19 +78,41 @@ func decodeVersionRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return nil, nil
 }
 
-func decodeModifyStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req modifyStreamReq
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var stream dapp.Stream
+	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
-	req.Id = bone.GetValue(r, "id")
+
+	return createStreamReq{stream}, nil
+}
+
+func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var stream dapp.Stream
+	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
+		return nil, err
+	}
+
+	req := updateStreamReq{
+		Id:     bone.GetValue(r, "id"),
+		Stream: stream,
+	}
 	return req, nil
 }
 
 func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req readStreamReq
-	req.Id = bone.GetValue(r, "id")
+	req := readStreamReq{
+		Id: bone.GetValue(r, "id"),
+	}
 	return req, nil
+}
+
+func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := deleteStreamReq{
+		Id: bone.GetValue(r, "id"),
+	}
+	return req, nil
+
 }
 
 // func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -123,7 +145,25 @@ func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 // 	return req, nil
 // }
 
+// func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+// 	return json.NewEncoder(w).Encode(response)
+// }
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", contentType)
+
+	if ar, ok := response.(apiRes); ok {
+		for k, v := range ar.headers() {
+			w.Header().Set(k, v)
+		}
+
+		w.WriteHeader(ar.code())
+
+		if ar.empty() {
+			return nil
+		}
+	}
+
 	return json.NewEncoder(w).Encode(response)
 }
 
@@ -131,20 +171,28 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
-	case auth.ErrMalformedEntity:
+	case dapp.ErrMalformedEntity:
 		w.WriteHeader(http.StatusBadRequest)
-	case auth.ErrUnauthorizedAccess:
+	case dapp.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
-	case auth.ErrNotFound:
+	case dapp.ErrNotFound:
 		w.WriteHeader(http.StatusNotFound)
-	case auth.ErrConflict:
+	case dapp.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
+	case dapp.ErrUnsupportedContentType:
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+	case io.ErrUnexpectedEOF:
+		w.WriteHeader(http.StatusBadRequest)
+	case io.EOF:
+		w.WriteHeader(http.StatusBadRequest)
 	default:
-		if _, ok := err.(*json.SyntaxError); ok {
+		switch err.(type) {
+		case *json.SyntaxError:
 			w.WriteHeader(http.StatusBadRequest)
-			return
+		case *json.UnmarshalTypeError:
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
 		}
-
-		w.WriteHeader(http.StatusInternalServerError)
 	}
 }

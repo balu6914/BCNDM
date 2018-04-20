@@ -3,7 +3,6 @@ package mongo
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"monetasa/auth"
 	"monetasa/dapp"
 )
 
@@ -18,20 +17,20 @@ func NewStreamRepository(db *mgo.Session) *streamRepository {
 	return &streamRepository{db}
 }
 
-func (sr streamRepository) Save(stream dapp.Stream) (dapp.Stream, error) {
+func (sr streamRepository) Save(stream dapp.Stream) error {
 	s := sr.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
 	if err := c.Insert(stream); err != nil {
 		if mgo.IsDup(err) {
-			return stream, auth.ErrConflict
+			return dapp.ErrConflict
 		}
 
-		return stream, err
+		return err
 	}
 
-	return stream, nil
+	return nil
 }
 
 func (sr streamRepository) Update(id string, stream dapp.Stream) error {
@@ -61,7 +60,7 @@ func (sr streamRepository) One(id string) (dapp.Stream, error) {
 	_id := bson.ObjectIdHex(id)
 	if err := c.Find(bson.M{"_id": _id}).One(&stream); err != nil {
 		if err == mgo.ErrNotFound {
-			return stream, auth.ErrNotFound
+			return stream, dapp.ErrNotFound
 		}
 
 		return stream, err
