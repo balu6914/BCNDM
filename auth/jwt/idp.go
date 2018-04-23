@@ -3,8 +3,9 @@ package jwt
 import (
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"monetasa/auth"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (

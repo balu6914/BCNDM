@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"monetasa/auth"
+
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -67,23 +68,6 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		return viewRes{user}, nil
-	}
-}
-
-func listEndpoint(svc auth.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(listReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		users, err := svc.List(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return listRes{users, len(users)}, nil
 	}
 }
 
