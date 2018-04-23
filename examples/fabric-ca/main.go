@@ -33,19 +33,17 @@ func main() {
 	 * [err fabric-ca err response]
 	 * user user Object
 	 */
-	user, err := b.CreateUser()
+	newUser, err := b.CreateUser()
 	if err != nil {
 		fmt.Println("Unable to create a user in the fabric-ca %v\n", err)
 	}
 
-	fmt.Println("User created!: %v\n", user)
+	fmt.Println("User created!: %v\n", newUser)
 
 	/**
-	 * Fetch this user from Fabric Network by passing a  email
+	 * Set the user in context
 	 */
 
-	/**
-	 * Set this user in context so we can sign transaction with his keys
-	 */
+	//userContext := fSetup.Sdk.Context(fabsdk.WithUser("test1"), fabsdk.WithOrg(fSetup.OrgName))
 
 }
