@@ -62,11 +62,11 @@ client:
 channels:
   myc:
     orderers:
-      - orderer.hf.monetasa.com
+      - orderer.monetasa.com
 
     # Network entity which maintains a ledger and runs chaincode containers in order to perform operations to the ledger. Peers are owned and maintained by members.
     peers:
-      peer0.org1.hf.monetasa.com:
+      peer0.org1.monetasa.com:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -86,54 +86,54 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1.org1.hf.monetasa.com:
+      peer1.org1.monetasa.com:
 
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: org1.hf.monetasa.com
-    cryptoPath: "peerOrganizations/org1.hf.monetasa.com/users/{userName}@org1.hf.monetasa.com/msp"
+    mspid: org1.monetasa.com
+    cryptoPath: "peerOrganizations/org1.monetasa.com/users/{userName}@org1.monetasa.com/msp"
     peers:
-      - peer0.org1.hf.monetasa.com
-      - peer1.org1.hf.monetasa.com
+      - peer0.org1.monetasa.com
+      - peer1.org1.monetasa.com
     certificateAuthorities:
-      - ca.org1.hf.monetasa.com
+      - ca.org1.monetasa.com
 
 # List of orderers to send transaction and channel create/update requests to.
 # The orderers consent on the order of transactions in a block to be committed to the ledger. For the time being only one orderer is needed.
 orderers:
-  orderer.hf.monetasa.com:
+  orderer.monetasa.com:
     url: grpcs://localhost:7050
     grpcOptions:
-      ssl-target-name-override: orderer.hf.monetasa.com
+      ssl-target-name-override: orderer.monetasa.com
       grpc-max-send-message-length: 15
     tlsCACerts:
-      path: "./crypto-config/ordererOrganizations/hf.monetasa.com/tlsca/tlsca.hf.monetasa.com-cert.pem"
+      path: "${GOPATH}/src/github.com/src/monetasa/examples/fabric-ca/crypto-config/ordererOrganizations/monetasa.com/tlsca/tlsca.monetasa.com-cert.pem"
 
 # List of peers to send various requests to, including endorsement, query and event listener registration.
 peers:
-  peer0.org1.hf.monetasa.com:
+  peer0.org1.monetasa.com:
     # this URL is used to send endorsement and query requests
     url: grpcs://localhost:7051
     # this URL is used to connect the EventHub and registering event listeners
     eventUrl: grpcs://localhost:7053
     # These parameters should be set in coordination with the keepalive policy on the server
     grpcOptions:
-      ssl-target-name-override: peer0.org1.hf.monetasa.com
+      ssl-target-name-override: peer0.org1.monetasa.com
       grpc.http2.keepalive_time: 15
 
     tlsCACerts:
-      path: "./crypto-config/peerOrganizations/org1.hf.monetasa.com/tlsca/tlsca.org1.hf.monetasa.com-cert.pem"
+      path: "${GOPATH}/src/github.com/src/monetasa/examples/fabric-ca/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
 
 
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows certificate management to be done via REST APIs.
 certificateAuthorities:
-  ca.org1.hf.monetasa.com:
-    url: https://localhost:7054
+  ca.org1.monetasa.com:
+    url: http://localhost:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
     httpOptions:
       verify: false
     registrar:
       enrollId: admin
       enrollSecret: adminpw
-    caName: ca.org1.hf.monetasa.com
+    caName: ca.org1.monetasa.com

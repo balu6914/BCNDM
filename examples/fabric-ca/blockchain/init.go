@@ -17,7 +17,7 @@ type FabricSetup struct {
 	OrgAdmin    string
 	OrgName     string
 	admin       resmgmt.Client
-	sdk         *fabsdk.FabricSDK
+	Sdk         *fabsdk.FabricSDK
 }
 
 // Initialize reads the configuration file and sets up the client, chain and event hub
@@ -34,7 +34,7 @@ func (setup *FabricSetup) Initialize() error {
 		return fmt.Errorf("failed to create sdk: %v", err)
 	}
 
-	setup.sdk = sdk
+	setup.Sdk = sdk
 
 	// ClientContext allows creation of transactions using the supplied identity as the credential.
 	// We will need this to set specific user to context (e.g make transactions in his name etc...).

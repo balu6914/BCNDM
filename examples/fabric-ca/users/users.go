@@ -1,8 +1,6 @@
-package blockchain
+package users
 
-import (
-	"monetasa/examples/blockchain"
-)
+import "monetasa/examples/fabric-ca/blockchain"
 
 // BC network instance
 type BcNetwork struct {
