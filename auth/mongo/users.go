@@ -67,20 +67,6 @@ func (ur *userRepository) One(email string) (auth.User, error) {
 	return user, nil
 }
 
-func (ur *userRepository) All() ([]auth.User, error) {
-	s := ur.db.Copy()
-	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
-
-	users := []auth.User{}
-
-	if err := c.Find(nil).All(&users); err != nil {
-		return users, err
-	}
-
-	return users, nil
-}
-
 func (ur *userRepository) Remove(email string) error {
 	s := ur.db.Copy()
 	defer s.Close()
