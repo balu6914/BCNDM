@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"monetasa/examples/fabric-ca/blockchain"
+	"monetasa/examples/blockchain"
 	"monetasa/examples/fabric-ca/users"
 )
 
@@ -12,7 +12,7 @@ func main() {
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:   "Admin",
 		OrgName:    "org1",
-		ConfigFile: "config.yaml",
+		ConfigFile: "../config.yaml",
 		// Channel parameters
 		ChannelID: "myc",
 	}

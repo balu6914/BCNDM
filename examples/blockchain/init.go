@@ -13,6 +13,7 @@ import (
 type FabricSetup struct {
 	ConfigFile  string
 	ChannelID   string
+	ChaincodeID string
 	Initialized bool
 	OrgAdmin    string
 	OrgName     string
