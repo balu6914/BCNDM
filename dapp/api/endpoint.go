@@ -7,15 +7,6 @@ import (
 	"monetasa/dapp"
 )
 
-func versionEndpoint() endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		res := versionRes{
-			Version: "0.1.0",
-		}
-		return res, nil
-	}
-}
-
 func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createStreamReq)
@@ -94,32 +85,26 @@ func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	}
 }
 
-// func searchStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
-// 	return func(_ context.Context, request interface{}) (interface{}, error) {
-// 		req := request.(searchStreamReq)
-// 		streams, err := svc.Search(req)
-// 		res := searchStreamRes{
-// 			Streams: streams,
-// 		}
+func searchStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(searchStreamReq)
 
-// 		fmt.Println("searchStreamEndpoint response")
-// 		fmt.Println(res)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
 
-// 		return res, err
-// 	}
-// }
+		coords := [][]float64{[]float64{req.x0, req.y0}, []float64{req.x1, req.y1},
+			[]float64{req.x2, req.y2}, []float64{req.x3, req.y3},
+			[]float64{req.x0, req.y0}}
 
-// func purchaseStreamEndpoint(svc StreamRepository) endpoint.Endpoint {
-// 	return func(_ context.Context, request interface{}) (interface{}, error) {
-// 		req := request.(purchaseStreamReq)
-// 		osReq := oneStreamReq{
-// 			Name: req.Name,
-// 		}
-// 		stream, err := svc.One(osReq)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		fmt.Println("Purchasing the stream", stream.Name)
-// 		return stream, nil
-// 	}
-// }
+		streams, err := svc.Search(coords)
+		if err != nil {
+			return nil, err
+		}
+
+		res := searchStreamRes{
+			Streams: streams,
+		}
+		return res, nil
+	}
+}

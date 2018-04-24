@@ -7,10 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-kit/kit/log"
-
 	"monetasa/dapp/api"
 	"monetasa/dapp/mongo"
+	log "monetasa/logger"
 )
 
 const (
@@ -64,9 +63,7 @@ func main() {
 		MongoSocketTimeout:  defMongoSocketTimeout,
 	}
 
-	var logger log.Logger
-	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger := log.New(os.Stdout)
 
 	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
 		cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
@@ -77,7 +74,7 @@ func main() {
 	defer ms.Close()
 
 	sr := mongo.NewStreamRepository(ms)
-	// sr = api.LoggingMiddleware(sr, logger)
+	sr = api.LoggingMiddleware(sr, logger)
 
 	errs := make(chan error, 2)
 
@@ -92,5 +89,6 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
-	logger.Log("terminated", <-errs)
+	err = <-errs
+	logger.Error(fmt.Sprintf("Auth service terminated: %s", err))
 }

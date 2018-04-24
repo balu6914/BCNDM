@@ -28,11 +28,15 @@ var (
 	ErrUnsupportedContentType error = errors.New("unsupported content type")
 )
 
-type Location struct {
-	Longitude float32
-	Latitude  float32
-}
+// type Location struct {
+// 	Longitude float32
+// 	Latitude  float32
+// }
 
+type Location struct {
+	Type        string
+	Coordinates []float64
+}
 type Stream struct {
 	Name        string
 	Type        string
@@ -40,7 +44,7 @@ type Stream struct {
 	URL         string
 	Price       int
 	// Owner       User
-	// Longlat     Location
+	Location Location
 }
 
 // Validate returns an error if user representation is invalid.
@@ -71,7 +75,7 @@ type StreamRepository interface {
 	One(string) (Stream, error)
 
 	// Search for streams by means of geolocation parameters.
-	// Search([]int) ([]Stream, error)
+	Search([][]float64) ([]Stream, error)
 
 	// Removes the stream having the provided identifier, that is owned
 	// by the specified user.

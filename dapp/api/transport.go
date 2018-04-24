@@ -3,14 +3,15 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"io"
 	// "fmt"
+	"io"
 	"net/http"
-	// "strconv"
+	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 
+	"monetasa"
 	"monetasa/dapp"
 )
 
@@ -22,16 +23,16 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 
 	r := bone.New()
 
-	r.Get("/version", kithttp.NewServer(
-		versionEndpoint(),
-		decodeVersionRequest,
+	r.Post("/streams", kithttp.NewServer(
+		saveStreamEndpoint(sr),
+		decodeCreateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/streams", kithttp.NewServer(
-		saveStreamEndpoint(sr),
-		decodeCreateStreamRequest,
+	r.Get("/streams/search", kithttp.NewServer(
+		searchStreamEndpoint(sr),
+		decodeSearchStreamRequest,
 		encodeResponse,
 		opts...,
 	))
@@ -57,19 +58,7 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 		opts...,
 	))
 
-	// r.Get("/streams/search", kithttp.NewServer(
-	// 	searchStreamEndpoint(sr),
-	// 	decodeSearchStreamRequest,
-	// 	encodeResponse,
-	// opts...,
-	// ))
-
-	// r.Post("/streams/purch", kithttp.NewServer(
-	// 	purchaseStreamEndpoint(sr),
-	// 	decodePurchaseStreamRequest,
-	// 	encodeResponse,
-	// opts...,
-	// ))
+	r.GetFunc("/version", monetasa.Version())
 
 	return r
 }
@@ -115,39 +104,22 @@ func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{},
 
 }
 
-// func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-// 	var req searchStreamReq
-// 	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 	// 	return nil, errp
-// 	// }
-// 	q := r.URL.Query()
+func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	q := r.URL.Query()
 
-// 	req.Type = q["type"][0]
-// 	req.x0, _ = strconv.Atoi(q["x0"][0])
-// 	req.y0, _ = strconv.Atoi(q["y0"][0])
-// 	req.x1, _ = strconv.Atoi(q["x1"][0])
-// 	req.y1, _ = strconv.Atoi(q["y1"][0])
-// 	req.x2, _ = strconv.Atoi(q["x2"][0])
-// 	req.y2, _ = strconv.Atoi(q["y2"][0])
-// 	req.x3, _ = strconv.Atoi(q["x3"][0])
-// 	req.y3, _ = strconv.Atoi(q["y3"][0])
+	var req searchStreamReq
+	req.Type = q["type"][0]
+	req.x0, _ = strconv.ParseFloat(q["x0"][0], 64)
+	req.y0, _ = strconv.ParseFloat(q["y0"][0], 64)
+	req.x1, _ = strconv.ParseFloat(q["x1"][0], 64)
+	req.y1, _ = strconv.ParseFloat(q["y1"][0], 64)
+	req.x2, _ = strconv.ParseFloat(q["x2"][0], 64)
+	req.y2, _ = strconv.ParseFloat(q["y2"][0], 64)
+	req.x3, _ = strconv.ParseFloat(q["x3"][0], 64)
+	req.y3, _ = strconv.ParseFloat(q["y3"][0], 64)
 
-// 	fmt.Println("decodeSearchStreamRequest")
-// 	fmt.Println(req)
-// 	return req, nil
-// }
-
-// func decodePurchaseStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-// 	var req purchaseStreamReq
-// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 		return nil, err
-// 	}
-// 	return req, nil
-// }
-
-// func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-// 	return json.NewEncoder(w).Encode(response)
-// }
+	return req, nil
+}
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", contentType)

@@ -13,7 +13,7 @@ type streamRepository struct {
 // Ensure a type streamRepository implements an interface StreamRepository
 var _ dapp.StreamRepository = (*streamRepository)(nil)
 
-func NewStreamRepository(db *mgo.Session) *streamRepository {
+func NewStreamRepository(db *mgo.Session) dapp.StreamRepository {
 	return &streamRepository{db}
 }
 
@@ -77,26 +77,32 @@ func (sr streamRepository) Remove(id string) error {
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	_id := bson.ObjectIdHex(id)
 	if err := c.Remove(bson.M{"_id": _id}); err != nil {
+		if err == mgo.ErrNotFound {
+			return dapp.ErrNotFound
+		}
 		return err
 	}
 
 	return nil
 }
 
-// func (sr streamRepository) Search(coords []int) ([]Stream, error) {
-// 	fmt.Println("Search")
-// 	fmt.Println(req)
+func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
+	s := sr.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
 
-// 	count := 10
-// 	streams := make([]Stream, count)
-// 	for i := 0; i < count; i++ {
-// 		streams[i] = Stream{
-// 			Name:        fmt.Sprintf("Name: %d", i),
-// 			Type:        fmt.Sprintf("Type: %d", i),
-// 			Description: fmt.Sprintf("Description: %d", i),
-// 			Price:       i,
-// 		}
-// 	}
+	var results []dapp.Stream
+	err := c.Find(bson.M{
+		"location": bson.M{
+			"$geoWithin": bson.M{
+				"$polygon": coords,
+			},
+		},
+	}).All(&results)
 
-// 	return streams, nil
-// }
+	if err != nil {
+		return nil, dapp.ErrNotFound
+	}
+
+	return results, nil
+}

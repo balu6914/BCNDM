@@ -73,3 +73,16 @@ func (lm *loggingMiddleware) Remove(name string) (err error) {
 
 	return lm.svc.Remove(name)
 }
+
+func (lm *loggingMiddleware) Search(coords [][]float64) (streams []dapp.Stream, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method Search for took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.Search(coords)
+}

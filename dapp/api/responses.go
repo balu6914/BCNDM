@@ -78,10 +78,17 @@ func (res readStreamRes) empty() bool {
 }
 
 type searchStreamRes struct {
-	// Streams []Stream `json:"streams"`
 	Streams []dapp.Stream
 }
 
+func (res searchStreamRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res searchStreamRes) code() int {
+	return http.StatusOK
+}
+
 func (res searchStreamRes) empty() bool {
-	return true
+	return false
 }
