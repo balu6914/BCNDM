@@ -39,6 +39,32 @@ func TestRegister(t *testing.T) {
 	}
 }
 
+func TestView(t *testing.T) {
+	svc := newService()
+	svc.Register(user)
+	key, _ := svc.Login(user)
+
+	cases := map[string]struct {
+		key string
+		err error
+	}{
+		"View existing user":     {key, nil},
+		"View non-existing user": {wrong, auth.ErrUnauthorizedAccess},
+	}
+
+	for desc, tc := range cases {
+		_, err := svc.View(tc.key)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+	}
+}
+
+func TestUpdate(t *testing.T) {
+
+}
+
+func TestDelete(t *testing.T) {
+
+}
 func TestLogin(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
