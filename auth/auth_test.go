@@ -59,12 +59,48 @@ func TestView(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
+	svc := newService()
+	svc.Register(user)
+	key, _ := svc.Login(user)
 
+	userUp := auth.User{"user@example.com", "newPassword"}
+	user2 := auth.User{"wrong@exemple.com", "newPassword"}
+
+	cases := map[string]struct {
+		key  string
+		user auth.User
+		err  error
+	}{
+		"Update user":                        {key, userUp, nil},
+		"Update user with wrong credentials": {wrong, userUp, auth.ErrUnauthorizedAccess},
+		"Update user email":                  {key, user2, auth.ErrUnauthorizedAccess},
+	}
+
+	for desc, tc := range cases {
+		err := svc.Update(tc.key, tc.user)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+	}
 }
 
 func TestDelete(t *testing.T) {
+	svc := newService()
+	svc.Register(user)
+	key, _ := svc.Login(user)
 
+	cases := map[string]struct {
+		key string
+		err error
+	}{
+		"Delete user":                        {key, nil},
+		"Delete user with wrong credentials": {wrong, auth.ErrUnauthorizedAccess},
+	}
+
+	for desc, tc := range cases {
+		err := svc.Delete(tc.key)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+	}
 }
+
 func TestLogin(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
