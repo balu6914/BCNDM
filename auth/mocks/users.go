@@ -40,10 +40,26 @@ func (urm *userRepositoryMock) One(email string) (auth.User, error) {
 	return auth.User{}, auth.ErrUnauthorizedAccess
 }
 
-func (ur *userRepositoryMock) Update(user auth.User) error {
+func (urm *userRepositoryMock) Update(user auth.User) error {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+
+	if _, ok := urm.users[user.Email]; !ok {
+		return auth.ErrNotFound
+	}
+
+	urm.users[user.Email] = user
 	return nil
 }
 
-func (ur *userRepositoryMock) Remove(email string) error {
+func (urm *userRepositoryMock) Remove(email string) error {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+
+	if _, ok := urm.users[email]; !ok {
+		return auth.ErrNotFound
+	}
+
+	urm.users[email] = auth.User{}
 	return nil
 }
