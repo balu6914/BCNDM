@@ -13,7 +13,7 @@ client:
   # Which organization does this application instance belong to? The value must be the name of an org
   organization: org1
   logging:
-    level: info
+    level: debug
 
   # Global configuration for peer, event service and orderer timeouts
   peer:
@@ -93,7 +93,6 @@ organizations:
     cryptoPath: "peerOrganizations/org1.monetasa.com/users/{userName}@org1.monetasa.com/msp"
     peers:
       - peer0.org1.monetasa.com
-      - peer1.org1.monetasa.com
     certificateAuthorities:
       - ca.org1.monetasa.com
 
@@ -119,7 +118,6 @@ peers:
     grpcOptions:
       ssl-target-name-override: peer0.org1.monetasa.com
       grpc.http2.keepalive_time: 15
-
     tlsCACerts:
       path: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
 
