@@ -9,7 +9,6 @@ import (
 
 func main() {
 
-	// Definition of the Fabric SDK properties
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:   "admin",
 		OrgName:    "org1",
@@ -19,9 +18,7 @@ func main() {
 		ChaincodeID: "token",
 	}
 
-	/**
-	 * Initialization of the Fabric SDK from the previously set properties
-	 */
+	// Initialization of the Fabric SDK from the previously set properties
 	err := fSetup.Initialize()
 	if err != nil {
 		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
@@ -31,7 +28,7 @@ func main() {
 
 	b := token.BcNetwork{Fabric: &fSetup}
 
-	balance, err := b.Balance("admin")
+	balance, err := b.Balance("test")
 
 	if err != nil {
 		fmt.Println("Error fetching balance", err)

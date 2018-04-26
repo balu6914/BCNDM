@@ -8,18 +8,14 @@ import (
 
 func main() {
 
-	// Definition of the Fabric SDK properties
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:   "Admin",
 		OrgName:    "org1",
 		ConfigFile: "../config.yaml",
-		// Channel parameters
-		ChannelID: "myc",
+		ChannelID:  "myc",
 	}
 
-	/**
-	 * Initialization of the Fabric SDK from the previously set properties
-	 */
+	// Initialization of the Fabric SDK from the previously set properties
 	err := fSetup.Initialize()
 	if err != nil {
 		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
@@ -39,11 +35,5 @@ func main() {
 	}
 
 	fmt.Println("User created!: %v\n", newUser)
-
-	/**
-	 * Set the user in context
-	 */
-
-	//userContext := fSetup.Sdk.Context(fabsdk.WithUser("test1"), fabsdk.WithOrg(fSetup.OrgName))
 
 }

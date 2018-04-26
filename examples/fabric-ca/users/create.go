@@ -23,7 +23,7 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 
 	// Register the new user
 	enrollmentSecret, err := mspClient.Register(&msp.RegistrationRequest{
-		Name:        "nikola",
+		Name:        "test",
 		Affiliation: "org1",
 		Secret:      "12345",
 	})

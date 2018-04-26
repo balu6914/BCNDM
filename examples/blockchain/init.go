@@ -37,9 +37,6 @@ func (setup *FabricSetup) Initialize() error {
 
 	setup.Sdk = sdk
 
-	// ClientContext allows creation of transactions using the supplied identity as the credential.
-	// We will need this to set specific user to context (e.g make transactions in his name etc...).
-	//clientContext := sdk.Context(fabsdk.WithUser(orgAdmin), fabsdk.WithOrg(ordererOrgName))
 	setup.Initialized = true
 	return nil
 }
