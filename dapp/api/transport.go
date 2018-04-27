@@ -16,7 +16,7 @@ import (
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(sr dapp.StreamRepository) http.Handler {
+func MakeHandler(sr dapp.Service) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
@@ -24,7 +24,7 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 	r := bone.New()
 
 	r.Post("/streams", kithttp.NewServer(
-		saveStreamEndpoint(sr),
+		addStreamEndpoint(sr),
 		decodeCreateStreamRequest,
 		encodeResponse,
 		opts...,
@@ -45,7 +45,7 @@ func MakeHandler(sr dapp.StreamRepository) http.Handler {
 	))
 
 	r.Get("/streams/:id", kithttp.NewServer(
-		oneStreamEndpoint(sr),
+		viewStreamEndpoint(sr),
 		decodeReadStreamRequest,
 		encodeResponse,
 		opts...,

@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"monetasa/dapp"
 	"monetasa/dapp/api"
 	"monetasa/dapp/mongo"
 	log "monetasa/logger"
@@ -68,19 +69,19 @@ func main() {
 	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
 		cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
 	if err != nil {
-		// logger.Error("Failed to connect to Mongo.", zap.Error(err))
 		os.Exit(1)
 	}
 	defer ms.Close()
 
 	sr := mongo.NewStreamRepository(ms)
-	sr = api.LoggingMiddleware(sr, logger)
+	svc := dapp.New(sr)
+	svc = api.LoggingMiddleware(svc, logger)
 
 	errs := make(chan error, 2)
 
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
-		errs <- http.ListenAndServe(p, api.MakeHandler(sr))
+		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
 	}()
 
 	go func() {

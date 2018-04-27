@@ -7,7 +7,7 @@ import (
 	"monetasa/dapp"
 )
 
-func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createStreamReq)
 
@@ -15,9 +15,7 @@ func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 			return nil, err
 		}
 
-		err := svc.Save(req.Stream)
-
-		if err != nil {
+		if err := svc.AddStream("", req.Stream); err != nil {
 			return nil, err
 		}
 
@@ -25,7 +23,7 @@ func saveStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	}
 }
 
-func updateStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+func updateStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateStreamReq)
 
@@ -33,9 +31,7 @@ func updateStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 			return nil, err
 		}
 
-		err := svc.Update(req.Id, req.Stream)
-
-		if err != nil {
+		if err := svc.UpdateStream("", req.Id, req.Stream); err != nil {
 			return nil, err
 		}
 
@@ -43,7 +39,7 @@ func updateStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	}
 }
 
-func oneStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+func viewStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(readStreamReq)
 
@@ -51,7 +47,7 @@ func oneStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 			return nil, err
 		}
 
-		s, err := svc.One(req.Id)
+		s, err := svc.ViewStream("", req.Id)
 
 		if err != nil {
 			return nil, err
@@ -67,7 +63,7 @@ func oneStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	}
 }
 
-func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+func removeStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteStreamReq)
 
@@ -75,9 +71,7 @@ func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 			return nil, err
 		}
 
-		err := svc.Remove(req.Id)
-
-		if err != nil {
+		if err := svc.RemoveStream("", req.Id); err != nil {
 			return nil, err
 		}
 
@@ -85,7 +79,7 @@ func removeStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 	}
 }
 
-func searchStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
+func searchStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(searchStreamReq)
 
@@ -93,11 +87,15 @@ func searchStreamEndpoint(svc dapp.StreamRepository) endpoint.Endpoint {
 			return nil, err
 		}
 
-		coords := [][]float64{[]float64{req.x0, req.y0}, []float64{req.x1, req.y1},
-			[]float64{req.x2, req.y2}, []float64{req.x3, req.y3},
-			[]float64{req.x0, req.y0}}
+		coords := [][]float64{
+			[]float64{req.x0, req.y0},
+			[]float64{req.x1, req.y1},
+			[]float64{req.x2, req.y2},
+			[]float64{req.x3, req.y3},
+			[]float64{req.x0, req.y0},
+		}
 
-		streams, err := svc.Search(coords)
+		streams, err := svc.SearchStreams(coords)
 		if err != nil {
 			return nil, err
 		}
