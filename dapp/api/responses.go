@@ -14,22 +14,6 @@ type apiRes interface {
 	empty() bool
 }
 
-type versionRes struct {
-	Version string `json:"version"`
-}
-
-func (res versionRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res versionRes) code() int {
-	return http.StatusOK
-}
-
-func (res versionRes) empty() bool {
-	return false
-}
-
 type createStreamRes struct{}
 
 func (res createStreamRes) headers() map[string]string {
