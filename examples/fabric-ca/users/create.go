@@ -17,8 +17,8 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 	mspClient, err := msp.New(ctxProvider)
 
 	if err != nil {
-		return nil, err
 		fmt.Println("MSP client init failed: %v", err)
+		return nil, err
 	}
 
 	// Register the new user
@@ -29,8 +29,8 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 	})
 
 	if err != nil {
-		return nil, err
 		fmt.Println("Registration failed: %v", err)
+		return nil, err
 	}
 
 	// Enroll the new user

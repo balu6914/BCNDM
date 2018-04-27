@@ -111,7 +111,7 @@ orderers:
 peers:
   peer0.org1.monetasa.com:
     # this URL is used to send endorsement and query requests
-    url: grpcs://localhost:7051
+    url: grpc://localhost:7051
     # this URL is used to connect the EventHub and registering event listeners
     eventUrl: grpcs://localhost:7053
     # These parameters should be set in coordination with the keepalive policy on the server

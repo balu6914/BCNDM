@@ -7,10 +7,10 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
-type Balance struct {
-	User  string `json:"user"`
-	Value uint64 `json:"value"`
-}
+// type Balance struct {
+// 	User  string `json:"user"`
+// 	Value uint64 `json:"value"`
+// }
 
 // Returns the account balance of another account with address user.
 func (bc *BcNetwork) Balance(name string) (b []byte, err error) {
@@ -36,7 +36,8 @@ func (bc *BcNetwork) Balance(name string) (b []byte, err error) {
 
 	balance, err := client.Query(channel.Request{
 		ChaincodeID: bc.Fabric.ChannelID,
-		Fcn:         args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])},
+		Fcn:         args[0],
+		Args:        [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])},
 	})
 
 	if err != nil {

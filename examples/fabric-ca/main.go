@@ -24,11 +24,7 @@ func main() {
 
 	b := users.BcNetwork{Fabric: &fSetup}
 
-	/**
-	 * Create New user in Fabric network calling fabric-ca
-	 * [err fabric-ca err response]
-	 * user user Object
-	 */
+	// Create New user in Fabric network calling fabric-ca
 	newUser, err := b.CreateUser()
 	if err != nil {
 		fmt.Println("Unable to create a user in the fabric-ca %v\n", err)

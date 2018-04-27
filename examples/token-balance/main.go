@@ -10,10 +10,9 @@ import (
 func main() {
 
 	fSetup := blockchain.FabricSetup{
-		OrgAdmin:   "admin",
-		OrgName:    "org1",
-		ConfigFile: "../config.yaml",
-		// Channel parameters
+		OrgAdmin:    "admin",
+		OrgName:     "org1",
+		ConfigFile:  "../config.yaml",
 		ChannelID:   "myc",
 		ChaincodeID: "token",
 	}
