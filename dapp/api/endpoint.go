@@ -15,11 +15,15 @@ func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.AddStream("", req.Stream); err != nil {
+		id, err := svc.AddStream("", req.Stream)
+
+		if err != nil {
 			return nil, err
 		}
 
-		return createStreamRes{}, nil
+		return createStreamRes{
+			ID: id,
+		}, nil
 	}
 }
 

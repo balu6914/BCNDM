@@ -1,7 +1,6 @@
 package mocks
 
 import (
-	"fmt"
 	"sync"
 
 	"monetasa/dapp"
@@ -9,7 +8,7 @@ import (
 
 var _ dapp.StreamRepository = (*streamRepositoryMock)(nil)
 
-const strId = "123e4567-e89b-12d3-a456-"
+const strName = "stream_name_"
 
 type streamRepositoryMock struct {
 	mu      sync.Mutex
@@ -24,23 +23,16 @@ func NewStreamRepository() dapp.StreamRepository {
 	}
 }
 
-func (srm *streamRepositoryMock) Id() string {
+func (srm *streamRepositoryMock) Save(stream dapp.Stream) (string, error) {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	srm.counter += 1
-	return fmt.Sprintf("%s%012d", strId, srm.counter)
-}
+	if _, ok := srm.streams[stream.ID.Hex()]; ok {
+		return "", dapp.ErrConflict
+	}
+	srm.streams[stream.ID.Hex()] = stream
 
-// TODO: Generate a dbKey with func key(email, id string) string in the commons.go
-
-func (srm *streamRepositoryMock) Save(stream dapp.Stream) error {
-	srm.mu.Lock()
-	defer srm.mu.Unlock()
-
-	srm.streams[srm.Id()] = stream
-
-	return nil
+	return stream.ID.Hex(), nil
 }
 
 func (srm *streamRepositoryMock) Update(id string, stream dapp.Stream) error {
@@ -57,8 +49,8 @@ func (srm *streamRepositoryMock) Update(id string, stream dapp.Stream) error {
 }
 
 func (srm *streamRepositoryMock) One(id string) (dapp.Stream, error) {
-	if c, ok := srm.streams[id]; ok {
-		return c, nil
+	if s, ok := srm.streams[id]; ok {
+		return s, nil
 	}
 
 	return dapp.Stream{}, dapp.ErrNotFound

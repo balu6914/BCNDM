@@ -13,7 +13,7 @@ func New(streams StreamRepository) Service {
 	}
 }
 
-func (ds *dappService) AddStream(key string, stream Stream) error {
+func (ds *dappService) AddStream(key string, stream Stream) (string, error) {
 	return ds.streams.Save(stream)
 }
 

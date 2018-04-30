@@ -20,7 +20,7 @@ func LoggingMiddleware(svc dapp.Service, logger log.Logger) dapp.Service {
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) AddStream(key string, stream dapp.Stream) (err error) {
+func (lm *loggingMiddleware) AddStream(key string, stream dapp.Stream) (id string, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method save for stream %s took %s to complete", stream.Name, time.Since(begin))
 		if err != nil {

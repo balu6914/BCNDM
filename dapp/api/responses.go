@@ -14,10 +14,14 @@ type apiRes interface {
 	empty() bool
 }
 
-type createStreamRes struct{}
+type createStreamRes struct {
+	ID string
+}
 
 func (res createStreamRes) headers() map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"location": res.ID,
+	}
 }
 
 func (res createStreamRes) code() int {

@@ -7,7 +7,7 @@ import (
 var (
 	// ErrConflict indicates usage of the existing email during account
 	// registration.
-	ErrConflict error = errors.New("email already taken")
+	ErrConflict error = errors.New("stream id already taken")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
 	// invalid username or password).
@@ -31,7 +31,7 @@ var (
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	// Adds new stream to the user identified by the provided key.
-	AddStream(string, Stream) error
+	AddStream(string, Stream) (string, error)
 
 	// Updates the stream identified by the provided ID, that
 	// belongs to the user identified by the provided key.

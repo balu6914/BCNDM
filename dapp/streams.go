@@ -2,6 +2,7 @@ package dapp
 
 import (
 	"github.com/asaskevich/govalidator"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Location struct {
@@ -9,6 +10,7 @@ type Location struct {
 	Coordinates []float64
 }
 type Stream struct {
+	ID          bson.ObjectId `bson:"_id"`
 	Name        string
 	Type        string
 	Description string
@@ -36,7 +38,7 @@ func (s *Stream) Validate() error {
 type StreamRepository interface {
 	// Save persists the stream. A non-nil error is returned to indicate
 	// operation failure.
-	Save(Stream) error
+	Save(Stream) (string, error)
 
 	// Update performs an update of an existing stream. A non-nil error is
 	// returned to indicate operation failure.

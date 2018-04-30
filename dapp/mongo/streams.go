@@ -17,20 +17,20 @@ func NewStreamRepository(db *mgo.Session) dapp.StreamRepository {
 	return &streamRepository{db}
 }
 
-func (sr streamRepository) Save(stream dapp.Stream) error {
+func (sr streamRepository) Save(stream dapp.Stream) (string, error) {
 	s := sr.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
 	if err := c.Insert(stream); err != nil {
 		if mgo.IsDup(err) {
-			return dapp.ErrConflict
+			return "", dapp.ErrConflict
 		}
 
-		return err
+		return "", err
 	}
 
-	return nil
+	return stream.ID.Hex(), nil
 }
 
 func (sr streamRepository) Update(id string, stream dapp.Stream) error {

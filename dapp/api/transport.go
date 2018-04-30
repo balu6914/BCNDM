@@ -10,6 +10,7 @@ import (
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
+	"gopkg.in/mgo.v2/bson"
 
 	"monetasa"
 	"monetasa/dapp"
@@ -63,15 +64,12 @@ func MakeHandler(sr dapp.Service) http.Handler {
 	return r
 }
 
-func decodeVersionRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return nil, nil
-}
-
 func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var stream dapp.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
+	stream.ID = bson.NewObjectId()
 
 	return createStreamReq{stream}, nil
 }
