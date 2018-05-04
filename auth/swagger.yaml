@@ -113,7 +113,7 @@ paths:
             Failed due to malformed JSON or using an invalid credentials.
         500:
           $ref: "#/responses/ServiceError"
-  /canaccess:
+  /access-grant:
     get:
       summary: Checks the token validity
       description: |

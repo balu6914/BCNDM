@@ -103,20 +103,3 @@ func identityEndpoint(svc auth.Service) endpoint.Endpoint {
 		return identityRes{Email: email}, nil
 	}
 }
-
-func canAccessEndpoint(svc auth.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(identityReq)
-
-		if err := req.validate(); err != nil {
-			return nil, auth.ErrUnauthorizedAccess
-		}
-
-		email, err := svc.CanAccess(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return identityRes{Email: email}, nil
-	}
-}

@@ -57,8 +57,8 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/can_access", kithttp.NewServer(
-		canAccessEndpoint(svc),
+	r.Get("/access-grant", kithttp.NewServer(
+		identityEndpoint(svc),
 		decodeIdentity,
 		encodeResponse,
 		opts...,
