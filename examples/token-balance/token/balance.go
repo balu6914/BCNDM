@@ -41,7 +41,7 @@ func (bc *BcNetwork) Balance(name string) (b []byte, err error) {
 	})
 
 	if err != nil {
-		fmt.Println("Error fetching balance")
+		fmt.Println("Error fetching balance!!!")
 		return nil, err
 
 	}

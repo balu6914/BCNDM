@@ -27,10 +27,10 @@ func main() {
 
 	b := token.BcNetwork{Fabric: &fSetup}
 
-	balance, err := b.Balance("test")
+	balance, err := b.Balance("nemanja")
 
 	if err != nil {
-		fmt.Println("Error fetching balance", err)
+		fmt.Println("Error fetching balance!!!", err)
 		os.Exit(3)
 	}
 

@@ -29,6 +29,7 @@ client:
     timeout:
       connection: 3s
       response: 5s
+  localMspId: DEFAULT
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
@@ -89,8 +90,9 @@ channels:
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: org1.monetasa.com
-    cryptoPath: "peerOrganizations/org1.monetasa.com/users/{userName}@org1.monetasa.com/msp"
+    mspid: DEFAULT
+    #MSPDir: msp
+    cryptoPath: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
     peers:
       - peer0.org1.monetasa.com
     certificateAuthorities:
@@ -100,7 +102,7 @@ organizations:
 # The orderers consent on the order of transactions in a block to be committed to the ledger. For the time being only one orderer is needed.
 orderers:
   orderer.monetasa.com:
-    url: grpcs://localhost:7050
+    url: grpc://localhost:7050
     grpcOptions:
       ssl-target-name-override: orderer.monetasa.com
       grpc-max-send-message-length: 15
@@ -113,7 +115,7 @@ peers:
     # this URL is used to send endorsement and query requests
     url: grpc://localhost:7051
     # this URL is used to connect the EventHub and registering event listeners
-    eventUrl: grpcs://localhost:7053
+    eventUrl: grpc://localhost:7053
     # These parameters should be set in coordination with the keepalive policy on the server
     grpcOptions:
       ssl-target-name-override: peer0.org1.monetasa.com
@@ -133,3 +135,16 @@ certificateAuthorities:
       enrollId: admin
       enrollSecret: adminpw
     caName: ca.org1.monetasa.com
+
+entityMatchers:
+ peer:
+  - pattern: (\w+).org1.monetasa.(\w+)
+    urlSubstitutionExp: localhost:7051
+    eventUrlSubstitutionExp: localhost:7053
+    sslTargetOverrideUrlSubstitutionExp: peer0.org1.monetasa.com
+    mappedHost: local.peer0.org1.monetasa.com
+orderer:
+  - pattern: (\w+).monetasa.(\w+)
+    urlSubstitutionExp: localhost:7050
+    sslTargetOverrideUrlSubstitutionExp: orderer.monetasa.com
+    mappedHost: orderer.monetasa.com

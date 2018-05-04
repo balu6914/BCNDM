@@ -4,18 +4,11 @@ OrdererOrgs:
 #---------------------------------------------------------
 # Orderer
 # --------------------------------------------------------
-- Name: orderer
+- Name: Orderer
   Domain: monetasa.com
-  CA:
-      Country: US
-      Province: California
-      Locality: San Francisco
-  #   OrganizationalUnit: Hyperledger Fabric
-  #   StreetAddress: address for org # default nil
-  #   PostalCode: postalCode for org # default nil
   # ------------------------------------------------------
   # "Specs" - See PeerOrgs below for complete description
-# -----------------------------------------------------
+  # -----------------------------------------------------
   Specs:
     - Hostname: orderer
 # -------------------------------------------------------
@@ -25,6 +18,8 @@ PeerOrgs:
 # -----------------------------------------------------
 # Org1
 # ----------------------------------------------------
-- Name: org1
+- Name: Org1
   Domain: org1.monetasa.com
-  EnableNodeOUs: true
+  EnableNodeOUs: false
+  Template:
+    Count: 1

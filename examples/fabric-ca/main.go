@@ -9,7 +9,7 @@ import (
 func main() {
 
 	fSetup := blockchain.FabricSetup{
-		OrgAdmin:   "Admin",
+		OrgAdmin:   "admin",
 		OrgName:    "org1",
 		ConfigFile: "../config.yaml",
 		ChannelID:  "myc",

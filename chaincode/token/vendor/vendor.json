@@ -1,0 +1,11 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"path": "github.com/hyperledger/fabric/protos/msp",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/fabric-token/chaincode"
+}
