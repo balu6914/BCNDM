@@ -100,12 +100,3 @@ func (ms *authService) Identity(key string) (string, error) {
 
 	return user, nil
 }
-
-func (ms *authService) CanAccess(key string) (string, error) {
-	email, err := ms.idp.Identity(key)
-	if err != nil {
-		return "", err
-	}
-
-	return email, nil
-}
