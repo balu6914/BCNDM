@@ -3,11 +3,9 @@ package api
 import (
 	"context"
 	"encoding/json"
-	// "fmt"
 	"io"
 	"net/http"
 	"strconv"
-	// "strings"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -18,7 +16,6 @@ import (
 	"monetasa/auth/client"
 
 	"monetasa/dapp"
-	// "monetasa/dapp/mongo"
 )
 
 var (
