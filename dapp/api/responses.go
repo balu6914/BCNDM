@@ -1,10 +1,9 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/mainflux/mainflux/manager"
+	"monetasa/dapp"
 )
 
 const contentType = "application/json; charset=utf-8"
@@ -15,202 +14,70 @@ type apiRes interface {
 	empty() bool
 }
 
-type identityRes struct {
-	id string
+type createStreamRes struct {
+	ID string
 }
 
-func (res identityRes) headers() map[string]string {
+func (res createStreamRes) headers() map[string]string {
 	return map[string]string{
-		"X-client-id": res.id,
+		"location": res.ID,
 	}
 }
 
-func (res identityRes) code() int {
-	return http.StatusOK
-}
-
-func (res identityRes) empty() bool {
-	return true
-}
-
-type tokenRes struct {
-	Token string `json:"token,omitempty"`
-}
-
-func (res tokenRes) code() int {
+func (res createStreamRes) code() int {
 	return http.StatusCreated
 }
 
-func (res tokenRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res tokenRes) empty() bool {
-	return res.Token == ""
-}
-
-type removeRes struct{}
-
-func (res removeRes) code() int {
-	return http.StatusNoContent
-}
-
-func (res removeRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res removeRes) empty() bool {
+func (res createStreamRes) empty() bool {
 	return true
 }
 
-type clientRes struct {
-	id      string
-	created bool
-}
+type modifyStreamRes struct{}
 
-func (res clientRes) code() int {
-	if res.created {
-		return http.StatusCreated
-	}
-
-	return http.StatusOK
-}
-
-func (res clientRes) headers() map[string]string {
-	if res.created {
-		return map[string]string{
-			"Location": fmt.Sprint("/clients/", res.id),
-		}
-	}
-
+func (res modifyStreamRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res clientRes) empty() bool {
+func (res modifyStreamRes) code() int {
+	return http.StatusOK
+}
+
+func (res modifyStreamRes) empty() bool {
 	return true
 }
 
-type viewClientRes struct {
-	manager.Client
+type readStreamRes struct {
+	Name        string        `json:"name"`
+	Type        string        `json:"type"`
+	Description string        `json:"description"`
+	Price       int           `json:"price"`
+	Location    dapp.Location `json:"location"`
 }
 
-func (res viewClientRes) code() int {
-	return http.StatusOK
-}
-
-func (res viewClientRes) headers() map[string]string {
+func (res readStreamRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res viewClientRes) empty() bool {
+func (res readStreamRes) code() int {
+	return http.StatusOK
+}
+
+func (res readStreamRes) empty() bool {
 	return false
 }
 
-type listClientsRes struct {
-	Clients []manager.Client `json:"clients"`
-	count   int
+type searchStreamRes struct {
+	Streams []dapp.Stream
 }
 
-func (res listClientsRes) code() int {
+func (res searchStreamRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res searchStreamRes) code() int {
 	return http.StatusOK
 }
 
-func (res listClientsRes) headers() map[string]string {
-	return map[string]string{
-		"X-Count": fmt.Sprintf("%d", res.count),
-	}
-}
-
-func (res listClientsRes) empty() bool {
+func (res searchStreamRes) empty() bool {
 	return false
-}
-
-type channelRes struct {
-	id      string
-	created bool
-}
-
-func (res channelRes) code() int {
-	if res.created {
-		return http.StatusCreated
-	}
-
-	return http.StatusOK
-}
-
-func (res channelRes) headers() map[string]string {
-	if res.created {
-		return map[string]string{
-			"Location": fmt.Sprint("/channels/", res.id),
-		}
-	}
-
-	return map[string]string{}
-}
-
-func (res channelRes) empty() bool {
-	return true
-}
-
-type viewChannelRes struct {
-	manager.Channel
-}
-
-func (res viewChannelRes) code() int {
-	return http.StatusOK
-}
-
-func (res viewChannelRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res viewChannelRes) empty() bool {
-	return false
-}
-
-type listChannelsRes struct {
-	Channels []manager.Channel `json:"channels"`
-	count    int
-}
-
-func (res listChannelsRes) code() int {
-	return http.StatusOK
-}
-
-func (res listChannelsRes) headers() map[string]string {
-	return map[string]string{
-		"X-Count": fmt.Sprintf("%d", res.count),
-	}
-}
-
-func (res listChannelsRes) empty() bool {
-	return false
-}
-
-type connectionRes struct{}
-
-func (res connectionRes) code() int {
-	return http.StatusOK
-}
-
-func (res connectionRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res connectionRes) empty() bool {
-	return true
-}
-
-type disconnectionRes struct{}
-
-func (res disconnectionRes) code() int {
-	return http.StatusNoContent
-}
-
-func (res disconnectionRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res disconnectionRes) empty() bool {
-	return true
 }

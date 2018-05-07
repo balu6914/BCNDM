@@ -2,280 +2,111 @@ package api
 
 import (
 	"context"
-
 	"github.com/go-kit/kit/endpoint"
-	"github.com/mainflux/mainflux/manager"
+
+	"monetasa/dapp"
 )
 
-func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
+func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(userReq)
+		req := request.(createStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		err := svc.Register(req.user)
-		return tokenRes{}, err
-	}
-}
-
-func loginEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(userReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		token, err := svc.Login(req.user)
-		if err != nil {
-			return nil, err
-		}
-
-		return tokenRes{token}, nil
-	}
-}
-
-func addClientEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(addClientReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		id, err := svc.AddClient(req.key, req.client)
-		if err != nil {
-			return nil, err
-		}
-
-		return clientRes{id: id, created: true}, nil
-	}
-}
-
-func updateClientEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(updateClientReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		req.client.ID = req.id
-
-		if err := svc.UpdateClient(req.key, req.client); err != nil {
-			return nil, err
-		}
-
-		return clientRes{id: req.id, created: false}, nil
-	}
-}
-
-func viewClientEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewResourceReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		client, err := svc.ViewClient(req.key, req.id)
-		if err != nil {
-			return nil, err
-		}
-
-		return viewClientRes{client}, nil
-	}
-}
-
-func listClientsEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(listResourcesReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		clients, err := svc.ListClients(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return listClientsRes{clients, len(clients)}, nil
-	}
-}
-
-func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewResourceReq)
-
-		err := req.validate()
-		if err == manager.ErrNotFound {
-			return removeRes{}, nil
-		}
+		id, err := svc.AddStream(req.User, req.Stream)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if err = svc.RemoveClient(req.key, req.id); err != nil {
-			return nil, err
-		}
-
-		return removeRes{}, nil
+		return createStreamRes{
+			ID: id,
+		}, nil
 	}
 }
 
-func createChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+func updateStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(createChannelReq)
+		req := request.(updateStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		id, err := svc.CreateChannel(req.key, req.channel)
+		if err := svc.UpdateStream(req.User, req.StreamId, req.Stream); err != nil {
+			return nil, err
+		}
+
+		return modifyStreamRes{}, nil
+	}
+}
+
+func viewStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(readStreamReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		s, err := svc.ViewStream(req.StreamId)
+
 		if err != nil {
 			return nil, err
 		}
 
-		return channelRes{id: id, created: true}, nil
+		res := readStreamRes{
+			Name:        s.Name,
+			Type:        s.Type,
+			Description: s.Description,
+			Price:       s.Price,
+		}
+		return res, nil
 	}
 }
 
-func updateChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+func removeStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(updateChannelReq)
+		req := request.(deleteStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		req.channel.ID = req.id
-
-		if err := svc.UpdateChannel(req.key, req.channel); err != nil {
+		if err := svc.RemoveStream(req.User, req.StreamId); err != nil {
 			return nil, err
 		}
 
-		return channelRes{id: req.id, created: false}, nil
+		return modifyStreamRes{}, nil
 	}
 }
 
-func viewChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+func searchStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewResourceReq)
+		req := request.(searchStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		channel, err := svc.ViewChannel(req.key, req.id)
+		coords := [][]float64{
+			[]float64{req.x0, req.y0},
+			[]float64{req.x1, req.y1},
+			[]float64{req.x2, req.y2},
+			[]float64{req.x3, req.y3},
+			[]float64{req.x0, req.y0},
+		}
+
+		streams, err := svc.SearchStreams(coords)
 		if err != nil {
 			return nil, err
 		}
 
-		return viewChannelRes{channel}, nil
-	}
-}
-
-func listChannelsEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(listResourcesReq)
-
-		if err := req.validate(); err != nil {
-			return nil, err
+		res := searchStreamRes{
+			Streams: streams,
 		}
-
-		channels, err := svc.ListChannels(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return listChannelsRes{channels, len(channels)}, nil
-	}
-}
-
-func removeChannelEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewResourceReq)
-
-		if err := req.validate(); err != nil {
-			if err == manager.ErrNotFound {
-				return removeRes{}, nil
-			}
-			return nil, err
-		}
-
-		if err := svc.RemoveChannel(req.key, req.id); err != nil {
-			return nil, err
-		}
-
-		return removeRes{}, nil
-	}
-}
-func connectEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cr := request.(connectionReq)
-
-		if err := cr.validate(); err != nil {
-			return nil, err
-		}
-
-		if err := svc.Connect(cr.key, cr.chanId, cr.clientId); err != nil {
-			return nil, err
-		}
-
-		return connectionRes{}, nil
-	}
-}
-
-func disconnectEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cr := request.(connectionReq)
-
-		if err := cr.validate(); err != nil {
-			return nil, err
-		}
-
-		if err := svc.Disconnect(cr.key, cr.chanId, cr.clientId); err != nil {
-			return nil, err
-		}
-
-		return disconnectionRes{}, nil
-	}
-}
-
-func identityEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(identityReq)
-
-		if err := req.validate(); err != nil {
-			return nil, manager.ErrUnauthorizedAccess
-		}
-
-		id, err := svc.Identity(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return identityRes{id: id}, nil
-	}
-}
-
-func canAccessEndpoint(svc manager.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewResourceReq)
-
-		if err := req.validate(); err != nil {
-			return nil, manager.ErrUnauthorizedAccess
-		}
-
-		id, err := svc.CanAccess(req.key, req.id)
-		if err != nil {
-			return nil, err
-		}
-
-		return identityRes{id: id}, nil
+		return res, nil
 	}
 }

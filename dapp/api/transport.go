@@ -3,241 +3,177 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
+	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
-	"github.com/mainflux/mainflux"
-	"github.com/mainflux/mainflux/manager"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/mgo.v2/bson"
+
+	"monetasa"
+	"monetasa/auth"
+	"monetasa/auth/client"
+
+	"monetasa/dapp"
+)
+
+var (
+	dappService dapp.Service
+	authClient  client.AuthClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc manager.Service) http.Handler {
+func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
+	dappService = sr
+	authClient = ac
+
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
 	r := bone.New()
 
-	r.Post("/users", kithttp.NewServer(
-		registrationEndpoint(svc),
-		decodeCredentials,
+	r.Post("/streams", kithttp.NewServer(
+		addStreamEndpoint(sr),
+		decodeCreateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/tokens", kithttp.NewServer(
-		loginEndpoint(svc),
-		decodeCredentials,
+	r.Get("/streams/search", kithttp.NewServer(
+		searchStreamEndpoint(sr),
+		decodeSearchStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/clients", kithttp.NewServer(
-		addClientEndpoint(svc),
-		decodeClientCreation,
+	r.Put("/streams/:id", kithttp.NewServer(
+		updateStreamEndpoint(sr),
+		decodeUpdateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Put("/clients/:id", kithttp.NewServer(
-		updateClientEndpoint(svc),
-		decodeClientUpdate,
+	r.Get("/streams/:id", kithttp.NewServer(
+		viewStreamEndpoint(sr),
+		decodeReadStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Delete("/clients/:id", kithttp.NewServer(
-		removeClientEndpoint(svc),
-		decodeView,
+	r.Delete("/streams/:id", kithttp.NewServer(
+		removeStreamEndpoint(sr),
+		decodeDeleteStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Get("/clients/:id", kithttp.NewServer(
-		viewClientEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/clients", kithttp.NewServer(
-		listClientsEndpoint(svc),
-		decodeList,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Post("/channels", kithttp.NewServer(
-		createChannelEndpoint(svc),
-		decodeChannelCreation,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Put("/channels/:id", kithttp.NewServer(
-		updateChannelEndpoint(svc),
-		decodeChannelUpdate,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Delete("/channels/:id", kithttp.NewServer(
-		removeChannelEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels/:id", kithttp.NewServer(
-		viewChannelEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels", kithttp.NewServer(
-		listChannelsEndpoint(svc),
-		decodeList,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Put("/channels/:chanId/clients/:clientId", kithttp.NewServer(
-		connectEndpoint(svc),
-		decodeConnection,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Delete("/channels/:chanId/clients/:clientId", kithttp.NewServer(
-		disconnectEndpoint(svc),
-		decodeConnection,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/access-grant", kithttp.NewServer(
-		identityEndpoint(svc),
-		decodeIdentity,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/channels/:id/access-grant", kithttp.NewServer(
-		canAccessEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
-	r.GetFunc("/version", mainflux.Version())
-	r.Handle("/metrics", promhttp.Handler())
+	r.GetFunc("/version", monetasa.Version())
 
 	return r
 }
 
-func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
-	req := identityReq{
-		key: r.Header.Get("Authorization"),
+func authenticate(r *http.Request) (string, error) {
+	// apiKey is a JWT token
+	apiKey := r.Header.Get("Authorization")
+
+	if apiKey == "" {
+		return "", auth.ErrUnauthorizedAccess
 	}
 
-	return req, nil
+	id, err := authClient.VerifyToken(apiKey)
+	if err != nil {
+		return "", err
+	}
+
+	// id is an email of the user
+	return id, nil
 }
 
-func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
-	var user manager.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
 		return nil, err
 	}
 
-	return userReq{user}, nil
-}
-
-func decodeClientCreation(_ context.Context, r *http.Request) (interface{}, error) {
-	var client manager.Client
-	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
+	var stream dapp.Stream
+	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
 
-	req := addClientReq{
-		key:    r.Header.Get("Authorization"),
-		client: client,
-	}
+	stream.ID = bson.NewObjectId()
 
+	req := createStreamReq{
+		User:   user,
+		Stream: stream,
+	}
 	return req, nil
 }
 
-func decodeClientUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var client manager.Client
-	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
+func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
 		return nil, err
 	}
 
-	req := updateClientReq{
-		key:    r.Header.Get("Authorization"),
-		id:     bone.GetValue(r, "id"),
-		client: client,
-	}
-
-	return req, nil
-}
-
-func decodeChannelCreation(_ context.Context, r *http.Request) (interface{}, error) {
-	var channel manager.Channel
-	if err := json.NewDecoder(r.Body).Decode(&channel); err != nil {
+	var stream dapp.Stream
+	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
 
-	req := createChannelReq{
-		key:     r.Header.Get("Authorization"),
-		channel: channel,
+	req := updateStreamReq{
+		User:     user,
+		StreamId: bone.GetValue(r, "id"),
+		Stream:   stream,
 	}
-
 	return req, nil
 }
 
-func decodeChannelUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var channel manager.Channel
-	if err := json.NewDecoder(r.Body).Decode(&channel); err != nil {
+func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	_, err := authenticate(r)
+	if err != nil {
 		return nil, err
 	}
 
-	req := updateChannelReq{
-		key:     r.Header.Get("Authorization"),
-		id:      bone.GetValue(r, "id"),
-		channel: channel,
+	req := readStreamReq{
+		StreamId: bone.GetValue(r, "id"),
 	}
-
 	return req, nil
 }
 
-func decodeView(_ context.Context, r *http.Request) (interface{}, error) {
-	req := viewResourceReq{
-		key: r.Header.Get("Authorization"),
-		id:  bone.GetValue(r, "id"),
+func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
 	}
 
+	req := deleteStreamReq{
+		User:     user,
+		StreamId: bone.GetValue(r, "id"),
+	}
 	return req, nil
+
 }
 
-func decodeList(_ context.Context, r *http.Request) (interface{}, error) {
-	req := listResourcesReq{
-		key:    r.Header.Get("Authorization"),
-		size:   10,
-		offset: 0,
+func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	_, err := authenticate(r)
+	if err != nil {
+		return nil, err
 	}
 
-	return req, nil
-}
+	q := r.URL.Query()
 
-func decodeConnection(_ context.Context, r *http.Request) (interface{}, error) {
-	req := connectionReq{
-		key:      r.Header.Get("Authorization"),
-		chanId:   bone.GetValue(r, "chanId"),
-		clientId: bone.GetValue(r, "clientId"),
-	}
+	var req searchStreamReq
+	req.Type = q["type"][0]
+	req.x0, _ = strconv.ParseFloat(q["x0"][0], 64)
+	req.y0, _ = strconv.ParseFloat(q["y0"][0], 64)
+	req.x1, _ = strconv.ParseFloat(q["x1"][0], 64)
+	req.y1, _ = strconv.ParseFloat(q["y1"][0], 64)
+	req.x2, _ = strconv.ParseFloat(q["x2"][0], 64)
+	req.y2, _ = strconv.ParseFloat(q["y2"][0], 64)
+	req.x3, _ = strconv.ParseFloat(q["x3"][0], 64)
+	req.y3, _ = strconv.ParseFloat(q["y3"][0], 64)
 
 	return req, nil
 }
@@ -264,20 +200,28 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
-	case manager.ErrMalformedEntity:
+	case dapp.ErrMalformedEntity:
 		w.WriteHeader(http.StatusBadRequest)
-	case manager.ErrUnauthorizedAccess:
+	case dapp.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
-	case manager.ErrNotFound:
+	case dapp.ErrNotFound:
 		w.WriteHeader(http.StatusNotFound)
-	case manager.ErrConflict:
+	case dapp.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
+	case dapp.ErrUnsupportedContentType:
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+	case io.ErrUnexpectedEOF:
+		w.WriteHeader(http.StatusBadRequest)
+	case io.EOF:
+		w.WriteHeader(http.StatusBadRequest)
 	default:
-		if _, ok := err.(*json.SyntaxError); ok {
+		switch err.(type) {
+		case *json.SyntaxError:
 			w.WriteHeader(http.StatusBadRequest)
-			return
+		case *json.UnmarshalTypeError:
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
 		}
-
-		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
