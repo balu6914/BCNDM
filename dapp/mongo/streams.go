@@ -69,23 +69,6 @@ func (sr streamRepository) One(id string) (dapp.Stream, error) {
 	return stream, nil
 }
 
-func (sr streamRepository) Remove(id string) error {
-	s := sr.db.Copy()
-	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
-
-	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	_id := bson.ObjectIdHex(id)
-	if err := c.Remove(bson.M{"_id": _id}); err != nil {
-		if err == mgo.ErrNotFound {
-			return dapp.ErrNotFound
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
 	s := sr.db.Copy()
 	defer s.Close()
@@ -105,4 +88,21 @@ func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
 	}
 
 	return results, nil
+}
+
+func (sr streamRepository) Remove(id string) error {
+	s := sr.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	// ObjectIdHex returns an ObjectId from the provided hex representation.
+	_id := bson.ObjectIdHex(id)
+	if err := c.Remove(bson.M{"_id": _id}); err != nil {
+		if err == mgo.ErrNotFound {
+			return dapp.ErrNotFound
+		}
+		return err
+	}
+
+	return nil
 }

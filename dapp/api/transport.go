@@ -7,17 +7,30 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	// "strings"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"gopkg.in/mgo.v2/bson"
 
 	"monetasa"
+	"monetasa/auth"
+	"monetasa/auth/client"
+
 	"monetasa/dapp"
+	// "monetasa/dapp/mongo"
+)
+
+var (
+	dappService dapp.Service
+	authClient  client.AuthClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(sr dapp.Service) http.Handler {
+func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
+	dappService = sr
+	authClient = ac
+
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
@@ -64,45 +77,94 @@ func MakeHandler(sr dapp.Service) http.Handler {
 	return r
 }
 
+func authenticate(r *http.Request) (string, error) {
+	// apiKey is a JWT token
+	apiKey := r.Header.Get("Authorization")
+
+	if apiKey == "" {
+		return "", auth.ErrUnauthorizedAccess
+	}
+
+	id, err := authClient.VerifyToken(apiKey)
+	if err != nil {
+		return "", err
+	}
+
+	// id is an email of the user
+	return id, nil
+}
+
 func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
 	var stream dapp.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
+
 	stream.ID = bson.NewObjectId()
 
-	return createStreamReq{stream}, nil
+	req := createStreamReq{
+		User:   user,
+		Stream: stream,
+	}
+	return req, nil
 }
 
 func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
 	var stream dapp.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
 
 	req := updateStreamReq{
-		Id:     bone.GetValue(r, "id"),
-		Stream: stream,
+		User:     user,
+		StreamId: bone.GetValue(r, "id"),
+		Stream:   stream,
 	}
 	return req, nil
 }
 
 func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	_, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
 	req := readStreamReq{
-		Id: bone.GetValue(r, "id"),
+		StreamId: bone.GetValue(r, "id"),
 	}
 	return req, nil
 }
 
 func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
 	req := deleteStreamReq{
-		Id: bone.GetValue(r, "id"),
+		User:     user,
+		StreamId: bone.GetValue(r, "id"),
 	}
 	return req, nil
 
 }
 
 func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	_, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
 	q := r.URL.Query()
 
 	var req searchStreamReq

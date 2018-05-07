@@ -10,14 +10,14 @@ type Location struct {
 	Coordinates []float64
 }
 type Stream struct {
+	User        string
 	ID          bson.ObjectId `bson:"_id"`
 	Name        string
 	Type        string
 	Description string
 	URL         string
 	Price       int
-	// Owner       User
-	Location Location
+	Location    Location
 }
 
 // Validate returns an error if user representation is invalid.

@@ -15,7 +15,7 @@ func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		id, err := svc.AddStream("", req.Stream)
+		id, err := svc.AddStream(req.User, req.Stream)
 
 		if err != nil {
 			return nil, err
@@ -35,7 +35,7 @@ func updateStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.UpdateStream("", req.Id, req.Stream); err != nil {
+		if err := svc.UpdateStream(req.User, req.StreamId, req.Stream); err != nil {
 			return nil, err
 		}
 
@@ -51,7 +51,7 @@ func viewStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		s, err := svc.ViewStream("", req.Id)
+		s, err := svc.ViewStream(req.StreamId)
 
 		if err != nil {
 			return nil, err
@@ -75,7 +75,7 @@ func removeStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.RemoveStream("", req.Id); err != nil {
+		if err := svc.RemoveStream(req.User, req.StreamId); err != nil {
 			return nil, err
 		}
 

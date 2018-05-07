@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"monetasa/auth/client"
 	"monetasa/dapp"
 	"monetasa/dapp/api"
 	"monetasa/dapp/mongo"
@@ -24,6 +25,8 @@ const (
 	defMongoPort           int    = 27017
 	defMongoConnectTimeout int    = 5000
 	defMongoSocketTimeout  int    = 5000
+	defAuthURL             string = "http://localhost:8180"
+	envAuthURL             string = "MONETASA_AUTH_URL"
 
 	envMongoURL string = "MONETASA_DAPP_MONGO_URL"
 	envDappURL  string = "MONETASA_DAPP_URL"
@@ -40,6 +43,8 @@ type config struct {
 	MongoPort           int
 	MongoConnectTimeout int
 	MongoSocketTimeout  int
+
+	AuthURL string
 }
 
 func getenv(key, fallback string) string {
@@ -62,6 +67,7 @@ func main() {
 		MongoPort:           defMongoPort,
 		MongoConnectTimeout: defMongoConnectTimeout,
 		MongoSocketTimeout:  defMongoSocketTimeout,
+		AuthURL:             getenv(envAuthURL, defAuthURL),
 	}
 
 	logger := log.New(os.Stdout)
@@ -73,6 +79,7 @@ func main() {
 	}
 	defer ms.Close()
 
+	ac := client.NewClient(cfg.AuthURL)
 	sr := mongo.NewStreamRepository(ms)
 	svc := dapp.New(sr)
 	svc = api.LoggingMiddleware(svc, logger)
@@ -81,7 +88,7 @@ func main() {
 
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
-		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
+		errs <- http.ListenAndServe(p, api.MakeHandler(svc, ac))
 	}()
 
 	go func() {

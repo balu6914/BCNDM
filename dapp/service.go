@@ -37,12 +37,10 @@ type Service interface {
 	// belongs to the user identified by the provided key.
 	UpdateStream(string, string, Stream) error
 
-	// Retrieves data about the stream identified with the provided
-	// ID, that belongs to the user identified by the provided key.
-	ViewStream(string, string) (Stream, error)
+	// Retrieves data about the stream identified with the provided ID
+	ViewStream(string) (Stream, error)
 
-	// Retrieves data about subset of streams
-	// given geolocation coordinates.
+	// Retrieves data about subset of streams given geolocation coordinates.
 	SearchStreams([][]float64) ([]Stream, error)
 
 	// Removes the stream identified with the provided ID, that

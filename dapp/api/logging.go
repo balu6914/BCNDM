@@ -48,7 +48,7 @@ func (lm *loggingMiddleware) UpdateStream(key string, id string, stream dapp.Str
 	return lm.svc.UpdateStream(key, id, stream)
 }
 
-func (lm *loggingMiddleware) ViewStream(key string, id string) (stream dapp.Stream, err error) {
+func (lm *loggingMiddleware) ViewStream(id string) (stream dapp.Stream, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method One for stream %s, took %s to complete", id, time.Since(begin))
 		if err != nil {
@@ -58,7 +58,7 @@ func (lm *loggingMiddleware) ViewStream(key string, id string) (stream dapp.Stre
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.ViewStream(key, id)
+	return lm.svc.ViewStream(id)
 }
 
 func (lm *loggingMiddleware) RemoveStream(key string, id string) (err error) {

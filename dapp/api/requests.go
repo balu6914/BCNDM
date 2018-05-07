@@ -6,11 +6,20 @@ import (
 	"monetasa/dapp"
 )
 
+const (
+	minLongitude = -180
+	maxLongitude = 180
+	minLatitude  = -90
+	maxLatitude  = 90
+	typeGeo      = "geo"
+)
+
 type apiReq interface {
 	validate() error
 }
 
 type createStreamReq struct {
+	User   string
 	Stream dapp.Stream
 }
 
@@ -19,16 +28,17 @@ func (req createStreamReq) validate() error {
 }
 
 type updateStreamReq struct {
-	Id     string
-	Stream dapp.Stream
+	User     string
+	StreamId string
+	Stream   dapp.Stream
 }
 
 func (req updateStreamReq) validate() error {
-	if req.Id == "" {
+	if req.StreamId == "" {
 		return dapp.ErrMalformedData
 	}
 
-	if !govalidator.IsHexadecimal(req.Id) {
+	if !govalidator.IsHexadecimal(req.StreamId) {
 		return dapp.ErrMalformedData
 	}
 
@@ -36,15 +46,15 @@ func (req updateStreamReq) validate() error {
 }
 
 type readStreamReq struct {
-	Id string
+	StreamId string
 }
 
 func (req readStreamReq) validate() error {
-	if req.Id == "" {
+	if req.StreamId == "" {
 		return dapp.ErrMalformedData
 	}
 
-	if !govalidator.IsHexadecimal(req.Id) {
+	if !govalidator.IsHexadecimal(req.StreamId) {
 		return dapp.ErrMalformedData
 	}
 
@@ -52,15 +62,16 @@ func (req readStreamReq) validate() error {
 }
 
 type deleteStreamReq struct {
-	Id string
+	User     string
+	StreamId string
 }
 
 func (req deleteStreamReq) validate() error {
-	if req.Id == "" {
+	if req.StreamId == "" {
 		return dapp.ErrMalformedData
 	}
 
-	if !govalidator.IsHexadecimal(req.Id) {
+	if !govalidator.IsHexadecimal(req.StreamId) {
 		return dapp.ErrMalformedData
 	}
 
@@ -80,25 +91,20 @@ type searchStreamReq struct {
 }
 
 func (req searchStreamReq) validate() error {
-	if req.Type != "geo" {
+	if req.Type != typeGeo {
 		return dapp.ErrUnknownType
 	}
 
-	if req.x0 < -180 || req.x0 > 180 ||
-		req.x1 < -180 || req.x1 > 180 ||
-		req.x2 < -180 || req.x2 > 180 ||
-		req.x3 < -180 || req.x3 > 180 ||
-		req.y0 < -90 || req.y0 > 90 ||
-		req.y1 < -90 || req.y1 > 90 ||
-		req.y2 < -90 || req.y2 > 90 ||
-		req.y3 < -90 || req.y3 > 90 {
+	if req.x0 < minLongitude || req.x0 > maxLongitude ||
+		req.x1 < minLongitude || req.x1 > maxLongitude ||
+		req.x2 < minLongitude || req.x2 > maxLongitude ||
+		req.x3 < minLongitude || req.x3 > maxLongitude ||
+		req.y0 < minLatitude || req.y0 > maxLatitude ||
+		req.y1 < minLatitude || req.y1 > maxLatitude ||
+		req.y2 < minLatitude || req.y2 > maxLatitude ||
+		req.y3 < minLatitude || req.y3 > maxLatitude {
 		return dapp.ErrMalformedData
 	}
 
 	return nil
 }
-
-// type purchaseStreamReq struct {
-// 	Id    string
-// 	Hours float64 `json:"hours"`
-// }
