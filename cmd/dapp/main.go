@@ -75,6 +75,7 @@ func main() {
 	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
 		cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
 	if err != nil {
+		logger.Error("Failed to connect to Mongo.")
 		os.Exit(1)
 	}
 	defer ms.Close()
