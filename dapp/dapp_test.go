@@ -11,11 +11,9 @@ import (
 	"monetasa/dapp/mocks"
 )
 
-const (
-	user string = "john.doe@email.com"
-)
-
 var (
+	user string = bson.NewObjectId().Hex()
+
 	stream dapp.Stream = dapp.Stream{
 		User:        user,
 		ID:          bson.NewObjectId(),
@@ -71,7 +69,7 @@ func TestUpdateStream(t *testing.T) {
 		{"update non-existing stream", stream, bson.NewObjectId(),
 			user, dapp.ErrNotFound},
 		{"update existing stream with wrong user", stream, stream.ID,
-			"anne.smith@email.com", dapp.ErrUnauthorizedAccess},
+			bson.NewObjectId().Hex(), dapp.ErrUnauthorizedAccess},
 	}
 
 	for _, tc := range cases {
@@ -112,7 +110,7 @@ func TestRemoveStream(t *testing.T) {
 		err      error
 	}{
 		{"remove existing stream with wrong user", stream.ID,
-			"anne.smith@email.com", dapp.ErrUnauthorizedAccess},
+			bson.NewObjectId().Hex(), dapp.ErrUnauthorizedAccess},
 		{"remove existing stream", stream.ID, user, nil},
 		{"remove non-existing stream", stream.ID, user, dapp.ErrNotFound},
 	}

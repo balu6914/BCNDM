@@ -5,8 +5,7 @@ import (
 )
 
 var (
-	// ErrConflict indicates usage of the existing email during account
-	// registration.
+	// ErrConflict indicates usage of the existing stream id for the new stream.
 	ErrConflict error = errors.New("stream id already taken")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
@@ -30,20 +29,20 @@ var (
 // Service specifies an API that must be fullfiled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
-	// Adds new stream to the user identified by the provided email.
+	// Adds new stream to the user identified by the provided user id.
 	AddStream(string, Stream) (string, error)
 
-	// Updates the stream identified by the provided ID, that
-	// belongs to the user identified by the provided email.
+	// Updates the stream identified by the provided id, that
+	// belongs to the user identified by the provided id.
 	UpdateStream(string, string, Stream) error
 
-	// Retrieves data about the stream identified with the provided ID
+	// Retrieves data about the stream identified with the provided id
 	ViewStream(string) (Stream, error)
 
 	// Retrieves data about subset of streams given geolocation coordinates.
 	SearchStreams([][]float64) ([]Stream, error)
 
-	// Removes the stream identified with the provided ID, that
-	// belongs to the user identified by the provided email.
+	// Removes the stream identified with the provided id, that
+	// belongs to the user identified by the provided id.
 	RemoveStream(string, string) error
 }

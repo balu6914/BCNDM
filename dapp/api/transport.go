@@ -87,7 +87,6 @@ func authenticate(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	// id is an email of the user
 	return id, nil
 }
 
