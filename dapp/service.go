@@ -30,11 +30,11 @@ var (
 // Service specifies an API that must be fullfiled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
-	// Adds new stream to the user identified by the provided key.
+	// Adds new stream to the user identified by the provided email.
 	AddStream(string, Stream) (string, error)
 
 	// Updates the stream identified by the provided ID, that
-	// belongs to the user identified by the provided key.
+	// belongs to the user identified by the provided email.
 	UpdateStream(string, string, Stream) error
 
 	// Retrieves data about the stream identified with the provided ID
@@ -44,6 +44,6 @@ type Service interface {
 	SearchStreams([][]float64) ([]Stream, error)
 
 	// Removes the stream identified with the provided ID, that
-	// belongs to the user identified by the provided key.
+	// belongs to the user identified by the provided email.
 	RemoveStream(string, string) error
 }
