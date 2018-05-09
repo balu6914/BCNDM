@@ -23,21 +23,20 @@ func (ds *dappService) authorize(user, id string) (bool, error) {
 		return false, err
 	}
 
-	if strings.Compare(user, s.User) != 0 {
+	if strings.Compare(user, s.Owner) != 0 {
 		return false, ErrUnauthorizedAccess
 	}
 
 	return true, nil
 }
 
-func (ds *dappService) AddStream(user string, stream Stream) (string, error) {
-	stream.User = user
-
+func (ds *dappService) AddStream(owner string, stream Stream) (string, error) {
+	stream.Owner = owner
 	return ds.streams.Save(stream)
 }
 
-func (ds *dappService) UpdateStream(user string, id string, stream Stream) error {
-	if _, err := ds.authorize(user, id); err != nil {
+func (ds *dappService) UpdateStream(owner, id string, stream Stream) error {
+	if _, err := ds.authorize(owner, id); err != nil {
 		return err
 	}
 	return ds.streams.Update(id, stream)

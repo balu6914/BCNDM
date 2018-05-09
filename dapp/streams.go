@@ -6,18 +6,18 @@ import (
 )
 
 type Location struct {
-	Type        string
-	Coordinates []float64
+	Type        string    `json:"type,omitempty"`
+	Coordinates []float64 `json:"coordinates,omitempty"`
 }
 type Stream struct {
-	User        string
-	ID          bson.ObjectId `bson:"_id"`
-	Name        string
-	Type        string
-	Description string
-	URL         string
-	Price       int
-	Location    Location
+	Owner       string        `json:"owner,omitempty"`
+	ID          bson.ObjectId `bson:"_id" json:"id,omitempty"`
+	Name        string        `json:"name,omitempty"`
+	Type        string        `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
+	URL         string        `json:"url,omitempty"`
+	Price       int           `json:"price,omitempty"`
+	Location    Location      `json:"location,omitempty"`
 }
 
 // Validate returns an error if user representation is invalid.
