@@ -89,6 +89,7 @@ func main() {
 
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
+		logger.Info(fmt.Sprintf("Dapp service started, exposed port %d", cfg.Port))
 		errs <- http.ListenAndServe(p, api.MakeHandler(svc, ac))
 	}()
 
