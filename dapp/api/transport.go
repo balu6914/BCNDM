@@ -82,13 +82,13 @@ func authenticate(r *http.Request) (string, error) {
 		return "", auth.ErrUnauthorizedAccess
 	}
 
-	id, err := authClient.VerifyToken(apiKey)
+	userId, err := authClient.VerifyToken(apiKey)
 	if err != nil {
 		return "", err
 	}
 
 	// id is an email of the user
-	return id, nil
+	return userId, nil
 }
 
 func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -101,6 +101,7 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
+	defer r.Body.Close()
 
 	stream.ID = bson.NewObjectId()
 
@@ -121,6 +122,7 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
+	defer r.Body.Close()
 
 	req := updateStreamReq{
 		User:     user,
@@ -157,8 +159,7 @@ func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	_, err := authenticate(r)
-	if err != nil {
+	if _, err := authenticate(r); err != nil {
 		return nil, err
 	}
 
