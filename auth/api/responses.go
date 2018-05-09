@@ -6,7 +6,7 @@ import (
 	"monetasa/auth"
 )
 
-const contentType = "application/json; charset=utf-8"
+const contentType = "application/json"
 
 type apiRes interface {
 	code() int
@@ -15,19 +15,21 @@ type apiRes interface {
 }
 
 type identityRes struct {
-	Email string `json:"email,omitempty"`
+	id string
+}
+
+func (res identityRes) headers() map[string]string {
+	return map[string]string{
+		"X-client-id": res.id,
+	}
 }
 
 func (res identityRes) code() int {
 	return http.StatusOK
 }
 
-func (res identityRes) headers() map[string]string {
-	return map[string]string{}
-}
-
 func (res identityRes) empty() bool {
-	return res.Email == ""
+	return true
 }
 
 type tokenRes struct {
