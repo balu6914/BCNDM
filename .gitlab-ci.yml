@@ -1,0 +1,22 @@
+image: golang
+
+variables:
+  USER: "darko.draskovic"
+  PASS: "2miLLi4on"
+
+stages:
+    # - build
+    - develop
+    # - deploy    
+    
+install_and_test:
+  stage: develop
+  script:
+    - apt-get update
+    - apt-get install -y git
+    - cd /root
+    - git clone https://$USER:$PASS@gitlab.com/drasko/monetasa
+    - cd /root/monetasa/auth
+    - go test
+    - cd /root/monetasa/dapp
+    - go test
