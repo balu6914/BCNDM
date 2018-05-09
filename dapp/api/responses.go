@@ -6,7 +6,7 @@ import (
 	"monetasa/dapp"
 )
 
-const contentType = "application/json; charset=utf-8"
+const contentType = "application/json"
 
 type apiRes interface {
 	code() int
@@ -29,7 +29,7 @@ func (res createStreamRes) code() int {
 }
 
 func (res createStreamRes) empty() bool {
-	return true
+	return false
 }
 
 type modifyStreamRes struct{}

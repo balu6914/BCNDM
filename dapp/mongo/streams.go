@@ -1,9 +1,10 @@
 package mongo
 
 import (
+	"monetasa/dapp"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"monetasa/dapp"
 )
 
 type streamRepository struct {
@@ -83,8 +84,8 @@ func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
 		},
 	}).All(&results)
 
-	if err != nil {
-		return nil, dapp.ErrNotFound
+	if results == nil || err != nil {
+		return []dapp.Stream{}, dapp.ErrNotFound
 	}
 
 	return results, nil

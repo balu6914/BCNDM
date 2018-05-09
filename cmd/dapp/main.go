@@ -25,7 +25,7 @@ const (
 	defMongoPort           int    = 27017
 	defMongoConnectTimeout int    = 5000
 	defMongoSocketTimeout  int    = 5000
-	defAuthURL             string = "http://localhost:8180"
+	defAuthURL             string = "http://localhost:8080"
 	envAuthURL             string = "MONETASA_AUTH_URL"
 
 	envMongoURL string = "MONETASA_DAPP_MONGO_URL"
