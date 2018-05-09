@@ -63,6 +63,10 @@ func (srm *streamRepositoryMock) Search([][]float64) ([]dapp.Stream, error) {
 }
 
 func (srm *streamRepositoryMock) Remove(id string) error {
+	if _, ok := srm.streams[id]; !ok {
+		return dapp.ErrNotFound
+	}
+
 	delete(srm.streams, id)
 	return nil
 }
