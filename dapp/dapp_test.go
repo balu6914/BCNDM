@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	user string = bson.NewObjectId().Hex()
+	owner string = bson.NewObjectId().Hex()
 
 	stream dapp.Stream = dapp.Stream{
-		User:        user,
+		Owner:       owner,
 		ID:          bson.NewObjectId(),
 		Name:        "stream_name",
 		Type:        "stream_type",
@@ -40,15 +40,15 @@ func TestAddStream(t *testing.T) {
 	cases := []struct {
 		desc   string
 		stream dapp.Stream
-		user   string
+		owner  string
 		err    error
 	}{
-		{"add new stream", stream, user, nil},
-		{"add existing stream", stream, user, dapp.ErrConflict},
+		{"add new stream", stream, owner, nil},
+		{"add existing stream", stream, owner, dapp.ErrConflict},
 	}
 
 	for _, tc := range cases {
-		_, err := svc.AddStream(tc.user, tc.stream)
+		_, err := svc.AddStream(tc.owner, tc.stream)
 		assert.Equal(t, tc.err, err,
 			fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
@@ -56,24 +56,24 @@ func TestAddStream(t *testing.T) {
 
 func TestUpdateStream(t *testing.T) {
 	svc := newService()
-	svc.AddStream(user, stream)
+	svc.AddStream(owner, stream)
 
 	cases := []struct {
 		desc     string
 		stream   dapp.Stream
 		streamId bson.ObjectId
-		user     string
+		owner    string
 		err      error
 	}{
-		{"update existing stream", stream, stream.ID, user, nil},
+		{"update existing stream", stream, stream.ID, owner, nil},
 		{"update non-existing stream", stream, bson.NewObjectId(),
-			user, dapp.ErrNotFound},
-		{"update existing stream with wrong user", stream, stream.ID,
+			owner, dapp.ErrNotFound},
+		{"update existing stream with wrong owner", stream, stream.ID,
 			bson.NewObjectId().Hex(), dapp.ErrUnauthorizedAccess},
 	}
 
 	for _, tc := range cases {
-		err := svc.UpdateStream(tc.user, tc.streamId.Hex(), tc.stream)
+		err := svc.UpdateStream(tc.owner, tc.streamId.Hex(), tc.stream)
 		assert.Equal(t, tc.err, err,
 			fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
@@ -81,7 +81,7 @@ func TestUpdateStream(t *testing.T) {
 
 func TestViewStream(t *testing.T) {
 	svc := newService()
-	svc.AddStream(user, stream)
+	svc.AddStream(owner, stream)
 
 	cases := []struct {
 		desc     string
@@ -101,22 +101,22 @@ func TestViewStream(t *testing.T) {
 
 func TestRemoveStream(t *testing.T) {
 	svc := newService()
-	svc.AddStream(user, stream)
+	svc.AddStream(owner, stream)
 
 	cases := []struct {
 		desc     string
 		streamId bson.ObjectId
-		user     string
+		owner    string
 		err      error
 	}{
-		{"remove existing stream with wrong user", stream.ID,
+		{"remove existing stream with wrong owner", stream.ID,
 			bson.NewObjectId().Hex(), dapp.ErrUnauthorizedAccess},
-		{"remove existing stream", stream.ID, user, nil},
-		{"remove non-existing stream", stream.ID, user, dapp.ErrNotFound},
+		{"remove existing stream", stream.ID, owner, nil},
+		{"remove non-existing stream", stream.ID, owner, dapp.ErrNotFound},
 	}
 
 	for _, tc := range cases {
-		err := svc.RemoveStream(tc.user, tc.streamId.Hex())
+		err := svc.RemoveStream(tc.owner, tc.streamId.Hex())
 		assert.Equal(t, tc.err, err,
 			fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
