@@ -15,7 +15,8 @@ install_and_test:
     - apt-get update
     - apt-get install -y git
     - cd /go/src/
-    - git clone https://$USER:$PASS@gitlab.com/drasko/monetasa
+    # - git clone https://$USER:$PASS@gitlab.com/drasko/monetasa
+    - git clone $CI_REPOSITORY_URL
     - cd /go/src/monetasa/auth
     - go test
     - cd /go/src/monetasa/dapp
