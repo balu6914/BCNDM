@@ -8,8 +8,6 @@ stages:
 install_and_test:
   stage: develop
   script:
-    - apt-get update
-    - apt-get install -y git
     - cd /go/src/
     - git clone $CI_REPOSITORY_URL
     - cd /go/src/monetasa/auth
