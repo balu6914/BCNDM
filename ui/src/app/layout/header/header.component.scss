@@ -1,0 +1,18 @@
+mdl-layout-header.public-header{
+  background-color: #fff; // change this for color
+  color: rgb(33,150,243);
+  a {
+      color: rgb(33,150,243);
+  }
+  .title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+  }
+}
+mdl-layout-header.public-header mdl-layout-header-row{
+  height: inherit;
+}
+
+.header-user-menu {
+    padding-right: 10px;
+}

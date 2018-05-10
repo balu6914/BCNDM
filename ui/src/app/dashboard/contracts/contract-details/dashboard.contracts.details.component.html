@@ -1,0 +1,48 @@
+<div class="mdl-grid contracts-container-section">
+    <div class="mdl-cell mdl-cell--12-col text-center">
+        <h4>
+            {{contract.stream.name}}
+           <i *ngIf="contract.signed && !contract.expiered" class="material-icons" title="Signed">lock</i>
+           <i *ngIf="!contract.signed && !contract.expiered" class="material-icons" title="Waiting for a signature">lock_open</i>
+           <i *ngIf="contract.expiered" class="material-icons" title="Contract Expiered">error_outline</i>
+       </h4>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+        <h5>Created {{contract.creationDate |  date: 'MMM d, y'}}</h5>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+        <h5>Expiering {{contract.exparationDate |  date: 'MMM d, y'}}</h5>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+        <h5>Price per hour <strong>{{contract.stream.price | tas}} TAS</strong></h5>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+        <h5>Share offer <strong>{{contract.share}} % of profit</strong></h5>
+    </div>
+    <br>
+    <br>
+
+    <div *ngIf="contract.expiered" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
+        <h3  class="mdl-cell mdl-cell--12-col text-center">This contract EXPIERED on {{contract.exparationDate |  date: 'MMM d, y'}}</h3>
+    </div>
+
+    <div *ngIf="!contract.signed && !contract.expiered" class="mdl-cell mdl-cell--12-col text-center">
+        <a class="sign-btn mdl-button mdl-js-button mdl-button--accent">
+            <mdl-icon class="material-icons">edit</mdl-icon>SIGN CONTRACT
+        </a>
+    </div>
+
+    <div *ngIf="!contract.expiered && contract.signed" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
+        <h3  class="mdl-cell mdl-cell--12-col text-center">This contract is ACTIVE until {{contract.exparationDate |  date: 'MMM d, y'}}</h3>
+    </div>
+
+    <div  class="mdl-cell mdl-cell--12-col text-center contract-sign-note" *ngIf="!contract.expiered && !contract.signed">
+        <p>
+            <strong>NOTE: By Signing this contract, you are accepting the offer and all conditions under this contract</strong>
+            <br>
+            Contract will be auto executed and cant be canceled!
+
+        </p>
+    </div>
+
+</div>
