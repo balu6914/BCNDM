@@ -47,11 +47,7 @@ func (res modifyStreamRes) empty() bool {
 }
 
 type readStreamRes struct {
-	Name        string        `json:"name"`
-	Type        string        `json:"type"`
-	Description string        `json:"description"`
-	Price       int           `json:"price"`
-	Location    dapp.Location `json:"location"`
+	Stream dapp.Stream
 }
 
 func (res readStreamRes) headers() map[string]string {
