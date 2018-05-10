@@ -1,0 +1,37 @@
+<div class="login-container animated fadeIn" mdl-shadow="6">
+    <div *ngIf="errorMsg" class="text-center">
+        <span class="error-message ">{{errorMsg}}</span>
+    </div>
+    <form [formGroup]="form">
+      <p>
+        <mdl-textfield
+            label="Email"
+            name="email"
+            type="text"
+            formControlName="email"
+            floating-label
+            pattern="^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$"
+            error-msg="Please provide a valid email!"
+            (focus)="errorMsg=null">
+        </mdl-textfield>
+      </p>
+      <p>
+        <mdl-textfield
+            label="Password"
+            name="password"
+            type="password"
+            formControlName="password"
+            disableNativeValidityChecking
+            [error-msg]="'Please provide a correct password!'"
+            floating-label
+            (focus)="errorMsg=null">
+        </mdl-textfield>
+        <p>
+            <button mdl-button (click)="onSubmit(form.value, form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>LOGIN</button>
+        </p>
+        <br>
+        <p class="text-center">
+            <span>Don't have an account ? <a routerLink="/signup">Signup</a></span>
+        </p>
+    </form>
+</div>

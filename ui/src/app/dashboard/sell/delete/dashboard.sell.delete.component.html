@@ -1,0 +1,24 @@
+<div class="mdl-grid animated fadeIn">
+    <div class="dashboard-sell-list-container" mdl-shadow="4">
+        <h4 class="mdl-cell mdl-cell--12-col"> DELETE STREAM
+          <a routerLink="/dashboard/sell/list" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
+              <i class="material-icons md-dark">close</i>
+          </a>
+        </h4>
+        <div> Name: {{name}} </div>
+        <div> Type: {{type}} </div>
+        <div> Description: {{description}} </div>
+        <div> Price: {{price}} </div>
+
+        <div class="mdl-cell mdl-cell--12-col">
+            <p>
+                <a routerLink="/dashboard/sell/list" mdl-button mdl-button-type="raised" mdl-ripple> CANCEL </a>
+            <button mdl-button (click)="onSubmit(form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>DELETE STREAM</button>
+            </p>
+            <br>
+                <p class="text-center">
+                    <strong>DISCLAIMER: </strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+        </div>
+    </div>
+</div>

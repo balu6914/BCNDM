@@ -53,16 +53,12 @@ func viewStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 		}
 
 		s, err := svc.ViewStream(req.StreamId)
-
 		if err != nil {
 			return nil, err
 		}
 
 		res := readStreamRes{
-			Name:        s.Name,
-			Type:        s.Type,
-			Description: s.Description,
-			Price:       s.Price,
+			Stream: s,
 		}
 		return res, nil
 	}
