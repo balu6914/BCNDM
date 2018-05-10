@@ -10,14 +10,14 @@ type Location struct {
 	Coordinates []float64 `json:"coordinates,omitempty"`
 }
 type Stream struct {
-	Owner       string        `json:"owner,omitempty"`
-	ID          bson.ObjectId `bson:"_id" json:"id,omitempty"`
-	Name        string        `json:"name,omitempty"`
-	Type        string        `json:"type,omitempty"`
-	Description string        `json:"description,omitempty"`
-	URL         string        `json:"url,omitempty"`
-	Price       int           `json:"price,omitempty"`
-	Location    Location      `json:"location,omitempty"`
+	Owner       string        `bson:"owner,omitempty" json:"owner,omitempty"`
+	ID          bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
+	Name        string        `bson:"name,omitempty" json:"name,omitempty"`
+	Type        string        `bson:"type,omitempty" json:"type,omitempty"`
+	Description string        `bson:"description,omitempty" json:"description,omitempty"`
+	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
+	Price       int           `bson:"price,omitempty" json:"price,omitempty"`
+	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
 }
 
 // Validate returns an error if user representation is invalid.
