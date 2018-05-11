@@ -177,12 +177,12 @@ export class DashboardMainComponent {
                 (result: any) => {
                     that.temp = [...result.Streams];
                     // Add stream markers on the map (Name, Description and price)
-                    for (var i = 0; i < result.Streams.length; i++) {
-                    if (result.Streams[i]["owner"] == that.user["email"]) {
+                    result.Streams.forEach(stream => {
+                    if (stream["owner"] == that.user["email"]) {
                         // Create marker with stream coordinates
                         const newMarker = L.marker(
-                        [result.Streams[i]["location"]["coordinates"][1],
-                         result.Streams[i]["location"]["coordinates"][0]], {}
+                        [stream["location"]["coordinates"][1],
+                         stream["location"]["coordinates"][0]], {}
                         );
                         // Use yellow color for owner streams and blue for others
                         var defIcon = L.icon({
@@ -191,13 +191,13 @@ export class DashboardMainComponent {
                         });
                         newMarker.setIcon(defIcon);
                         // Popup Msg
-                        const msg = "<b>" + result.Streams[i]["name"] + "</b>" +
-                        "<br>" + result.Streams[i]["description"]
+                        const msg = "<b>" + stream["name"] + "</b>" +
+                        "<br>" + stream["description"]
                         // Push marker to the markers list
-                        that.myStreamsList.push(result.Streams[i]);
+                        that.myStreamsList.push(stream);
                         that.markers.push(newMarker);
                     }
-                    }
+                });
 
                     // Set markers on the map
                     that.setTabMarkers();
