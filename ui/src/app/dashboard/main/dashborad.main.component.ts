@@ -85,7 +85,6 @@ export class DashboardMainComponent {
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
-                console.log('Current user:', this.user);
             },
             err => {
                 console.log(err)
