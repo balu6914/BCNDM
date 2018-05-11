@@ -119,7 +119,7 @@ export class DashboardSellListComponent {
         if ( e.type == "mouseenter" ) {
             for (var i = 0; i < this.streamList.length; i++) {
                 // Set red-marker if mouse is over corresponding row
-                if (this.streamList[i]["owner"] == e.row["email"]) {
+                if (this.streamList[i]["id"] == e.row["id"]) {
                     var redIcon = L.icon({
                         iconUrl:  '/assets/images/red-marker.png',
                         iconSize: [45, 45]
