@@ -211,35 +211,35 @@ export class DashboardSellListComponent {
             (result: any) => {
                 that.temp = [...result.Streams];
                 // Add stream markers on the map (Name, Description and price)
-                for (var i = 0; i < result.Streams.length; i++) {
-                if (result.Streams[i].owner == that.user["email"]) {
-                    // Create marker with stream coordinates
-                    const newMarker = L.marker(
-                    [result.Streams[i]["location"]["coordinates"][1],
-                     result.Streams[i]["location"]["coordinates"][0]], {}
-                    );
+                result.Streams.forEach(stream => {
+                    if (stream.owner == that.user["email"]) {
+                        // Create marker with stream coordinates
+                        const newMarker = L.marker(
+                        [stream["location"]["coordinates"][1],
+                         stream["location"]["coordinates"][0]], {}
+                        );
 
-                    // Popup Msg
-                    const msg = "<b>" + result.Streams[i]["name"] + "</b>" +
-                    "<br>" + result.Streams[i]["description"] +
-                    "<br> " + that.tasPipe.transform(result.Streams[i]["price"])
-                    + '<a  class="mdl-button mdl-js-button mdl-button--accent">BUY</a>'
-                    newMarker.bindPopup(msg);
+                        // Popup Msg
+                        const msg = "<b>" + stream["name"] + "</b>" +
+                        "<br>" + stream["description"] +
+                        "<br> " + that.tasPipe.transform(stream["price"])
+                        + '<a  class="mdl-button mdl-js-button mdl-button--accent">BUY</a>'
+                        newMarker.bindPopup(msg);
 
-                    // Use yellow color for owner streams and blue for others
-                    var defIcon = L.icon({
-                        iconUrl:  '/assets/images/yellow-marker.png',
-                        iconSize: [45, 45]
-                    });
-                    newMarker.setIcon(defIcon);
+                        // Use yellow color for owner streams and blue for others
+                        var defIcon = L.icon({
+                            iconUrl:  '/assets/images/yellow-marker.png',
+                            iconSize: [45, 45]
+                        });
+                        newMarker.setIcon(defIcon);
 
-                    // Push marker to the markers list
-                    that.streamList.push(result.Streams[i]);
-                    that.markers.push(newMarker);
+                        // Push marker to the markers list
+                        that.streamList.push(stream);
+                        that.markers.push(newMarker);
 
-                    drawnItems.addLayer(newMarker);
-                }
-                }
+                        drawnItems.addLayer(newMarker);
+                    }
+                });
 
                 // Refresh ngx-datatable list
                 that.streamList = [...that.streamList];
