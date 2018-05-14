@@ -223,7 +223,7 @@ export class DashboardSellListComponent {
                         const name = stream["name"]
                         const description = stream["description"]
                         const price = that.tasPipe.transform(stream["price"])
-                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS` +
+                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS`
                         newMarker.bindPopup(msg);
 
                         // Use yellow color for owner streams and blue for others
