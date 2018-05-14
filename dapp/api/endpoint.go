@@ -28,6 +28,22 @@ func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	}
 }
 
+func addBulkStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(createBulkStreamRequest)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.AddBulkStream(req.Streams); err != nil {
+			return nil, err
+		}
+
+		return createBulkStreamResponse{}, nil
+	}
+}
+
 func updateStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateStreamReq)

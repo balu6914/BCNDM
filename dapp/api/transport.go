@@ -2,7 +2,9 @@ package api
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -37,6 +39,13 @@ func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
 	r.Post("/streams", kithttp.NewServer(
 		addStreamEndpoint(sr),
 		decodeCreateStreamRequest,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Post("/streams/bulk", kithttp.NewServer(
+		addBulkStreamEndpoint(sr),
+		decodeCreateBulkStreamRequest,
 		encodeResponse,
 		opts...,
 	))
@@ -109,6 +118,66 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 		User:   user,
 		Stream: stream,
 	}
+	return req, nil
+}
+
+func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
+	file, _, err := r.FormFile("csv")
+	if err != nil {
+		return nil, err
+	}
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	// remove the first csv row
+	records = records[1:]
+
+	var streams []dapp.Stream
+	for _, record := range records {
+		var stream dapp.Stream
+		stream.Owner = user
+		stream.ID = bson.NewObjectId()
+
+		stream.Name = record[0]
+		stream.Type = record[1]
+		stream.Description = record[2]
+
+		i, err := strconv.Atoi(record[3])
+		if err != nil {
+			return nil, err
+		}
+		stream.Price = i
+
+		stream.Location.Type = "geo"
+		f, err := strconv.ParseFloat(record[4], 64)
+		if err != nil {
+			return nil, err
+		}
+		stream.Location.Coordinates = append(stream.Location.Coordinates, f)
+		f, err = strconv.ParseFloat(record[5], 64)
+		if err != nil {
+			return nil, err
+		}
+		stream.Location.Coordinates = append(stream.Location.Coordinates, f)
+
+		stream.URL = record[6]
+
+		streams = append(streams, stream)
+	}
+
+	req := createBulkStreamRequest{
+		Streams: streams,
+	}
+
+	fmt.Println("Here")
 	return req, nil
 }
 

@@ -35,6 +35,15 @@ func (ds *dappService) AddStream(owner string, stream Stream) (string, error) {
 	return ds.streams.Save(stream)
 }
 
+func (ds *dappService) AddBulkStream(streams []Stream) error {
+	for _, stream := range streams {
+		if _, err := ds.streams.Save(stream); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (ds *dappService) UpdateStream(owner, id string, stream Stream) error {
 	if _, err := ds.authorize(owner, id); err != nil {
 		return err

@@ -33,6 +33,19 @@ type updateStreamReq struct {
 	Stream   dapp.Stream
 }
 
+type createBulkStreamRequest struct {
+	Streams []dapp.Stream
+}
+
+func (req createBulkStreamRequest) validate() error {
+	for _, stream := range req.Streams {
+		if err := stream.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (req updateStreamReq) validate() error {
 	if req.StreamId == "" {
 		return dapp.ErrMalformedData

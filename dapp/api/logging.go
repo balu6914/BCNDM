@@ -34,6 +34,20 @@ func (lm *loggingMiddleware) AddStream(key string, stream dapp.Stream) (id strin
 	return lm.svc.AddStream(key, stream)
 }
 
+func (lm *loggingMiddleware) AddBulkStream(streams []dapp.Stream) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method AddBulkStream for streams %v took %s to complete", streams, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.AddBulkStream(streams)
+}
+
 func (lm *loggingMiddleware) UpdateStream(key string, id string, stream dapp.Stream) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method Update for stream %s took %s to complete", id, time.Since(begin))

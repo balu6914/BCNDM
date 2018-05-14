@@ -32,6 +32,9 @@ type Service interface {
 	// Adds new stream to the user identified by the provided user id.
 	AddStream(string, Stream) (string, error)
 
+	// Adds new streams via parsed csv file.
+	AddBulkStream([]Stream) error
+
 	// Updates the stream identified by the provided id, that
 	// belongs to the user identified by the provided id.
 	UpdateStream(string, string, Stream) error
