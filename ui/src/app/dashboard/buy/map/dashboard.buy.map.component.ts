@@ -144,9 +144,10 @@ export class DashboardBuyMapComponent {
                             newMarker.setIcon(defIcon);
 
                             // Popup Msg
-                            const msg = "<b>" + stream["name"] + "</b>" +
-                            "<br>" + stream["description"] +
-                            "<br> " + that.tasPipe.transform(stream["price"])
+                            const name = stream["name"]
+                            const description = stream["description"]
+                            const price = that.tasPipe.transform(stream["price"])
+                            const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS`
                             newMarker.bindPopup(msg);
 
                             // Push marker to the markers list

@@ -220,10 +220,10 @@ export class DashboardSellListComponent {
                         );
 
                         // Popup Msg
-                        const msg = "<b>" + stream["name"] + "</b>" +
-                        "<br>" + stream["description"] +
-                        "<br> " + that.tasPipe.transform(stream["price"])
-                        + '<a  class="mdl-button mdl-js-button mdl-button--accent">BUY</a>'
+                        const name = stream["name"]
+                        const description = stream["description"]
+                        const price = that.tasPipe.transform(stream["price"])
+                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS` +
                         newMarker.bindPopup(msg);
 
                         // Use yellow color for owner streams and blue for others
