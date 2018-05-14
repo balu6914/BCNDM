@@ -12,6 +12,7 @@ import * as L from 'leaflet';
 import { icon, latLng, Layer, marker } from 'leaflet';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
+import { TasPipe } from '../../common/pipes/converter.pipe';
 
 @Component({
   selector: 'dashboard-main',
@@ -77,7 +78,8 @@ export class DashboardMainComponent {
         private streamService: StreamService,
         public searchService: SearchService,
         public http: HttpClient,
-        private dialogService: MdlDialogService
+        private dialogService: MdlDialogService,
+        private tasPipe: TasPipe
     ) {}
 
     ngOnInit() {
@@ -190,9 +192,14 @@ export class DashboardMainComponent {
                             iconSize: [45, 45]
                         });
                         newMarker.setIcon(defIcon);
+
                         // Popup Msg
-                        const msg = "<b>" + stream["name"] + "</b>" +
-                        "<br>" + stream["description"]
+                        const name = stream["name"]
+                        const description = stream["description"]
+                        const price = that.tasPipe.transform(stream["price"])
+                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS`
+                        newMarker.bindPopup(msg);
+
                         // Push marker to the markers list
                         that.myStreamsList.push(stream);
                         that.markers.push(newMarker);
