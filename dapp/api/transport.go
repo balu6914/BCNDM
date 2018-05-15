@@ -87,12 +87,11 @@ func authenticate(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	// id is an email of the user
 	return userId, nil
 }
 
 func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	user, err := authenticate(r)
+	userID, err := authenticate(r)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +105,7 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	stream.ID = bson.NewObjectId()
 
 	req := createStreamReq{
-		User:   user,
+		User:   userID,
 		Stream: stream,
 	}
 	return req, nil

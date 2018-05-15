@@ -209,10 +209,11 @@ export class DashboardSellListComponent {
             // Search streams on drawed region
             that.searchService.searchStreams("geo",x1, y1, x2, y2, x3, y3, x4, y4).subscribe(
             (result: any) => {
+                console.log(result.Streams)
                 that.temp = [...result.Streams];
                 // Add stream markers on the map (Name, Description and price)
                 result.Streams.forEach(stream => {
-                    if (stream.owner == that.user["email"]) {
+                    if (stream.owner == that.user["id"]) {
                         // Create marker with stream coordinates
                         const newMarker = L.marker(
                         [stream["location"]["coordinates"][1],

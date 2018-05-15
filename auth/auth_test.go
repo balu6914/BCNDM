@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const wrong string = "wrong-value"
 
-var user auth.User = auth.User{"user@example.com", "password"}
+var user auth.User = auth.User{"user@example.com", "password", bson.NewObjectId()}
 
 func newService() auth.Service {
 	users := mocks.NewUserRepository()
@@ -63,16 +64,17 @@ func TestUpdate(t *testing.T) {
 	svc.Register(user)
 	key, _ := svc.Login(user)
 
-	userUp := auth.User{"user@example.com", "newPassword"}
-	user2 := auth.User{"wrong@exemple.com", "newPassword"}
+	user2 := user
+	user.Password = "newPassword"
+	user2.Email = "new@example.com"
 
 	cases := map[string]struct {
 		key  string
 		user auth.User
 		err  error
 	}{
-		"Update user":                        {key, userUp, nil},
-		"Update user with wrong credentials": {wrong, userUp, auth.ErrUnauthorizedAccess},
+		"Update user":                        {key, user, nil},
+		"Update user with wrong credentials": {wrong, user, auth.ErrUnauthorizedAccess},
 		"Update user email":                  {key, user2, auth.ErrUnauthorizedAccess},
 	}
 
@@ -110,8 +112,8 @@ func TestLogin(t *testing.T) {
 		err  error
 	}{
 		"login with good credentials": {user, nil},
-		"login with wrong e-mail":     {auth.User{wrong, user.Password}, auth.ErrUnauthorizedAccess},
-		"login with wrong password":   {auth.User{user.Email, wrong}, auth.ErrUnauthorizedAccess},
+		"login with wrong e-mail":     {auth.User{wrong, user.Password, user.ID}, auth.ErrUnauthorizedAccess},
+		"login with wrong password":   {auth.User{user.Email, wrong, user.ID}, auth.ErrUnauthorizedAccess},
 	}
 
 	for desc, tc := range cases {

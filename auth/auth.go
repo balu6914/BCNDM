@@ -1,5 +1,7 @@
 package auth
 
+import "gopkg.in/mgo.v2/bson"
+
 var _ Service = (*authService)(nil)
 
 type authService struct {
@@ -24,6 +26,7 @@ func (ms *authService) Register(user User) error {
 	}
 
 	user.Password = hash
+	user.ID = bson.NewObjectId()
 	return ms.users.Save(user)
 }
 
