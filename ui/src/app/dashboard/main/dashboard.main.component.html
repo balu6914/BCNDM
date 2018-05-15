@@ -112,14 +112,14 @@
             </ngx-datatable-column>
             <ngx-datatable-column name="Latitude, Longitude">
               <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.longlat.coordinates[1]}}, {{row.longlat.coordinates[0]}}
+                {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
               </ng-template>
             </ngx-datatable-column>
 
             <ngx-datatable-column name="Action">
               <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <div class="btn-buy-stream">
-                  <a [routerLink]="['/dashboard/sell/edit', row._id.$oid]" class="mdl-button mdl-js-button mdl-button--accent">EDIT</a>
+                  <a [routerLink]="['/dashboard/sell/edit', row.id]" class="mdl-button mdl-js-button mdl-button--accent">EDIT</a>
                 </div>
               </ng-template>
             </ngx-datatable-column>

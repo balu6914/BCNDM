@@ -12,6 +12,7 @@ import * as L from 'leaflet';
 import { icon, latLng, Layer, marker } from 'leaflet';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
+import { TasPipe } from '../../common/pipes/converter.pipe';
 
 @Component({
   selector: 'dashboard-main',
@@ -77,21 +78,20 @@ export class DashboardMainComponent {
         private streamService: StreamService,
         public searchService: SearchService,
         public http: HttpClient,
-        private dialogService: MdlDialogService
+        private dialogService: MdlDialogService,
+        private tasPipe: TasPipe
     ) {}
 
     ngOnInit() {
         this.user = {};
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
-                console.log("her is a data", data);
                 this.user = data;
             },
             err => {
                 console.log(err)
             }
         );
-        console.log('Current user:', this.user);
 
         // Fetch all subscriptions
         this.SubscriptionService.get().subscribe(
@@ -120,7 +120,7 @@ export class DashboardMainComponent {
               }
           },
           err => { console.log(err) }
-        );
+      );
     }
 
     onMapReady(map: L) {
@@ -177,15 +177,14 @@ export class DashboardMainComponent {
             // Search streams on drawed region
             that.searchService.searchStreams("geo",x1, y1, x2, y2, x3, y3, x4, y4).subscribe(
                 (result: any) => {
-                    that.temp = [...result.data];
+                    that.temp = [...result.Streams];
                     // Add stream markers on the map (Name, Description and price)
-                    for (var i = 0; i < result.data.length; i++) {
-                    if (result.data[i]["owner"]["$oid"] ==
-                        that.user["_id"]["$oid"]) {
+                    result.Streams.forEach(stream => {
+                    if (stream["owner"] == that.user["email"]) {
                         // Create marker with stream coordinates
                         const newMarker = L.marker(
-                        [result.data[i]["longlat"]["coordinates"][1],
-                         result.data[i]["longlat"]["coordinates"][0]], {}
+                        [stream["location"]["coordinates"][1],
+                         stream["location"]["coordinates"][0]], {}
                         );
                         // Use yellow color for owner streams and blue for others
                         var defIcon = L.icon({
@@ -193,14 +192,19 @@ export class DashboardMainComponent {
                             iconSize: [45, 45]
                         });
                         newMarker.setIcon(defIcon);
+
                         // Popup Msg
-                        const msg = "<b>" + result.data[i]["name"] + "</b>" +
-                        "<br>" + result.data[i]["description"]
+                        const name = stream["name"]
+                        const description = stream["description"]
+                        const price = that.tasPipe.transform(stream["price"])
+                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS`
+                        newMarker.bindPopup(msg);
+
                         // Push marker to the markers list
-                        that.myStreamsList.push(result.data[i]);
+                        that.myStreamsList.push(stream);
                         that.markers.push(newMarker);
                     }
-                    }
+                });
 
                     // Set markers on the map
                     that.setTabMarkers();
@@ -215,8 +219,7 @@ export class DashboardMainComponent {
     }
 
     setMarkerColor(i: number){
-        if (this.myStreamsList[i]["owner"]["$oid"] !=
-            this.user["_id"]["$oid"]) {
+        if (this.myStreamsList[i]["owner"] != this.user["email"]) {
                 var defIcon = L.icon({
                     iconUrl:  '/assets/images/blue-marker.png',
                     iconSize: [45, 45]
