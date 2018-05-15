@@ -19,7 +19,6 @@ type apiReq interface {
 }
 
 type createStreamReq struct {
-	User   string
 	Stream dapp.Stream
 }
 

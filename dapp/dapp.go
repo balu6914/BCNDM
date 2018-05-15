@@ -30,8 +30,7 @@ func (ds *dappService) authorize(user, id string) (bool, error) {
 	return true, nil
 }
 
-func (ds *dappService) AddStream(owner string, stream Stream) (string, error) {
-	stream.Owner = owner
+func (ds *dappService) AddStream(stream Stream) (string, error) {
 	return ds.streams.Save(stream)
 }
 

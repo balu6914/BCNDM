@@ -68,15 +68,14 @@ func TestAddStream(t *testing.T) {
 	cases := []struct {
 		desc   string
 		stream dapp.Stream
-		owner  string
 		err    error
 	}{
-		{"add new stream", s, s.Owner, nil},
-		{"add existing stream", s, s.Owner, dapp.ErrConflict},
+		{"add new stream", s, nil},
+		{"add existing stream", s, dapp.ErrConflict},
 	}
 
 	for _, tc := range cases {
-		_, err := svc.AddStream(tc.owner, tc.stream)
+		_, err := svc.AddStream(tc.stream)
 		assert.Equal(t, tc.err, err,
 			fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
@@ -104,7 +103,7 @@ func TestAddBulkStreams(t *testing.T) {
 func TestUpdateStream(t *testing.T) {
 	svc := newService()
 	s := generateStream()
-	svc.AddStream(s.Owner, s)
+	svc.AddStream(s)
 
 	cases := []struct {
 		desc     string
@@ -130,7 +129,7 @@ func TestUpdateStream(t *testing.T) {
 func TestViewStream(t *testing.T) {
 	svc := newService()
 	s := generateStream()
-	svc.AddStream(s.Owner, s)
+	svc.AddStream(s)
 
 	cases := []struct {
 		desc     string
@@ -151,7 +150,7 @@ func TestViewStream(t *testing.T) {
 func TestRemoveStream(t *testing.T) {
 	svc := newService()
 	s := generateStream()
-	svc.AddStream(s.Owner, s)
+	svc.AddStream(s)
 
 	cases := []struct {
 		desc     string

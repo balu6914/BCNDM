@@ -16,7 +16,7 @@ func addStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		id, err := svc.AddStream(req.User, req.Stream)
+		id, err := svc.AddStream(req.Stream)
 
 		if err != nil {
 			return nil, err
