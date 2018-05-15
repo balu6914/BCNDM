@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -142,33 +141,34 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 
 	var streams []dapp.Stream
 	for _, record := range records {
-		var stream dapp.Stream
-		stream.Owner = user
-		stream.ID = bson.NewObjectId()
-
-		stream.Name = record[0]
-		stream.Type = record[1]
-		stream.Description = record[2]
-
-		i, err := strconv.Atoi(record[3])
+		price, err := strconv.Atoi(record[3])
 		if err != nil {
 			return nil, err
 		}
-		stream.Price = i
 
-		stream.Location.Type = "geo"
-		f, err := strconv.ParseFloat(record[4], 64)
+		longitude, err := strconv.ParseFloat(record[4], 64)
 		if err != nil {
 			return nil, err
 		}
-		stream.Location.Coordinates = append(stream.Location.Coordinates, f)
-		f, err = strconv.ParseFloat(record[5], 64)
+
+		latitude, err := strconv.ParseFloat(record[5], 64)
 		if err != nil {
 			return nil, err
 		}
-		stream.Location.Coordinates = append(stream.Location.Coordinates, f)
 
-		stream.URL = record[6]
+		stream := dapp.Stream{
+			Owner:       user,
+			ID:          bson.NewObjectId(),
+			Name:        record[0],
+			Type:        record[1],
+			Description: record[2],
+			Price:       price,
+			Location: dapp.Location{
+				Type:        "Point",
+				Coordinates: []float64{longitude, latitude},
+			},
+			URL: record[6],
+		}
 
 		streams = append(streams, stream)
 	}
@@ -177,7 +177,6 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 		Streams: streams,
 	}
 
-	fmt.Println("Here")
 	return req, nil
 }
 

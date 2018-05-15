@@ -36,6 +36,9 @@ func (ds *dappService) AddStream(owner string, stream Stream) (string, error) {
 }
 
 func (ds *dappService) AddBulkStream(streams []Stream) error {
+	if len(streams) < 1 {
+		return ErrMalformedData
+	}
 	for _, stream := range streams {
 		if _, err := ds.streams.Save(stream); err != nil {
 			return err
