@@ -18,7 +18,7 @@ func New(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
 }
 
 func (ms *authService) Register(user User) error {
-	_, err := ms.users.One(user.Email)
+	_, err := ms.users.OneByEmail(user.Email)
 	if err != ErrNotFound {
 		return ErrConflict
 	}
@@ -33,7 +33,7 @@ func (ms *authService) Register(user User) error {
 }
 
 func (ms *authService) Login(user User) (string, error) {
-	dbu, err := ms.users.One(user.Email)
+	dbu, err := ms.users.OneByEmail(user.Email)
 	if err != nil {
 		return "", ErrUnauthorizedAccess
 	}

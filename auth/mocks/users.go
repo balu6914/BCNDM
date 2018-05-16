@@ -45,6 +45,17 @@ func (urm *userRepositoryMock) One(id string) (auth.User, error) {
 	return auth.User{}, auth.ErrNotFound
 }
 
+func (urm *userRepositoryMock) OneByEmail(email string) (auth.User, error) {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+
+	if u, ok := urm.users[email]; ok {
+		return u, nil
+	}
+
+	return auth.User{}, auth.ErrNotFound
+}
+
 func (urm *userRepositoryMock) Update(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()

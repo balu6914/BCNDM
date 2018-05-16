@@ -57,7 +57,6 @@ func (ur *userRepository) One(id string) (auth.User, error) {
 
 	user := auth.User{}
 
-	// Check if ID is an Email or an ObjectID and do proper query on mongo
 	if bson.IsObjectIdHex(id) {
 		_id := bson.ObjectIdHex(id)
 		if err := c.Find(bson.M{"_id": _id}).One(&user); err != nil {
@@ -67,8 +66,18 @@ func (ur *userRepository) One(id string) (auth.User, error) {
 		}
 	}
 
-	if govalidator.IsEmail(id) {
-		if err := c.Find(bson.M{"email": id}).One(&user); err != nil {
+	return user, nil
+}
+
+func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
+	s := ur.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	user := auth.User{}
+
+	if govalidator.IsEmail(email) {
+		if err := c.Find(bson.M{"email": email}).One(&user); err != nil {
 			if err == mgo.ErrNotFound {
 				return user, auth.ErrNotFound
 			}
