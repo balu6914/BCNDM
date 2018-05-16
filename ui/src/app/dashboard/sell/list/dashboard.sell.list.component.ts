@@ -140,7 +140,7 @@ export class DashboardSellListComponent {
     }
 
     setMarkerColor(i: number){
-        if (this.streamList[i]["owner"] != this.user["email"]) {
+        if (this.streamList[i]["owner"] != this.user["id"]) {
                 var defIcon = L.icon({
                     iconUrl:  '/assets/images/blue-marker.png',
                     iconSize: [45, 45]

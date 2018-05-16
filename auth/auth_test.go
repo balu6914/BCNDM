@@ -67,6 +67,7 @@ func TestUpdate(t *testing.T) {
 	user2 := user
 	user.Password = "newPassword"
 	user2.Email = "new@example.com"
+	user2.ID = bson.ObjectIdHex("0000ffff0000ffff0000ffff")
 
 	cases := map[string]struct {
 		key  string
@@ -136,8 +137,8 @@ func TestIdentity(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		email, err := svc.Identity(tc.key)
-		if email != user.Email {
+		id, err := svc.Identity(tc.key)
+		if id != user.ID.Hex() {
 			err = auth.ErrUnauthorizedAccess
 		}
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
