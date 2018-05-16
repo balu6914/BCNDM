@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -120,11 +121,24 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	return req, nil
 }
 
-func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	user, err := authenticate(r)
-	if err != nil {
-		return nil, err
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
 	}
+	return false
+}
+
+// required csv fields
+var fields []string = []string{"name", "type", "description",
+	"price", "longitude", "latitude", "url"}
+
+func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	// user, err := authenticate(r)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	file, _, err := r.FormFile("csv")
 	if err != nil {
@@ -136,32 +150,50 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 	if err != nil {
 		return nil, err
 	}
-	// remove the first csv row
+
+	csvCols := records[0]
 	records = records[1:]
+
+	for idx, field := range csvCols {
+		csvCols[idx] = strings.ToLower(field)
+	}
+
+	// check if csv contains all required fields
+	for _, field := range fields {
+		if !stringInSlice(field, csvCols) {
+			return nil, dapp.ErrMalformedData
+		}
+	}
+
+	// map with csv field names as keys and field col nums as values
+	keys := make(map[string]int)
+	for idx, attr := range csvCols {
+		keys[attr] = idx
+	}
 
 	var streams []dapp.Stream
 	for _, record := range records {
-		price, err := strconv.Atoi(record[3])
+		price, err := strconv.Atoi(record[keys["price"]])
 		if err != nil {
 			return nil, err
 		}
 
-		longitude, err := strconv.ParseFloat(record[4], 64)
+		longitude, err := strconv.ParseFloat(record[keys["longitude"]], 64)
 		if err != nil {
 			return nil, err
 		}
 
-		latitude, err := strconv.ParseFloat(record[5], 64)
+		latitude, err := strconv.ParseFloat(record[keys["latitude"]], 64)
 		if err != nil {
 			return nil, err
 		}
 
 		stream := dapp.Stream{
-			Owner:       user,
+			Owner:       "user",
 			ID:          bson.NewObjectId(),
-			Name:        record[0],
-			Type:        record[1],
-			Description: record[2],
+			Name:        record[keys["name"]],
+			Type:        record[keys["type"]],
+			Description: record[keys["description"]],
 			Price:       price,
 			Location: dapp.Location{
 				Type:        "Point",
