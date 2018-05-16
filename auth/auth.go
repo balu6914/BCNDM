@@ -51,11 +51,10 @@ func (ms *authService) Update(key string, user User) error {
 		return err
 	}
 
-	u, err := ms.users.One(id)
+	u, err := ms.users.OneById(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
 	if u.Email != user.Email {
 		return ErrUnauthorizedAccess
 	}
@@ -78,7 +77,7 @@ func (ms *authService) View(key string) (User, error) {
 		return User{}, err
 	}
 
-	user, err := ms.users.One(id)
+	user, err := ms.users.OneById(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
@@ -92,7 +91,7 @@ func (ms *authService) Delete(key string) error {
 		return err
 	}
 
-	user, err := ms.users.One(id)
+	user, err := ms.users.OneById(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}

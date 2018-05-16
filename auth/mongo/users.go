@@ -50,7 +50,7 @@ func (ur *userRepository) Update(user auth.User) error {
 	return nil
 }
 
-func (ur *userRepository) One(id string) (auth.User, error) {
+func (ur *userRepository) OneById(id string) (auth.User, error) {
 	s := ur.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)

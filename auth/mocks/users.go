@@ -34,7 +34,7 @@ func (urm *userRepositoryMock) Save(user auth.User) error {
 	return nil
 }
 
-func (urm *userRepositoryMock) One(id string) (auth.User, error) {
+func (urm *userRepositoryMock) OneById(id string) (auth.User, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 

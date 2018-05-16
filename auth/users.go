@@ -33,7 +33,7 @@ type UserRepository interface {
 	Save(User) error
 
 	// One retrieves user by its ID.
-	One(string) (User, error)
+	OneById(string) (User, error)
 
 	// One retrieves user by its Email.
 	OneByEmail(string) (User, error)
