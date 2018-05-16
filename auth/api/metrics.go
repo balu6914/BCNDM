@@ -44,40 +44,31 @@ func (ms *metricsMiddleware) Login(user auth.User) (string, error) {
 	return ms.svc.Login(user)
 }
 
-func (ms *metricsMiddleware) Update(key, id string, user auth.User) error {
+func (ms *metricsMiddleware) Update(key string, user auth.User) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "update").Add(1)
 		ms.latency.With("method", "update").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.Update(key, id, user)
+	return ms.svc.Update(key, user)
 }
 
-func (ms *metricsMiddleware) View(key, id string) (auth.User, error) {
+func (ms *metricsMiddleware) View(key string) (auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view").Add(1)
 		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.View(key, id)
+	return ms.svc.View(key)
 }
 
-func (ms *metricsMiddleware) List(key string) ([]auth.User, error) {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "list").Add(1)
-		ms.latency.With("method", "list").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.List(key)
-}
-
-func (ms *metricsMiddleware) Delete(key, id string) error {
+func (ms *metricsMiddleware) Delete(key string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "remove").Add(1)
 		ms.latency.With("method", "remove").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.Delete(key, id)
+	return ms.svc.Delete(key)
 }
 
 func (ms *metricsMiddleware) Identity(key string) (string, error) {
@@ -87,13 +78,4 @@ func (ms *metricsMiddleware) Identity(key string) (string, error) {
 	}(time.Now())
 
 	return ms.svc.Identity(key)
-}
-
-func (ms *metricsMiddleware) CanAccess(key, id string) (string, error) {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "can_access").Add(1)
-		ms.latency.With("method", "can_access").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.CanAccess(key, id)
 }

@@ -2,11 +2,10 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"io"
-	"io/ioutil"
 	"monetasa"
 	"net/http"
-	"strings"
 
 	"monetasa/auth"
 
@@ -16,53 +15,51 @@ import (
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc auth.Service, mc auth.AuthClient) http.Handler {
-	auth = mc
-
+func MakeHandler(svc auth.Service) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
 	r := bone.New()
 
-	r.Get("/users", kithttp.NewServer(
-		getUsersEndpoint(svc),
-		decodeRequest,
+	r.Post("/user", kithttp.NewServer(
+		registrationEndpoint(svc),
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Get("/users/:id", kithttp.NewServer(
-		getUserEndpoint(svc),
-		decodeRequest,
+	r.Get("/user", kithttp.NewServer(
+		viewEndpoint(svc),
+		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/users", kithttp.NewServer(
-		createUserEndpoint(svc),
-		decodeRequest,
+	r.Put("/user", kithttp.NewServer(
+		updateEndpoint(svc),
+		decodeUpdate,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Delete("/users/:id", kithttp.NewServer(
-		deletetUserEndpoint(svc),
-		decodeRequest,
+	r.Delete("/user", kithttp.NewServer(
+		deleteEndpoint(svc),
+		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/login", kithttp.NewServer(
+	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
-		decodeRequest,
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Post("/auth", kithttp.NewServer(
-		authEndpoint(svc),
-		decodeRequest,
+	r.Get("/access-grant", kithttp.NewServer(
+		identityEndpoint(svc),
+		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))
@@ -73,87 +70,89 @@ func MakeHandler(svc auth.Service, mc auth.AuthClient) http.Handler {
 	return r
 }
 
-func decodeRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	ct, err := checkContentType(r)
-	if err != nil {
+func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
+	req := identityReq{
+		key: r.Header.Get("Authorization"),
+	}
+
+	return req, nil
+}
+
+func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, auth.ErrUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		return nil, err
 	}
 
-	publisher, err := authorize(r)
-	if err != nil {
+	return userReq{user}, nil
+}
+
+func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, auth.ErrUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		return nil, err
 	}
 
-	payload, err := decodePayload(r.Body)
-	if err != nil {
-		return nil, err
+	req := updateReq{
+		key:  r.Header.Get("Authorization"),
+		user: user,
 	}
 
-	channel := bone.GetValue(r, "id")
-
-	msg := writer.RawMessage{
-		Publisher:   publisher,
-		Protocol:    protocol,
-		ContentType: ct,
-		Channel:     channel,
-		Payload:     payload,
-	}
-
-	return msg, nil
-}
-
-func authorize(r *http.Request) (string, error) {
-	apiKey := r.Header.Get("Authorization")
-
-	if apiKey == "" {
-		return "", errUnauthorizedAccess
-	}
-
-	// Path is `/channels/:id/messages`, we need chanID.
-	c := strings.Split(r.URL.Path, "/")[2]
-
-	id, err := auth.CanAccess(c, apiKey)
-	if err != nil {
-		return "", err
-	}
-
-	return id, nil
-}
-
-func checkContentType(r *http.Request) (string, error) {
-	ct := r.Header.Get("Content-Type")
-
-	if ct != ctJson {
-		return "", errUnknownType
-	}
-
-	return ct, nil
-}
-
-func decodePayload(body io.ReadCloser) ([]byte, error) {
-	payload, err := ioutil.ReadAll(body)
-	if err != nil {
-		return nil, errMalformedData
-	}
-	defer body.Close()
-
-	return payload, nil
+	return req, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.WriteHeader(http.StatusAccepted)
-	return nil
+	w.Header().Set("Content-Type", contentType)
+
+	if ar, ok := response.(apiRes); ok {
+		for k, v := range ar.headers() {
+			w.Header().Set(k, v)
+		}
+
+		w.WriteHeader(ar.code())
+
+		if ar.empty() {
+			return nil
+		}
+	}
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", contentType)
+
 	switch err {
-	case errMalformedData:
+	case auth.ErrMalformedEntity:
 		w.WriteHeader(http.StatusBadRequest)
-	case errUnknownType:
-		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case auth.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
+	case auth.ErrNotFound:
+		w.WriteHeader(http.StatusNotFound)
+	case auth.ErrConflict:
+		w.WriteHeader(http.StatusConflict)
+	case auth.ErrUnsupportedContentType:
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+	case io.ErrUnexpectedEOF:
+		w.WriteHeader(http.StatusBadRequest)
+	case io.EOF:
+		w.WriteHeader(http.StatusBadRequest)
 	default:
-		w.WriteHeader(http.StatusInternalServerError)
+		switch err.(type) {
+		case *json.SyntaxError:
+			w.WriteHeader(http.StatusBadRequest)
+		case *json.UnmarshalTypeError:
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }

@@ -1,13 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"monetasa/auth"
 )
 
-const contentType = "application/json; charset=utf-8"
+const contentType = "application/json"
 
 type apiRes interface {
 	code() int
@@ -21,7 +20,7 @@ type identityRes struct {
 
 func (res identityRes) headers() map[string]string {
 	return map[string]string{
-		"X-user-id": res.id,
+		"X-client-id": res.id,
 	}
 }
 
@@ -64,7 +63,6 @@ func (res removeRes) empty() bool {
 }
 
 type userRes struct {
-	id      string
 	created bool
 }
 
@@ -77,12 +75,6 @@ func (res userRes) code() int {
 }
 
 func (res userRes) headers() map[string]string {
-	if res.created {
-		return map[string]string{
-			"Location": fmt.Sprint("/users/", res.id),
-		}
-	}
-
 	return map[string]string{}
 }
 
@@ -103,24 +95,5 @@ func (res viewRes) headers() map[string]string {
 }
 
 func (res viewRes) empty() bool {
-	return false
-}
-
-type listRes struct {
-	Users []auth.User `json:"users"`
-	count   int
-}
-
-func (res listRes) code() int {
-	return http.StatusOK
-}
-
-func (res listRes) headers() map[string]string {
-	return map[string]string{
-		"X-Count": fmt.Sprintf("%d", res.count),
-	}
-}
-
-func (res listRes) empty() bool {
 	return false
 }

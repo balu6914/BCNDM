@@ -1,0 +1,133 @@
+<div class="mdl-grid animated fadeIn">
+  <!-- Left card -->
+  <mdl-card class="dashboard-card card-welcome mdl-paper mdl-paper--1  mdl-cell mdl-cell--6-col mdl-cell--6-desktop" mdl-shadow="2">
+      <div class="mdl-cell mdl-cell--12-col" >
+          <div leaflet style="height: 300px"
+          leafletDraw
+          [leafletOptions]="options"
+          [leafletDrawOptions]="drawOptions"
+          (leafletMapReady)="onMapReady($event)">
+          </div>
+      </div>
+  </mdl-card>
+  <!-- right card -->
+  <mdl-card class="dashboard-card card-balance mdl-paper mdl-paper--1 mdl-card mdl-background--card mdl-cell mdl-cell--6-col mdl-cell--6-desktop" mdl-shadow="2">
+    <mdl-card-title mdl-card-expand>
+      <h5>BALANCE</h5>
+    </mdl-card-title>
+    <mdl-card-title mdl-card-expand class="text-center">
+        <h3 class="card-title-center">
+            <mdl-icon>account_balance_wallet</mdl-icon>
+            {{user.balance | tas}} TAS
+        </h3>
+    </mdl-card-title>
+    <mdl-card-actions mdl-card-border>
+      <button [routerLink]="['../wallet/balance']" mdl-button mdl-colored mdl-ripple>
+                <mdl-icon>account_balance_wallet</mdl-icon> MY WALLET
+                </button>
+      <mdl-layout-spacer></mdl-layout-spacer>
+
+    </mdl-card-actions>
+  </mdl-card>
+
+  <!--Tabs -->
+  <div class="mdl-cell mdl-cell--12-col dashboard-tabs">
+
+<mdl-tabs mdl-ripple mdl-tab-active-index="0" (mdl-tab-active-changed)="tabChanged($event)">
+    <mdl-tab-panel>
+        <mdl-tab-panel-title>
+         <span mdl-badge="{{mySubscriptions.length}}">BOUGHT STREAMS</span>
+        </mdl-tab-panel-title>
+        <mdl-tab-panel-content>
+
+          <div class="table-search">
+            <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateSubscriptions($event)' autocomplete="name">
+            </mdl-textfield>
+          </div>
+          <ngx-datatable #table class='material' [columns]="" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [rows]='mySubscriptions' [messages]="tableSubsMessages">
+            <ngx-datatable-column name="Stream Name">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.streamData.name}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Price Paid">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.pricePaid | tas}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Start Date">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.subscriptionStartDate.$date | date}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="End Date">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.subscriptionEndDate.$date | date}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Stream URL">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <a class="button" href="{{row.streamUrl}}" target="_blank"
+                     mdl-button mdl-button-type="raised"
+                     mdl-ripple>OPEN</a>
+                    <button mdl-button mdl-button-type="raised" mdl-ripple
+                     ngxClipboard [cbContent]="row.streamUrl" >COPY</button>
+                </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+
+        </mdl-tab-panel-content>
+      </mdl-tab-panel>
+
+      <mdl-tab-panel>
+        <mdl-tab-panel-title>
+          <span mdl-badge="{{myStreamsList.length}}">SOLD STREAMS</span>
+        </mdl-tab-panel-title>
+        <mdl-tab-panel-content>
+          <div class="table-search">
+            <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateMyStreams($event)' autocomplete="name">
+            </mdl-textfield>
+          </div>
+
+          <ngx-datatable #table class='material' [columns]="tableColumns" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [rows]='myStreamsList' [messages]="tableStreamsMessages">
+            <ngx-datatable-column name="Name">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.name}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Stream Type">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.type}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Description">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.description}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Tokens per hour">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.price | tas}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Latitude, Longitude">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="Action">
+              <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <div class="btn-buy-stream">
+                  <a [routerLink]="['/dashboard/sell/edit', row.id]" class="mdl-button mdl-js-button mdl-button--accent">EDIT</a>
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+
+
+        </mdl-tab-panel-content>
+      </mdl-tab-panel>
+    </mdl-tabs>
+  </div>
+</div>

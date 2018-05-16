@@ -2,6 +2,7 @@ package api
 
 import (
 	"monetasa/auth"
+
 	"github.com/asaskevich/govalidator"
 )
 
@@ -30,18 +31,13 @@ func (req identityReq) validate() error {
 }
 
 type updateReq struct {
-	key    string
-	id     string
+	key  string
 	user auth.User
 }
 
 func (req updateReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.id) {
-		return auth.ErrNotFound
 	}
 
 	return req.user.Validate()
@@ -62,22 +58,4 @@ func (req viewReq) validate() error {
 	}
 
 	return nil
-}
-
-type listReq struct {
-	key    string
-	size   int
-	offset int
-}
-
-func (req listReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.size > 0 && req.offset >= 0 {
-		return nil
-	}
-
-	return auth.ErrMalformedEntity
 }

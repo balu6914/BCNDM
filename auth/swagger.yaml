@@ -8,14 +8,28 @@ consumes:
 produces:
   - "application/json"
 paths:
-  /users:
-    post:
-      summary: Registers user account
-      description: |
-        Registers new user account given email and password. New account will
-        be uniquely identified by its email address.
+  /user:
+    get:
+      summary: Retrieves user info
       tags:
-        - users
+        - user
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: User data retrieved.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
+    post:
+      summary: Create a user account
+      description: |
+        User creation is performed with values provided in a request payload.
+      tags:
+        - user
       parameters:
         - name: user
           description: JSON-formatted document describing the new user.
@@ -24,61 +38,14 @@ paths:
             $ref: "#/definitions/User"
           required: true
       responses:
-        201:
-          description: Registered new user.
+        200:
+          description: User updated.
         400:
           description: Failed due to malformed JSON.
-        409:
-          description: Failed due to using an existing email address.
-        500:
-          $ref: "#/responses/ServiceError"
-    get:
-      summary: Retrieves user accounts
-      description: |
-        Retrieves a list of user accounts. Due to performance concerns, data
-        is retrieved in subsets. The API clients must ensure that the entire
-        dataset is consumed either by making subsequent requests, or by
-        increasing the subset size of the initial request.
-      tags:
-        - channels
-      parameters:
-        - $ref: "#/parameters/Authorization"
-        - $ref: "#/parameters/Size"
-        - $ref: "#/parameters/Offset"
-      responses:
-        200:
-          description: Data retrieved.
-          headers:
-            X-Count:
-              type: integer
-              description: |
-                Total number of managed channels. This value can be used to
-                implement the paging strategy on API clients.
-          schema:
-            $ref: "#/definitions/UserList"
-        400:
-          description: Failed due to malformed query parameters.
-        403:
-          description: Missing or invalid access token provided.
-        500:
-          $ref: "#/responses/ServiceError"
-  /users/{id}:
-    get:
-      summary: Retrieves user info
-      tags:
-        - channels
-      parameters:
-        - $ref: "#/parameters/Authorization"
-        - $ref: "#/parameters/Id"
-      responses:
-        200:
-          description: Data retrieved.
-          schema:
-            $ref: "#/definitions/UserRes"
         403:
           description: Missing or invalid access token provided.
         404:
-          description: Channel does not exist.
+          description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
     put:
@@ -88,15 +55,13 @@ paths:
         provided in a request payload. Resource's unique identifier will not be
         affected.
       tags:
-        - channels
+        - user
       parameters:
-        - $ref: "#/parameters/Authorization"
-        - $ref: "#/parameters/Id"
-        - name: channel
-          description: JSON-formatted document describing the updated channel.
+        - name: user
+          description: JSON-formatted document describing the new user.
           in: body
           schema:
-            $ref: "#/definitions/UserReq"
+            $ref: "#/definitions/User"
           required: true
       responses:
         200:
@@ -112,13 +77,11 @@ paths:
     delete:
       summary: Removes a user account
       description: |
-        Removes user account. The service will ensure that the subscribed apps and
-        devices are unsubscribed from the removed channel.
+        Removes user account.
       tags:
-        - channels
+        - user
       parameters:
         - $ref: "#/parameters/Authorization"
-        - $ref: "#/parameters/Id"
       responses:
         204:
           description: User removed.
@@ -126,13 +89,13 @@ paths:
           description: Missing or invalid access token provided.
         500:
           $ref: "#/responses/ServiceError"
-  /login:
+  /tokens:
     post:
       summary: User authentication
       description: |
         Generates an access token when provided with proper credentials.
       tags:
-        - users
+        - Authentication
       parameters:
         - name: credentials
           description: JSON-formatted document containing user credentials.
@@ -150,7 +113,7 @@ paths:
             Failed due to malformed JSON or using an invalid credentials.
         500:
           $ref: "#/responses/ServiceError"
-  /auth:
+  /access-grant:
     get:
       summary: Checks the token validity
       description: |
@@ -162,11 +125,11 @@ paths:
         - $ref: "#/parameters/Authorization"
       responses:
         200:
-          description: ID retrieved
+          description: Email retrieved
           headers:
             X-client-id:
               type: string
-              description: ID of the entity bound to the provided access key.
+              description: Email of the entity bound to the provided access key.
         403:
           description: Missing or invalid access token provided.
 
@@ -177,86 +140,12 @@ parameters:
     in: header
     type: string
     required: true
-  Id:
-    name: id
-    description: Unique resource identifier.
-    in: path
-    type: string
-    format: uuid
-    required: true
-  Size:
-    name: size
-    description: Size of the subset to retrieve.
-    in: query
-    type: integer
-    default: 10
-    required: false
-  Offset:
-    name: offset
-    description: Number of items to skip during retrieval.
-    in: query
-    type: integer
-    default: 0
-    required: false
 
 responses:
   ServiceError:
     description: Unexpected server-side error occured.
 
 definitions:
-  UserList:
-    type: object
-    properties:
-      channels:
-        type: array
-        minItems: 0
-        uniqueItems: true
-        items:
-          $ref: "#/definitions/UserRes"
-    required:
-      - channels
-  UserRes:
-    type: object
-    properties:
-      id:
-        type: string
-        description: Unique user identifier generated by the service.
-      email:
-        type: string
-        description: Free-form channel name.
-      connected:
-        type: array
-        minItems: 0
-        uniqueItems: true
-        items:
-          type: string
-    required:
-      - id
-      - name
-      - connected
-  ChannelReq:
-    type: object
-    properties:
-      name:
-        type: string
-        description: Free-form channel name.
-      connected:
-        type: array
-        minItems: 0
-        uniqueItems: true
-        items:
-          type: string
-  ClientList:
-    type: object
-    properties:
-      clients:
-        type: array
-        minItems: 0
-        uniqueItems: true
-        items:
-          $ref: "#/definitions/ClientRes"
-    required:
-      - clients
   User:
     type: object
     properties:
@@ -272,25 +161,6 @@ definitions:
     required:
       - email
       - password
-  UserReq:
-    type: object
-    properties:
-      type:
-        type: string
-        enum:
-          - app
-          - device
-        description: Type of the client.
-      name:
-        type: string
-        description: Free-form client name.
-      meta:
-        type: object
-        description: Client's meta-data.
-        additionalProperties:
-          type: string
-    required:
-      - type
   Token:
     type: object
     properties:

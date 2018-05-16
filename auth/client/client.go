@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"moentasa/auth"
+	"monetasa/auth"
+
 	"github.com/sony/gobreaker"
 )
 
@@ -55,13 +56,6 @@ func NewClient(url string) AuthClient {
 // VerifyToken tries to extract an identity from the provided token.
 func (mc AuthClient) VerifyToken(token string) (string, error) {
 	url := fmt.Sprintf("%s/access-grant", mc.url)
-	return mc.makeRequest(url, token)
-}
-
-// CanAccess checks whether or not the client having a provided token has
-// access to the specified channel.
-func (mc AuthClient) CanAccess(channel, token string) (string, error) {
-	url := fmt.Sprintf("%s/channels/%s/access-grant", mc.url, channel)
 	return mc.makeRequest(url, token)
 }
 

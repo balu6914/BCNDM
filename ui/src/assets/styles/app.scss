@@ -1,0 +1,83 @@
+/* App style module imports
+ You can add global styles to this file, and also import other style files
+ */
+
+// Import MDL design theme
+@import "~@angular-mdl/core/scss/_color-definitions";
+$color-primary: $palette-blue-500;
+$color-primary-dark: $palette-blue-700;
+$color-accent: $palette-amber-A200;
+$color-primary-contrast: $color-dark-contrast;
+$color-accent-contrast: $color-dark-contrast;
+
+@import '~@angular-mdl/core/scss/material-design-lite';
+// Import MDL additinal extensions
+@import '~@angular2-mdl-ext/popover/popover.css';
+@import '~@angular2-mdl-ext/select/select.css';
+@import '~@angular-mdl/datepicker/datepicker';
+
+// Import ngx-tables style
+@import '~@swimlane/ngx-datatable/release/index.css';
+@import '~@swimlane/ngx-datatable/release/themes/material.css';
+@import '~@swimlane/ngx-datatable/release/assets/icons.css';
+@import "_global.scss";
+@import "_vars.scss";
+
+
+.mdl-layout__drawer {
+  overflow: hidden;
+  // width: 55px;
+  transform: translateX(0);
+  transition: 250ms width ease-in-out;
+  background: #fff;
+
+.mdl-navigation__link {
+    transition: 250ms width ease-in-out;
+
+}
+  .mdl-navigation__link i {
+      color: #2196f3;
+  }
+
+  .mdl-navigation__link span {
+    opacity: 1;
+    transition: 250ms opacity ease-in-out;
+  }
+
+  .mdl-navigation__link:hover {
+  transition: 250ms width ease-in-out;
+      background-color: #2196f3 !important;
+      color: #fff !important;
+      i {
+  transition: 250ms width ease-in-out;
+          color: #fff;
+      }
+  }
+
+  + .mdl-layout__header,
+  ~ .mdl-layout__content {
+    transition: 250ms margin-left ease-in-out;
+  }
+
+}
+
+// .mdl-layout__header,
+// .mdl-layout__content {
+//   margin-left: 55px!important;
+// }
+
+.mdl-navigation {
+  width: 240px;
+}
+
+.mdl-layout__header-row {
+  padding: 0 16px 0 22px;
+}
+
+.error-message {
+    color: rgb(213,0,0);
+    width: 100%;
+    font-size: 12px;
+    margin-top: 3px;
+    display: block;
+}

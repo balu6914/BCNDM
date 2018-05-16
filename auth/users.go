@@ -31,12 +31,9 @@ type UserRepository interface {
 	// One retrieves user by its unique identifier.
 	One(string) (User, error)
 
-	// All retrieves all users.
-	All() ([]User, error)
-
 	// Update updates user by its unique identifier.
-	Update(string, User) (error)
+	Update(User) error
 
 	// Remove removes user by its unique identifier.
-	Remove(string) (error)
+	Remove(string) error
 }

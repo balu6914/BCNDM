@@ -2,143 +2,108 @@ package api
 
 import (
 	"github.com/asaskevich/govalidator"
-	"github.com/mainflux/mainflux/manager"
+
+	"monetasa/dapp"
+)
+
+const (
+	minLongitude = -180
+	maxLongitude = 180
+	minLatitude  = -90
+	maxLatitude  = 90
+	typeGeo      = "geo"
 )
 
 type apiReq interface {
 	validate() error
 }
 
-type userReq struct {
-	user manager.User
+type createStreamReq struct {
+	User   string
+	Stream dapp.Stream
 }
 
-func (req userReq) validate() error {
-	return req.user.Validate()
+func (req createStreamReq) validate() error {
+	return req.Stream.Validate()
 }
 
-type identityReq struct {
-	key string
+type updateStreamReq struct {
+	User     string
+	StreamId string
+	Stream   dapp.Stream
 }
 
-func (req identityReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
+func (req updateStreamReq) validate() error {
+	if req.StreamId == "" {
+		return dapp.ErrMalformedData
+	}
+
+	if !govalidator.IsHexadecimal(req.StreamId) {
+		return dapp.ErrMalformedData
+	}
+
+	return req.Stream.Validate()
+}
+
+type readStreamReq struct {
+	StreamId string
+}
+
+func (req readStreamReq) validate() error {
+	if req.StreamId == "" {
+		return dapp.ErrMalformedData
+	}
+
+	if !govalidator.IsHexadecimal(req.StreamId) {
+		return dapp.ErrMalformedData
 	}
 
 	return nil
 }
 
-type addClientReq struct {
-	key    string
-	client manager.Client
+type deleteStreamReq struct {
+	User     string
+	StreamId string
 }
 
-func (req addClientReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
+func (req deleteStreamReq) validate() error {
+	if req.StreamId == "" {
+		return dapp.ErrMalformedData
 	}
 
-	return req.client.Validate()
-}
-
-type updateClientReq struct {
-	key    string
-	id     string
-	client manager.Client
-}
-
-func (req updateClientReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.id) {
-		return manager.ErrNotFound
-	}
-
-	return req.client.Validate()
-}
-
-type createChannelReq struct {
-	key     string
-	channel manager.Channel
-}
-
-func (req createChannelReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
+	if !govalidator.IsHexadecimal(req.StreamId) {
+		return dapp.ErrMalformedData
 	}
 
 	return nil
 }
 
-type updateChannelReq struct {
-	key     string
-	id      string
-	channel manager.Channel
+type searchStreamReq struct {
+	Type string
+	x0   float64
+	y0   float64
+	x1   float64
+	y1   float64
+	x2   float64
+	y2   float64
+	x3   float64
+	y3   float64
 }
 
-func (req updateChannelReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
+func (req searchStreamReq) validate() error {
+	if req.Type != typeGeo {
+		return dapp.ErrUnknownType
 	}
 
-	if !govalidator.IsUUID(req.id) {
-		return manager.ErrNotFound
-	}
-
-	return nil
-}
-
-type viewResourceReq struct {
-	key string
-	id  string
-}
-
-func (req viewResourceReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.id) {
-		return manager.ErrNotFound
-	}
-
-	return nil
-}
-
-type listResourcesReq struct {
-	key    string
-	size   int
-	offset int
-}
-
-func (req listResourcesReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
-	}
-
-	if req.size > 0 && req.offset >= 0 {
-		return nil
-	}
-
-	return manager.ErrMalformedEntity
-}
-
-type connectionReq struct {
-	key      string
-	chanId   string
-	clientId string
-}
-
-func (req connectionReq) validate() error {
-	if req.key == "" {
-		return manager.ErrUnauthorizedAccess
-	}
-
-	if !govalidator.IsUUID(req.chanId) && !govalidator.IsUUID(req.clientId) {
-		return manager.ErrNotFound
+	if req.x0 < minLongitude || req.x0 > maxLongitude ||
+		req.x1 < minLongitude || req.x1 > maxLongitude ||
+		req.x2 < minLongitude || req.x2 > maxLongitude ||
+		req.x3 < minLongitude || req.x3 > maxLongitude ||
+		req.y0 < minLatitude || req.y0 > maxLatitude ||
+		req.y1 < minLatitude || req.y1 > maxLatitude ||
+		req.y2 < minLatitude || req.y2 > maxLatitude ||
+		req.y3 < minLatitude || req.y3 > maxLatitude {
+		return dapp.ErrMalformedData
 	}
 
 	return nil

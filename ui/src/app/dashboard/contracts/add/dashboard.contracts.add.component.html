@@ -1,0 +1,60 @@
+<div class="mdl-grid animated fadeIn contracts-add-container">
+  <div class="dashboard-sell-add-container" mdl-shadow="2">
+
+    <h4 class="mdl-cell mdl-cell--12-col">NEW CONTRACT
+    <a [routerLink]="['/dashboard/contract/list']" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
+        <i class="material-icons md-dark">close</i>
+    </a>
+</h4>
+
+    <div class="mdl-cell mdl-cell--12-col">
+      <form class="form-full-width-filds" [formGroup]="form">
+          <!-- Left side -->
+          <div class="mdl-col mdl-cell--6-col">
+              <p>
+                  <mdl-select label="Select Stream" floating-label>
+                      <mdl-option *ngFor="let u of streamList" [value]="u">{{u.stream.name}}</mdl-option>
+                  </mdl-select>
+              </p>
+              <p>
+                  Select Parties by picking a uses from a list
+              </p>
+              <p>
+                  <mdl-select label="Select Users" floating-label [multiple]="true" formControlName="parties">
+                      <mdl-option *ngFor="let u of usersList" [value]="u">{{u.name}}</mdl-option>
+                  </mdl-select>
+              </p>
+
+              <p>
+                  <button (click)="pickADate($event)"
+                  mdl-button
+                  mdl-button-type="icon"
+                  mdl-ripple>
+                  <mdl-icon>event</mdl-icon>
+              </button>
+              <label (click)="pickADate($event)" for="">Select Contract Exparation Date</label>
+              <span> <strong>{{ selectedEndDate | date: 'MMM d, y' }}</strong></span>
+          </p>
+          </div>
+          <!-- Right side -->
+          <div class="mdl-col mdl-cell--6-col">
+              <p *ngFor="let p of form.parties">
+                  {{p.name}}
+              </p>
+          </div>
+          <hr>
+          <p>
+            <a [routerLink]="['/dashboard/contract/list']" mdl-button mdl-button-type="raised" mdl-ripple>
+                          CANCEL
+                      </a>
+            <button mdl-button (click)="onSubmit(form.value, form.valid)" [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>CREATE CONTRACT</button>
+          </p>
+          <br>
+          <p class="text-center">
+            <strong>DISCLAIMER: </strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+      </form>
+    </div>
+  </div>
+</div>
