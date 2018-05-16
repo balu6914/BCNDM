@@ -135,10 +135,10 @@ var fields []string = []string{"name", "type", "description",
 	"price", "longitude", "latitude", "url"}
 
 func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	// user, err := authenticate(r)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	user, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
 
 	file, _, err := r.FormFile("csv")
 	if err != nil {
@@ -189,7 +189,7 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 		}
 
 		stream := dapp.Stream{
-			Owner:       "user",
+			Owner:       user,
 			ID:          bson.NewObjectId(),
 			Name:        record[keys["name"]],
 			Type:        record[keys["type"]],
