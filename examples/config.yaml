@@ -29,7 +29,7 @@ client:
     timeout:
       connection: 3s
       response: 5s
-  localMspId: DEFAULT
+  localMspId: org1MSP
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
@@ -90,7 +90,7 @@ channels:
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: DEFAULT
+    mspid: org1MSP
     #MSPDir: msp
     cryptoPath: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
     peers:

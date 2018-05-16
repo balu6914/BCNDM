@@ -10,7 +10,7 @@ import (
 func main() {
 
 	fSetup := blockchain.FabricSetup{
-		OrgAdmin:    "admin",
+		OrgAdmin:    "Admin",
 		OrgName:     "org1",
 		ConfigFile:  "../config.yaml",
 		ChannelID:   "myc",
@@ -27,7 +27,7 @@ func main() {
 
 	b := token.BcNetwork{Fabric: &fSetup}
 
-	balance, err := b.Balance("nemanja")
+	balance, err := b.Balance("Admin")
 
 	if err != nil {
 		fmt.Println("Error fetching balance!!!", err)
