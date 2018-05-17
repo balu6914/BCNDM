@@ -18,11 +18,6 @@ func New(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
 }
 
 func (ms *authService) Register(user User) error {
-	_, err := ms.users.OneByEmail(user.Email)
-	if err != ErrNotFound {
-		return ErrConflict
-	}
-
 	hash, err := ms.hasher.Hash(user.Password)
 	if err != nil {
 		return ErrMalformedEntity

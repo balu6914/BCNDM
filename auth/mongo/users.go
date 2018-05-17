@@ -25,6 +25,10 @@ func (ur *userRepository) Save(user auth.User) error {
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
+	if count, _ := c.Find(bson.M{"email": user.Email}).Count(); count != 0 {
+		return auth.ErrConflict
+	}
+
 	if err := c.Insert(user); err != nil {
 		if mgo.IsDup(err) {
 			return auth.ErrConflict
