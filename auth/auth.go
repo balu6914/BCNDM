@@ -50,9 +50,6 @@ func (ms *authService) Update(key string, user User) error {
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-	if u.Email != user.Email {
-		return ErrUnauthorizedAccess
-	}
 	if u.ID.Hex() != user.ID.Hex() {
 		return ErrUnauthorizedAccess
 	}
