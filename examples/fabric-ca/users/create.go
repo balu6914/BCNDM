@@ -23,7 +23,7 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 
 	// Register the new user
 	enrollmentSecret, err := mspClient.Register(&msp.RegistrationRequest{
-		Name:        "Admin",
+		Name:        "Nikola",
 		Affiliation: "org1",
 		Secret:      "12345",
 	})
@@ -34,7 +34,7 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 	}
 
 	// Enroll the new user
-	err = mspClient.Enroll("nemanja", msp.WithSecret(enrollmentSecret))
+	err = mspClient.Enroll("Nikola", msp.WithSecret(enrollmentSecret))
 
 	if err != nil {
 		fmt.Println("Enroll failed: %v", err)

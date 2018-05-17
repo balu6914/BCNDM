@@ -11,7 +11,7 @@ version: 2
 # The client section used by GO SDK.
 client:
   # Which organization does this application instance belong to? The value must be the name of an org
-  organization: org1
+  organization: Org1
   logging:
     level: debug
 
@@ -29,7 +29,7 @@ client:
     timeout:
       connection: 3s
       response: 5s
-  localMspId: org1MSP
+  localMspId: Org1MSP
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
@@ -56,7 +56,7 @@ client:
      level: 256
 
   tlsCerts:
-    systemCertPool: false
+    systemCertPool: true
 
 # [Optional]. But most apps would have this section so that channel objects can be constructed based on the content below.
 # If one of your application is creating channels, you might not use this
@@ -90,7 +90,7 @@ channels:
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: org1MSP
+    mspid: Org1MSP
     #MSPDir: msp
     cryptoPath: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
     peers:
@@ -102,7 +102,7 @@ organizations:
 # The orderers consent on the order of transactions in a block to be committed to the ledger. For the time being only one orderer is needed.
 orderers:
   orderer.monetasa.com:
-    url: grpc://localhost:7050
+    url: grpcs://localhost:7050
     grpcOptions:
       ssl-target-name-override: orderer.monetasa.com
       grpc-max-send-message-length: 15
@@ -113,9 +113,9 @@ orderers:
 peers:
   peer0.org1.monetasa.com:
     # this URL is used to send endorsement and query requests
-    url: grpc://localhost:7051
+    url: grpcs://localhost:7051
     # this URL is used to connect the EventHub and registering event listeners
-    eventUrl: grpc://localhost:7053
+    eventUrl: grpcs://localhost:7053
     # These parameters should be set in coordination with the keepalive policy on the server
     grpcOptions:
       ssl-target-name-override: peer0.org1.monetasa.com

@@ -35,9 +35,9 @@ func (bc *BcNetwork) Balance(name string) (b []byte, err error) {
 	args = append(args, name)      // Chaincode fn params
 
 	balance, err := client.Query(channel.Request{
-		ChaincodeID: bc.Fabric.ChannelID,
+		ChaincodeID: bc.Fabric.ChaincodeID,
 		Fcn:         args[0],
-		Args:        [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])},
+		Args:        [][]byte{[]byte(args[0]), []byte(args[1]), []byte(args[2]), []byte(args[3])},
 	})
 
 	if err != nil {

@@ -12,17 +12,21 @@ Profiles:
         Orderer:
             <<: *OrdererDefaults
             Organizations:
-                - *org1
+                - *OrdererOrg
         Consortiums:
             SampleConsortium:
                 Organizations:
-                    - *org1
+                    - *Org1
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Org1
     MonetasaChannel:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *org1
+                - *Org1
 
 ################################################################################
 #
@@ -33,16 +37,19 @@ Profiles:
 #
 ################################################################################
 Organizations:
-
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/monetasa.com/msp
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
-    - &org1
+    - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: org1MSP
+        Name: Org1MSP
 
         # ID to load the MSP definition as
-        ID: org1MSP
+        ID: Org1MSP
 
         MSPDir: crypto-config/peerOrganizations/org1.monetasa.com/msp
 
@@ -68,7 +75,7 @@ Orderer: &OrdererDefaults
     OrdererType: solo
 
     Addresses:
-        - orderer:7050
+        - orderer.monetasa.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
