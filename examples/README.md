@@ -1,35 +1,49 @@
 ### Collection of examples
 
 ----
+# Network and system provisioning
+Monetasa network runs in docker
 
-### Requirments
+### Getting Started
+`NOTE: Follow this step ONLY if you are running the network for first time (it means you don't have crypto material, genesis block, channel config etc...), otherwise jump to step 2. Running docker-compose`
 
-- Running Fabric network
-- Hyperledger Fabric [cryptogen](http://hyperledger-fabric.readthedocs.io/en/release-1.1/commands/cryptogen-commands.html) utility.
-- Generated Fabric key material using cryptogen utility.
-- For `fabric-ca` examples running [fabric-ca](https://github.com/hyperledger/fabric-ca) service.
-
-
- ## Cryptogen
- In order to generate Fabric  Fabric key material and certificates, we must run cryptogen tool and pass crypto-config.yaml
-
-Clone fabric repository
-```
-git clone https://github.com/hyperledger/fabric
-```
-Build cryptogen
-```
-make cryptogen
-```
-Navigate to `monetasa/examples`
-```
-cd `path_to_monetasa_project/monetasa/examples`
-```
-
-Generate certificates
+1.From monetasa **project root** run generation script
 
 ```
-~/path_to_your_fabric_folder/fabric/build/bin/cryptogen generate --config=./crypto-config.yaml
+./examples/generate.sh
+```
+
+After few seconds you should see Success message.
+
+
+2.Run docker-compose from **project root**
 
 ```
-You will see auto generated `crypto-config` folder with all requiured keys. 
+docker-compose -f examples/docker/docker-compose.yaml up
+```
+
+After few seconds you should see Success Network is ready message.
+
+### Testing network
+To confirm that network is working properly and that token chaincode is deployed and running on network we will call chaincode from our docker `cli` container.
+
+1.Enter docker `cli` container
+
+```
+docker exec -it cli bash
+```
+
+2.Query chaincode
+
+```
+peer chaincode query -C myc -n token -c '{"Args":["balance","{\"user\": \"testUser\"}"]}'
+
+```
+
+You should get response
+```
+Query Result: {"user":"testUser","value":0}
+
+```
+
+This confirm that Monetasa network is fully operational with running token chaincode.
