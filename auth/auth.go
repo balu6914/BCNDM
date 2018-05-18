@@ -28,30 +28,29 @@ func (ms *authService) Register(user User) error {
 }
 
 func (ms *authService) Login(user User) (string, error) {
-	dbUser, err := ms.users.One(user.Email)
+	dbu, err := ms.users.OneByEmail(user.Email)
 	if err != nil {
 		return "", ErrUnauthorizedAccess
 	}
 
-	if err := ms.hasher.Compare(user.Password, dbUser.Password); err != nil {
+	if err := ms.hasher.Compare(user.Password, dbu.Password); err != nil {
 		return "", ErrUnauthorizedAccess
 	}
 
-	return ms.idp.TemporaryKey(user.Email)
+	return ms.idp.TemporaryKey(dbu.ID.Hex())
 }
 
 func (ms *authService) Update(key string, user User) error {
-	sub, err := ms.idp.Identity(key)
+	id, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	u, err := ms.users.One(sub)
+	u, err := ms.users.OneById(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
-	if u.Email != user.Email {
+	if u.ID.Hex() != user.ID.Hex() {
 		return ErrUnauthorizedAccess
 	}
 
@@ -65,12 +64,12 @@ func (ms *authService) Update(key string, user User) error {
 }
 
 func (ms *authService) View(key string) (User, error) {
-	sub, err := ms.idp.Identity(key)
+	id, err := ms.idp.Identity(key)
 	if err != nil {
 		return User{}, err
 	}
 
-	user, err := ms.users.One(sub)
+	user, err := ms.users.OneById(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
@@ -79,24 +78,24 @@ func (ms *authService) View(key string) (User, error) {
 }
 
 func (ms *authService) Delete(key string) error {
-	sub, err := ms.idp.Identity(key)
+	id, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	user, err := ms.users.One(sub)
+	user, err := ms.users.OneById(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
 
-	return ms.users.Remove(user.Email)
+	return ms.users.Remove(user.ID.Hex())
 }
 
 func (ms *authService) Identity(key string) (string, error) {
-	user, err := ms.idp.Identity(key)
+	id, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
 	}
 
-	return user, nil
+	return id, nil
 }

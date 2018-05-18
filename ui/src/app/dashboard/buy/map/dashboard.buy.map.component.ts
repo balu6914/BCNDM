@@ -130,7 +130,7 @@ export class DashboardBuyMapComponent {
                     that.temp = [...result.Streams];
                     // Add stream markers on the map (Name, Description and price)
                     result.Streams.forEach(stream => {
-                        if (stream["owner"] != that.user["email"]) {
+                        if (stream["owner"] != that.user["id"]) {
                             // Create marker with stream coordinates
                             const newMarker = L.marker(
                             [stream["location"]["coordinates"][1],
@@ -199,7 +199,7 @@ export class DashboardBuyMapComponent {
     }
 
     setMarkerColor(i: number){
-        if (this.streamList[i]["owner"] != this.user["email"]) {
+        if (this.streamList[i]["owner"] != this.user["id"]) {
                 var defIcon = L.icon({
                     iconUrl:  '/assets/images/blue-marker.png',
                     iconSize: [45, 45]

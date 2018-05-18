@@ -21,23 +21,39 @@ func (urm *userRepositoryMock) Save(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
+	// Save user with two keys. This will allow to simulate
+	// mongo queries by email or _id (login and register or other endpoints)
 	if _, ok := urm.users[user.Email]; ok {
 		return auth.ErrConflict
 	}
+	if _, ok := urm.users[user.ID.Hex()]; ok {
+		return auth.ErrConflict
+	}
 
-	urm.users[user.Email] = user
+	urm.users[user.Email], urm.users[user.ID.Hex()] = user, user
 	return nil
 }
 
-func (urm *userRepositoryMock) One(email string) (auth.User, error) {
+func (urm *userRepositoryMock) OneById(id string) (auth.User, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if val, ok := urm.users[email]; ok {
-		return val, nil
+	if u, ok := urm.users[id]; ok {
+		return u, nil
 	}
 
-	return auth.User{}, auth.ErrUnauthorizedAccess
+	return auth.User{}, auth.ErrNotFound
+}
+
+func (urm *userRepositoryMock) OneByEmail(email string) (auth.User, error) {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+
+	if u, ok := urm.users[email]; ok {
+		return u, nil
+	}
+
+	return auth.User{}, auth.ErrNotFound
 }
 
 func (urm *userRepositoryMock) Update(user auth.User) error {

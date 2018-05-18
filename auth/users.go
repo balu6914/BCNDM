@@ -1,12 +1,16 @@
 package auth
 
-import "github.com/asaskevich/govalidator"
+import (
+	"github.com/asaskevich/govalidator"
+	"gopkg.in/mgo.v2/bson"
+)
 
 // User represents a Monetasa user account. Each user is identified given its
 // email and password.
 type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string        `json:"email"`
+	Password string        `json:"password"`
+	ID       bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
 }
 
 // Validate returns an error if user representation is invalid.
@@ -28,8 +32,11 @@ type UserRepository interface {
 	// operation failure.
 	Save(User) error
 
-	// One retrieves user by its unique identifier.
-	One(string) (User, error)
+	// Retrieves user by its ID.
+	OneById(string) (User, error)
+
+	// Retrieves user by its Email.
+	OneByEmail(string) (User, error)
 
 	// Update updates user by its unique identifier.
 	Update(User) error
