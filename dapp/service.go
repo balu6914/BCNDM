@@ -30,7 +30,10 @@ var (
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	// Adds new stream to the user identified by the provided user id.
-	AddStream(string, Stream) (string, error)
+	AddStream(Stream) (string, error)
+
+	// Adds new streams via parsed csv file.
+	AddBulkStream([]Stream) error
 
 	// Updates the stream identified by the provided id, that
 	// belongs to the user identified by the provided id.

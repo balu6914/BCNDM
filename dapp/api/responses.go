@@ -32,6 +32,20 @@ func (res createStreamRes) empty() bool {
 	return false
 }
 
+type createBulkStreamResponse struct{}
+
+func (res createBulkStreamResponse) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res createBulkStreamResponse) code() int {
+	return http.StatusCreated
+}
+
+func (res createBulkStreamResponse) empty() bool {
+	return true
+}
+
 type modifyStreamRes struct{}
 
 func (res modifyStreamRes) headers() map[string]string {
