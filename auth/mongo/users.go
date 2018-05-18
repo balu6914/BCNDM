@@ -96,10 +96,14 @@ func (ur *userRepository) Remove(id string) error {
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
-	_id := bson.ObjectIdHex(id)
-	if err := c.Remove(bson.M{"_id": _id}); err != nil {
-		return err
+	if bson.IsObjectIdHex(id) {
+		_id := bson.ObjectIdHex(id)
+		if err := c.Remove(bson.M{"_id": _id}); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	return nil
+	return auth.ErrUnauthorizedAccess
 }
