@@ -32,10 +32,10 @@ type UserRepository interface {
 	// operation failure.
 	Save(User) error
 
-	// One retrieves user by its ID.
+	// Retrieves user by its ID.
 	OneById(string) (User, error)
 
-	// One retrieves user by its Email.
+	// Retrieves user by its Email.
 	OneByEmail(string) (User, error)
 
 	// Update updates user by its unique identifier.
