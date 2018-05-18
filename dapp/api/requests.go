@@ -19,7 +19,6 @@ type apiReq interface {
 }
 
 type createStreamReq struct {
-	User   string
 	Stream dapp.Stream
 }
 
@@ -31,6 +30,19 @@ type updateStreamReq struct {
 	User     string
 	StreamId string
 	Stream   dapp.Stream
+}
+
+type createBulkStreamRequest struct {
+	Streams []dapp.Stream
+}
+
+func (req createBulkStreamRequest) validate() error {
+	for _, stream := range req.Streams {
+		if err := stream.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (req updateStreamReq) validate() error {

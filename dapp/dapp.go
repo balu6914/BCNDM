@@ -30,9 +30,20 @@ func (ds *dappService) authorize(user, id string) (bool, error) {
 	return true, nil
 }
 
-func (ds *dappService) AddStream(owner string, stream Stream) (string, error) {
-	stream.Owner = owner
+func (ds *dappService) AddStream(stream Stream) (string, error) {
 	return ds.streams.Save(stream)
+}
+
+func (ds *dappService) AddBulkStream(streams []Stream) error {
+	if len(streams) < 1 {
+		return ErrMalformedData
+	}
+	for _, stream := range streams {
+		if _, err := ds.streams.Save(stream); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ds *dappService) UpdateStream(owner, id string, stream Stream) error {
