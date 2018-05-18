@@ -60,13 +60,6 @@ func (urm *userRepositoryMock) Update(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if _, ok := urm.users[user.Email]; !ok {
-		return auth.ErrNotFound
-	}
-	if _, ok := urm.users[urm.users[user.Email].ID.Hex()]; !ok {
-		return auth.ErrNotFound
-	}
-
 	urm.users[user.Email] = user
 	urm.users[urm.users[user.Email].ID.Hex()] = user
 

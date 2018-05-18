@@ -64,19 +64,15 @@ func TestUpdate(t *testing.T) {
 	svc.Register(user)
 	key, _ := svc.Login(user)
 
-	user2 := user
 	user.Password = "newPassword"
-	user2.Email = "new@example.com"
-	user2.ID = bson.NewObjectId()
-
+	user.Email = "new@mail.com"
 	cases := map[string]struct {
 		key  string
 		user auth.User
 		err  error
 	}{
-		"Update user":                        {key, user, nil},
+		"Update user email and password":     {key, user, nil},
 		"Update user with wrong credentials": {wrong, user, auth.ErrUnauthorizedAccess},
-		"Update user email":                  {key, user2, auth.ErrUnauthorizedAccess},
 	}
 
 	for desc, tc := range cases {
