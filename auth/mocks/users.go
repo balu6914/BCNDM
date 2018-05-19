@@ -60,22 +60,24 @@ func (urm *userRepositoryMock) Update(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if _, ok := urm.users[user.Email]; !ok {
-		return auth.ErrNotFound
-	}
-
 	urm.users[user.Email] = user
+	urm.users[urm.users[user.Email].ID.Hex()] = user
+
 	return nil
 }
 
-func (urm *userRepositoryMock) Remove(email string) error {
+func (urm *userRepositoryMock) Remove(id string) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if _, ok := urm.users[email]; !ok {
+	if _, ok := urm.users[id]; !ok {
+		return auth.ErrNotFound
+	}
+	if _, ok := urm.users[urm.users[id].Email]; !ok {
 		return auth.ErrNotFound
 	}
 
-	urm.users[email] = auth.User{}
+	urm.users[urm.users[id].Email] = auth.User{}
+	urm.users[id] = auth.User{}
 	return nil
 }
