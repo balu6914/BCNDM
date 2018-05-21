@@ -26,7 +26,7 @@ func main() {
 	fmt.Println("Successfully connected to Fabric network")
 
 	b := token.BcNetwork{Fabric: &fSetup}
-
+	// Get balance for user Nikola
 	balance, err := b.Balance("Nikola")
 
 	if err != nil {
