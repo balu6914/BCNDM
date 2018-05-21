@@ -42,7 +42,7 @@ func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
 	}
 
 	// Get the new user's signing identity
-	si, err := mspClient.GetSigningIdentity("john")
+	si, err := mspClient.GetSigningIdentity("Nikola")
 	if err != nil {
 		fmt.Println("GetSigningIdentity failed: %v", err)
 		return nil, err
