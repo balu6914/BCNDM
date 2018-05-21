@@ -1,3 +1,6 @@
+examples/crypto-config/*
+examples/docker/artifacts/*
+!examples/docker/artifacts/.gitkeep
 # System Files
 .DS_Store
 Thumbs.db

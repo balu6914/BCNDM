@@ -1,0 +1,27 @@
+# cryptogen config which generate crypto-config folder
+
+OrdererOrgs:
+#---------------------------------------------------------
+# Orderer
+# --------------------------------------------------------
+- Name: Orderer
+  Domain: monetasa.com
+  # ------------------------------------------------------
+  # "Specs" - See PeerOrgs below for complete description
+  # -----------------------------------------------------
+  Specs:
+    - Hostname: orderer
+# -------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+ # ------------------------------------------------------
+PeerOrgs:
+# -----------------------------------------------------
+# Org1
+# ----------------------------------------------------
+- Name: Org1
+  Domain: org1.monetasa.com
+  EnableNodeOUs: false
+  Template:
+    Count: 1
+  Users:
+    Count: 1
