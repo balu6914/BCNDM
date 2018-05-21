@@ -7,11 +7,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
-// type Balance struct {
-// 	User  string `json:"user"`
-// 	Value uint64 `json:"value"`
-// }
-
 // Returns the account balance of another account with address user.
 func (bc *BcNetwork) Balance(name string) (b []byte, err error) {
 
