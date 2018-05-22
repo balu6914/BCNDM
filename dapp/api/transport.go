@@ -112,7 +112,7 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	defer r.Body.Close()
 
 	stream.ID = bson.NewObjectId()
-	stream.Owner = user
+	stream.Owner = userID
 
 	req := createStreamReq{
 		Stream: stream,
