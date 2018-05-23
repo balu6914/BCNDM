@@ -38,22 +38,16 @@ cd $LOCATION
 
 $FABRIC_PATH/build/bin/cryptogen generate --config=$CRYPTO_CONF_PATH --output=$CRYPTO_CONF_OUTPUT_PATH
 
-sleep 1
-
 # configtxgen requires configtx.yaml on current location
 cd examples/config
 
 $FABRIC_PATH/build/bin/configtxgen  -outputBlock $GENESIS_BLOCK_PATH -profile  $GENESIS_BLOCK_PROFILE
 
-sleep 1
 
 $FABRIC_PATH/build/bin/configtxgen  -outputCreateChannelTx $CH_OUTPUT_PATH  -profile $CH_PROFILE -channelID $CH_ID
 
-sleep 1
 
 cd $LOCATION
-
-echo $LOCATION
 
 # Change org ca pub key file name docker-compose env var
 NEW_CERT_NAME=`find $LOCATION/examples/crypto-config/peerOrganizations/org1.monetasa.com/ca/ -type f -name "*_sk" -printf "%f\n"`
