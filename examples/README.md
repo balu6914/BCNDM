@@ -5,7 +5,7 @@
 Monetasa network runs in docker
 
 ### Getting Started
-`NOTE: Follow this step ONLY if you are running the network for first time (it means you don't have crypto material, genesis block, channel config etc...), otherwise jump to step 2. Running docker-compose`
+`NOTE: Follow this step ONLY if you are running the network for first time (it means you don't have crypto material, genesis block, channel config etc...), otherwise jump to step 2. Clear all stoped docker containers and 3. Running docker-compose`
 
 1.From monetasa **project root** run generation script
 
@@ -15,8 +15,12 @@ Monetasa network runs in docker
 
 After few seconds you should see Success message.
 
+2.Clear all stoped docker containers
+```
+docker rm $(docker ps -a -q)
+```
 
-2.Run docker-compose from **project root**
+3.Run docker-compose from **project root**
 
 ```
 docker-compose -f examples/docker/docker-compose.yaml up
