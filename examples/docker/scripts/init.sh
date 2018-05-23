@@ -16,6 +16,8 @@ CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS
 
 CERT_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem"
 
+LOCATION=$PWD
+
 MSG_DONE="
 #################################################################
        ########## Success! Network is ready. #########
@@ -35,6 +37,17 @@ peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --ca
 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
 
 sleep 5
+
+cd $GOPATH/src/github.com/chaincode/token
+# Install govendor tool
+go get -u github.com/kardianos/govendor
+
+govendor init
+
+# Fetch deps
+govendor fetch github.com/hyperledger/fabric/protos/msp
+
+cd $LOCATION
 
 # Install chaincode
 peer chaincode install -n $CHAIN_ID -v $CHAIN_VER -p $CHAIN_PATH

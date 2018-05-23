@@ -1,5 +1,6 @@
 examples/crypto-config/*
 chaincode/token/token
+chaincode/token/vendor/*
 examples/docker/artifacts/*
 !examples/docker/artifacts/.gitkeep
 # System Files
