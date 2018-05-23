@@ -17,6 +17,8 @@ CH_PROFILE="MonetasaChannel"
 CH_ID="myc"
 MSG_DONE="Success! All done."
 LOCATION=$PWD
+BASE_COMPOSE_PATH='docker/base/docker-compose-base.yaml'
+
 
 # Get hyperledger/fabric
 FABRIC_PATH="$GOPATH/src/github.com/hyperledger/fabric"
@@ -48,6 +50,15 @@ sleep 1
 $FABRIC_PATH/build/bin/configtxgen  -outputCreateChannelTx $CH_OUTPUT_PATH  -profile $CH_PROFILE -channelID $CH_ID
 
 sleep 1
+
+cd $LOCATION
+
+echo $LOCATION
+
+# Change org ca pub key file name docker-compose env var
+NEW_CERT_NAME=`find $LOCATION/examples/crypto-config/peerOrganizations/org1.monetasa.com/ca/ -type f -name "*_sk" -printf "%f\n"`
+sed -i "s#FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/.*#FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/$NEW_CERT_NAME#" examples/docker/base/docker-compose-base.yaml
+sed -i "s#FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/.*#FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/$NEW_CERT_NAME#" examples/docker/base/docker-compose-base.yaml
 
 echo $MSG_DONE
 
