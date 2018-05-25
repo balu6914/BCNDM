@@ -1,53 +1,60 @@
-### Collection of examples
+# Collection of examples
 
-----
-# Network and system provisioning
-Monetasa network runs in docker
+## Prerequisits
+### Fabric Installation
+Make sure that you have all Fabric prerequisits (docker images and dev tools) installed:
+```
+curl -sSL https://goo.gl/kFFqh5 | bash -s 1.1.0
+```
 
-### Getting Started
-`NOTE: Follow this step ONLY if you are running the network for first time (it means you don't have crypto material, genesis block, channel config etc...), otherwise jump to step 2. Clear all stoped docker containers and 3. Running docker-compose`
+### Cleaning Old Docker Images
+If needed, old Hyperledger docker images can be cleaned with:
+```
+docker rmi -f `docker images | grep hyperledger`
+```
 
-1.From monetasa **project root** run generation script
+## Network and system provisioning
 
+### Generate Crypto Material
+From Datapace **project root** run generation script:
 ```
 ./examples/generate.sh
 ```
 
-After few seconds you should see Success message.
+> N.B.: This step needs to be done only once
 
-2.Clear all stoped docker containers
-```
-docker rm $(docker ps -a -q)
-```
-
-3.Run docker-compose from **project root**
-
+### Start the Network
 ```
 docker-compose -f examples/docker/docker-compose.yaml up
 ```
 
-After few seconds you should see Success Network is ready message.
+After few seconds you should see `Success Network` is ready message.
 
-### Testing network
+N.B. sometimes it is needed to clean old docker containers:
+```
+docker rm `docker ps -a | grep hyperledger | awk '{print $1}'`
+```
+
+### Testing the Network
 To confirm that network is working properly and that token chaincode is deployed and running on network we will call chaincode from our docker `cli` container.
 
-1.Enter docker `cli` container
+1. Enter docker `cli` container
 
 ```
 docker exec -it cli bash
 ```
 
-2.Query chaincode
+2. Query chaincode
 
 ```
 peer chaincode query -C myc -n token -c '{"Args":["balance","{\"user\": \"testUser\"}"]}'
 
 ```
 
-You should get response
+You should get response:
 ```
 Query Result: {"user":"testUser","value":0}
 
 ```
 
-This confirm that Monetasa network is fully operational with running token chaincode.
+This confirms that Datapace network is fully operational with running token chaincode.
