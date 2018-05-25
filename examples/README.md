@@ -21,8 +21,6 @@ From Datapace **project root** run generation script:
 ./examples/generate.sh
 ```
 
-> N.B.: This step needs to be done only once
-
 ### Start the Network
 ```
 docker-compose -f examples/docker/docker-compose.yaml up
@@ -30,21 +28,23 @@ docker-compose -f examples/docker/docker-compose.yaml up
 
 After few seconds you should see `Success Network` is ready message.
 
+
 N.B. sometimes it is needed to clean old docker containers:
 ```
 docker rm `docker ps -a | grep hyperledger | awk '{print $1}'`
 ```
 
-### Testing the Network
-To confirm that network is working properly and that token chaincode is deployed and running on network we will call chaincode from our docker `cli` container.
+## Testing the Network
+To confirm that network is working properly and that token chaincode is deployed and running on network
+we will call chaincode from our docker `cli` container.
 
-1. Enter docker `cli` container
+- Enter docker `cli` container:
 
 ```
 docker exec -it cli bash
 ```
 
-2. Query chaincode
+- Query chaincode:
 
 ```
 peer chaincode query -C myc -n token -c '{"Args":["balance","{\"user\": \"testUser\"}"]}'
