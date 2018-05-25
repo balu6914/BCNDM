@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "bnA1r1EPFP1KZppFMTw430PsE5I=",
+			"path": "github.com/hyperledger/fabric/protos/msp",
+			"revision": "57d7ac86fa49a28b6fa27c4f717690fd9596d2b0",
+			"revisionTime": "2018-05-25T20:42:35Z"
+		}
+	],
+	"rootPath": "github.com/chaincode/token"
+}
