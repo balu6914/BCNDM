@@ -1,17 +1,23 @@
 # Collection of examples
 
 ## Prerequisits
-### Fabric Installation
-Make sure that you have all Fabric prerequisits (docker images and dev tools) installed:
-```
-curl -sSL https://goo.gl/kFFqh5 | bash -s 1.1.0
-```
 
 ### Cleaning Old Docker Images
 If needed, old Hyperledger docker images can be cleaned with:
 ```
 docker rmi -f `docker images | grep hyperledger`
 ```
+
+### Fabric Installation
+Make sure that you have all Fabric prerequisits (docker images and dev tools) installed:
+```
+mkdir -p ~/fabric
+cd ~/fabric
+curl -sSL https://goo.gl/kFFqh5 | bash -s 1.1.0
+export PATH=$PATH:~/fabric/bin
+```
+
+Finally, add `~/fabric/bin` to your `PATH` in `~/.bashrc` for further use.
 
 ## Network and system provisioning
 
