@@ -8,7 +8,7 @@ If needed, old Hyperledger docker images can be cleaned with:
 docker rmi -f `docker images | grep hyperledger`
 ```
 
-### Fabric Installation
+### Fabric Tools Installation
 Make sure that you have all Fabric prerequisites (docker images and dev tools) installed:
 ```
 go get -u github.com/hyperledger/fabric
@@ -19,7 +19,7 @@ make -j 16 configtxgen
 cp build/bin/* $GOBIN
 ```
 
-Make sure that ``$GOBIN` is in your `PATH`.
+Make sure that `$GOBIN` is in your `PATH`.
 
 Now you should be able to use tools globally, for example:
 ```
