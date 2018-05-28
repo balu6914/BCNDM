@@ -9,15 +9,26 @@ docker rmi -f `docker images | grep hyperledger`
 ```
 
 ### Fabric Installation
-Make sure that you have all Fabric prerequisits (docker images and dev tools) installed:
+Make sure that you have all Fabric prerequisites (docker images and dev tools) installed:
 ```
-mkdir -p ~/fabric
-cd ~/fabric
-curl -sSL https://goo.gl/kFFqh5 | bash -s 1.1.0
-export PATH=$PATH:~/fabric/bin
+go get -u github.com/hyperledger/fabric
+cd $GOPATH/github.com/hyperledger/fabric
+git checkout v1.1.0
+make -j 16 cryptogen
+make -j 16 configtxgen
+cp build/bin/* $GOBIN
 ```
 
-Finally, add `~/fabric/bin` to your `PATH` in `~/.bashrc` for further use.
+Make sure that ``$GOBIN` is in your `PATH`.
+
+Now you should be able to use tools globally, for example:
+```
+drasko@Marx:~/go/src/github.com/hyperledger/fabric$ cryptogen version
+cryptogen:
+ Version: 1.1.0
+ Go version: go1.10.1
+ OS/Arch: linux/amd64
+```
 
 ## Network and system provisioning
 
@@ -54,7 +65,6 @@ docker exec -it cli bash
 
 ```
 peer chaincode query -C myc -n token -c '{"Args":["balance","{\"user\": \"testUser\"}"]}'
-
 ```
 
 You should get response:
