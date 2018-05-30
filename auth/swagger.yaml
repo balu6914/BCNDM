@@ -8,11 +8,11 @@ consumes:
 produces:
   - "application/json"
 paths:
-  /user:
+  /users:
     get:
       summary: Retrieves user info
       tags:
-        - user
+        - Users
       parameters:
         - $ref: "#/parameters/Authorization"
       responses:
@@ -29,7 +29,7 @@ paths:
       description: |
         User creation is performed with values provided in a request payload.
       tags:
-        - user
+        - Users
       parameters:
         - name: user
           description: JSON-formatted document describing the new user.
@@ -55,7 +55,7 @@ paths:
         provided in a request payload. Resource's unique identifier will not be
         affected.
       tags:
-        - user
+        - Users
       parameters:
         - name: user
           description: JSON-formatted document describing the new user.
@@ -79,7 +79,7 @@ paths:
       description: |
         Removes user account.
       tags:
-        - user
+        - Users
       parameters:
         - $ref: "#/parameters/Authorization"
       responses:
@@ -120,7 +120,7 @@ paths:
         If the request is made using valid token, an identifier bound
         to that token will be returned.
       tags:
-        - access control
+        - Access control
       parameters:
         - $ref: "#/parameters/Authorization"
       responses:
@@ -136,7 +136,7 @@ paths:
 parameters:
   Authorization:
     name: Authorization
-    description: User's access token.
+    description: User access token.
     in: header
     type: string
     required: true
