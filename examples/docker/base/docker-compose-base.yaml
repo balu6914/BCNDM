@@ -58,10 +58,11 @@ services:
     environment:
        - FABRIC_CA_SERVER_CA_NAME=ca.org1.monetasa.com
        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8145ba8603faf5c2046d6b46c1c879b14fc2a846c94c0ebdc6b383116d34052_sk
+       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/05f7cab3f0dde7e29e822c094bf64dee02ae3b2c26bf6c3e365cd2b7d253a1bf_sk
        - FABRIC_CA_SERVER_TLS_ENABLED=false
        - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8145ba8603faf5c2046d6b46c1c879b14fc2a846c94c0ebdc6b383116d34052_sk
+       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/05f7cab3f0dde7e29e822c094bf64dee02ae3b2c26bf6c3e365cd2b7d253a1bf_sk
     volumes:
-       - "../../crypto-config/peerOrganizations/org1.monetasa.com/ca:/etc/hyperledger/fabric-ca-server-config"
+       - "../../crypto-config/peerOrganizations/org1.monetasa.com/ca/:/etc/hyperledger/fabric-ca-server-config"
        - "../../crypto-config/peerOrganizations/org1.monetasa.com:/etc/hyperledger/fabric-ca-server"
+       - "../../config/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml"
