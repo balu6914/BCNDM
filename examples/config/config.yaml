@@ -131,12 +131,6 @@ certificateAuthorities:
     tlsCACerts:
       # Comma-Separated list of paths
       path: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
-        # Client key and cert for SSL handshake with Fabric CA
-      # client:
-      #   key:
-      #     path: ${GOPATH}/src/github.com/hyperledger/fabric-sdk-go/test/fixtures/fabricca/tls/certs/client/client_fabric_client-key.pem
-      #   cert:
-      #     path: ${GOPATH}/src/github.com/hyperledger/fabric-sdk-go/test/fixtures/fabricca/tls/certs/client/client_fabric_client.pem
     httpOptions:
       verify: false
     registrar:
