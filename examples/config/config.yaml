@@ -62,9 +62,9 @@ client:
 # If one of your application is creating channels, you might not use this
 channels:
   myc:
-    orderers:
-      - orderer.monetasa.com
-
+    # orderers:
+    #   - orderer.monetasa.com
+    #
     # Network entity which maintains a ledger and runs chaincode containers in order to perform operations to the ledger. Peers are owned and maintained by members.
     peers:
       peer0.org1.monetasa.com:
@@ -91,7 +91,6 @@ channels:
 organizations:
   org1:
     mspid: Org1MSP
-    #MSPDir: msp
     cryptoPath: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
     peers:
       - peer0.org1.monetasa.com
@@ -129,6 +128,9 @@ certificateAuthorities:
   ca.org1.monetasa.com:
     url: http://localhost:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
+    tlsCACerts:
+      # Comma-Separated list of paths
+      path: "${GOPATH}/src/monetasa/examples/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
     httpOptions:
       verify: false
     registrar:

@@ -3,18 +3,18 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH="./artifacts/myc.tx"
-CHANNEL_BLOCK="myc.block"
+CHANNEL_PATH=./artifacts/myc.tx
+CHANNEL_BLOCK=myc.block
 
-ORDERER_URL="orderer.monetasa.com:7050"
+ORDERER_URL=orderer.monetasa.com:7050
 
-CHANNEL_ID="myc"
-CHAIN_ID="token"
-CHAIN_PATH="github.com/chaincode/token"
-CHAIN_VER="1.0"
+CHANNEL_ID=myc
+CHAIN_ID=token
+CHAIN_PATH=github.com/chaincode/token
+CHAIN_VER=1.0
 CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 1000000}"]}'
 
-CERT_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem"
+CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
 
 LOCATION=$PWD
 
