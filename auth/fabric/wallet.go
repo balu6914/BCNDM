@@ -15,16 +15,14 @@ type userBalance struct {
 }
 
 // Returns the account balance of another account with address user.
-func Balance(name string, bcn BcNetwork) (uint64, error) {
+func Balance(name string, fabric Fabric) (uint64, error) {
 	// ClientContext allows creation of transactions using the supplied identity as the credential.
-	adminChannelContext := bcn.Fabric.Sdk.ChannelContext(
-		bcn.Fabric.ChannelID,
-		fabsdk.WithUser(bcn.Fabric.OrgAdmin), fabsdk.WithOrg(bcn.Fabric.OrgName))
+	adminChannelContext := fabric.Sdk.ChannelContext(fabric.ChannelID,
+		fabsdk.WithUser(fabric.OrgAdmin), fabsdk.WithOrg(fabric.OrgName))
 
 	client, err := channel.New(adminChannelContext)
 	if err != nil {
-		fmt.Errorf("Error init SDK")
-		return 0, err
+		return 0, fmt.Errorf("Error on admin channel context init")
 	}
 
 	ub := userBalance{
@@ -33,7 +31,7 @@ func Balance(name string, bcn BcNetwork) (uint64, error) {
 
 	balanceRqBytes, _ := json.Marshal(ub)
 	balance, err := client.Query(channel.Request{
-		ChaincodeID: bcn.Fabric.ChaincodeID,
+		ChaincodeID: fabric.ChaincodeID,
 		Fcn:         "balance",
 		Args:        util.ToChaincodeArgs(string(balanceRqBytes)),
 	})

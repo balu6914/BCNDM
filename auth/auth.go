@@ -8,19 +8,19 @@ import (
 var _ Service = (*authService)(nil)
 
 type authService struct {
-	users     UserRepository
-	hasher    Hasher
-	idp       IdentityProvider
-	bcnetwork fabric.BcNetwork
+	users  UserRepository
+	hasher Hasher
+	idp    IdentityProvider
+	fabric fabric.Fabric
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider, bcn fabric.BcNetwork) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, fs fabric.Fabric) Service {
 	return &authService{
-		users:     users,
-		hasher:    hasher,
-		idp:       idp,
-		bcnetwork: bcn,
+		users:  users,
+		hasher: hasher,
+		idp:    idp,
+		fabric: fs,
 	}
 }
 
@@ -41,9 +41,8 @@ func (ms *authService) Register(user User) error {
 		return err
 	}
 
-	bcn := ms.bcnetwork
 	// Create New user in Fabric network calling fabric-ca
-	newUser, err := fabric.CreateUser(u.ID.Hex(), u.Password, bcn)
+	newUser, err := fabric.CreateUser(u.ID.Hex(), u.Password, ms.fabric)
 	if err != nil {
 		fmt.Printf("Unable to create a user in the fabric-ca %v\n", err)
 		return ErrConflict
@@ -98,9 +97,9 @@ func (ms *authService) View(key string) (User, error) {
 		return User{}, ErrUnauthorizedAccess
 	}
 
-	bcn := ms.bcnetwork
+	fs := ms.fabric
 	// Get balance and update user
-	balance, err := fabric.Balance(user.ID.Hex(), bcn)
+	balance, err := fabric.Balance(user.ID.Hex(), fs)
 	if err != nil {
 		return User{}, fmt.Errorf("Error fetching balance: %v\n", err)
 	}

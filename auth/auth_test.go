@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"monetasa/auth"
 	"monetasa/auth/fabric"
-	"monetasa/auth/fabric/blockchain"
 	"monetasa/auth/mocks"
 	"os"
 	"testing"
@@ -23,7 +22,7 @@ func newService() auth.Service {
 	idp := mocks.NewIdentityProvider()
 
 	// Initialization of the Fabric SDK from the previously set properties
-	fSetup := blockchain.FabricSetup{
+	fSetup := fabric.Fabric{
 		OrgAdmin:    "admin",
 		OrgName:     "org1",
 		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
@@ -33,9 +32,9 @@ func newService() auth.Service {
 	if err := fSetup.Initialize(); err != nil {
 		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
 	}
-	bcn := fabric.BcNetwork{Fabric: &fSetup}
+	fs := fSetup
 
-	return auth.New(users, hasher, idp, bcn)
+	return auth.New(users, hasher, idp, fs)
 }
 
 func TestRegister(t *testing.T) {

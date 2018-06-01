@@ -11,7 +11,6 @@ import (
 	"monetasa/auth/api"
 	"monetasa/auth/bcrypt"
 	"monetasa/auth/fabric"
-	"monetasa/auth/fabric/blockchain"
 	"monetasa/auth/jwt"
 	"monetasa/auth/mongo"
 	log "monetasa/logger"
@@ -84,8 +83,12 @@ func main() {
 	}
 	defer ms.Close()
 
+	users := mongo.NewUserRepository(ms)
+	hasher := bcrypt.New()
+	idp := jwt.New(cfg.Secret)
+
 	// Initialization of the Fabric SDK
-	fSetup := blockchain.FabricSetup{
+	fSetup := fabric.Fabric{
 		OrgAdmin:    "admin",
 		OrgName:     "org1",
 		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
@@ -96,12 +99,7 @@ func main() {
 		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
 	}
 
-	users := mongo.NewUserRepository(ms)
-	hasher := bcrypt.New()
-	idp := jwt.New(cfg.Secret)
-	bcn := fabric.BcNetwork{Fabric: &fSetup}
-
-	svc := auth.New(users, hasher, idp, bcn)
+	svc := auth.New(users, hasher, idp, fSetup)
 	svc = api.LoggingMiddleware(svc, logger)
 
 	fields := []string{"method"}

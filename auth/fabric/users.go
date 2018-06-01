@@ -7,10 +7,12 @@ import (
 	mspctx "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 )
 
-// Add new user to fabric network
-func CreateUser(name, secret string, bcn BcNetwork) (mspctx.SigningIdentity, error) {
+const affiliation = "org1"
 
-	sdk := bcn.Fabric.Sdk
+// Add new user to fabric network
+func CreateUser(name, secret string, fabric Fabric) (mspctx.SigningIdentity, error) {
+
+	sdk := fabric.Sdk
 	ctxProvider := sdk.Context()
 	mspClient, err := msp.New(ctxProvider)
 	if err != nil {
@@ -20,7 +22,7 @@ func CreateUser(name, secret string, bcn BcNetwork) (mspctx.SigningIdentity, err
 	// Register the new user
 	enrollmentSecret, err := mspClient.Register(&msp.RegistrationRequest{
 		Name:        name,
-		Affiliation: "org1",
+		Affiliation: affiliation,
 		Secret:      secret,
 	})
 	if err != nil {
