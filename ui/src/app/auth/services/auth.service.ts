@@ -67,7 +67,7 @@ export class AuthService {
     }
 
     fetchCurrentUser() {
-        return this.http.get(`${environment.API_AUTH}/user`)
+        return this.http.get(`${environment.API_AUTH}/users`)
         .map((data: Response) =>  {
             this.setCurrentUser(data);
             return data;

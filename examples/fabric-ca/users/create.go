@@ -8,43 +8,38 @@ import (
 )
 
 // Add new user to fabric network
-func (bc *BcNetwork) CreateUser() (usr mspctx.SigningIdentity, err error) {
+func (bc *BcNetwork) CreateUser(name, secret string) (mspctx.SigningIdentity, error) {
 
 	sdk := bc.Fabric.Sdk
-
 	ctxProvider := sdk.Context()
-
 	mspClient, err := msp.New(ctxProvider)
-
 	if err != nil {
-		fmt.Println("MSP client init failed: %v", err)
+		fmt.Printf("MSP client init failed: %v\n", err)
 		return nil, err
 	}
 
 	// Register the new user
 	enrollmentSecret, err := mspClient.Register(&msp.RegistrationRequest{
-		Name:        "Nikola",
+		Name:        name,
 		Affiliation: "org1",
-		Secret:      "12345",
+		Secret:      secret,
 	})
-
 	if err != nil {
-		fmt.Println("Registration failed: %v", err)
+		fmt.Printf("Registration failed: %v\n", err)
 		return nil, err
 	}
 
 	// Enroll the new user
-	err = mspClient.Enroll("Nikola", msp.WithSecret(enrollmentSecret))
-
+	err = mspClient.Enroll(name, msp.WithSecret(enrollmentSecret))
 	if err != nil {
-		fmt.Println("Enroll failed: %v", err)
+		fmt.Printf("Enroll failed: %v\n", err)
 		return nil, err
 	}
 
 	// Get the new user's signing identity
-	si, err := mspClient.GetSigningIdentity("Nikola")
+	si, err := mspClient.GetSigningIdentity(name)
 	if err != nil {
-		fmt.Println("GetSigningIdentity failed: %v", err)
+		fmt.Printf("GetSigningIdentity failed: %v\n", err)
 		return nil, err
 	}
 

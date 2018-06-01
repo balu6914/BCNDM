@@ -22,14 +22,13 @@ func main() {
 	}
 	fmt.Println("Successfully connected to Fabric network")
 
-	b := users.BcNetwork{Fabric: &fSetup}
+	bc := users.BcNetwork{Fabric: &fSetup}
 
 	// Create New user in Fabric network calling fabric-ca
-	newUser, err := b.CreateUser()
+	newUser, err := bc.CreateUser("Nikola", "12345")
 	if err != nil {
-		fmt.Println("Unable to create a user in the fabric-ca %v\n", err)
+		fmt.Printf("Unable to create a user in the fabric-ca %v\n", err)
 	}
 
-	fmt.Println("User created!: %v\n", newUser)
-
+	fmt.Printf("User created!: %v\n", newUser)
 }
