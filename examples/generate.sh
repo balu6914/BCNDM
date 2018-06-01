@@ -43,7 +43,7 @@ FABRIC_CFG_PATH=examples/config configtxgen -outputCreateChannelTx $CH_OUTPUT_PA
 # Update docker-compose
 ###
 NEW_CERT_NAME=`find $CRYPTO_CONF_DIR/peerOrganizations/org1.monetasa.com/ca/ -type f -name "*_sk" | xargs basename`
-sed -i "s#\(FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
-sed -i "s#\(FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
+sed -i -- "s#\(FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
+sed -i -- "s#\(FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
 
 echo "Success! All done."
