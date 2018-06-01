@@ -10,6 +10,8 @@ install_and_test:
   script:
     - cd /go/src/
     - git clone $CI_REPOSITORY_URL
+    - cd /go/src/monetasa
+    - go get -d ./...
     - cd /go/src/monetasa/auth
     - go test
     - cd /go/src/monetasa/dapp
