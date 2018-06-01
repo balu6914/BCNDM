@@ -2,6 +2,7 @@ examples/crypto-config/*
 chaincode/token/token
 chaincode/token/vendor/*/**
 examples/docker/artifacts/*
+fabric-ca-db
 !examples/docker/artifacts/.gitkeep
 # System Files
 .DS_Store

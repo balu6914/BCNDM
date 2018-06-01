@@ -38,18 +38,12 @@ From Datapace **project root** run generation script:
 ./examples/generate.sh
 ```
 
-### Start the Network
+### Start/Restart the Network
+If docker composition is running first stop it with `ctrl+c` then run:
 ```
-docker-compose -f examples/docker/docker-compose.yaml up
+./examples/run.sh
 ```
-
 After few seconds you should see `Success Network` is ready message.
-
-
-N.B. sometimes it is needed to clean old docker containers:
-```
-docker rm `docker ps -a | grep hyperledger | awk '{print $1}'`
-```
 
 ## Testing the Network
 To confirm that network is working properly and that token chaincode is deployed and running on network
@@ -74,3 +68,15 @@ Query Result: {"user":"testUser","value":0}
 ```
 
 This confirms that Datapace network is fully operational with running token chaincode.
+
+
+## Testing Examples
+
+You can test our examples
+* fabric-ca - Creates new user in fabric-ca using fabric-sdk-go
+* token-balance - Query our chaincode for user balance using  fabric-sdk-go
+
+Navigate to example folder `cd EXAMPLE_FOLDER_NAME` and execute
+```
+go run main.go
+```
