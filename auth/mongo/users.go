@@ -1,7 +1,9 @@
 package mongo
 
 import (
+	"fmt"
 	"monetasa/auth"
+	"monetasa/auth/fabric"
 
 	"github.com/asaskevich/govalidator"
 	"gopkg.in/mgo.v2"
@@ -37,6 +39,21 @@ func (ur *userRepository) Save(user auth.User) error {
 		return err
 	}
 
+	// Find user structure to get generated mongoID
+	if err := c.Find(bson.M{"email": user.Email}).One(&user); err != nil {
+		if err == mgo.ErrNotFound {
+			return auth.ErrConflict
+		}
+	}
+
+	// Create New user in Fabric network calling fabric-ca
+	newUser, err := fabric.CreateUser(user.ID.Hex(), user.Password)
+	if err != nil {
+		fmt.Printf("Unable to create a user in the fabric-ca %v\n", err)
+		return auth.ErrConflict
+	}
+
+	fmt.Printf("User created!: %v\n", newUser)
 	return nil
 }
 
@@ -69,6 +86,13 @@ func (ur *userRepository) OneById(id string) (auth.User, error) {
 			}
 		}
 	}
+
+	// Get user balance
+	balance, err := fabric.Balance(user.ID.Hex())
+	if err != nil {
+		return auth.User{}, fmt.Errorf("Error fetching balance: %v\n", err)
+	}
+	user.Balance = balance
 
 	return user, nil
 }
