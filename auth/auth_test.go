@@ -3,7 +3,10 @@ package auth_test
 import (
 	"fmt"
 	"monetasa/auth"
+	"monetasa/auth/fabric"
+	"monetasa/auth/fabric/blockchain"
 	"monetasa/auth/mocks"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +22,20 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 
-	return auth.New(users, hasher, idp)
+	// Initialization of the Fabric SDK from the previously set properties
+	fSetup := blockchain.FabricSetup{
+		OrgAdmin:    "admin",
+		OrgName:     "org1",
+		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
+		ChannelID:   "myc",
+		ChaincodeID: "token",
+	}
+	if err := fSetup.Initialize(); err != nil {
+		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
+	}
+	bcn := fabric.BcNetwork{Fabric: &fSetup}
+
+	return auth.New(users, hasher, idp, bcn)
 }
 
 func TestRegister(t *testing.T) {

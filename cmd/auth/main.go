@@ -8,10 +8,12 @@ import (
 	"syscall"
 
 	"monetasa/auth"
-	"monetasa/auth/mongo"
 	"monetasa/auth/api"
 	"monetasa/auth/bcrypt"
+	"monetasa/auth/fabric"
+	"monetasa/auth/fabric/blockchain"
 	"monetasa/auth/jwt"
+	"monetasa/auth/mongo"
 	log "monetasa/logger"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -19,20 +21,20 @@ import (
 )
 
 const (
-	port                    int    = 8080
-	defMongoURL            	string = "0.0.0.0"
-	defMongoUser            string = ""
-	defMongoPass            string = ""
-	defMongoDatabase       	string = "auth"
-	defMongoPort           	int    = 27017
-	defMongoConnectTimeout 	int    = 5000
-	defMongoSocketTimeout  	int    = 5000
-	defAuthURL              string = "0.0.0.0"
-	defSecret               string = "monetasa"
+	port                   int    = 8080
+	defMongoURL            string = "0.0.0.0"
+	defMongoUser           string = ""
+	defMongoPass           string = ""
+	defMongoDatabase       string = "auth"
+	defMongoPort           int    = 27017
+	defMongoConnectTimeout int    = 5000
+	defMongoSocketTimeout  int    = 5000
+	defAuthURL             string = "0.0.0.0"
+	defSecret              string = "monetasa"
 
-	envMongoURL             string = "MONETASA_AUTH_MONGO_URL"
-	envAuthURL              string = "MONETASA_AUTH_URL"
-	envSecret               string = "MONETASA_AUTH_SECRET"
+	envMongoURL string = "MONETASA_AUTH_MONGO_URL"
+	envAuthURL  string = "MONETASA_AUTH_URL"
+	envSecret   string = "MONETASA_AUTH_SECRET"
 )
 
 type config struct {
@@ -60,33 +62,46 @@ func getenv(key, fallback string) string {
 
 func main() {
 	cfg := config{
-		Port:                 port,
-		AuthURL:              getenv(envAuthURL, defAuthURL),
-		MongoURL:             getenv(envMongoURL, defMongoURL),
-		MongoUser:            defMongoUser,
-		MongoPass:            defMongoPass,
-		MongoDatabase:        defMongoDatabase,
-		MongoPort:            defMongoPort,
-		MongoConnectTimeout:  defMongoConnectTimeout,
-		MongoSocketTimeout:   defMongoSocketTimeout,
-		Secret:               getenv(envSecret, defSecret),
+		Port:                port,
+		AuthURL:             getenv(envAuthURL, defAuthURL),
+		MongoURL:            getenv(envMongoURL, defMongoURL),
+		MongoUser:           defMongoUser,
+		MongoPass:           defMongoPass,
+		MongoDatabase:       defMongoDatabase,
+		MongoPort:           defMongoPort,
+		MongoConnectTimeout: defMongoConnectTimeout,
+		MongoSocketTimeout:  defMongoSocketTimeout,
+		Secret:              getenv(envSecret, defSecret),
 	}
 
 	logger := log.New(os.Stdout)
 
 	ms, err := mongo.Connect(cfg.MongoURL, cfg.MongoConnectTimeout, cfg.MongoSocketTimeout,
-														cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
+		cfg.MongoDatabase, cfg.MongoUser, cfg.MongoPass)
 	if err != nil {
 		logger.Error("Failed to connect to Mongo.")
 		os.Exit(1)
 	}
 	defer ms.Close()
 
+	// Initialization of the Fabric SDK
+	fSetup := blockchain.FabricSetup{
+		OrgAdmin:    "admin",
+		OrgName:     "org1",
+		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
+		ChannelID:   "myc",
+		ChaincodeID: "token",
+	}
+	if err := fSetup.Initialize(); err != nil {
+		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
+	}
+
 	users := mongo.NewUserRepository(ms)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.Secret)
+	bcn := fabric.BcNetwork{Fabric: &fSetup}
 
-	svc := auth.New(users, hasher, idp)
+	svc := auth.New(users, hasher, idp, bcn)
 	svc = api.LoggingMiddleware(svc, logger)
 
 	fields := []string{"method"}

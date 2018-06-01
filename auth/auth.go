@@ -1,19 +1,26 @@
 package auth
 
+import (
+	"fmt"
+	"monetasa/auth/fabric"
+)
+
 var _ Service = (*authService)(nil)
 
 type authService struct {
-	users  UserRepository
-	hasher Hasher
-	idp    IdentityProvider
+	users     UserRepository
+	hasher    Hasher
+	idp       IdentityProvider
+	bcnetwork fabric.BcNetwork
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, bcn fabric.BcNetwork) Service {
 	return &authService{
-		users:  users,
-		hasher: hasher,
-		idp:    idp,
+		users:     users,
+		hasher:    hasher,
+		idp:       idp,
+		bcnetwork: bcn,
 	}
 }
 
@@ -24,7 +31,26 @@ func (ms *authService) Register(user User) error {
 	}
 
 	user.Password = hash
-	return ms.users.Save(user)
+	err = ms.users.Save(user)
+	if err != nil {
+		return err
+	}
+
+	u, err := ms.users.OneByEmail(user.Email)
+	if err != nil {
+		return err
+	}
+
+	bcn := ms.bcnetwork
+	// Create New user in Fabric network calling fabric-ca
+	newUser, err := fabric.CreateUser(u.ID.Hex(), u.Password, bcn)
+	if err != nil {
+		fmt.Printf("Unable to create a user in the fabric-ca %v\n", err)
+		return ErrConflict
+	}
+	fmt.Printf("User created!: %v\n", newUser)
+
+	return nil
 }
 
 func (ms *authService) Login(user User) (string, error) {
@@ -71,6 +97,14 @@ func (ms *authService) View(key string) (User, error) {
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
+
+	bcn := ms.bcnetwork
+	// Get balance and update user
+	balance, err := fabric.Balance(user.ID.Hex(), bcn)
+	if err != nil {
+		return User{}, fmt.Errorf("Error fetching balance: %v\n", err)
+	}
+	user.Balance = balance
 
 	return user, nil
 }

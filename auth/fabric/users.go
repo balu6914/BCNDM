@@ -2,29 +2,15 @@ package fabric
 
 import (
 	"fmt"
-	"monetasa/auth/fabric/blockchain"
-	"os"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
 	mspctx "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 )
 
 // Add new user to fabric network
-func CreateUser(name, secret string) (mspctx.SigningIdentity, error) {
+func CreateUser(name, secret string, bcn BcNetwork) (mspctx.SigningIdentity, error) {
 
-	fSetup := blockchain.FabricSetup{
-		OrgAdmin:   "admin",
-		OrgName:    "org1",
-		ConfigFile: os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
-		ChannelID:  "myc",
-	}
-	// Initialization of the Fabric SDK from the previously set properties
-	if err := fSetup.Initialize(); err != nil {
-		return nil, fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
-	}
-
-	bc := BcNetwork{Fabric: &fSetup}
-	sdk := bc.Fabric.Sdk
+	sdk := bcn.Fabric.Sdk
 	ctxProvider := sdk.Context()
 	mspClient, err := msp.New(ctxProvider)
 	if err != nil {

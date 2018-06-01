@@ -3,8 +3,6 @@ package fabric
 import (
 	"encoding/json"
 	"fmt"
-	"monetasa/auth/fabric/blockchain"
-	"os"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
@@ -17,26 +15,11 @@ type userBalance struct {
 }
 
 // Returns the account balance of another account with address user.
-func Balance(name string) (uint64, error) {
-
-	fSetup := blockchain.FabricSetup{
-		OrgAdmin:    "admin",
-		OrgName:     "Org1",
-		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
-		ChannelID:   "myc",
-		ChaincodeID: "token",
-	}
-
-	// Initialization of the Fabric SDK from the previously set properties
-	if err := fSetup.Initialize(); err != nil {
-		return 0, fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
-	}
-
-	bc := BcNetwork{Fabric: &fSetup}
+func Balance(name string, bcn BcNetwork) (uint64, error) {
 	// ClientContext allows creation of transactions using the supplied identity as the credential.
-	adminChannelContext := bc.Fabric.Sdk.ChannelContext(
-		bc.Fabric.ChannelID,
-		fabsdk.WithUser(bc.Fabric.OrgAdmin), fabsdk.WithOrg(bc.Fabric.OrgName))
+	adminChannelContext := bcn.Fabric.Sdk.ChannelContext(
+		bcn.Fabric.ChannelID,
+		fabsdk.WithUser(bcn.Fabric.OrgAdmin), fabsdk.WithOrg(bcn.Fabric.OrgName))
 
 	client, err := channel.New(adminChannelContext)
 	if err != nil {
@@ -50,7 +33,7 @@ func Balance(name string) (uint64, error) {
 
 	balanceRqBytes, _ := json.Marshal(ub)
 	balance, err := client.Query(channel.Request{
-		ChaincodeID: bc.Fabric.ChaincodeID,
+		ChaincodeID: bcn.Fabric.ChaincodeID,
 		Fcn:         "balance",
 		Args:        util.ToChaincodeArgs(string(balanceRqBytes)),
 	})
@@ -66,5 +49,4 @@ func Balance(name string) (uint64, error) {
 	}
 
 	return ub.Value, nil
-
 }
