@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  postgreSQL:
+    restart: on-failure
+    image: postgres:10.2-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG=false

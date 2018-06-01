@@ -58,11 +58,24 @@ services:
     environment:
        - FABRIC_CA_SERVER_CA_NAME=ca.org1.monetasa.com
        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/05f7cab3f0dde7e29e822c094bf64dee02ae3b2c26bf6c3e365cd2b7d253a1bf_sk
+       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2c555ae34bf8c2f378b5614cd3bd2caa50b7ff0993ee979df58c24db4d14e13f_sk
        - FABRIC_CA_SERVER_TLS_ENABLED=false
        - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/05f7cab3f0dde7e29e822c094bf64dee02ae3b2c26bf6c3e365cd2b7d253a1bf_sk
+       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2c555ae34bf8c2f378b5614cd3bd2caa50b7ff0993ee979df58c24db4d14e13f_sk
+       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+       - FABRIC_CA_SERVER_DB_TYPE=postgres
+       - FABRIC_CA_SERVER_DB_DATASOURCE=host=fabric-ca-pgsql port=5432 user=postgres password=postgres dbname=fabric_ca sslmode=disable
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
-       - ../../crypto-config/peerOrganizations/org1.monetasa.com/ca/:/etc/hyperledger/fabric-ca-server-config
+       - ../../crypto-config/peerOrganizations/org1.monetasa.com/ca:/etc/hyperledger/fabric-ca-server-config
        - ../../crypto-config/peerOrganizations/org1.monetasa.com:/etc/hyperledger/fabric-ca-server
-       - ../../config/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
+  fabric-ca-pgsql:
+    container_name: fabric-ca-pgsql
+    extends:
+      file: pg-base.yaml
+      service: postgreSQL
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=fabric_ca
