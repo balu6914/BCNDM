@@ -44,8 +44,7 @@ func (ms *authService) Register(user User) error {
 	// Create New user in Fabric network calling fabric-ca
 	newUser, err := fabric.CreateUser(u.ID.Hex(), u.Password, ms.fabric)
 	if err != nil {
-		fmt.Printf("Unable to create a user in the fabric-ca %v\n", err)
-		return ErrConflict
+		return fmt.Errorf("Unable to create a user in the fabric-ca %v\n", err)
 	}
 	fmt.Printf("User created!: %v\n", newUser)
 
