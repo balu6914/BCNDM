@@ -37,13 +37,11 @@ func Balance(name string, fabric Fabric) (uint64, error) {
 	})
 	if err != nil {
 		return 0, fmt.Errorf("Error fetching balance: %v\n", err)
-
 	}
 
 	err = json.Unmarshal(balance.Payload, &ub)
 	if err != nil {
 		return 0, fmt.Errorf("Error Unmarshaling balance: %v\n", err)
-
 	}
 
 	return ub.Value, nil
