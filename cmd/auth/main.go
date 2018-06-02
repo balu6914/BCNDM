@@ -34,6 +34,12 @@ const (
 	envMongoURL string = "MONETASA_AUTH_MONGO_URL"
 	envAuthURL  string = "MONETASA_AUTH_URL"
 	envSecret   string = "MONETASA_AUTH_SECRET"
+
+	defFabricOrgAdmin    string = "admin"
+	defFabricOrgName     string = "org1"
+	defFabricConfFile    string = "/src/monetasa/examples/config/config.yaml"
+	defFabricChannelID   string = "myc"
+	defFabricChaincodeID string = "token"
 )
 
 type config struct {
@@ -48,6 +54,11 @@ type config struct {
 	MongoConnectTimeout int
 	MongoSocketTimeout  int
 	Secret              string
+	FabricOrgAdmin      string
+	FabricOrgName       string
+	FabricConfFile      string
+	FabricChannelID     string
+	FabricChaincodeID   string
 }
 
 func getenv(key, fallback string) string {
@@ -71,6 +82,11 @@ func main() {
 		MongoConnectTimeout: defMongoConnectTimeout,
 		MongoSocketTimeout:  defMongoSocketTimeout,
 		Secret:              getenv(envSecret, defSecret),
+		FabricOrgAdmin:      defFabricOrgAdmin,
+		FabricOrgName:       defFabricOrgName,
+		FabricConfFile:      os.Getenv("GOPATH") + defFabricConfFile,
+		FabricChannelID:     defFabricChannelID,
+		FabricChaincodeID:   defFabricChaincodeID,
 	}
 
 	logger := log.New(os.Stdout)
@@ -89,11 +105,11 @@ func main() {
 
 	// Initialization of the Fabric SDK
 	fSetup := fabric.Fabric{
-		OrgAdmin:    "admin",
-		OrgName:     "org1",
-		ConfigFile:  os.Getenv("GOPATH") + "/src/monetasa/examples/config/config.yaml",
-		ChannelID:   "myc",
-		ChaincodeID: "token",
+		OrgAdmin:    cfg.FabricOrgAdmin,
+		OrgName:     cfg.FabricOrgName,
+		ConfigFile:  cfg.FabricConfFile,
+		ChannelID:   cfg.FabricChannelID,
+		ChaincodeID: cfg.FabricChaincodeID,
 	}
 	if err := fSetup.Initialize(); err != nil {
 		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)

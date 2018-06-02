@@ -14,6 +14,8 @@ type userBalance struct {
 	Value uint64 `json:"value"`
 }
 
+const balanceFcn = "balance"
+
 // Returns the account balance of another account with address user.
 func Balance(name string, fabric Fabric) (uint64, error) {
 	// ClientContext allows creation of transactions using the supplied identity as the credential.
@@ -32,7 +34,7 @@ func Balance(name string, fabric Fabric) (uint64, error) {
 	balanceRqBytes, _ := json.Marshal(ub)
 	balance, err := client.Query(channel.Request{
 		ChaincodeID: fabric.ChaincodeID,
-		Fcn:         "balance",
+		Fcn:         balanceFcn,
 		Args:        util.ToChaincodeArgs(string(balanceRqBytes)),
 	})
 	if err != nil {
