@@ -11,7 +11,7 @@ func main() {
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:   "admin",
 		OrgName:    "org1",
-		ConfigFile: "../config/config.yaml",
+		ConfigFile: "../../config/config.yaml",
 		ChannelID:  "myc",
 	}
 
