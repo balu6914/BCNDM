@@ -47,10 +47,8 @@ Organizations:
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: Org1MSP
-
         # ID to load the MSP definition as
         ID: Org1MSP
-
         MSPDir: ../crypto-config/peerOrganizations/org1.monetasa.com/msp
 
         AnchorPeers:

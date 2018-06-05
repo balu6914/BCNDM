@@ -7,17 +7,17 @@
 
 # NOTE: Required tools are cryptogen and configtxgen
 
-CRYPTO_CONF_PATH=examples/config/crypto-config.yaml
-CRYPTO_CONF_DIR=examples/crypto-config
+CRYPTO_CONF_PATH=config/fabric/crypto-config.yaml
+CRYPTO_CONF_DIR=config/crypto-config
 
-FABRIC_CFG_PATH=examples/config
-GENESIS_BLOCK_PATH=examples/docker/artifacts/genesis.block
+FABRIC_CFG_PATH=config/fabric
+GENESIS_BLOCK_PATH=docker/fabric/artifacts/genesis.block
 GENESIS_BLOCK_PROFILE=MonetasaOrdererGenesis
-CH_OUTPUT_PATH=examples/docker/artifacts/myc.tx
+CH_OUTPUT_PATH=docker/fabric/artifacts/myc.tx
 CH_PROFILE=MonetasaChannel
 CH_ID=myc
 
-BASE_COMPOSE_FILE=examples/docker/base/docker-compose-base.yaml
+BASE_COMPOSE_FILE=docker/fabric/base/docker-compose-base.yaml
 
 ###
 # Clean previous
@@ -25,6 +25,8 @@ BASE_COMPOSE_FILE=examples/docker/base/docker-compose-base.yaml
 if [ -d $CRYPTO_CONF_DIR ]; then
   sudo rm -rf $CRYPTO_CONF_DIR
 fi
+
+rm -rf /tmp/monetasa-service-*
 
 ###
 # Fabric keys
@@ -36,8 +38,8 @@ cryptogen generate --config=$CRYPTO_CONF_PATH --output=$CRYPTO_CONF_DIR
 # Network artifacts
 ###
 echo "### Generating network artifacts"
-FABRIC_CFG_PATH=examples/config configtxgen -outputBlock $GENESIS_BLOCK_PATH -profile $GENESIS_BLOCK_PROFILE
-FABRIC_CFG_PATH=examples/config configtxgen -outputCreateChannelTx $CH_OUTPUT_PATH -profile $CH_PROFILE -channelID $CH_ID
+FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputBlock $GENESIS_BLOCK_PATH -profile $GENESIS_BLOCK_PROFILE
+FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputCreateChannelTx $CH_OUTPUT_PATH -profile $CH_PROFILE -channelID $CH_ID
 
 ###
 # Update docker-compose

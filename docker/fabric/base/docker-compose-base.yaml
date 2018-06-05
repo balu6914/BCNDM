@@ -23,8 +23,8 @@ services:
     command: orderer
     volumes:
     - ../artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-    - ../../crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp:/var/hyperledger/orderer/msp
-    - ../../crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/tls/:/var/hyperledger/orderer/tls
+    - ../../../config/crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp:/var/hyperledger/orderer/msp
+    - ../../../config/crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/tls/:/var/hyperledger/orderer/tls
     ports:
       - 7050:7050
 
@@ -44,8 +44,8 @@ services:
       - CORE_PEER_ADDRESSAUTODETECT=true
     volumes:
         - /var/run/:/host/var/run/
-        - ../../crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/msp:/etc/hyperledger/fabric/msp
-        - ../../crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls:/etc/hyperledger/fabric/tls
+        - ../../../config/crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/msp:/etc/hyperledger/fabric/msp
+        - ../../../config/crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls:/etc/hyperledger/fabric/tls
     ports:
       - 7051:7051
       - 7053:7053
@@ -58,17 +58,17 @@ services:
     environment:
        - FABRIC_CA_SERVER_CA_NAME=ca.org1.monetasa.com
        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2c555ae34bf8c2f378b5614cd3bd2caa50b7ff0993ee979df58c24db4d14e13f_sk
+       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e532efd79e58ac4a8a155f3900bdeb0f489e6a7a7b84f8ed5790859bc565ab5c_sk
        - FABRIC_CA_SERVER_TLS_ENABLED=false
        - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.monetasa.com-cert.pem
-       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2c555ae34bf8c2f378b5614cd3bd2caa50b7ff0993ee979df58c24db4d14e13f_sk
+       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e532efd79e58ac4a8a155f3900bdeb0f489e6a7a7b84f8ed5790859bc565ab5c_sk
        - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
        - FABRIC_CA_SERVER_DB_TYPE=postgres
        - FABRIC_CA_SERVER_DB_DATASOURCE=host=fabric-ca-pgsql port=5432 user=postgres password=postgres dbname=fabric_ca sslmode=disable
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
-       - ../../crypto-config/peerOrganizations/org1.monetasa.com/ca:/etc/hyperledger/fabric-ca-server-config
-       - ../../crypto-config/peerOrganizations/org1.monetasa.com:/etc/hyperledger/fabric-ca-server
+       - ../../../config/crypto-config/peerOrganizations/org1.monetasa.com/ca:/etc/hyperledger/fabric-ca-server-config
+       - ../../../config/crypto-config/peerOrganizations/org1.monetasa.com:/etc/hyperledger/fabric-ca-server
 
   fabric-ca-pgsql:
     container_name: fabric-ca-pgsql
