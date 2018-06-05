@@ -7,10 +7,10 @@
 
 # NOTE: Required tools are cryptogen and configtxgen
 
-CRYPTO_CONF_PATH=config/crypto-config.yaml
+CRYPTO_CONF_PATH=config/fabric/crypto-config.yaml
 CRYPTO_CONF_DIR=config/crypto-config
 
-FABRIC_CFG_PATH=config
+FABRIC_CFG_PATH=config/fabric
 GENESIS_BLOCK_PATH=docker/fabric/artifacts/genesis.block
 GENESIS_BLOCK_PROFILE=MonetasaOrdererGenesis
 CH_OUTPUT_PATH=docker/fabric/artifacts/myc.tx
@@ -25,6 +25,8 @@ BASE_COMPOSE_FILE=docker/fabric/base/docker-compose-base.yaml
 if [ -d $CRYPTO_CONF_DIR ]; then
   sudo rm -rf $CRYPTO_CONF_DIR
 fi
+
+rm -rf /tmp/monetasa-service-*
 
 ###
 # Fabric keys

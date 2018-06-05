@@ -5,8 +5,8 @@
 		{
 			"checksumSHA1": "kMA3IoI8xhSIuCsn3CMOFzIZiYo=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "43960493d279861fed861e9378d08e43b091a965",
-			"revisionTime": "2018-06-05T12:06:50Z"
+			"revision": "ae6f84c242cac1b0b79b9fed5b0bb02d0585125b",
+			"revisionTime": "2018-06-05T14:33:08Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/token"
