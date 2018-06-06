@@ -3,15 +3,13 @@ image: golang
 stages:
     # - build
     - develop
-    # - deploy    
-    
+    # - deploy
+
 install_and_test:
   stage: develop
   script:
     - cd /go/src/
     - git clone $CI_REPOSITORY_URL
-    - cd /go/src/monetasa
-    - go get -d ./...
     - cd /go/src/monetasa/auth
     - go test
     - cd /go/src/monetasa/dapp
