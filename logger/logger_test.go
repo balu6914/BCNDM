@@ -6,7 +6,8 @@ import (
 	"io"
 	"testing"
 
-	log "github.com/mainflux/mainflux/logger"
+	log "monetasa/logger"
+
 	"github.com/stretchr/testify/assert"
 )
 
