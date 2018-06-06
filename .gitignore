@@ -1,8 +1,9 @@
-examples/crypto-config/*
+config/crypto-config/*
 chaincode/token/token
 chaincode/token/vendor/*/**
-examples/docker/artifacts/*
-!examples/docker/artifacts/.gitkeep
+docker/fabric/artifacts/*
+fabric-ca-db
+!docker/artifacts/.gitkeep
 # System Files
 .DS_Store
 Thumbs.db

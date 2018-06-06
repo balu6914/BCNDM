@@ -80,7 +80,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name:
+  name: ca.org1.monetasa.com
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -147,8 +147,8 @@ registry:
 #  or "mysql".
 #############################################################################
 db:
-  type: sqlite3
-  datasource: fabric-ca-server.db
+  type: postgres
+  datasource: host=fabric-ca-pgsql port=5432 user=postgres password=postgres dbname=fabric_ca sslmode=disable
   tls:
       enabled: false
       certfiles:
@@ -239,7 +239,6 @@ ldap:
 affiliations:
    org1:
       - department1
-      - department2
    org2:
       - department1
 
@@ -303,11 +302,11 @@ signing:
 csr:
    cn: fabric-ca-server
    names:
-      - C: US
-        ST: "North Carolina"
+      - C: FR
+        ST: "Paris"
         L:
-        O: Hyperledger
-        OU: Fabric
+        O: Datapace
+        OU: App
    hosts:
      - b72d18a2ab7c
      - localhost

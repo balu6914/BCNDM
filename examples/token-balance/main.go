@@ -12,7 +12,7 @@ func main() {
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:    "admin",
 		OrgName:     "Org1",
-		ConfigFile:  "../config/config.yaml",
+		ConfigFile:  "../../config/fabric/config.yaml",
 		ChannelID:   "myc",
 		ChaincodeID: "token",
 	}
