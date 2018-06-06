@@ -9,8 +9,6 @@ package orderer
 import (
 	reqContext "context"
 	"crypto/x509"
-	"fmt"
-	"net"
 	"os"
 	"strings"
 	"testing"
@@ -25,21 +23,23 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/test/mockfab"
-	mocks "github.com/hyperledger/fabric-sdk-go/pkg/fab/mocks"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fab/mocks"
 	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 var testOrdererURL = "127.0.0.1:0"
+var testOrdererMainURL = "127.0.0.1:0"
 
 var ordererAddr string
 var ordererMockSrv *mocks.MockBroadcastServer
 
 func TestMain(m *testing.M) {
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	ordererMockSrv, ordererAddr = startMockServer(grpcServer)
+	ordererMockSrv = &mocks.MockBroadcastServer{}
+	ordererAddr = ordererMockSrv.Start(testOrdererMainURL)
+	defer ordererMockSrv.Stop()
+
 	os.Exit(m.Run())
 }
 
@@ -97,44 +97,21 @@ func TestSendDeliver(t *testing.T) {
 	blocks, errs := orderer.SendDeliver(ctx, &fab.SignedEnvelope{})
 
 	select {
-	case block := <-blocks:
-		t.Fatalf("This usecase was not supposed to receive blocks : %#v", block)
+	case block, ok := <-blocks:
+		if ok {
+			t.Fatalf("This usecase was not supposed to receive blocks : %#v", block)
+		}
+	case <-time.After(time.Second * 5):
+		t.Fatal("Did not receive closed response from SendDeliver")
+	}
+
+	select {
 	case err := <-errs:
 		t.Logf("There is an error as expected : %s", err)
 	case <-time.After(time.Second * 5):
 		t.Fatal("Did not receive error from SendDeliver")
 	}
 
-}
-
-func startMockServer(grpcServer *grpc.Server) (*mocks.MockBroadcastServer, string) {
-	lis, err := net.Listen("tcp", testOrdererURL)
-	addr := lis.Addr().String()
-
-	broadcastServer := new(mocks.MockBroadcastServer)
-	ab.RegisterAtomicBroadcastServer(grpcServer, broadcastServer)
-	if err != nil {
-		panic(fmt.Sprintf("Error starting test server %s", err))
-	}
-	fmt.Printf("Starting test server on %s\n", addr)
-	go grpcServer.Serve(lis)
-
-	return broadcastServer, addr
-}
-
-func startCustomizedMockServer(t *testing.T, serverURL string, grpcServer *grpc.Server, broadcastServer *mocks.MockBroadcastServer) string {
-	lis, err := net.Listen("tcp", serverURL)
-	addr := lis.Addr().String()
-
-	ab.RegisterAtomicBroadcastServer(grpcServer, broadcastServer)
-	if err != nil {
-		t.Logf("Error starting test server %s", err)
-		t.FailNow()
-	}
-	t.Logf("Starting test customized server on %s\n", addr)
-	go grpcServer.Serve(lis)
-
-	return addr
 }
 
 func TestNewOrdererWithTLS(t *testing.T) {
@@ -144,8 +121,8 @@ func TestNewOrdererWithTLS(t *testing.T) {
 		t.Fatalf("tlsConfig.LoadBytes() failed, cause [%s]", err)
 	}
 
-	cert, err := tlsConfig.TLSCert()
-	if err != nil {
+	cert, ok, err := tlsConfig.TLSCert()
+	if err != nil || !ok {
 		t.Fatalf("Testing New with TLS failed, cause [%s]", err)
 	}
 	orderer, err := New(mocks.NewMockEndpointConfigCustomized(true, false, false), WithURL("grpcs://"), WithTLSCert(cert))
@@ -170,9 +147,9 @@ func TestNewOrdererWithMutualTLS(t *testing.T) {
 		t.Fatalf("tlsConfig.LoadBytes() failed, cause [%s]", err)
 	}
 
-	cert, err := tlsConfig.TLSCert()
+	cert, ok, err := tlsConfig.TLSCert()
 
-	if err != nil {
+	if err != nil || !ok {
 		t.Fatalf("Testing New with TLS failed, cause [%s]", err)
 	}
 
@@ -224,9 +201,9 @@ func TestSendDeliverServerBadResponse(t *testing.T) {
 		},
 	}
 
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	addr := startCustomizedMockServer(t, testOrdererURL, grpcServer, &broadcastServer)
+	addr := broadcastServer.Start(testOrdererURL)
+	defer broadcastServer.Stop()
+
 	orderer, _ := New(mocks.NewMockEndpointConfig(), WithURL("grpc://"+addr), WithInsecure())
 
 	ctx, cancel := reqContext.WithTimeout(reqContext.Background(), 5*time.Second)
@@ -255,9 +232,8 @@ func TestSendDeliverServerSuccessResponse(t *testing.T) {
 		},
 	}
 
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	addr := startCustomizedMockServer(t, testOrdererURL, grpcServer, &broadcastServer)
+	addr := broadcastServer.Start(testOrdererURL)
+	defer broadcastServer.Stop()
 
 	orderer, _ := New(mocks.NewMockEndpointConfig(), WithURL("grpc://"+addr), WithInsecure())
 
@@ -281,26 +257,35 @@ func TestSendDeliverFailure(t *testing.T) {
 
 	broadcastServer := mocks.MockBroadcastServer{
 		DeliverResponse: &ab.DeliverResponse{},
+		DeliverError:    errors.New("fail me"),
 	}
 
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	addr := startCustomizedMockServer(t, testOrdererURL, grpcServer, &broadcastServer)
+	addr := broadcastServer.Start(testOrdererURL)
+	defer broadcastServer.Stop()
+
 	orderer, _ := New(mocks.NewMockEndpointConfig(), WithURL("grpc://"+addr), WithInsecure())
 
 	ctx, cancel := reqContext.WithTimeout(reqContext.Background(), 5*time.Second)
 	defer cancel()
-	blocks, errors := orderer.SendDeliver(ctx, &fab.SignedEnvelope{})
+	blocks, errs := orderer.SendDeliver(ctx, &fab.SignedEnvelope{})
 
 	select {
-	case block := <-blocks:
-		t.Fatalf("This usecase was not supposed to get valid block %+v", block)
-	case err := <-errors:
-		if err == nil || !strings.HasPrefix(err.Error(), "unknown response type from ordering service") {
-			t.Fatalf("Error response is not working as expected : '%s' ", err)
+	case block, ok := <-blocks:
+		if ok {
+			t.Fatalf("This usecase was not supposed to get valid block %+v", block)
+		} else {
+			t.Fatalf("did not receive any response or error from SendDeliver")
+		}
+	case err, ok := <-errs:
+		if ok {
+			if err == nil || !strings.HasPrefix(err.Error(), "recv from ordering service failed") {
+				t.Fatalf("Error response is not working as expected : '%s' ", err)
+			}
+		} else {
+			t.Fatalf("did not receive any response or error from SendDeliver")
 		}
 	case <-time.After(time.Second * 5):
-		t.Fatal("Did not receive any response or error from SendDeliver")
+		t.Fatal("Timeout: did not receive any response or error from SendDeliver")
 	}
 }
 
@@ -310,9 +295,8 @@ func TestSendBroadcastServerBadResponse(t *testing.T) {
 		BroadcastInternalServerError: true,
 	}
 
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	addr := startCustomizedMockServer(t, testOrdererURL, grpcServer, &broadcastServer)
+	addr := broadcastServer.Start(testOrdererURL)
+	defer broadcastServer.Stop()
 	orderer, _ := New(mocks.NewMockEndpointConfig(), WithURL("grpc://"+addr), WithInsecure())
 
 	_, err := orderer.SendBroadcast(reqContext.Background(), &fab.SignedEnvelope{})
@@ -332,14 +316,14 @@ func TestSendBroadcastError(t *testing.T) {
 		BroadcastError: errors.New("just to test error scenario"),
 	}
 
-	grpcServer := grpc.NewServer()
-	defer grpcServer.Stop()
-	addr := startCustomizedMockServer(t, testOrdererURL, grpcServer, &broadcastServer)
+	addr := broadcastServer.Start(testOrdererURL)
+	defer broadcastServer.Stop()
+
 	orderer, _ := New(mocks.NewMockEndpointConfig(), WithURL("grpc://"+addr), WithInsecure())
 
-	statusCode, err := orderer.SendBroadcast(reqContext.Background(), &fab.SignedEnvelope{})
+	_, err := orderer.SendBroadcast(reqContext.Background(), &fab.SignedEnvelope{})
 
-	if err == nil || statusCode != nil {
+	if err == nil {
 		t.Fatalf("expected Send Broadcast to fail with error, but got %s", err)
 	}
 	statusError, ok := status.FromError(err)
