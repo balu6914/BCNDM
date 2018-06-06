@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"monetasa/auth/fabric"
 )
 
 var _ Service = (*authService)(nil)
@@ -11,16 +10,16 @@ type authService struct {
 	users  UserRepository
 	hasher Hasher
 	idp    IdentityProvider
-	fabric fabric.Fabric
+	fabric FabricNetwork
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider, fs fabric.Fabric) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, fn FabricNetwork) Service {
 	return &authService{
 		users:  users,
 		hasher: hasher,
 		idp:    idp,
-		fabric: fs,
+		fabric: fn,
 	}
 }
 
@@ -42,11 +41,10 @@ func (ms *authService) Register(user User) error {
 	}
 
 	// Create New user in Fabric network calling fabric-ca
-	newUser, err := fabric.CreateUser(u.ID.Hex(), u.Password, ms.fabric)
+	err = ms.fabric.CreateUser(u.ID.Hex(), u.Password)
 	if err != nil {
-		return fmt.Errorf("Unable to create a user in the fabric-ca %v\n", err)
+		return err
 	}
-	fmt.Printf("User created!: %v\n", newUser)
 
 	return nil
 }
@@ -96,9 +94,8 @@ func (ms *authService) View(key string) (User, error) {
 		return User{}, ErrUnauthorizedAccess
 	}
 
-	fs := ms.fabric
 	// Get balance and update user
-	balance, err := fabric.Balance(user.ID.Hex(), fs)
+	balance, err := ms.fabric.Balance(user.ID.Hex())
 	if err != nil {
 		return User{}, fmt.Errorf("Error fetching balance: %v\n", err)
 	}

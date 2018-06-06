@@ -99,23 +99,24 @@ func main() {
 	}
 	defer ms.Close()
 
-	users := mongo.NewUserRepository(ms)
-	hasher := bcrypt.New()
-	idp := jwt.New(cfg.Secret)
-
 	// Initialization of the Fabric SDK
-	fSetup := fabric.Fabric{
+	fs := auth.FabricSetup{
 		OrgAdmin:    cfg.FabricOrgAdmin,
 		OrgName:     cfg.FabricOrgName,
 		ConfigFile:  cfg.FabricConfFile,
 		ChannelID:   cfg.FabricChannelID,
 		ChaincodeID: cfg.FabricChaincodeID,
 	}
-	if err := fSetup.Initialize(); err != nil {
+
+	users := mongo.NewUserRepository(ms)
+	hasher := bcrypt.New()
+	idp := jwt.New(cfg.Secret)
+	fn := fabric.NewFabricNetwork(&fs)
+	if err := fn.Initialize(); err != nil {
 		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
 	}
 
-	svc := auth.New(users, hasher, idp, fSetup)
+	svc := auth.New(users, hasher, idp, fn)
 	svc = api.LoggingMiddleware(svc, logger)
 
 	fields := []string{"method"}
