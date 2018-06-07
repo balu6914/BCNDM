@@ -1,7 +1,7 @@
 config/crypto-config/*
 chaincode/token/token
 chaincode/token/vendor/*/**
-docker/fabric/artifacts/*
+docker/fabric/artifacts/**/**
 fabric-ca-db
 !docker/artifacts/.gitkeep
 # System Files
