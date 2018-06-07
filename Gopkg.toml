@@ -46,10 +46,6 @@
   version = "1.9.1"
 
 [[constraint]]
-  name = "github.com/mainflux/mainflux"
-  version = "0.2.3"
-
-[[constraint]]
   name = "github.com/prometheus/client_golang"
   version = "0.8.0"
 
