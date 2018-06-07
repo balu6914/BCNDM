@@ -1,13 +1,10 @@
-# Copyright (c) 2018 Mainflux
-#
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2018 Monetasa
 
 version: "3"
 
 services:
-
   ###
-  # NGINX
+  # Nginx
   ###
   nginx:
     image: nginx:alpine
@@ -20,24 +17,36 @@ services:
     ports:
       - "80:80"
       - "443:443"
-  
   ###
   # MongoDB
   ###
-  mongo:
+  monetasa-mongodb:
     image: mongo:latest
-    container_name: edgex-mongodb
+    container_name: monetasa-mongodb
     command: --smallfiles --nojournal
     ports:
       - "27017:27017"
-
   ###
-  # EdgeX Auth
+  # Monetasa Auth
   ###
-  edgex-auth:
-    image: drasko/edgex-auth:latest
-    container_name: edgex-auth
+  monetasa-auth:
+    build: .
+    container_name: monetasa-auth
     links:
       - mongo
+    depends_on:
+      - monetasa-mongodb
     ports:
-      - "8089:8089"
+      - "8080:8080"
+  ###
+  # Monetasa dApp
+  ###
+  monetasa-dapp:
+    build: .
+    container_name: monetasa-dapp
+    links:
+      - mongo
+    depends_on:
+      - monetasa-mongodb
+    ports:
+      - "8081:8081"
