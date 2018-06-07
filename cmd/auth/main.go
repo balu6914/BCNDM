@@ -37,7 +37,7 @@ const (
 
 	defFabricOrgAdmin    string = "admin"
 	defFabricOrgName     string = "org1"
-	defFabricConfFile    string = "/src/monetasa/examples/config/config.yaml"
+	defFabricConfFile    string = "/src/monetasa/config/fabric/config.yaml"
 	defFabricChannelID   string = "myc"
 	defFabricChaincodeID string = "token"
 )
@@ -113,7 +113,8 @@ func main() {
 	idp := jwt.New(cfg.Secret)
 	fn := fabric.NewFabricNetwork(&fs)
 	if err := fn.Initialize(); err != nil {
-		fmt.Errorf("Unable to initialize the Fabric SDK: %v\n", err)
+		logger.Error(fmt.Sprintf("Unable to initialize the Fabric SDK: %v\n", err))
+		os.Exit(1)
 	}
 
 	svc := auth.New(users, hasher, idp, fn)
