@@ -95,8 +95,8 @@ export class DashboardMainComponent {
 
         // Fetch all subscriptions
         this.SubscriptionService.get().subscribe(
-          (result: any) => {
-              this.temp2 = [...result.data];
+          result => {
+              this.temp2 = [...result];
 
               // Create list of user subscriptions
               this.mySubscriptions = this.temp2;
@@ -104,8 +104,8 @@ export class DashboardMainComponent {
               for (var i = 0; i < this.mySubscriptions.length; i++) {
                   // Create marker with stream coordinates
                   const newMarker = L.marker(
-                  [this.mySubscriptions[i]["streamData"]["longlat"]["coordinates"][1],
-                   this.mySubscriptions[i]["streamData"]["longlat"]["coordinates"][0]], {}
+                  [this.mySubscriptions[i]["stream_data"]["coordinates"][1],
+                   this.mySubscriptions[i]["stream_data"]["coordinates"][0]], {}
                   );
                   // Use yellow color for owner streams and blue for others
                   var defIcon = L.icon({
@@ -114,12 +114,16 @@ export class DashboardMainComponent {
                   });
                   newMarker.setIcon(defIcon);
                   // Popup Msg
-                  const msg = "<b>" + this.mySubscriptions[i]["streamData"]["name"] + "</b>"
+                  const msg = "<b>" + this.mySubscriptions[i]["stream_data"]["name"] + "</b>"
                   // Push marker to the markers list
                   this.markersSubs.push(newMarker);
               }
+              // Set markers on the map
+              this.setTabMarkers();
           },
-          err => { console.log(err) }
+          err => {
+              console.log(err)
+          }
       );
     }
 

@@ -11,29 +11,22 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class SubscriptionService {
-     // Resolve HTTP using the constructor
-     constructor (private http: HttpClient) {}
+    // Resolve HTTP using the constructor
+    constructor (private http: HttpClient) {}
 
-     // Fetch  stream
-     get () : Observable<Subscription[]> {
-         return this.http.get(`${environment.API_URL}/streams/purch`)
-                         .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
-     }
-     add (data): Observable<Stream[]> {
-        return this.http.post(`${environment.API_URL}/streams/purch`, data)
-                         .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
+    get() : Observable<Subscription[]> {
+        return this.http.get(`${environment.API_URL}/subscriptions`)
+                        .map((res:Response) => res)
+                        .catch((error:any) => Observable.throw(error || 'Server error'));
     }
-     remove (id:string): Observable<Stream[]> {
-        return this.http.delete(`${environment.API_URL}/streams/purch/${id}`)
-                         .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
+    add(data) {
+        return this.http.post(`${environment.API_URL}/subscriptions`, data)
+                        .map((res:Response) => res)
+                        .catch((error:any) => Observable.throw(error || 'Server error'));
     }
-     update (id:string, data): Observable<Stream> {
-        return this.http.put(`${environment.API_URL}/streams/purch/${id}`, data)
-                         .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
+    update(id:string, data): Observable<Subscription> {
+        return this.http.put(`${environment.API_URL}/subscriptions/${id}`, data)
+                        .map((res:Response) => res)
+                        .catch((error:any) => Observable.throw(error || 'Server error'));
     }
-
 }

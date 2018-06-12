@@ -81,8 +81,10 @@ func main() {
 	defer ms.Close()
 
 	ac := client.NewClient(cfg.AuthURL)
-	sr := mongo.NewStreamRepository(ms)
-	svc := dapp.New(sr)
+	strr := mongo.NewStreamRepository(ms)
+	subr := mongo.NewSubscriptionsRepository(ms)
+
+	svc := dapp.New(strr, subr)
 	svc = api.LoggingMiddleware(svc, logger)
 
 	errs := make(chan error, 2)

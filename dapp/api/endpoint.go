@@ -123,3 +123,36 @@ func searchStreamEndpoint(svc dapp.Service) endpoint.Endpoint {
 		return res, nil
 	}
 }
+
+func subscriptionEndpoint(svc dapp.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(subscriptionReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.CreateSubscription(req.Subscription); err != nil {
+			return nil, err
+		}
+
+		return subscriptionRes{}, nil
+	}
+}
+
+func getSubsEndpoint(svc dapp.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(getSubsReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		subs, err := svc.GetSubscriptions(req.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		return subs, nil
+	}
+}

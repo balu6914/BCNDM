@@ -60,7 +60,8 @@ func generateStreams(numStreams int) []dapp.Stream {
 
 func newService() dapp.Service {
 	streams := mocks.NewStreamRepository()
-	return dapp.New(streams)
+	subs := mocks.NewSubscriptionsRepository()
+	return dapp.New(streams, subs)
 }
 
 func TestAddStream(t *testing.T) {

@@ -48,4 +48,10 @@ type Service interface {
 	// Removes the stream identified with the provided id, that
 	// belongs to the user identified by the provided id.
 	RemoveStream(string, string) error
+
+	// Subscribe to a stream
+	CreateSubscription(Subscription) error
+
+	// Get all user subscriptions
+	GetSubscriptions(string) ([]Subscription, error)
 }

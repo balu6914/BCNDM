@@ -45,10 +45,12 @@ export class SubscriptionAddComponent {
         let id = this.route.snapshot.params['id'];
         this.streamService.getStream(id).subscribe(
                 (result: any) => {
-                    this.stream = result.data;
+                    this.stream = result.Stream;
                     this.isDataAvailable = true;
                 },
-                err => { console.log(err) }
+                err => {
+                    console.log(err)
+                }
               );
 
     }
@@ -64,7 +66,7 @@ export class SubscriptionAddComponent {
                 this.showLoading = true;
                 form.id = this.route.snapshot.params['id'];
                 this.subscriptionService.add(form).subscribe(
-                    response => {
+                    res => {
                         let successMsg = `Success! You now have access to ${this.stream.name} in next ${form.hours} hours`
                         let result = this.dialogService.confirm(successMsg);
                         this.showLoading = false;
@@ -82,8 +84,7 @@ export class SubscriptionAddComponent {
                     },
                     err => {
                         this.showLoading = false;
-                        let error = err.error
-                        let errMsg = `Ups...Error was occured: <br> <strong>${error.error}</strong>`
+                        let errMsg = `Ups...Error was occured: <br> <strong>${err}</strong>`
                         let resultError = this.dialogService.confirm(errMsg, "");
                         resultError.subscribe( () => {
                             this.router.navigate(['/dashboard/buy/map']);

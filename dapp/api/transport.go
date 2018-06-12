@@ -78,6 +78,20 @@ func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
 		opts...,
 	))
 
+	r.Get("/subscriptions", kithttp.NewServer(
+		getSubsEndpoint(sr),
+		decodeGetSubsRequest,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Post("/subscriptions", kithttp.NewServer(
+		subscriptionEndpoint(sr),
+		decodeSubscriptionRequest,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", monetasa.Version())
 
 	return r
@@ -275,6 +289,37 @@ func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{},
 	req.x3, _ = strconv.ParseFloat(q["x3"][0], 64)
 	req.y3, _ = strconv.ParseFloat(q["y3"][0], 64)
 
+	return req, nil
+}
+
+func decodeSubscriptionRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
+	sub := dapp.Subscription{}
+	if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
+		return nil, err
+	}
+
+	sub.UserID = userID
+
+	req := subscriptionReq{
+		Subscription: sub,
+	}
+	return req, nil
+}
+
+func decodeGetSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authenticate(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req := getSubsReq{
+		UserID: userID,
+	}
 	return req, nil
 }
 
