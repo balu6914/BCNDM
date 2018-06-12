@@ -21,7 +21,7 @@ func NewStreamRepository(db *mgo.Session) dapp.StreamRepository {
 func (sr streamRepository) Save(stream dapp.Stream) (string, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
+	c := s.DB(dbName).C(collectionStreams)
 
 	if err := c.Insert(stream); err != nil {
 		if mgo.IsDup(err) {
@@ -37,7 +37,7 @@ func (sr streamRepository) Save(stream dapp.Stream) (string, error) {
 func (sr streamRepository) Update(id string, stream dapp.Stream) error {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
+	c := s.DB(dbName).C(collectionStreams)
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	_id := bson.ObjectIdHex(id)
@@ -53,7 +53,7 @@ func (sr streamRepository) Update(id string, stream dapp.Stream) error {
 func (sr streamRepository) One(id string) (dapp.Stream, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
+	c := s.DB(dbName).C(collectionStreams)
 
 	stream := dapp.Stream{}
 
@@ -73,7 +73,7 @@ func (sr streamRepository) One(id string) (dapp.Stream, error) {
 func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
+	c := s.DB(dbName).C(collectionStreams)
 
 	var results []dapp.Stream
 	err := c.Find(bson.M{
@@ -94,7 +94,7 @@ func (sr streamRepository) Search(coords [][]float64) ([]dapp.Stream, error) {
 func (sr streamRepository) Remove(id string) error {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collectionName)
+	c := s.DB(dbName).C(collectionStreams)
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	_id := bson.ObjectIdHex(id)

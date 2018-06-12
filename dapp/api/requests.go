@@ -120,3 +120,23 @@ func (req searchStreamReq) validate() error {
 
 	return nil
 }
+
+type subscriptionReq struct {
+	Subscription dapp.Subscription
+}
+
+func (req subscriptionReq) validate() error {
+	return req.Subscription.Validate()
+}
+
+type getSubsReq struct {
+	UserID string
+}
+
+func (req getSubsReq) validate() error {
+	if req.UserID == "" {
+		return dapp.ErrMalformedData
+	}
+
+	return nil
+}

@@ -100,3 +100,31 @@ func (lm *loggingMiddleware) SearchStreams(coords [][]float64) (streams []dapp.S
 
 	return lm.svc.SearchStreams(coords)
 }
+
+func (lm *loggingMiddleware) CreateSubscription(sub dapp.Subscription) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method CreateSubscription for user %s took %s to complete", sub.UserID, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.CreateSubscription(sub)
+}
+
+func (lm *loggingMiddleware) GetSubscriptions(userID string) (subs []dapp.Subscription, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method GetSubscriptions for user %s took %s to complete", userID, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.GetSubscriptions(userID)
+}

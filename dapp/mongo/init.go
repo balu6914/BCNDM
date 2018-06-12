@@ -8,9 +8,11 @@ import (
 
 // DBName - DB name
 // CollectionName - Collection name
+//
 const (
-	dbName         string = "monetasa"
-	collectionName string = "dapp"
+	dbName            string = "monetasa"
+	collectionStreams string = "dapp_streams"
+	collentionSubs    string = "dapp_subscriptions"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error

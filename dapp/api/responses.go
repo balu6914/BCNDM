@@ -91,3 +91,33 @@ func (res searchStreamRes) code() int {
 func (res searchStreamRes) empty() bool {
 	return false
 }
+
+type subscriptionRes struct{}
+
+func (res subscriptionRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res subscriptionRes) code() int {
+	return http.StatusCreated
+}
+
+func (res subscriptionRes) empty() bool {
+	return false
+}
+
+type getSubscriptionsRes struct {
+	Subscriptions []dapp.Subscription
+}
+
+func (res getSubscriptionsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res getSubscriptionsRes) code() int {
+	return http.StatusOK
+}
+
+func (res getSubscriptionsRes) empty() bool {
+	return false
+}
