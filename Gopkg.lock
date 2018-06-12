@@ -94,12 +94,6 @@
   revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
-  name = "github.com/mainflux/mainflux"
-  packages = ["logger"]
-  revision = "aea7db14b7bfcde2ecf23d34f7007d0064371fec"
-  version = "0.2.3"
-
-[[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"

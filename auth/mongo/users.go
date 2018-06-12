@@ -33,7 +33,6 @@ func (ur *userRepository) Save(user auth.User) error {
 		if mgo.IsDup(err) {
 			return auth.ErrConflict
 		}
-
 		return err
 	}
 

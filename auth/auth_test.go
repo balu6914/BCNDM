@@ -12,14 +12,15 @@ import (
 
 const wrong string = "wrong-value"
 
-var user auth.User = auth.User{"user@example.com", "password", bson.NewObjectId()}
+var user auth.User = auth.User{"user@example.com", "password", bson.NewObjectId(), 0}
 
 func newService() auth.Service {
 	users := mocks.NewUserRepository()
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
+	fn := mocks.NewFabricNetwork()
 
-	return auth.New(users, hasher, idp)
+	return auth.New(users, hasher, idp, fn)
 }
 
 func TestRegister(t *testing.T) {
@@ -65,7 +66,7 @@ func TestUpdate(t *testing.T) {
 	key, _ := svc.Login(user)
 
 	user.Password = "newPassword"
-	user.Email = "new@mail.com"
+	user.Email = "new@email.com"
 	cases := map[string]struct {
 		key  string
 		user auth.User
@@ -109,8 +110,8 @@ func TestLogin(t *testing.T) {
 		err  error
 	}{
 		"login with good credentials": {user, nil},
-		"login with wrong e-mail":     {auth.User{wrong, user.Password, user.ID}, auth.ErrUnauthorizedAccess},
-		"login with wrong password":   {auth.User{user.Email, wrong, user.ID}, auth.ErrUnauthorizedAccess},
+		"login with wrong e-mail":     {auth.User{wrong, user.Password, user.ID, user.Balance}, auth.ErrUnauthorizedAccess},
+		"login with wrong password":   {auth.User{user.Email, wrong, user.ID, user.Balance}, auth.ErrUnauthorizedAccess},
 	}
 
 	for desc, tc := range cases {

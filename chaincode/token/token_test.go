@@ -22,8 +22,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/fabric-token/chaincode/mock"
-	"github.com/fabric-token/chaincode/testdata"
+	"monetasa/chaincode/token/mock"
+	"monetasa/chaincode/token/testdata"
+
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )

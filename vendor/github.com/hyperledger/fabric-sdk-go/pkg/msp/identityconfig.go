@@ -1,0 +1,297 @@
+/*
+Copyright SecureKey Technologies Inc. All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
+package msp
+
+import (
+	"strconv"
+	"strings"
+
+	"github.com/pkg/errors"
+
+	"sort"
+
+	"regexp"
+
+	"io/ioutil"
+
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/lookup"
+	fabImpl "github.com/hyperledger/fabric-sdk-go/pkg/fab"
+	"github.com/hyperledger/fabric-sdk-go/pkg/util/pathvar"
+)
+
+//ConfigFromBackend returns identity config implementation of given backend
+func ConfigFromBackend(coreBackend ...core.ConfigBackend) (msp.IdentityConfig, error) {
+	//prepare underlying endpoint config
+	endpointConfig, err := fabImpl.ConfigFromBackend(coreBackend...)
+	if err != nil {
+		return nil, errors.New("failed load identity configuration")
+	}
+
+	return ConfigFromEndpointConfig(endpointConfig, coreBackend...)
+}
+
+//ConfigFromEndpointConfig returns identity config implementation of given endpoint config and backend
+func ConfigFromEndpointConfig(endpointConfig fab.EndpointConfig, coreBackend ...core.ConfigBackend) (msp.IdentityConfig, error) {
+
+	//create identity config
+	config := &IdentityConfig{endpointConfig: endpointConfig,
+		backend:    lookup.New(coreBackend...),
+		caMatchers: make(map[int]*regexp.Regexp)}
+
+	//compile CA matchers
+	err := config.compileMatchers()
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to compile certificate authority matchers")
+	}
+
+	return config, nil
+}
+
+// IdentityConfig represents the identity configuration for the client
+type IdentityConfig struct {
+	endpointConfig fab.EndpointConfig
+	backend        *lookup.ConfigLookup
+	entityMatchers *entityMatchers
+	caMatchers     map[int]*regexp.Regexp
+}
+
+//entityMatchers for identity configuration
+type entityMatchers struct {
+	matchers map[string][]fab.MatchConfig
+}
+
+// Client returns the Client config
+func (c *IdentityConfig) Client() (*msp.ClientConfig, error) {
+	config, err := c.networkConfig()
+	if err != nil {
+		return nil, err
+	}
+	return &config.Client, nil
+}
+
+// CAConfig returns the CA configuration.
+func (c *IdentityConfig) CAConfig(org string) (*msp.CAConfig, error) {
+	networkConfig, err := c.networkConfig()
+	if err != nil {
+		return nil, err
+	}
+	return c.getCAConfig(networkConfig, org)
+}
+
+func (c *IdentityConfig) getCAConfig(networkConfig *fab.NetworkConfig, org string) (*msp.CAConfig, error) {
+
+	logger.Debugf("Getting cert authority for org: %s.", org)
+
+	if len(networkConfig.Organizations[strings.ToLower(org)].CertificateAuthorities) == 0 {
+		return nil, errors.Errorf("organization [%s] has no Certificate Authorities setup. Make sure each org has at least 1 configured", org)
+	}
+	//for now, we're only loading the first Cert Authority by default. TODO add logic to support passing the Cert Authority ID needed by the client.
+	certAuthorityName := networkConfig.Organizations[strings.ToLower(org)].CertificateAuthorities[0]
+	logger.Debugf("Cert authority for org: [%s] is [%s]", org, certAuthorityName)
+
+	if certAuthorityName == "" {
+		return nil, errors.Errorf("certificate authority empty for [%s]. Make sure each org has at least 1 non empty certificate authority name", org)
+	}
+
+	caConfig, ok := networkConfig.CertificateAuthorities[strings.ToLower(certAuthorityName)]
+	if !ok {
+		logger.Debugf("Could not find Certificate Authority for [%s], trying with Entity Matchers", certAuthorityName)
+		caConfig, mappedHost := c.tryMatchingCAConfig(networkConfig, strings.ToLower(certAuthorityName))
+		if mappedHost == "" {
+			return nil, errors.Errorf("CA Server Name [%s] not found", certAuthorityName)
+		}
+		logger.Debugf("Mapped Certificate Authority for [%s] to [%s]", certAuthorityName, mappedHost)
+		return caConfig, nil
+	}
+
+	return &caConfig, nil
+}
+
+//CAClientCert read configuration for the fabric CA client cert bytes for given org
+func (c *IdentityConfig) CAClientCert(org string) ([]byte, error) {
+	networkConfig, err := c.networkConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	caConfig, err := c.getCAConfig(networkConfig, org)
+	if err != nil {
+		return nil, err
+	}
+
+	return caConfig.TLSCACerts.Client.Cert.Bytes(), err
+}
+
+//CAClientKey read configuration for the fabric CA client key bytes for given org
+func (c *IdentityConfig) CAClientKey(org string) ([]byte, error) {
+	networkConfig, err := c.networkConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	caConfig, err := c.getCAConfig(networkConfig, org)
+	if err != nil {
+		return nil, err
+	}
+
+	return caConfig.TLSCACerts.Client.Key.Bytes(), err
+}
+
+// CAServerCerts Read configuration option for the server certificates
+// will send a list of cert bytes for given org
+func (c *IdentityConfig) CAServerCerts(org string) ([][]byte, error) {
+	networkConfig, err := c.networkConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	caConfig, err := c.getCAConfig(networkConfig, org)
+	if err != nil {
+		return nil, err
+	}
+
+	var serverCerts [][]byte
+	//check for pems first
+	pems := caConfig.TLSCACerts.Pem
+	if len(pems) > 0 {
+		serverCerts = make([][]byte, len(pems))
+		for i, pem := range pems {
+			serverCerts[i] = []byte(pem)
+		}
+		return serverCerts, nil
+	}
+
+	//check for files if pems not found
+	certFiles := strings.Split(caConfig.TLSCACerts.Path, ",")
+	serverCerts = make([][]byte, len(certFiles))
+	for i, certPath := range certFiles {
+		bytes, err := ioutil.ReadFile(pathvar.Subst(certPath))
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to load pem bytes from path '%s'", certPath)
+		}
+		serverCerts[i] = bytes
+	}
+	return serverCerts, nil
+}
+
+// CAKeyStorePath returns the same path as KeyStorePath() without the
+// 'keystore' directory added. This is done because the fabric-ca-client
+// adds this to the path
+func (c *IdentityConfig) CAKeyStorePath() string {
+	return pathvar.Subst(c.backend.GetString("client.credentialStore.cryptoStore.path"))
+}
+
+// CredentialStorePath returns the user store path
+func (c *IdentityConfig) CredentialStorePath() string {
+	return pathvar.Subst(c.backend.GetString("client.credentialStore.path"))
+}
+
+// NetworkConfig returns the network configuration defined in the config file
+func (c *IdentityConfig) networkConfig() (*fab.NetworkConfig, error) {
+	if c.endpointConfig == nil {
+		return nil, errors.New("network config not initialized for identity config")
+	}
+	networkConfig := c.endpointConfig.NetworkConfig()
+	//make sure underlying endpoint config has network config
+	if networkConfig == nil {
+		return nil, errors.New("network config not initialized for identity config")
+	}
+	return networkConfig, nil
+}
+
+func (c *IdentityConfig) tryMatchingCAConfig(networkConfig *fab.NetworkConfig, caName string) (*msp.CAConfig, string) {
+	//Return if no caMatchers are configured
+	if len(c.caMatchers) == 0 {
+		return nil, ""
+	}
+
+	//sort the keys
+	var keys []int
+	for k := range c.caMatchers {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	//loop over certAuthorityEntityMatchers to find the matching Cert
+	for _, k := range keys {
+		v := c.caMatchers[k]
+		if v.MatchString(caName) {
+			return c.findMatchingCert(networkConfig, caName, v, k)
+		}
+	}
+
+	return nil, ""
+}
+
+func (c *IdentityConfig) findMatchingCert(networkConfig *fab.NetworkConfig, caName string, v *regexp.Regexp, k int) (*msp.CAConfig, string) {
+	// get the matching Config from the index number
+	certAuthorityMatchConfig := c.entityMatchers.matchers["certificateauthority"][k]
+	//Get the certAuthorityMatchConfig from mapped host
+	caConfig, ok := networkConfig.CertificateAuthorities[strings.ToLower(certAuthorityMatchConfig.MappedHost)]
+	if !ok {
+		return nil, ""
+	}
+	_, isPortPresentInCAName := c.getPortIfPresent(caName)
+	//if substitution url is empty, use the same network certAuthority url
+	if certAuthorityMatchConfig.URLSubstitutionExp == "" {
+		port, isPortPresent := c.getPortIfPresent(caConfig.URL)
+
+		caConfig.URL = caName
+		//append port of matched config
+		if isPortPresent && !isPortPresentInCAName {
+			caConfig.URL += ":" + strconv.Itoa(port)
+		}
+	} else {
+		//else, replace url with urlSubstitutionExp if it doesnt have any variable declarations like $
+		if !strings.Contains(certAuthorityMatchConfig.URLSubstitutionExp, "$") {
+			caConfig.URL = certAuthorityMatchConfig.URLSubstitutionExp
+		} else {
+			//if the urlSubstitutionExp has $ variable declarations, use regex replaceallstring to replace networkhostname with substituionexp pattern
+			caConfig.URL = v.ReplaceAllString(caName, certAuthorityMatchConfig.URLSubstitutionExp)
+		}
+	}
+
+	return &caConfig, certAuthorityMatchConfig.MappedHost
+}
+
+func (c *IdentityConfig) getPortIfPresent(url string) (int, bool) {
+	s := strings.Split(url, ":")
+	if len(s) > 1 {
+		if port, err := strconv.Atoi(s[len(s)-1]); err == nil {
+			return port, true
+		}
+	}
+	return 0, false
+}
+
+func (c *IdentityConfig) compileMatchers() error {
+	entityMatchers := entityMatchers{}
+
+	err := c.backend.UnmarshalKey("entityMatchers", &entityMatchers.matchers)
+	logger.Debugf("Matchers are: %+v", entityMatchers)
+	if err != nil {
+		return errors.WithMessage(err, "failed to parse 'entityMatchers' config item")
+	}
+
+	if entityMatchers.matchers["certificateauthority"] != nil {
+		certMatchersConfig := entityMatchers.matchers["certificateauthority"]
+		var err error
+		for i := 0; i < len(certMatchersConfig); i++ {
+			if certMatchersConfig[i].Pattern != "" {
+				c.caMatchers[i], err = regexp.Compile(certMatchersConfig[i].Pattern)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	c.entityMatchers = &entityMatchers
+	return nil
+}

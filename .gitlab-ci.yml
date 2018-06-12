@@ -3,8 +3,8 @@ image: golang
 stages:
     # - build
     - develop
-    # - deploy    
-    
+    # - deploy
+
 install_and_test:
   stage: develop
   script:
