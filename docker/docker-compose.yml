@@ -1,43 +1,77 @@
-# Copyright (c) 2018 Mainflux
-#
-# SPDX-License-Identifier: Apache-2.0
-
+# Copyright (c) 2018 Monetasa
 version: "3"
 
 services:
-
-  ###
-  # NGINX
-  ###
-  nginx:
-    image: nginx:alpine
-    container_name: edgex-nginx
-    volumes:
-      - $PWD/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - $PWD/proxy/nginx/ssl/certs/mainflux-server.crt:/etc/ssl/certs/mainflux-server.crt
-      - $PWD/proxy/nginx/ssl/certs/mainflux-server.key:/etc/ssl/private/mainflux-server.key
-      - $PWD/proxy/nginx/ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
-    ports:
-      - "80:80"
-      - "443:443"
-  
   ###
   # MongoDB
   ###
-  mongo:
+  monetasa-mongodb:
     image: mongo:latest
-    container_name: edgex-mongodb
+    container_name: monetasa-mongodb
     command: --smallfiles --nojournal
     ports:
       - "27017:27017"
+  ###
+  # Monetasa Auth
+  ###
+  monetasa-auth:
+    image: monetasa/auth
+    container_name: monetasa-auth
+    restart: on-failure
+    links:
+      - monetasa-mongodb
+    depends_on:
+      - monetasa-mongodb
+    ports:
+      - "8080:8080"
+    environment:
+      MONETASA_AUTH_MONGO_URL: monetasa-mongodb
+      MONETASA_AUTH_URL: monetasa-auth
+      MONETASA_AUTH_SECRET: monetasa
 
   ###
-  # EdgeX Auth
+  # Monetasa dApp
   ###
-  edgex-auth:
-    image: drasko/edgex-auth:latest
-    container_name: edgex-auth
+  monetasa-dapp:
+    image: monetasa/dapp
+    container_name: monetasa-dapp
+    restart: on-failure
     links:
-      - mongo
+      - monetasa-mongodb
+    depends_on:
+      - monetasa-mongodb
     ports:
-      - "8089:8089"
+      - "8081:8081"
+    environment:
+      MONETASA_DAPP_MONGO_URL: monetasa-mongodb
+      MONETASA_AUTH_URL: http://monetasa-auth
+      MONETASA_DAPP_URL: http://monetasa-dapp
+
+  ###
+  # Monetasa UI
+  ###
+  monetasa-ui:
+    image: monetasa/ui
+    container_name: monetasa-ui
+    restart: on-failure
+    ports:
+      - 3000:3000
+  ###
+  # Nginx
+  ###
+  nginx:
+    image: nginx:alpine
+    container_name: monetasa-nginx
+    restart: on-failure
+    depends_on:
+      - monetasa-auth
+      - monetasa-dapp
+      - monetasa-ui
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl/certs/monetasa.crt:/etc/ssl/certs/monetasa.crt
+      - ./ssl/certs/monetasa.key:/etc/ssl/private/monetasa.key
+      - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
+    ports:
+      - "80:80"
+      - "443:443"

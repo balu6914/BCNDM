@@ -1,9 +1,12 @@
-FROM golang:1.8-alpine AS builder
+FROM golang:1.10-alpine AS builder
+ARG SVC_NAME
 WORKDIR /go/src/monetasa
 COPY . .
-RUN cd cmd && CGO_ENABLED=0 GOOS=linux go build -ldflags "-s" -a -installsuffix cgo -o exe
+RUN apk update \
+    && apk add make git \
+    && make $SVC_NAME \
+    && mv build/monetasa-$SVC_NAME /exe
 
 FROM scratch
-COPY --from=builder /go/src/monetasa/cmd/monetasa/exe /
-EXPOSE 8080
+COPY --from=builder /exe /
 ENTRYPOINT ["/exe"]
