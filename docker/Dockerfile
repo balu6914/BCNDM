@@ -3,7 +3,7 @@ ARG SVC_NAME
 WORKDIR /go/src/monetasa
 COPY . .
 RUN apk update \
-    && apk add make git \
+    && apk add git gcc libc-dev libltdl libtool libgcc make \
     && make $SVC_NAME \
     && mv build/monetasa-$SVC_NAME /exe
 
