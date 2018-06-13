@@ -45,7 +45,7 @@ services:
     environment:
       MONETASA_DAPP_MONGO_URL: monetasa-mongodb
       MONETASA_AUTH_URL: http://monetasa-auth
-      MONETASA_DAPP_URL: http://monetasa-dApp
+      MONETASA_DAPP_URL: http://monetasa-dapp
 
   ###
   # Monetasa UI
