@@ -1,13 +1,13 @@
 ---
-title: Monetasa
+title: Datapace
 subtitle: Decentralized data marketplace based on blockchain
 author:
   - name: Drasko Draskovic
-    affiliation: Monetasa
-    email: <drasko@monetasa.com>
+    affiliation: Datapace
+    email: <drasko@datapace.io>
   - name: George Saleh
-    affiliation: Monetasa
-    email: <george@monetasa.com>
+    affiliation: Datapace
+    email: <george@datapace.io>
 date: December 28, 2017
 colorlinks: true
 header-includes:
