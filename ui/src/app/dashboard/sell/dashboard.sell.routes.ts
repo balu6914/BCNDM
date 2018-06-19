@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 import { DashboardSellEditComponent } from './edit/dashboard.sell.edit.component';
-import { DashboardSellListComponent } from './list/dashboard.sell.list.component';
+import { DashboardSellMapComponent } from './map/dashboard.sell.map.component';
 import { DashboardSellComponent } from './dashboard.sell.component';
 import { SubscriptionAddComponent } from '../../dashboard/subscription/add';
 import { AuthGuardService as AuthGuard } from '../../auth/guardians/auth.guardian';
@@ -20,8 +20,8 @@ const routes: Routes = [
         canActivate: [AuthGuard],
     },
     {
-        path: 'list',
-        component: DashboardSellListComponent ,
+        path: 'map',
+        component: DashboardSellMapComponent ,
         canActivate: [AuthGuard]
     }
 ];

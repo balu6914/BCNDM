@@ -14,7 +14,7 @@ import { TokenInterceptor } from '../../auth/services/token.http.interceptor.ser
 import { DashboardSellComponent } from './index';
 import { DashboardSellAddComponent } from './add';
 import { DashboardSellEditComponent } from './edit';
-import { DashboardSellListComponent } from './list';
+import { DashboardSellMapComponent } from './map';
 
 import { CommonAppModule } from '../../common/common.module';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
@@ -37,7 +37,7 @@ import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
       DashboardSellComponent,
       DashboardSellAddComponent,
       DashboardSellEditComponent,
-      DashboardSellListComponent,
+      DashboardSellMapComponent,
   ],
   providers: [
       StreamService,

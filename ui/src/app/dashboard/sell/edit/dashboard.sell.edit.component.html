@@ -1,7 +1,7 @@
 <div class="mdl-grid animated fadeIn">
     <div class="dashboard-sell-edit-container" mdl-shadow="4">
         <h4 class="mdl-cell mdl-cell--12-col">EDIT STREAM
-              <a routerLink="/dashboard/sell/list" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
+              <a routerLink="/dashboard/sell/map" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
                   <i class="material-icons md-dark">close</i>
               </a>
         </h4>
@@ -74,7 +74,7 @@
                     </mdl-textfield>
                 </p>
                 <p>
-                    <a routerLink="/dashboard/sell/list" mdl-button mdl-button-type="raised" mdl-ripple>
+                    <a routerLink="/dashboard/sell/map" mdl-button mdl-button-type="raised" mdl-ripple>
                         CANCEL
                     </a>
                     <button mdl-button (click)="onSubmit(form.value, form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>SAVE CHANGES</button>

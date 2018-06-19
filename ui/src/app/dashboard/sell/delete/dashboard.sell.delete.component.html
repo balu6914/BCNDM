@@ -1,7 +1,7 @@
 <div class="mdl-grid animated fadeIn">
-    <div class="dashboard-sell-list-container" mdl-shadow="4">
+    <div class="dashboard-sell-map-container" mdl-shadow="4">
         <h4 class="mdl-cell mdl-cell--12-col"> DELETE STREAM
-          <a routerLink="/dashboard/sell/list" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
+          <a routerLink="/dashboard/sell/map" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
               <i class="material-icons md-dark">close</i>
           </a>
         </h4>
@@ -12,7 +12,7 @@
 
         <div class="mdl-cell mdl-cell--12-col">
             <p>
-                <a routerLink="/dashboard/sell/list" mdl-button mdl-button-type="raised" mdl-ripple> CANCEL </a>
+                <a routerLink="/dashboard/sell/map" mdl-button mdl-button-type="raised" mdl-ripple> CANCEL </a>
             <button mdl-button (click)="onSubmit(form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>DELETE STREAM</button>
             </p>
             <br>

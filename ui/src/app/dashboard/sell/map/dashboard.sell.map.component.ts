@@ -14,11 +14,11 @@ import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { icon, latLng, Layer, marker, tileLayer } from 'leaflet';
 
 @Component({
-  selector: 'dashboard-sell-list',
-  templateUrl: './dashboard.sell.list.component.html',
-  styleUrls: [ './dashboard.sell.list.component.scss' ]
+  selector: 'dashboard-sell-map',
+  templateUrl: './dashboard.sell.map.component.html',
+  styleUrls: [ './dashboard.sell.map.component.scss' ]
 })
-export class DashboardSellListComponent {
+export class DashboardSellMapComponent {
     options = {
 		layers: [
             L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjdbxg3f6c6sq2smdj7cp4wwa/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {
@@ -108,7 +108,7 @@ export class DashboardSellListComponent {
             formData.append('csv', file, file.name);
 
             this.streamService.addStreamBulk(formData).subscribe(
-                data => this.router.navigate(['/dashboard/sell/list']),
+                data => this.router.navigate(['/dashboard/sell/map']),
                 error => console.log(error),
             );
         }
@@ -209,7 +209,6 @@ export class DashboardSellListComponent {
             // Search streams on drawed region
             that.searchService.searchStreams("geo",x1, y1, x2, y2, x3, y3, x4, y4).subscribe(
             (result: any) => {
-                console.log(result.Streams)
                 that.temp = [...result.Streams];
                 // Add stream markers on the map (Name, Description and price)
                 result.Streams.forEach(stream => {
