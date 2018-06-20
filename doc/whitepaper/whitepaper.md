@@ -94,11 +94,9 @@ In the second phase of development, Datapace validation will be opened to public
 ## Description
 Datapace is a decentralized application based on the blockchain network with native token of value.
 
-Datapace blockchain is provided via novel BigchainDB technology, which provides several benefits to the system:
+Datapace blockchain is based on Hyperledger Fabric technology, an industrial blockchain implementation with quality guarantees by Linux Foundation and consortium of over 200 companies gathered around the open-source project.
 
-- Native token, in a form of divisible digital asset
-- Digital asset queries
-- Fast transaction throughput and finalization
+In addition to Hyperledger Fabric, Datapace comes with specialized Smart Contract (chaincode) which implements ERC-20 token (crypto-currency) native to the platform.
 
 \begin{figure}
 \begin{center}
@@ -136,49 +134,46 @@ Datapace blockchain is provided via novel BigchainDB technology, which provides 
 \label{fig:arch}
 \end{figure}
 
-
-In order to secure the system and make it resistant to Byzantine General attack[@bft], Datapace replaces the underlying BigchainDB default BCA consensus algorithm[@bcdb] with Tendermint PBFT consensus engine[@tendr].
-
-Tendermint is very performant PBFT consensus algorithm - it supports thousands of transaction per second at 1000ms latencies. Not only that Datapace benefits from this consensus algorithm in security and performance, but this mechanism opens the possibility to connect Datapace system to incoming Cosmos network. Announced as "Internet of Blockchains", Cosmos hub will give to Datapace system two very important features: interoperability and additional scalability.
+Hyperledger Fabric uses high-performance PBFT consensus algorithm - it supports thousands of transaction per second at 1000ms latencies. Additionally, an ABC-compliant connector/adapter for Datapace system to incoming Cosmos network will be created in the future. Announced as "Internet of Blockchains", Cosmos hub will give to Datapace system two very important features: interoperability and additional scalability.
 
 \begin{figure}
 \begin{center}
 \begin{tikzpicture}[>=stealth]
 
   %nodes
-  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, text width=3cm, align=center] (BDB1) {BigchainDB\_1};
-  \node[draw, minimum width=3cm, minimum height=1cm, below of=BDB1, text width=3cm, align=center, fill=gray!20] (T1) {Tendermint\_1};
+  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, text width=3cm, align=center] (DDA1) {Datapace dApp\_1};
+  \node[draw, minimum width=3cm, minimum height=1cm, below of=DDA1, text width=3cm, align=center, fill=gray!20] (HF1) {Hyperledger Fabric\_1};
 
-  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=-4cm, yshift=-3cm, text width=3cm, align=center] (BDB2) {BigchainDB\_2};
-  \node[draw, minimum width=3cm, minimum height=1cm, below of=BDB2, text width=3cm, align=center, fill=gray!20] (T2) {Tendermint\_2};
-
-
-  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=4cm, yshift=-3cm,text width=3cm, align=center] (BDB3) {BigchainDB\_3};
-  \node[draw, minimum width=3cm, minimum height=1cm, below of=BDB3, text width=3cm, align=center, fill=gray!20] (T3) {Tendermint\_3};
-
-  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=-2.5cm, yshift=-6cm, text width=3cm, align=center] (BDB4) {BigchainDB\_4};
-  \node[draw, minimum width=3cm, minimum height=1cm, below of=BDB4, text width=3cm, align=center, fill=gray!20] (T4) {Tendermint\_4};
+  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=-4cm, yshift=-3cm, text width=3cm, align=center] (DDA2) {Datapace dApp\_2};
+  \node[draw, minimum width=3cm, minimum height=1cm, below of=DDA2, text width=3cm, align=center, fill=gray!20] (HF2) {Hyperledger Fabric\_2};
 
 
-  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=2.5cm, yshift=-6cm,text width=3cm, align=center] (BDB5) {BigchainDB\_5};
-  \node[draw, minimum width=3cm, minimum height=1cm, below of=BDB5, text width=3cm, align=center, fill=gray!20] (T5) {Tendermint\_5};
+  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=4cm, yshift=-3cm,text width=3cm, align=center] (DDA3) {Datapace dApp\_3};
+  \node[draw, minimum width=3cm, minimum height=1cm, below of=DDA3, text width=3cm, align=center, fill=gray!20] (HF3) {Hyperledger Fabric\_3};
 
-  % draw the paths and and print some Text below/above the graph
-  \path (T1) edge[bend right=43] (BDB2);
-  \path (T1) edge[bend left=43] (BDB3);
+  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=-2.5cm, yshift=-6cm, text width=3cm, align=center] (DDA4) {Datapace dApp\_4};
+  \node[draw, minimum width=3cm, minimum height=1cm, below of=DDA4, text width=3cm, align=center, fill=gray!20] (HF4) {Hyperledger Fabric\_4};
 
-  \path (T2) edge[bend right=60] (T4);
-  \path (T3) edge[bend left=60] (T5);
 
-  \path (T4) edge[-] (T5);
+  \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, xshift=2.5cm, yshift=-6cm,text width=3cm, align=center] (DDA5) {Datapace dApp\_5};
+  \node[draw, minimum width=3cm, minimum height=1cm, below of=DDA5, text width=3cm, align=center, fill=gray!20] (HF5) {Hyperledger Fabric\_5};
 
-  \path (T2) edge[-] (BDB5);
-  \path (T3) edge[-] (BDB4);
+  % draw the paths and and print some text below/above the graph
+  \path (HF1) edge[bend right=43] (DDA2);
+  \path (HF1) edge[bend left=43] (DDA3);
 
-  \path (T1) edge[-] (BDB5);
-  \path (T1) edge[-] (BDB4);
+  \path (HF2) edge[bend right=60] (HF4);
+  \path (HF3) edge[bend left=60] (HF5);
 
-  \path (BDB2) edge[-] (BDB3);
+  \path (HF4) edge[-] (HF5);
+
+  \path (HF2) edge[-] (DDA5);
+  \path (HF3) edge[-] (DDA4);
+
+  \path (HF1) edge[-] (DDA5);
+  \path (HF1) edge[-] (DDA4);
+
+  \path (DDA2) edge[-] (DDA3);
 
 \end{tikzpicture}
 \end{center}
@@ -186,7 +181,7 @@ Tendermint is very performant PBFT consensus algorithm - it supports thousands o
 \label{fig:arch}
 \end{figure}
 
-Interoperability is extremely important, as it will enable TAS token to natively flow from Datapace private blockchain into other blockchains connected to the Cosmos hub, thus opening potential for TAS exchange to other crypto-currencies, and vice versa. This will influence token economy and raise the value of the TAS token. Additionally, developed token economy would allow _Proof-of-Stake_ consensus to be applied on the top of the Datapace-Tendermint system and allow opening Datapace validator set participation to the wide public.
+Interoperability is extremely important, as it will enable TAS token to natively flow from Datapace private blockchain into other blockchains connected to the Cosmos hub, thus opening potential for TAS exchange to other crypto-currencies, and vice versa. This will influence token economy and raise the value of the TAS token. Additionally, developed token economy would allow _Proof-of-Stake_ consensus to be applied on the top of the Datapace-Hyperledger system and allow opening Datapace validator set participation to the wide public.
 
 Scalability is also important, although, as a consequence of the wise technology choices, Datapace system is already very performant. But "Interent of Blockchains" will enable additional scaling od Datapace chains through sharding[@shard] using Cosmos zones.
 
@@ -228,7 +223,7 @@ Scalability is also important, although, as a consequence of the wise technology
 As mentioned before, blockchain technology is used for several important purposes in Datapace system:
 
 - **TAS token**: TAS token is native token of value in Datapace system and is necessary for system operation and functioning. It will be explained in details in a dedicated chapter.
-- **Data integrity**: Leveraging on BigchainDB digital asset features, as well as native digital asset querying, Datapace implements mechanism that insures integrity of the data that flows through the system by taking it's digital fingerprint (cryptographic hash) and stores it in to the immutable blockchain database. This way system assures that critical data has not been tampered with. In the context of OTA firmware updates of safety-critical IoT devices or tamper-proof checking of already running software on such a systems (for example a braking system of a self-driving vehicule) this form of data security becomes quintessential.
+- **Data integrity**: Leveraging on Datapace Hyperledger Fabric ERC-20 chincode that provides digital asset features, as well as native digital asset querying, Datapace implements mechanism that insures integrity of the data that flows through the system by taking it's digital fingerprint (cryptographic hash) and stores it in to the immutable blockchain database. This way system assures that critical data has not been tampered with. In the context of OTA firmware updates of safety-critical IoT devices or tamper-proof checking of already running software on such a systems (for example a braking system of a self-driving vehicule) this form of data security becomes quintessential.
 - **Smart Contract**: Smart Contracts define a complex set of conditions under which data is exchanged. They are important part of Datapace system, and will be explained in detail in a dedicated chapter.
 - **Network security (via PBFT consensus)**:  In order to protect valuable digital assets and network infrastructure in the era of ever-increasing security threats[^2], Datapace builds a decentralized network based on Byzantine fault-tolerant state and data replication algorithm. This way system can tolerate up to 1/3 malicious-acting nodes and assure network functioning under cyber-attack. Additionally, blockchain-structured data assure immutability and anti-tampering characteristics. Applying _Proof-of-Validated-Source_ and _Proof-of-Stake_ consensus, network is adding an additional layer of protection, incentivizing nodes to behave honestly and punishing badly behaving nodes. Based on these important features and technologies, Datapace builds high-security network that is capable to fully protect digital assets and insure secure protection of value exchanged through Datapace marketplace.
 - **Auditing (via record immutability)**: Datapace enables monetary transactions, which are often subject to various regulations and can be examined by regulatory bodies. Thanks to the immutability feature of blockchain systems, Datapace system allows every organization participating in Datapace data market to have a proven track of records of all executed transactions.
@@ -266,10 +261,10 @@ Datapace integrates several open-source technologies which in combination provid
 
 \toprule
 
-BigchainDB        & Blockchain (Distributed Ledger). Provides token as a form of divisible digital asset. Immutability, querying, validator voting. Fast transactions.    \\
+Hyperledger Fabric        & Blockchain (Distributed Ledger). Provides PBFT consensus algorithm and P2P machine state replication. Adds security to Datapace blockchain. Immutability, querying, validator voting. Fast transactions.    \\
 \midrule
 
-Tendermint        & Provides PBFT consensus algorithm and P2P machine state replication. Adds security to Datapace blockchain (BigchainDB network). Facilitates Cosmos integration.     \\
+ERC-20 Smart Contract     & Provides ERC-20-compliant token as a form of divisible digital asset recorded by user-account balances.     \\
 \midrule
 
 Cosmos            & Provides TAS token interchangeability. Provides Datapace blockchain scalability through sharding. Provides interoperability with other blockchain networks - like Ethereum or Bitcoin.      \\
@@ -417,6 +412,6 @@ LinkedIn: <https://www.linkedin.com/company/datapace/>
 Facebook: <https://www.facebook.com/datapace>
 
 # Acknowledgments {-}
-This work is the cumulative effort of multiple individuals within the Datapace team, and would not have been possible without the help, comments, and review of the collaborators and advisors of Datapace. Drasko Draskovic ad George Saleh published the original Datapace ideas in 2016, laying the groundwork for this work. Special thanks goes to the community contributors: Troy McCognahy and Manuel Rodriguez from BigchainDB team - thanks for hanging with us on IRC channel, guiding us through BigchainDB internals; Jae Kwon and Ethan Buchman, Tendermint and Cosmos creators - thanks for moving blockchain tech forward; we appreciate huge help and contributions given by Janko Isidorovic and Mainflux team - this magnificent piece of IoT technology became one of the essential architectural blocks of Datapace system. We also thank all of our collaborators and advisors for useful conversations.
+This work is the cumulative effort of multiple individuals within the Datapace team, and would not have been possible without the help, comments, and review of the collaborators and advisors of Datapace. Drasko Draskovic ad George Saleh published the original Datapace ideas in 2016, laying the groundwork for this work. Special thanks goes to the community contributors: Maxime Aubanel, Aleksandar Likic and Marta Piekarska from IBM's Hyperledger team - thanks for hanging with us on IRC channel, guiding us through Fabric internals; Jae Kwon and Ethan Buchman, Tendermint and Cosmos creators - thanks for moving blockchain tech forward; we appreciate huge help and contributions given by Janko Isidorovic and Mainflux team - this magnificent piece of IoT technology became one of the essential architectural blocks of Datapace system. We also thank all of our collaborators and advisors for useful conversations.
 
 # References
