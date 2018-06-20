@@ -87,7 +87,7 @@ export class DashboardSellEditComponent {
                     },
                     err => {
                         if (err.status == 200) {
-                            this.router.navigate(['/dashboard/sell/list'])
+                            this.router.navigate(['/dashboard/sell/map'])
                         } else {
                             console.log(err);
                         }
@@ -117,7 +117,7 @@ export class DashboardSellEditComponent {
                  },
                  err => {
                      if (err.status == 200) {
-                         this.router.navigate(['/dashboard/sell/list'])
+                         this.router.navigate(['/dashboard/sell/map'])
                      } else {
                          console.log(err);
                      }

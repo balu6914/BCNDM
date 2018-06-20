@@ -57,7 +57,7 @@ export class DashboardSellAddComponent {
 
                  this.StreamService.addStream(model).subscribe(
                      response => {
-                         this.router.navigate(['/dashboard/sell/list'])
+                         this.router.navigate(['/dashboard/sell/map'])
                      },
                      err => {
                          console.log(err);
