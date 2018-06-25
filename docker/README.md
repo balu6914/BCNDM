@@ -14,8 +14,8 @@ docker rmi -f `docker images | grep hyperledger`
 ### Fabric Tools Installation
 Make sure that you have all Fabric prerequisites and development tools installed:
 ```
-go get -u github.com/hyperledger/fabric
-cd $GOPATH/github.com/hyperledger/fabric
+go get github.com/hyperledger/fabric
+cd $GOPATH/src/github.com/hyperledger/fabric
 git checkout v1.1.0
 make -j 16 cryptogen
 make -j 16 configtxgen
