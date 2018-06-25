@@ -3,6 +3,7 @@ package fabric
 import (
 	"encoding/json"
 	"fmt"
+	"monetasa/auth"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
@@ -19,8 +20,11 @@ const balanceFcn = "balance"
 // Returns the account balance of another account with address user.
 func (fn *fabricNetwork) Balance(name string) (uint64, error) {
 	// ClientContext allows creation of transactions using the supplied identity as the credential.
-	adminChannelContext := fn.setup.Sdk.ChannelContext(fn.setup.ChannelID,
-		fabsdk.WithUser(fn.setup.OrgAdmin), fabsdk.WithOrg(fn.setup.OrgName))
+	adminChannelContext := fn.setup.Sdk.ChannelContext(
+		fn.setup.ChannelID,
+		fabsdk.WithUser(fn.setup.OrgAdmin),
+		fabsdk.WithOrg(fn.setup.OrgName),
+	)
 
 	client, err := channel.New(adminChannelContext)
 	if err != nil {
@@ -31,19 +35,22 @@ func (fn *fabricNetwork) Balance(name string) (uint64, error) {
 		User: name,
 	}
 
-	balanceRqBytes, _ := json.Marshal(ub)
+	balanceRqBytes, err := json.Marshal(ub)
+	if err != nil {
+		return 0, auth.ErrMalformedEntity
+	}
+
 	balance, err := client.Query(channel.Request{
 		ChaincodeID: fn.setup.ChaincodeID,
 		Fcn:         balanceFcn,
 		Args:        util.ToChaincodeArgs(string(balanceRqBytes)),
 	})
 	if err != nil {
-		return 0, fmt.Errorf("Error fetching balance: %v\n", err)
+		return 0, auth.ErrFetchingBalance
 	}
 
-	err = json.Unmarshal(balance.Payload, &ub)
-	if err != nil {
-		return 0, fmt.Errorf("Error Unmarshaling balance: %v\n", err)
+	if err := json.Unmarshal(balance.Payload, &ub); err != nil {
+		return 0, auth.ErrFetchingBalance
 	}
 
 	return ub.Value, nil

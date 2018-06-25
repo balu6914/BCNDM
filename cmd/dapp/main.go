@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"monetasa/auth/client"
 	"monetasa/dapp"
 	"monetasa/dapp/api"
 	"monetasa/dapp/mongo"
@@ -80,7 +79,6 @@ func main() {
 	}
 	defer ms.Close()
 
-	ac := client.NewClient(cfg.AuthURL)
 	strr := mongo.NewStreamRepository(ms)
 	subr := mongo.NewSubscriptionsRepository(ms)
 
@@ -92,7 +90,7 @@ func main() {
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
 		logger.Info(fmt.Sprintf("Dapp service started, exposed port %d", cfg.Port))
-		errs <- http.ListenAndServe(p, api.MakeHandler(svc, ac))
+		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
 	}()
 
 	go func() {

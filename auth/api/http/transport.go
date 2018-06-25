@@ -1,18 +1,20 @@
-package api
+package http
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"monetasa"
-	"net/http"
-
 	"monetasa/auth"
+	"net/http"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
+
+var errUnsupportedContentType = errors.New("unsupported content type")
 
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc auth.Service) http.Handler {
@@ -57,13 +59,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/access-grant", kithttp.NewServer(
-		identityEndpoint(svc),
-		decodeIdentity,
-		encodeResponse,
-		opts...,
-	))
-
 	r.GetFunc("/version", monetasa.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
@@ -80,7 +75,7 @@ func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
-		return nil, auth.ErrUnsupportedContentType
+		return nil, errUnsupportedContentType
 	}
 
 	var user auth.User
@@ -93,7 +88,7 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 
 func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
-		return nil, auth.ErrUnsupportedContentType
+		return nil, errUnsupportedContentType
 	}
 
 	var user auth.User
@@ -139,7 +134,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 	case auth.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
-	case auth.ErrUnsupportedContentType:
+	case errUnsupportedContentType:
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case io.ErrUnexpectedEOF:
 		w.WriteHeader(http.StatusBadRequest)

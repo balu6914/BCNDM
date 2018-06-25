@@ -5,24 +5,21 @@ import "errors"
 var (
 	// ErrConflict indicates usage of the existing email during account
 	// registration.
-	ErrConflict error = errors.New("email already taken")
+	ErrConflict = errors.New("email already taken")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
 	// invalid username or password).
-	ErrMalformedEntity error = errors.New("malformed entity specification")
+	ErrMalformedEntity = errors.New("malformed entity specification")
 
 	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
 	// when accessing a protected resource.
-	ErrUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
+	ErrUnauthorizedAccess = errors.New("missing or invalid credentials provided")
 
 	// ErrNotFound indicates a non-existent entity request.
-	ErrNotFound error = errors.New("non-existent entity")
+	ErrNotFound = errors.New("non-existent entity")
 
-	ErrUnknownType error = errors.New("unknown type")
-
-	ErrMalformedData error = errors.New("malformed data")
-
-	ErrUnsupportedContentType error = errors.New("unsupported content type")
+	// ErrFetchingBalance indicates failure while fetching users balance.
+	ErrFetchingBalance = errors.New("failed to fetch balance")
 )
 
 // Service specifies an API that must be fullfiled by the domain service
@@ -50,5 +47,5 @@ type Service interface {
 	Login(User) (string, error)
 
 	// Identity retrieves Client ID for provided client token.
-	Identity(string) (string, error)
+	Identify(string) (string, error)
 }

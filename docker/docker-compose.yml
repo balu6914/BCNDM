@@ -24,9 +24,10 @@ services:
       - monetasa-mongodb
     ports:
       - "8080:8080"
+    expose:
+      - "8081"
     environment:
       MONETASA_AUTH_MONGO_URL: monetasa-mongodb
-      MONETASA_AUTH_URL: monetasa-auth
       MONETASA_AUTH_SECRET: monetasa
 
   ###
