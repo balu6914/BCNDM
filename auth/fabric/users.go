@@ -23,7 +23,6 @@ func NewFabricNetwork(fs *auth.FabricSetup) auth.FabricNetwork {
 
 // Add new user to fabric network
 func (fn *fabricNetwork) CreateUser(name, secret string) error {
-
 	sdk := fn.setup.Sdk
 	ctxProvider := sdk.Context()
 	mspClient, err := msp.New(ctxProvider)
@@ -42,8 +41,7 @@ func (fn *fabricNetwork) CreateUser(name, secret string) error {
 	}
 
 	// Enroll the new user
-	err = mspClient.Enroll(name, msp.WithSecret(enrollmentSecret))
-	if err != nil {
+	if err := mspClient.Enroll(name, msp.WithSecret(enrollmentSecret)); err != nil {
 		return fmt.Errorf("Enroll failed: %v\n", err)
 	}
 
@@ -52,7 +50,7 @@ func (fn *fabricNetwork) CreateUser(name, secret string) error {
 	if err != nil {
 		return fmt.Errorf("Unable to create a user in the fabric-ca, GetSigningIdentity failed: %v\n", err)
 	}
-	fmt.Printf("User created!: %v\n", si)
+	fmt.Printf("User created: %v\n", si)
 
 	return nil
 }

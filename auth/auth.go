@@ -1,9 +1,5 @@
 package auth
 
-import (
-	"fmt"
-)
-
 var _ Service = (*authService)(nil)
 
 type authService struct {
@@ -30,8 +26,7 @@ func (ms *authService) Register(user User) error {
 	}
 
 	user.Password = hash
-	err = ms.users.Save(user)
-	if err != nil {
+	if err = ms.users.Save(user); err != nil {
 		return err
 	}
 
@@ -41,12 +36,7 @@ func (ms *authService) Register(user User) error {
 	}
 
 	// Create New user in Fabric network calling fabric-ca
-	err = ms.fabric.CreateUser(u.ID.Hex(), u.Password)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ms.fabric.CreateUser(u.ID.Hex(), u.Password)
 }
 
 func (ms *authService) Login(user User) (string, error) {
@@ -65,10 +55,10 @@ func (ms *authService) Login(user User) (string, error) {
 func (ms *authService) Update(key string, user User) error {
 	id, err := ms.idp.Identity(key)
 	if err != nil {
-		return err
+		return ErrUnauthorizedAccess
 	}
 
-	u, err := ms.users.OneById(id)
+	u, err := ms.users.OneByID(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
@@ -86,10 +76,10 @@ func (ms *authService) Update(key string, user User) error {
 func (ms *authService) View(key string) (User, error) {
 	id, err := ms.idp.Identity(key)
 	if err != nil {
-		return User{}, err
+		return User{}, ErrUnauthorizedAccess
 	}
 
-	user, err := ms.users.OneById(id)
+	user, err := ms.users.OneByID(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
@@ -97,7 +87,7 @@ func (ms *authService) View(key string) (User, error) {
 	// Get balance and update user
 	balance, err := ms.fabric.Balance(user.ID.Hex())
 	if err != nil {
-		return User{}, fmt.Errorf("Error fetching balance: %v\n", err)
+		return User{}, ErrFetchingBalance
 	}
 	user.Balance = balance
 
@@ -107,10 +97,10 @@ func (ms *authService) View(key string) (User, error) {
 func (ms *authService) Delete(key string) error {
 	id, err := ms.idp.Identity(key)
 	if err != nil {
-		return err
+		return ErrUnauthorizedAccess
 	}
 
-	user, err := ms.users.OneById(id)
+	user, err := ms.users.OneByID(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
@@ -118,7 +108,7 @@ func (ms *authService) Delete(key string) error {
 	return ms.users.Remove(user.ID.Hex())
 }
 
-func (ms *authService) Identity(key string) (string, error) {
+func (ms *authService) Identify(key string) (string, error) {
 	id, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err

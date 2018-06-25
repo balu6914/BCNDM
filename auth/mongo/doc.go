@@ -1,2 +1,2 @@
-// Package jwt provides a JWT identity provider.
+// Package mongo provides MongoDB specific repository implementation.
 package mongo

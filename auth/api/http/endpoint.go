@@ -1,8 +1,7 @@
-package api
+package http
 
 import (
 	"context"
-
 	"monetasa/auth"
 
 	"github.com/go-kit/kit/endpoint"
@@ -11,7 +10,6 @@ import (
 func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(userReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -24,7 +22,6 @@ func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 func loginEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(userReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -41,7 +38,6 @@ func loginEndpoint(svc auth.Service) endpoint.Endpoint {
 func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -57,7 +53,6 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -74,7 +69,6 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 func deleteEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -84,22 +78,5 @@ func deleteEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		return removeRes{}, nil
-	}
-}
-
-func identityEndpoint(svc auth.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(identityReq)
-
-		if err := req.validate(); err != nil {
-			return nil, auth.ErrUnauthorizedAccess
-		}
-
-		id, err := svc.Identity(req.key)
-		if err != nil {
-			return nil, err
-		}
-
-		return identityRes{id: id}, nil
 	}
 }

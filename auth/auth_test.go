@@ -12,7 +12,12 @@ import (
 
 const wrong string = "wrong-value"
 
-var user auth.User = auth.User{"user@example.com", "password", bson.NewObjectId(), 0}
+var user = auth.User{
+	Email:    "user@example.com",
+	Password: "password",
+	ID:       bson.NewObjectId(),
+	Balance:  0,
+}
 
 func newService() auth.Service {
 	users := mocks.NewUserRepository()
@@ -110,8 +115,24 @@ func TestLogin(t *testing.T) {
 		err  error
 	}{
 		"login with good credentials": {user, nil},
-		"login with wrong e-mail":     {auth.User{wrong, user.Password, user.ID, user.Balance}, auth.ErrUnauthorizedAccess},
-		"login with wrong password":   {auth.User{user.Email, wrong, user.ID, user.Balance}, auth.ErrUnauthorizedAccess},
+		"login with wrong e-mail": {
+			auth.User{
+				Email:    wrong,
+				Password: user.Password,
+				ID:       user.ID,
+				Balance:  user.Balance,
+			},
+			auth.ErrUnauthorizedAccess,
+		},
+		"login with wrong password": {
+			auth.User{
+				Email:    user.Email,
+				Password: wrong,
+				ID:       user.ID,
+				Balance:  user.Balance,
+			},
+			auth.ErrUnauthorizedAccess,
+		},
 	}
 
 	for desc, tc := range cases {
@@ -120,7 +141,7 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestIdentity(t *testing.T) {
+func TestIdentify(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
 	key, _ := svc.Login(user)
@@ -134,7 +155,7 @@ func TestIdentity(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		id, err := svc.Identity(tc.key)
+		id, err := svc.Identify(tc.key)
 		if id != user.ID.Hex() {
 			err = auth.ErrUnauthorizedAccess
 		}

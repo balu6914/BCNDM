@@ -1,9 +1,8 @@
-package api
+package http
 
 import (
-	"net/http"
-
 	"monetasa/auth"
+	"net/http"
 )
 
 const contentType = "application/json"
