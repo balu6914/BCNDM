@@ -4,6 +4,8 @@ chaincode/token/vendor/*/**
 docker/fabric/artifacts/**/**
 !docker/fabric/artifacts/.gitkeep
 fabric-ca-db
+/*.pb.go
+
 # System Files
 .DS_Store
 Thumbs.db

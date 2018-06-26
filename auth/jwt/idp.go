@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	issuer   string        = "monetasa"
-	duration time.Duration = 10 * time.Hour
+	issuer   = "monetasa"
+	duration = 10 * time.Hour
 )
 
 var _ auth.IdentityProvider = (*jwtIdentityProvider)(nil)
@@ -51,14 +51,14 @@ func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 
 		return []byte(idp.secret), nil
 	})
-
-	if err != nil {
+	if err != nil || !token.Valid {
 		return "", auth.ErrUnauthorizedAccess
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims["sub"].(string), nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", auth.ErrUnauthorizedAccess
 	}
 
-	return "", auth.ErrUnauthorizedAccess
+	return claims["sub"].(string), nil
 }

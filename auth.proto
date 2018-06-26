@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package monetasa;
+
+service AuthService {
+    rpc Identify(Token) returns (UserID) {}
+}
+
+message Token {
+    string value = 1;
+}
+
+message UserID {
+    string value = 1;
+}

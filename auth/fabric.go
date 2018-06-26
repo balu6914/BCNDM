@@ -5,7 +5,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
-// Fabric implementation
+// FabricSetup with configuration parameters.
 type FabricSetup struct {
 	ConfigFile  string
 	ChannelID   string

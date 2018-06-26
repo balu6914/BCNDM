@@ -86,9 +86,9 @@ func (lm *loggingMiddleware) Delete(key string) (err error) {
 	return lm.svc.Delete(key)
 }
 
-func (lm *loggingMiddleware) Identity(key string) (id string, err error) {
+func (lm *loggingMiddleware) Identify(key string) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method identity for user %s took %s to complete", id, time.Since(begin))
+		message := fmt.Sprintf("Method identify for user %s took %s to complete", id, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -96,5 +96,5 @@ func (lm *loggingMiddleware) Identity(key string) (id string, err error) {
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.Identity(key)
+	return lm.svc.Identify(key)
 }
