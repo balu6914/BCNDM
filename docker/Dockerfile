@@ -7,6 +7,8 @@ RUN apk update \
     && make $SVC_NAME \
     && mv build/monetasa-$SVC_NAME /exe
 
-FROM scratch
+FROM golang:1.10-alpine
+RUN apk update && apk add libltdl
 COPY --from=builder /exe /
+COPY --from=builder /go/src/monetasa/config/ /config/
 ENTRYPOINT ["/exe"]
