@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Monetasa
-version: "3"
+version: "2"
 
 services:
   ###
@@ -11,6 +11,9 @@ services:
     command: --smallfiles --nojournal
     ports:
       - "27017:27017"
+    networks:
+      # Our network is called "monetasa-net"
+      - monetasa-net
   ###
   # Monetasa Auth
   ###
@@ -27,8 +30,14 @@ services:
     expose:
       - "8081"
     environment:
-      MONETASA_AUTH_MONGO_URL: monetasa-mongodb
-      MONETASA_AUTH_SECRET: monetasa
+      - MONETASA_AUTH_MONGO_URL=monetasa-mongodb
+      - MONETASA_AUTH_SECRET=monetasa
+    volumes:
+        -  ../config:/go/src/monetasa/config/
+    networks:
+      # Link to monetasa fabric net
+      - fabric_monetasa-bc-net
+      - monetasa-net
 
   ###
   # Monetasa dApp
@@ -47,6 +56,9 @@ services:
       MONETASA_DAPP_MONGO_URL: monetasa-mongodb
       MONETASA_AUTH_URL: http://monetasa-auth
       MONETASA_DAPP_URL: http://monetasa-dapp
+    networks:
+      # Our network is called "monetasa-net"
+      - monetasa-net
 
   ###
   # Monetasa UI
@@ -57,6 +69,8 @@ services:
     restart: on-failure
     ports:
       - 3000:3000
+    networks:
+      - monetasa-net
   ###
   # Nginx
   ###
@@ -76,3 +90,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      # Our network is called "monetasa-net"
+      - monetasa-net
+
+networks:
+  fabric_monetasa-bc-net:
+    external: true
+  monetasa-net:
+    driver: bridge
