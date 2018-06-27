@@ -10,5 +10,4 @@ RUN apk update \
 FROM golang:1.10-alpine
 RUN apk update && apk add libltdl
 COPY --from=builder /exe /
-COPY --from=builder /go/src/monetasa/config/ /config/
 ENTRYPOINT ["/exe"]
