@@ -20,6 +20,6 @@ type FabricSetup struct {
 // FabricNetwork specifies an fabric account persistence API.
 type FabricNetwork interface {
 	Initialize() error
-	CreateUser(string, string) error
+	CreateUser(*User) error
 	Balance(string) (uint64, error)
 }

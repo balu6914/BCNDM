@@ -12,6 +12,8 @@ type User struct {
 	Password string        `json:"password"`
 	ID       bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
 	Balance  uint64        `json:"balance"`
+	PubCert  []byte        `json:"pub_cert"`
+	PrivCert []byte        `json:"priv_cert"`
 }
 
 // Validate returns an error if user representation is invalid.

@@ -41,7 +41,12 @@ func (ms *authService) Register(user User) error {
 	}
 
 	// Create New user in Fabric network calling fabric-ca
-	err = ms.fabric.CreateUser(u.ID.Hex(), u.Password)
+	err = ms.fabric.CreateUser(&u)
+	if err != nil {
+		return err
+	}
+
+	err = ms.users.Update(u)
 	if err != nil {
 		return err
 	}
