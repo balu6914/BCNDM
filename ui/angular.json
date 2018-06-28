@@ -24,7 +24,12 @@
               "src/assets/styles/app.scss",
               "node_modules/animate.css/animate.min.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/styles"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -126,5 +131,6 @@
     "@schematics/angular:directive": {
       "prefix": "app"
     }
-  }
+  },
+
 }

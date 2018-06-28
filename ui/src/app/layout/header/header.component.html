@@ -2,6 +2,92 @@
 [speed]="200" [showSpinner]="true" [direction]="'leftToRightIncreased'"
 [color]="'#2196f3'" [trickleSpeed]="250" [thick]="false" [ease]="'linear'"
 ></ng-progress>
+
+
+
+<nav class="topbar js-topbar">
+  <div class="container-fluid">
+    <div class="topbar__wrapper">
+      <a class="topbar__brand" href="index.html"></a>
+      <div class="topbar__collapse">
+        <ul *ngIf="isLoggedin && user"  class="topbar__menu">
+          <li class="topbar__item">
+            <a href="dashboard.html" class="topbar__link{% if menu_active == 'dashboard' %} topbar__link--selected{% endif %}">
+              <span class="topbar__icon topbar__icon--dashboard"></span>
+              Dashboard
+            </a>
+          </li>
+          <li class="topbar__item">
+            <a href="sell-stream.html" class="topbar__link{% if menu_active == 'sell-stream' %} topbar__link--selected{% endif %}">
+              <span class="topbar__icon topbar__icon--sell"></span>
+              Sell stream
+            </a>
+          </li>
+          <li class="topbar__item">
+            <a href="buy-stream.html" class="topbar__link{% if menu_active == 'buy-stream' %} topbar__link--selected{% endif %}">
+              <span class="topbar__icon topbar__icon--buy"></span>
+              Buy stream
+            </a>
+          </li>
+          <li class="topbar__item">
+            <a href="smart-contract.html" class="topbar__link{% if menu_active == 'smart-contract' %} topbar__link--selected{% endif %}">
+              <span class="topbar__icon topbar__icon--smart"></span>
+              Smart contract
+            </a>
+          </li>
+          <li class="topbar__item">
+            <a href="my-wallet.html" class="topbar__link{% if menu_active == 'my-wallet' %} topbar__link--selected{% endif %}">
+              <span class="topbar__icon topbar__icon--wallet"></span>
+              My wallet
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="isLoggedin && user"  class="wallet-balance">
+        <div class="wallet-balance__title">
+          Wallet balance
+        </div>
+        <div class="wallet-balance__amount">
+          52.765123 TAS
+        </div>
+      </div>
+      <div *ngIf="isLoggedin && user"  class="user">
+        <div class="dropdown">
+          <a class="user__toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="user__toggle-icon"></span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" href="#">
+              <span class="user__icon user__icon--settings"></span>
+              Settings
+            </a>
+            <a class="dropdown-item" href="#">
+              <span class="user__icon user__icon--logout"></span>
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+
+<!--
+
+
+
+
+
+
+
       <mdl-layout-header class="public-header">
          <mdl-layout-header-row>
              <mdl-layout-title class="title">
@@ -9,7 +95,7 @@
              </mdl-layout-title>
             <mdl-layout-spacer></mdl-layout-spacer>
             <!-- Navigation. We hide it in small screens. -->
-            <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <!-- <nav class="mdl-navigation mdl-layout--large-screen-only">
                <a *ngIf="!isLoggedin" href="" class="mdl-navigation__link" >ABOUT</a>
                <a *ngIf="!isLoggedin" href="" class="mdl-navigation__link" >CONTACT</a>
                <div  *ngIf="isLoggedin && user" class="header-user-menu">
@@ -21,4 +107,4 @@
                </div>
             </nav>
          </mdl-layout-header-row>
-      </mdl-layout-header>
+      </mdl-layout-header> -->

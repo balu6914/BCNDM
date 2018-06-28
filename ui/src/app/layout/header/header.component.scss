@@ -1,18 +1,314 @@
-mdl-layout-header.public-header{
-  background-color: #fff; // change this for color
-  color: rgb(33,150,243);
-  a {
-      color: rgb(33,150,243);
+@import '~bootstrap/scss/bootstrap-grid.scss';
+@import '_vars';
+
+$topbar-height: 71px;
+$topbar-height-mobile: 60px;
+
+.topbar {
+
+  $d: &;
+
+  // margin-bottom: 25px;
+  background-color: #fff;
+  box-shadow: 0 1px 0 0 #DFE9F7;
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    min-height: $topbar-height;
   }
-  .title {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
+  &__brand {
+    display: inline-block;
+    background: url(#{$asset-path}/img/logo.svg) 0 0 no-repeat;
+    width: 103px;
+    height: 20px;
+    background-size: 103px 20px;
+    @include media-breakpoint-up(sm) {
+      width: 129px;
+      height: 25px;
+      background-size: 129px 25px;
+    }
   }
-}
-mdl-layout-header.public-header mdl-layout-header-row{
-  height: inherit;
+  &__toggler {
+    display: none;
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
+  &__toggler-line {
+  }
+  &__collapse {
+    display: none;
+  }
+  &__menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  &__item {
+  }
+  &__link {
+    display: block;
+    font-weight: $font-weight-medium;
+    font-size: 12px;
+    color: $text-color-1;
+    text-align: center;
+    padding: 0 5px 3px 5px;
+    margin-top: 3px;
+    position: relative;
+    transition: $transition-base;
+    &:hover {
+      text-decoration: none;
+      color: $body-color;
+    }
+  }
+  &__link:before {
+    opacity: 0;
+    position: absolute;
+    content: '';
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: theme-color("primary");
+    transition: $transition-base;
+  }
+  &__link:hover,
+  &__link--selected {
+    &:before {
+      opacity: 1;
+    }
+  }
+  &__link--selected {
+    color: $body-color;
+  }
+  &--right {
+
+  }
+  &__icon {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 8px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 18px;
+    height: 18px;
+    :hover > &,
+    #{$d}__link--selected & {
+      background-position: 0 100%;
+    }
+    &--dashboard {
+      background-image: url(#{$asset-path}/img/icons/dashboard.svg);
+      width: 17px;
+    }
+    &--sell {
+      background-image: url(#{$asset-path}/img/icons/sell.svg);
+    }
+    &--buy {
+      background-image: url(#{$asset-path}/img/icons/buy.svg);
+    }
+    &--smart {
+      background-image: url(#{$asset-path}/img/icons/smart.svg);
+      width: 16px;
+    }
+    &--wallet {
+      background-image: url(#{$asset-path}/img/icons/wallet.svg);
+      :hover > &,
+      #{$d}__link--selected & {
+        background-position: 0 calc(100% - 2px);
+      }
+    }
+  }
+
+  @include media-breakpoint-down(sm) {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+
+    &__brand {
+      margin-right: auto;
+    }
+    &__collapse {
+      display: block;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: $topbar-height-mobile;
+      z-index: 5;
+      background-color: white;
+      box-shadow: 0 -1px 0 0 #DFE9F7;
+    }
+    &__menu {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 5px;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    &__link {
+      font-size: 10px;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    &__brand {
+      margin-right: 45px;
+    }
+    &__menu {
+      flex-direction: row;
+    }
+    &__collapse {
+      display: block;
+      margin-right: auto;
+    }
+    &__item {
+      margin-right: 2rem;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    &__brand {
+      margin-right: 90px;
+    }
+  }
 }
 
-.header-user-menu {
-    padding-right: 10px;
+.wallet-balance {
+
+  margin-left: 1rem;
+  margin-right: 1rem;
+
+  &__title {
+    font-weight: $font-weight-medium;
+    font-size: 12px;
+    color: $text-color-1;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  &__amount {
+    font-weight: $font-weight-semi-bold;
+    font-size: 16px;
+    line-height: 1.1;
+  }
+
+  display: none;
+  @include media-breakpoint-up(lg) {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+.user {
+  $c: &;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid #DFE9F7;
+  height: $topbar-height;
+  padding-left: 1rem;
+  .btn {
+    font-weight: $font-weight-medium;
+    color: $body-color;
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .dropdown-menu {
+    margin-top: 25px;
+    border: none;
+    padding-top: 0;
+    padding-bottom: 0;
+    min-width: 200px;
+    box-shadow: 0 4px 10px 0 rgba(53,62,76,0.15);
+  }
+  .dropdown-item {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    &:hover {
+      background-color: #DFE9F7;
+    }
+  }
+  &__icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 16px;
+    height: 16px;
+    &--settings {
+      background-image: url(#{$asset-path}/img/icons/settings.svg);
+    }
+    &--logout {
+      background-image: url(#{$asset-path}/img/icons/logout.svg);
+    }
+  }
+  .dropdown-item:hover {
+    #{$c}__icon {
+      background-position: 0 100%;
+    }
+  }
+  &__toggle-icon {
+    display: block;
+    background: url(#{$asset-path}/img/icons/user.svg) 50% 50% no-repeat;
+    background-color: rgba(0, 125, 255, .1);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    transition: $transition-base;
+    :hover > & {
+      background-color: rgba(0, 125, 255, .25);
+    }
+  }
+  &__toggle {
+    display: block;
+    position: relative;
+    padding-right: 20px;
+    &:before {
+      display: block;
+      content: '';
+      position: absolute;
+      top: 50%;
+      margin-top: -3px;
+      right: 0;
+      background: url(#{$asset-path}/img/icons/arrow-down.svg) 0 0 no-repeat;
+      width: 9px;
+      height: 6px;
+      :hover > & {
+        background-position: 0 100%;
+      }
+    }
+  }
+
+}
+
+.topbar.topbar--fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+// when the topbar is fixed we should also add some padding to body tag as well - most likely that should be height of the topbar
+// + add some bottom space on the desktop as well
+
+
+body {
+  @include media-breakpoint-down(sm) {
+    padding-top: $topbar-height;
+    padding-bottom: $topbar-height-mobile;
+  }
+  @include media-breakpoint-up(md) {
+    padding-bottom: 4rem;
+  }
 }
