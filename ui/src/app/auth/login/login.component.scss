@@ -1,31 +1,146 @@
-@import '../../../assets/styles/_vars.scss';
+// @import '../../../assets/styles/_vars.scss';
+//
+// .login-container {
+//     margin: 0px auto;
+//     width: 400px;
+//     margin-top: 100px;
+//     padding: 80px;
+//     border: 1px solid rgb(33,150,243);
+//     background-color: #fff;
+//
+//     .mdl-textfield {
+//         width: 100%;
+//     }
+//
+//     button {
+//         width: 100%;
+//     }
+//     a {
+//         color: rgb(33,150,243);
+//     }
+//
+//      @media screen and (max-width: $break-middle) {
+//          width: 60%;
+//          padding: 15%;
+//      }
+//      @media screen and (max-width: $break-small) {
+//          width: 80%;
+//          padding: 5%;
+//      }
+//
+// }
+//
+//
 
-.login-container {
-    margin: 0px auto;
-    width: 400px;
-    margin-top: 100px;
-    padding: 80px;
-    border: 1px solid rgb(33,150,243);
-    background-color: #fff;
+/*
+  Theming Bootstrap
+  Based on http://getbootstrap.com/docs/4.1/getting-started/theming/
+*/
 
-    .mdl-textfield {
-        width: 100%;
+// Variable overrides
+@import "../../../assets/styles/_vars.scss";
+
+// Bootstrap and its default variables
+@import "node_modules/bootstrap/scss/bootstrap";
+
+// Custom Styles
+
+body {
+  font-weight: $font-weight-medium;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+html,
+body {
+  height: 100%;
+}
+
+.btn {
+  font-weight: $font-weight-medium;
+}
+
+.wrapper {
+  padding: 60px 0;
+  @include media-breakpoint-up(sm) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 60px 0 120px 0;
+    min-height: 100%;
+  }
+  @include media-breakpoint-up(lg) {
+    padding-bottom: 160px;
+  }
+}
+
+// Logo
+
+.logo {
+  background: url('../../../assets/img/logo.svg') 0 0 no-repeat;
+  width: 129px;
+  height: 25px;
+  background-size: 129px 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 60px;
+  @include media-breakpoint-up(sm) {
+    margin-bottom: 80px;
+    width: 180px;
+    height: 35px;
+    background-size: 180px 35px;
+  }
+}
+
+/*
+  Sign In
+  Forgot Password
+  Sign Up
+*/
+
+.box {
+  width: 370px;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fff;
+  padding: 1rem;
+  box-shadow: 0px 4px 32px 0px rgba(220,226,230,1);
+  .col-form-label {
+    font-size: 12px;
+    color: #8291A7;
+    padding-right: 0;
+    @include media-breakpoint-up(sm) {
+      text-align: right;
     }
-
-    button {
-        width: 100%;
+  }
+  .col-form-label-2-rows {
+    @include media-breakpoint-up(sm) {
+      line-height: 1;
     }
-    a {
-        color: rgb(33,150,243);
-    }
-
-     @media screen and (max-width: $break-middle) {
-         width: 60%;
-         padding: 15%;
-     }
-     @media screen and (max-width: $break-small) {
-         width: 80%;
-         padding: 5%;
-     }
-
+  }
+  .btn {
+    margin-bottom: 15px;
+  }
+}
+.box__title {
+}
+.form-control {
+  font-weight: $font-weight-base;
+}
+.box__forgot {
+  font-size: 12px;
+  text-align: right;
+}
+.box__forgot-link {
+  color: #8291A7;
+}
+.box__action {
+  font-size: 12px;
+  margin-bottom: 0;
+  font-weight: $font-weight-semi-bold;
+  text-align: center;
+}
+.box__action-link--dark {
+  color: $body-color;
 }

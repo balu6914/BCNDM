@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="55px" viewBox="0 0 36 55" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 17</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-48.5%" y="-213.6%" width="197.1%" height="527.2%" filterUnits="objectBoundingBox" id="filter-1">
+            <feGaussianBlur stdDeviation="3.56026786" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-17" transform="translate(3.000000, 0.000000)">
+            <ellipse id="Oval-3" fill="#6F829F" opacity="0.9" filter="url(#filter-1)" cx="15" cy="43.5" rx="11" ry="2.5"></ellipse>
+            <g id="Group-16">
+                <path d="M15,42.3916016 C25,29.6533814 30,20.5228475 30,15 C30,6.71572875 23.2842712,0 15,0 C6.71572875,0 0,6.71572875 0,15 C0,20.5228475 5,29.6533814 15,42.3916016 Z" id="Oval-2" fill="#06D2D8"></path>
+                <circle id="Oval-2" fill="#10B1B6" cx="15" cy="15" r="12"></circle>
+            </g>
+            <g id="thermometer" transform="translate(11.000000, 7.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M6.66665625,9.01853125 L6.66665625,2.66665625 C6.66665625,1.19390625 5.47275,0 4,0 C2.52725,0 1.33334375,1.19390625 1.33334375,2.66665625 L1.33334375,9.0185 C0.515,9.7509375 0,10.8153438 0,12 C0,14.2091562 1.790875,16 4,16 C6.209125,16 8,14.2091562 8,12 C8,10.8153438 7.485,9.7509375 6.66665625,9.01853125 Z M4,14.6666562 C2.52725,14.6666562 1.33334375,13.47275 1.33334375,12 C1.33334375,11.2300937 1.659625,10.515875 2.2225625,10.0120312 L2.6666875,9.61453125 L2.6666875,2.66665625 C2.6666875,1.93028125 3.26365625,1.3333125 4.00003125,1.3333125 C4.73640625,1.3333125 5.333375,1.93025 5.333375,2.66665625 L5.333375,9.61453125 L5.7775,10.0120312 C6.3404375,10.515875 6.66671875,11.2300625 6.66671875,12 C6.66665625,13.47275 5.47275,14.6666562 4,14.6666562 Z" id="Shape"></path>
+                <rect id="Rectangle-path" x="3.38461538" y="5.33333333" width="1.33333333" height="8"></rect>
+                <circle id="Oval" cx="3.94871795" cy="12.0512821" r="2"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

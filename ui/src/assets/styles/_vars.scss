@@ -4,3 +4,43 @@
  $break-small: 320px;
  $break-middle: 720px;
  $break-large: 1200px;
+
+
+ /*
+   Variable overrides
+   http://getbootstrap.com/docs/4.1/getting-started/theming/#variable-defaults
+ */
+
+ /*
+   IBM Plex Sans Condensed
+   400 Regular
+   500 Medium
+   600 Semi Bold
+   700 Bold
+ */
+
+ // Body
+ $body-bg: #F3F7FA;
+ $body-color: #353E4C;
+
+ // Fonts
+ $font-family-sans-serif: 'IBM Plex Sans Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+ $font-weight-medium: 500;
+ $font-weight-base: 500;
+ $font-weight-semi-bold: 600;
+ $font-size-base: 0.875rem;
+
+ // Options
+ $enable-rounded: false;
+
+ // Buttons + Forms
+ $input-btn-padding-y: .5rem;
+
+ // Buttons
+ $btn-padding-y: .688rem;
+ $btn-padding-x: .9375rem;
+ $input-btn-padding-y-sm: .125rem;
+
+ // MISC
+ $text-color-1: #9EAFC8;
+ $text-color-2: #8291A7;
