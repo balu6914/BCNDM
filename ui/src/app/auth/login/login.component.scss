@@ -1,49 +1,5 @@
-// @import '../../../assets/styles/_vars.scss';
-//
-// .login-container {
-//     margin: 0px auto;
-//     width: 400px;
-//     margin-top: 100px;
-//     padding: 80px;
-//     border: 1px solid rgb(33,150,243);
-//     background-color: #fff;
-//
-//     .mdl-textfield {
-//         width: 100%;
-//     }
-//
-//     button {
-//         width: 100%;
-//     }
-//     a {
-//         color: rgb(33,150,243);
-//     }
-//
-//      @media screen and (max-width: $break-middle) {
-//          width: 60%;
-//          padding: 15%;
-//      }
-//      @media screen and (max-width: $break-small) {
-//          width: 80%;
-//          padding: 5%;
-//      }
-//
-// }
-//
-//
-
-/*
-  Theming Bootstrap
-  Based on http://getbootstrap.com/docs/4.1/getting-started/theming/
-*/
-
-// Variable overrides
-@import "../../../assets/styles/_vars.scss";
-
-// Bootstrap and its default variables
-@import "node_modules/bootstrap/scss/bootstrap";
-
-// Custom Styles
+@import "_vars.scss";
+@import "~bootstrap/scss/bootstrap";
 
 body {
   font-weight: $font-weight-medium;

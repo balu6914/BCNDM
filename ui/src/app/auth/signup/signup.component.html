@@ -1,54 +1,70 @@
-<div class="singup-container animated fadeIn" mdl-shadow="6">
-    <div *ngIf="errorMsg" class="text-center">
-        <span class="error-message ">{{errorMsg}}</span>
-    </div>
-    <form [formGroup]="form">
-      <p>
-        <mdl-textfield
-            label="Email"
-            name="email"
-            type="text"
+<div class="wrapper">
+
+  <div class="logo"></div>
+
+  <div class="box">
+    <p class="box__title">
+      Sign Up
+      <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
+    </p>
+    <form [formGroup]="form" class="needs-validation" novalidate>
+      <div class="form-group row">
+        <label for="staticEmail" class="col-sm-3 col-form-label">Email*</label>
+        <div class="col-sm-9">
+          <input type="email"
             formControlName="email"
-            floating-label
             pattern="^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$"
             error-msg="Please provide a valid email!"
-            (focus)="errorMsg=null">
-        </mdl-textfield>
-      </p>
-      <p>
-        <mdl-textfield
-            label="Password"
-            name="password"
-            type="password"
+            (focus)="errorMsg=null"
+            class="form-control"
+            id="staticEmail"
+            placeholder="Enter email"
+            required>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="inputPassword" class="col-sm-3 col-form-label">Password*</label>
+        <div class="col-sm-9">
+          <input type="password"
             formControlName="password"
             disableNativeValidityChecking
-            [error-msg]="'Please provide a correct password (min length is 5 chars)!'"
-            floating-label>
-        </mdl-textfield>
-      <p>
-        <mdl-textfield
-            label="First Name (optional)"
-            name="first_name"
-            type="text"
+            error-msg="'Please provide a correct password (min length is 5 chars)!'"
+            class="form-control"
+            id="inputPassword"
+            placeholder="**********" required>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="inputRepeatPassword" class="col-sm-3 col-form-label col-form-label-2-rows">Repeat Password*</label>
+        <div class="col-sm-9">
+          <input
+            type="password"
+            class="form-control"
+            id="inputRepeatPassword" required>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="firstName" class="col-sm-3 col-form-label">First name</label>
+        <div class="col-sm-9">
+          <input type="text"
             formControlName="first_name"
-            floating-label>
-        </mdl-textfield>
-      </p>
-      <p>
-        <mdl-textfield
-            label="Last Name (optional)"
-            name="last_name"
-            type="text"
+            class="form-control"
+            id="firstName">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="firstName" class="col-sm-3 col-form-label">Second name</label>
+        <div class="col-sm-9">
+          <input type="text"
             formControlName="last_name"
-            floating-label>
-        </mdl-textfield>
-      </p>
-        <p>
-            <button mdl-button (click)="onSubmit(form.value, form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>SIGNUP</button>
-        </p>
-        <br>
-        <p class="text-center">
-            <span>Do you have an account ? <a routerLink="/login">Login</a></span>
-        </p>
+            class="form-control"
+            id="secondName">
+        </div>
+      </div>
+      <button (click)="onSubmit(form.value, form.valid)" [disabled]="!form.valid" class="btn btn-block btn-primary">Sign Up</button>
     </form>
+    <p class="box__action">
+      Don you have an account? <a routerLink="/login" class="box__action-link">Login</a>
+    </p>
+  </div>
 </div>
