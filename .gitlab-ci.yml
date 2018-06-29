@@ -1,16 +1,25 @@
-image: golang
+image: golang:1.10
 
 stages:
-    # - build
     - develop
-    # - deploy
 
 install_and_test:
   stage: develop
   script:
+    - apt-get update
+    - apt-get -y install libltdl-dev git make unzip
+    - PROTOC_ZIP=protoc-3.5.1-linux-x86_64.zip
+    - curl -0L https://github.com/google/protobuf/releases/download/v3.5.1/$PROTOC_ZIP -o $PROTOC_ZIP
+    - mkdir protoc3
+    - unzip -o $PROTOC_ZIP -d protoc3
+    - mv protoc3/bin/* /usr/local/bin/
+    - mv protoc3/include/* /usr/local/include/
+    - rm -f $PROTOC_ZIP
+    - export PATH=$PATH:/usr/local/bin/protoc
+    - go get -u github.com/golang/protobuf/protoc-gen-go
+    - go get -u google.golang.org/grpc
     - cd /go/src/
     - git clone $CI_REPOSITORY_URL
-    - cd /go/src/monetasa/auth
-    - go test
-    - cd /go/src/monetasa/dapp
-    - go test
+    - cd monetasa
+    - make proto
+    - go test ./... -race
