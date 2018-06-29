@@ -74,9 +74,3 @@ func EncodeKeyValue(key, val string) (string, string) {
 	}
 	return key, val
 }
-
-type contextKey int
-
-const (
-	ContextKeyRequestMethod contextKey = iota
-)
