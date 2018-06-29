@@ -73,32 +73,23 @@ type config struct {
 	FabricChaincodeID   string
 }
 
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return fallback
-	}
-
-	return value
-}
-
 func main() {
 	fullConfPath := fmt.Sprintf("%s%s", os.Getenv("GOPATH"), defFabricConfFile)
 	cfg := config{
-		HTTPPort:            getenv(envHTTPPort, defHTTPPort),
-		GRPCPort:            getenv(envGRPCPort, defGRPCPort),
-		MongoURL:            getenv(envMongoURL, defMongoURL),
-		MongoUser:           getenv(envMongoUser, defMongoUser),
-		MongoPass:           getenv(envMongoPass, defMongoPass),
-		MongoDatabase:       getenv(envMongoDatabase, defMongoDatabase),
+		HTTPPort:            monetasa.Env(envHTTPPort, defHTTPPort),
+		GRPCPort:            monetasa.Env(envGRPCPort, defGRPCPort),
+		MongoURL:            monetasa.Env(envMongoURL, defMongoURL),
+		MongoUser:           monetasa.Env(envMongoUser, defMongoUser),
+		MongoPass:           monetasa.Env(envMongoPass, defMongoPass),
+		MongoDatabase:       monetasa.Env(envMongoDatabase, defMongoDatabase),
 		MongoConnectTimeout: mongoConnectTimeout,
 		MongoSocketTimeout:  mongoSocketTimeout,
-		Secret:              getenv(envSecret, defSecret),
-		FabricOrgAdmin:      getenv(envFabricOrgAdmin, defFabricOrgAdmin),
-		FabricOrgName:       getenv(envFabricOrgName, defFabricOrgName),
-		FabricConfFile:      getenv(envFabricConfFile, fullConfPath),
-		FabricChannelID:     getenv(envFabricChannelID, defFabricChannelID),
-		FabricChaincodeID:   getenv(envFabricChaincodeID, defFabricChaincodeID),
+		Secret:              monetasa.Env(envSecret, defSecret),
+		FabricOrgAdmin:      monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
+		FabricOrgName:       monetasa.Env(envFabricOrgName, defFabricOrgName),
+		FabricConfFile:      monetasa.Env(envFabricConfFile, fullConfPath),
+		FabricChannelID:     monetasa.Env(envFabricChannelID, defFabricChannelID),
+		FabricChaincodeID:   monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
 	}
 
 	logger := log.New(os.Stdout)

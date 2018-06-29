@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package monetasa;
+
+service TransactionsService {
+    rpc CreateUser(User) returns (Key) {}
+}
+
+message User {
+    string id = 1;
+    string secret = 2;
+}
+
+message Key {
+    bytes value = 1;
+}

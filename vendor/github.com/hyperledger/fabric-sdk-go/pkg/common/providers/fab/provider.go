@@ -36,13 +36,21 @@ type InfraProvider interface {
 	Close()
 }
 
+// ChaincodeCall contains the ID of the chaincode as well
+// as an optional set of private data collections that may be
+// accessed by the chaincode.
+type ChaincodeCall struct {
+	ID          string
+	Collections []string
+}
+
 // SelectionService selects peers for endorsement and commit events
 type SelectionService interface {
 	// GetEndorsersForChaincode returns a set of peers that should satisfy the endorsement
 	// policies of all of the given chaincodes.
 	// A set of options may be provided to the selection service. Note that the type of options
 	// may vary depending on the specific selection service implementation.
-	GetEndorsersForChaincode(chaincodeIDs []string, opts ...options.Opt) ([]Peer, error)
+	GetEndorsersForChaincode(chaincodes []*ChaincodeCall, opts ...options.Opt) ([]Peer, error)
 }
 
 // DiscoveryService is used to discover eligible peers on specific channel
@@ -76,10 +84,10 @@ type EndpointConfig interface {
 	PeerConfig(nameOrURL string) (*PeerConfig, bool)
 	NetworkConfig() *NetworkConfig
 	NetworkPeers() []NetworkPeer
-	ChannelConfig(name string) (*ChannelNetworkConfig, bool)
+	ChannelConfig(name string) (*ChannelEndpointConfig, bool)
 	ChannelPeers(name string) ([]ChannelPeer, bool)
 	ChannelOrderers(name string) ([]OrdererConfig, bool)
-	TLSCACertPool(certConfig ...*x509.Certificate) (*x509.CertPool, error)
+	TLSCACertPool() CertPool
 	EventServiceType() EventServiceType
 	TLSClientCerts() []tls.Certificate
 	CryptoConfigPath() string
@@ -147,4 +155,11 @@ type Providers interface {
 	ChannelProvider() ChannelProvider
 	InfraProvider() InfraProvider
 	EndpointConfig() EndpointConfig
+}
+
+// CertPool is a thread safe wrapper around the x509 standard library
+// cert pool implementation.
+type CertPool interface {
+	// Get returns the cert pool, optionally adding the provided certs
+	Get(certs ...*x509.Certificate) (*x509.CertPool, error)
 }

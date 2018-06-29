@@ -9,19 +9,14 @@ package bone
 
 import (
 	"net/http"
-	"net/url"
 	"regexp"
 	"strings"
 )
 
 const (
-	//PARAM value store in Atts if the route have parameters
 	PARAM = 2
-	//SUB value store in Atts if the route is a sub router
-	SUB = 4
-	//WC value store in Atts if the route have wildcard
-	WC = 8
-	//REGEX value store in Atts if the route contains regex
+	SUB   = 4
+	WC    = 8
 	REGEX = 16
 )
 
@@ -61,7 +56,7 @@ func NewRoute(url string, h http.Handler) *Route {
 	return r
 }
 
-// Save, set automatically  the Route.Size and Route.Pattern value
+// Save, set automatically the the Route.Size and Route.Pattern value
 func (r *Route) save() {
 	r.Size = len(r.Path)
 	r.Token.Tokens = strings.Split(r.Path, "/")
@@ -113,7 +108,7 @@ func (r *Route) matchAndParse(req *http.Request) (bool, map[string]string) {
 
 			vars := make(map[string]string, totalSize)
 			for k, v := range r.Pattern {
-				vars[v], _ = url.QueryUnescape(ss[k])
+				vars[v] = ss[k]
 			}
 
 			if r.Atts&REGEX != 0 {
@@ -121,7 +116,7 @@ func (r *Route) matchAndParse(req *http.Request) (bool, map[string]string) {
 					if !v.MatchString(ss[k]) {
 						return false, nil
 					}
-					vars[r.Tag[k]], _ = url.QueryUnescape(ss[k])
+					vars[r.Tag[k]] = ss[k]
 				}
 			}
 
@@ -166,26 +161,6 @@ func (r *Route) matchRawTokens(ss *[]string) bool {
 				return false
 			}
 		}
-		return true
-	}
-	return false
-}
-
-func (r *Route) exists(rw http.ResponseWriter, req *http.Request) bool {
-	if r.Atts != 0 {
-		if r.Atts&SUB != 0 {
-			if len(req.URL.Path) >= r.Size {
-				if req.URL.Path[:r.Size] == r.Path {
-					return true
-				}
-			}
-		}
-
-		if ok, _ := r.matchAndParse(req); ok {
-			return true
-		}
-	}
-	if req.URL.Path == r.Path {
 		return true
 	}
 	return false

@@ -7,7 +7,6 @@ package mockfab
 import (
 	context "context"
 	tls "crypto/tls"
-	x509 "crypto/x509"
 	reflect "reflect"
 	time "time"
 
@@ -39,9 +38,9 @@ func (m *MockEndpointConfig) EXPECT() *MockEndpointConfigMockRecorder {
 }
 
 // ChannelConfig mocks base method
-func (m *MockEndpointConfig) ChannelConfig(arg0 string) (*fab.ChannelNetworkConfig, bool) {
+func (m *MockEndpointConfig) ChannelConfig(arg0 string) (*fab.ChannelEndpointConfig, bool) {
 	ret := m.ctrl.Call(m, "ChannelConfig", arg0)
-	ret0, _ := ret[0].(*fab.ChannelNetworkConfig)
+	ret0, _ := ret[0].(*fab.ChannelEndpointConfig)
 	ret1, _ := ret[1].(bool)
 	return ret0, ret1
 }
@@ -177,20 +176,15 @@ func (mr *MockEndpointConfigMockRecorder) PeersConfig(arg0 interface{}) *gomock.
 }
 
 // TLSCACertPool mocks base method
-func (m *MockEndpointConfig) TLSCACertPool(arg0 ...*x509.Certificate) (*x509.CertPool, error) {
-	varargs := []interface{}{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "TLSCACertPool", varargs...)
-	ret0, _ := ret[0].(*x509.CertPool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+func (m *MockEndpointConfig) TLSCACertPool() fab.CertPool {
+	ret := m.ctrl.Call(m, "TLSCACertPool")
+	ret0, _ := ret[0].(fab.CertPool)
+	return ret0
 }
 
 // TLSCACertPool indicates an expected call of TLSCACertPool
-func (mr *MockEndpointConfigMockRecorder) TLSCACertPool(arg0 ...interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TLSCACertPool", reflect.TypeOf((*MockEndpointConfig)(nil).TLSCACertPool), arg0...)
+func (mr *MockEndpointConfigMockRecorder) TLSCACertPool() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TLSCACertPool", reflect.TypeOf((*MockEndpointConfig)(nil).TLSCACertPool))
 }
 
 // TLSClientCerts mocks base method

@@ -1,8 +1,6 @@
 bone [![GoDoc](https://godoc.org/github.com/squiidz/bone?status.png)](http://godoc.org/github.com/go-zoo/bone) [![Build Status](https://travis-ci.org/go-zoo/bone.svg)](https://travis-ci.org/go-zoo/bone) [![Go Report Card](https://goreportcard.com/badge/go-zoo/bone)](https://goreportcard.com/report/go-zoo/bone)
 =======
 
-[bone on Gitlab](https://gitlab.com/go-zoo/bone)
-
 ## What is bone ?
 
 Bone is a lightweight and lightning fast HTTP Multiplexer for Golang. It support :
@@ -54,7 +52,7 @@ func main () {
   mux.Post("/data", http.HandlerFunc(DataHandler))
 
   // Support REGEX Route params
-  mux.Get("/index/#id^[0-9]$", http.HandlerFunc(IndexHandler))
+  mux.Get("/index/#id^[0-9]$", http.HandleFunc(IndexHandler))
 
   // Handle take http.Handler
   mux.Handle("/", http.HandlerFunc(RootHandler))
@@ -73,10 +71,83 @@ func Handler(rw http.ResponseWriter, req *http.Request) {
 }
 
 ```
+## Changelog
 
-## Blog Posts
-- http://www.peterbe.com/plog/my-favorite-go-multiplexer
-- https://harshladha.xyz/my-first-library-in-go-language-hasty-791b8e2b9e69
+#### Update 10 September 2016
+
+- Add support for go1.7 net.Context
+
+#### Update 25 September 2015
+
+- Add support for Sub router
+
+Example :
+``` go
+func main() {
+    mux := bone.New()
+    sub := mux.NewRouter()
+
+    sub.GetFunc("/test/example", func(rw http.ResponseWriter, req *http.Request) {
+        rw.Write([]byte("From sub router !"))
+    })
+
+    mux.SubRoute("/api", sub)
+
+    http.ListenAndServe(":8080", mux)
+}
+
+```
+
+
+#### Update 26 April 2015
+
+- Add Support for REGEX parameters, using ` # ` instead of ` : `.
+- Add Mux method ` mux.GetFunc(), mux.PostFunc(), etc ... `, takes ` http.HandlerFunc ` instead of ` http.Handler `.
+
+Example :
+``` go
+func main() {
+    mux.GetFunc("/route/#var^[a-z]$", handler)
+}
+
+func handler(rw http.ResponseWriter, req *http.Request) {
+    bone.GetValue(req, "var")
+}
+```
+
+#### Update 29 january 2015
+
+- Speed improvement for url Parameters, from ```~ 1500 ns/op ``` to ```~ 1000 ns/op ```.
+
+#### Update 25 december 2014
+
+After trying to find a way of using the default url.Query() for route parameters, i decide to change the way bone is dealing with this. url.Query() is too slow for good router performance.
+So now to get the parameters value in your handler, you need to use
+` bone.GetValue(req, key) ` instead of ` req.Url.Query().Get(key) `.
+This change give a big speed improvement for every kind of application using route parameters, like ~80x faster ...
+Really sorry for breaking things, but i think it's worth it.  
+
+## TODO
+
+- DOC
+- More Testing
+- Debugging
+- Optimisation
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Write Tests!
+4. Commit your changes (git commit -am 'Add some feature')
+5. Push to the branch (git push origin my-new-feature)
+6. Create new Pull Request
+
+## License
+MIT
+
+## Links
+- Blog post talking about bone : http://www.peterbe.com/plog/my-favorite-go-multiplexer
 
 ## Libs
 - Errors dump for Go : [Trash](https://github.com/go-zoo/trash)

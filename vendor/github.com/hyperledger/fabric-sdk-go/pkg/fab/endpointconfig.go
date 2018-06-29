@@ -20,7 +20,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	commtls "github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/cryptoutil"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
@@ -65,20 +64,8 @@ func ConfigFromBackend(coreBackend ...core.ConfigBackend) (fab.EndpointConfig, e
 		channelMatchers: make(map[int]*regexp.Regexp),
 	}
 
-	if err := config.loadNetworkConfiguration(); err != nil {
+	if err := config.loadEndpointConfiguration(); err != nil {
 		return nil, errors.WithMessage(err, "network configuration load failed")
-	}
-
-	config.tlsCertPool = commtls.NewCertPool(config.backend.GetBool("client.tlsCerts.systemCertPool"))
-
-	// preemptively add all TLS certs to cert pool as adding them at request time
-	// is expensive
-	certs, err := config.loadTLSCerts()
-	if err != nil {
-		logger.Infof("could not cache TLS certs: %s", err)
-	}
-	if _, err := config.TLSCACertPool(certs...); err != nil {
-		return nil, errors.WithMessage(err, "cert pool load failed")
 	}
 
 	//print deprecated warning
@@ -91,7 +78,7 @@ func ConfigFromBackend(coreBackend ...core.ConfigBackend) (fab.EndpointConfig, e
 type EndpointConfig struct {
 	backend                  *lookup.ConfigLookup
 	networkConfig            *fab.NetworkConfig
-	tlsCertPool              commtls.CertPool
+	tlsCertPool              fab.CertPool
 	entityMatchers           *entityMatchers
 	peerConfigsByOrg         map[string][]fab.PeerConfig
 	networkPeers             []fab.NetworkPeer
@@ -104,9 +91,18 @@ type EndpointConfig struct {
 	channelMatchers          map[int]*regexp.Regexp
 }
 
+//endpointConfigEntity contains endpoint config elements needed by endpointconfig
+type endpointConfigEntity struct {
+	Client        ClientConfig
+	Channels      map[string]ChannelEndpointConfig
+	Organizations map[string]OrganizationConfig
+	Orderers      map[string]OrdererConfig
+	Peers         map[string]PeerConfig
+}
+
 //entityMatchers for endpoint configuration
 type entityMatchers struct {
-	matchers map[string][]fab.MatchConfig
+	matchers map[string][]MatchConfig
 }
 
 // Timeout reads timeouts for the given timeout type, if type is not found in the config
@@ -136,7 +132,7 @@ func (c *EndpointConfig) OrdererConfig(nameOrURL string) (*fab.OrdererConfig, bo
 
 	if !ok {
 		logger.Debugf("Could not find Orderer for [%s], trying with Entity Matchers", nameOrURL)
-		matchingOrdererConfig := c.tryMatchingOrdererConfig(c.networkConfig, strings.ToLower(nameOrURL))
+		matchingOrdererConfig := c.tryMatchingOrdererConfig(strings.ToLower(nameOrURL))
 		if matchingOrdererConfig == nil {
 			return nil, false
 		}
@@ -165,7 +161,7 @@ func (c *EndpointConfig) PeerConfig(nameOrURL string) (*fab.PeerConfig, bool) {
 	} else {
 		for _, staticPeerConfig := range c.networkConfig.Peers {
 			if strings.EqualFold(staticPeerConfig.URL, nameOrURL) {
-				matchPeerConfig = c.tryMatchingPeerConfig(c.networkConfig, nameOrURL)
+				matchPeerConfig = c.tryMatchingPeerConfig(nameOrURL)
 				if matchPeerConfig == nil {
 					matchPeerConfig = &staticPeerConfig
 				}
@@ -178,7 +174,7 @@ func (c *EndpointConfig) PeerConfig(nameOrURL string) (*fab.PeerConfig, bool) {
 	if matchPeerConfig == nil {
 		logger.Debugf("Could not find Peer for name/url [%s], trying with Entity Matchers", nameOrURL)
 		//try to match nameOrURL with peer entity matchers
-		matchPeerConfig = c.tryMatchingPeerConfig(c.networkConfig, nameOrURL)
+		matchPeerConfig = c.tryMatchingPeerConfig(nameOrURL)
 	}
 
 	if matchPeerConfig == nil {
@@ -240,7 +236,7 @@ func (c *EndpointConfig) mappedChannelName(networkConfig *fab.NetworkConfig, cha
 }
 
 // ChannelConfig returns the channel configuration
-func (c *EndpointConfig) ChannelConfig(name string) (*fab.ChannelNetworkConfig, bool) {
+func (c *EndpointConfig) ChannelConfig(name string) (*fab.ChannelEndpointConfig, bool) {
 
 	// get the mapped channel Name
 	mappedChannelName := c.mappedChannelName(c.networkConfig, name)
@@ -282,8 +278,8 @@ func (c *EndpointConfig) ChannelOrderers(name string) ([]fab.OrdererConfig, bool
 
 // TLSCACertPool returns the configured cert pool. If a certConfig
 // is provided, the certificate is added to the pool
-func (c *EndpointConfig) TLSCACertPool(certs ...*x509.Certificate) (*x509.CertPool, error) {
-	return c.tlsCertPool.Get(certs...)
+func (c *EndpointConfig) TLSCACertPool() fab.CertPool {
+	return c.tlsCertPool
 }
 
 // EventServiceType returns the type of event service client to use
@@ -304,7 +300,7 @@ func (c *EndpointConfig) TLSClientCerts() []tls.Certificate {
 	return c.tlsClientCerts
 }
 
-func (c *EndpointConfig) loadPrivateKeyFromConfig(clientConfig *msp.ClientConfig, clientCerts tls.Certificate, cb []byte) ([]tls.Certificate, error) {
+func (c *EndpointConfig) loadPrivateKeyFromConfig(clientConfig *ClientConfig, clientCerts tls.Certificate, cb []byte) ([]tls.Certificate, error) {
 
 	kb := clientConfig.TLSCerts.Client.Key.Bytes()
 
@@ -428,60 +424,50 @@ func (c *EndpointConfig) getTimeout(tType fab.TimeoutType) time.Duration { //nol
 	return timeout
 }
 
-func (c *EndpointConfig) loadNetworkConfiguration() error {
+func (c *EndpointConfig) loadEndpointConfiguration() error {
 
-	networkConfig := fab.NetworkConfig{}
-	networkConfig.Name = c.backend.GetString("name")
-	networkConfig.Description = c.backend.GetString("description")
-	networkConfig.Version = c.backend.GetString("version")
+	endpointConfigEntity := endpointConfigEntity{}
 
-	err := c.backend.UnmarshalKey("client", &networkConfig.Client)
-	logger.Debugf("Client is: %+v", networkConfig.Client)
+	err := c.backend.UnmarshalKey("client", &endpointConfigEntity.Client)
+	logger.Debugf("Client is: %+v", endpointConfigEntity.Client)
 	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'client' config item to networkConfig.Client type")
+		return errors.WithMessage(err, "failed to parse 'client' config item to endpointConfigEntity.Client type")
 	}
 
-	err = c.backend.UnmarshalKey("channels", &networkConfig.Channels, lookup.WithUnmarshalHookFunction(peerChannelConfigHookFunc()))
-	logger.Debugf("channels are: %+v", networkConfig.Channels)
+	err = c.backend.UnmarshalKey("channels", &endpointConfigEntity.Channels, lookup.WithUnmarshalHookFunction(peerChannelConfigHookFunc()))
+	logger.Debugf("channels are: %+v", endpointConfigEntity.Channels)
 	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'channels' config item to networkConfig.Channels type")
+		return errors.WithMessage(err, "failed to parse 'channels' config item to endpointConfigEntity.Channels type")
 	}
 
-	err = c.backend.UnmarshalKey("organizations", &networkConfig.Organizations)
-	logger.Debugf("organizations are: %+v", networkConfig.Organizations)
+	err = c.backend.UnmarshalKey("organizations", &endpointConfigEntity.Organizations)
+	logger.Debugf("organizations are: %+v", endpointConfigEntity.Organizations)
 	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'organizations' config item to networkConfig.Organizations type")
+		return errors.WithMessage(err, "failed to parse 'organizations' config item to endpointConfigEntity.Organizations type")
 	}
 
-	err = c.backend.UnmarshalKey("orderers", &networkConfig.Orderers)
-	logger.Debugf("orderers are: %+v", networkConfig.Orderers)
+	err = c.backend.UnmarshalKey("orderers", &endpointConfigEntity.Orderers)
+	logger.Debugf("orderers are: %+v", endpointConfigEntity.Orderers)
 	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'orderers' config item to networkConfig.Orderers type")
+		return errors.WithMessage(err, "failed to parse 'orderers' config item to endpointConfigEntity.Orderers type")
 	}
 
-	err = c.backend.UnmarshalKey("peers", &networkConfig.Peers)
-	logger.Debugf("peers are: %+v", networkConfig.Peers)
+	err = c.backend.UnmarshalKey("peers", &endpointConfigEntity.Peers)
+	logger.Debugf("peers are: %+v", endpointConfigEntity.Peers)
 	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'peers' config item to networkConfig.Peers type")
-	}
-
-	err = c.backend.UnmarshalKey("certificateAuthorities", &networkConfig.CertificateAuthorities)
-	logger.Debugf("certificateAuthorities are: %+v", networkConfig.CertificateAuthorities)
-	if err != nil {
-		return errors.WithMessage(err, "failed to parse 'certificateAuthorities' config item to networkConfig.CertificateAuthorities type")
+		return errors.WithMessage(err, "failed to parse 'peers' config item to endpointConfigEntity.Peers type")
 	}
 
 	//load all endpointconfig entities
-	err = c.loadEndpointConfigEntities(&networkConfig)
+	err = c.loadEndpointConfigEntities(&endpointConfigEntity)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load channel configs")
 	}
 
-	c.networkConfig = &networkConfig
 	return nil
 }
 
-func (c *EndpointConfig) loadEndpointConfigEntities(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadEndpointConfigEntities(configEntity *endpointConfigEntity) error {
 
 	//Compile the entityMatchers
 	matchError := c.compileMatchers()
@@ -489,62 +475,159 @@ func (c *EndpointConfig) loadEndpointConfigEntities(networkConfig *fab.NetworkCo
 		return matchError
 	}
 
-	//load all TLS configs
-	err := c.loadAllTLSConfig(networkConfig)
+	//load network config
+	err := c.loadNetworkConfig(configEntity)
 	if err != nil {
-		return errors.WithMessage(err, "failed to load network TLSConfig")
+		return errors.WithMessage(err, "failed to network config")
 	}
 
 	//load peer configs by org dictionary
-	c.loadPeerConfigsByOrg(networkConfig)
+	c.loadPeerConfigsByOrg()
 
 	//load network peers
-	c.loadNetworkPeers(networkConfig)
+	c.loadNetworkPeers()
 
 	//load orderer configs
-	err = c.loadOrdererConfigs(networkConfig)
+	err = c.loadOrdererConfigs()
 	if err != nil {
 		return errors.WithMessage(err, "failed to load orderer configs")
 	}
 
 	//load channel peers
-	err = c.loadChannelPeers(networkConfig)
+	err = c.loadChannelPeers()
 	if err != nil {
 		return errors.WithMessage(err, "failed to load channel peers")
 	}
 
 	//load channel orderers
-	err = c.loadChannelOrderers(networkConfig)
+	err = c.loadChannelOrderers()
 	if err != nil {
 		return errors.WithMessage(err, "failed to load channel orderers")
+	}
+
+	//load tls cert pool
+	err = c.loadTLSCertPool()
+	if err != nil {
+		return errors.WithMessage(err, "failed to load TLS cert pool")
 	}
 
 	return nil
 }
 
+func (c *EndpointConfig) loadNetworkConfig(configEntity *endpointConfigEntity) error {
+
+	//load all TLS configs, before building network config
+	err := c.loadAllTLSConfig(configEntity)
+	if err != nil {
+		return errors.WithMessage(err, "failed to load network TLSConfig")
+	}
+
+	networkConfig := fab.NetworkConfig{}
+
+	//Channels
+	networkConfig.Channels = make(map[string]fab.ChannelEndpointConfig)
+	for chID, chNwCfg := range configEntity.Channels {
+
+		chPeers := make(map[string]fab.PeerChannelConfig)
+		for chPeer, chPeerCfg := range chNwCfg.Peers {
+			chPeers[chPeer] = fab.PeerChannelConfig{
+				EndorsingPeer:  chPeerCfg.EndorsingPeer,
+				ChaincodeQuery: chPeerCfg.ChaincodeQuery,
+				LedgerQuery:    chPeerCfg.LedgerQuery,
+				EventSource:    chPeerCfg.EventSource,
+			}
+		}
+
+		networkConfig.Channels[chID] = fab.ChannelEndpointConfig{
+			Peers:    chPeers,
+			Orderers: chNwCfg.Orderers,
+			Policies: fab.ChannelPolicies{
+				QueryChannelConfig: fab.QueryChannelConfigPolicy{
+					RetryOpts:    chNwCfg.Policies.QueryChannelConfig.RetryOpts,
+					MaxTargets:   chNwCfg.Policies.QueryChannelConfig.MaxTargets,
+					MinResponses: chNwCfg.Policies.QueryChannelConfig.MinResponses,
+				},
+			},
+		}
+	}
+
+	//Organizations
+	networkConfig.Organizations = make(map[string]fab.OrganizationConfig)
+	for orgName, orgConfig := range configEntity.Organizations {
+
+		tlsKeyCertPairs := make(map[string]fab.CertKeyPair)
+		for user, tlsKeyPair := range orgConfig.Users {
+			tlsKeyCertPairs[user] = fab.CertKeyPair{
+				Cert: tlsKeyPair.Cert.Bytes(),
+				Key:  tlsKeyPair.Key.Bytes(),
+			}
+		}
+
+		networkConfig.Organizations[orgName] = fab.OrganizationConfig{
+			MSPID:      orgConfig.MSPID,
+			CryptoPath: orgConfig.CryptoPath,
+			Peers:      orgConfig.Peers,
+			CertificateAuthorities: orgConfig.CertificateAuthorities,
+			Users: tlsKeyCertPairs,
+		}
+
+	}
+
+	//Orderers
+	networkConfig.Orderers = make(map[string]fab.OrdererConfig)
+	for name, ordererConfig := range configEntity.Orderers {
+		tlsCert, _, err := ordererConfig.TLSCACerts.TLSCert()
+		if err != nil {
+			return errors.WithMessage(err, "failed to load orderer network config")
+		}
+		networkConfig.Orderers[name] = fab.OrdererConfig{
+			URL:         ordererConfig.URL,
+			GRPCOptions: ordererConfig.GRPCOptions,
+			TLSCACert:   tlsCert,
+		}
+	}
+
+	//Peers
+	networkConfig.Peers = make(map[string]fab.PeerConfig)
+	for name, peerConfig := range configEntity.Peers {
+		tlsCert, _, err := peerConfig.TLSCACerts.TLSCert()
+		if err != nil {
+			return errors.WithMessage(err, "failed to load network config")
+		}
+		networkConfig.Peers[name] = fab.PeerConfig{
+			URL:         peerConfig.URL,
+			EventURL:    peerConfig.EventURL,
+			GRPCOptions: peerConfig.GRPCOptions,
+			TLSCACert:   tlsCert,
+		}
+	}
+
+	c.networkConfig = &networkConfig
+	return nil
+}
+
 //loadAllTLSConfig pre-loads all network TLS Configs
-func (c *EndpointConfig) loadAllTLSConfig(networkConfig *fab.NetworkConfig) error {
-	err := c.loadClientTLSConfig(networkConfig)
+func (c *EndpointConfig) loadAllTLSConfig(configEntity *endpointConfigEntity) error {
+	//resolve path and load bytes
+	err := c.loadClientTLSConfig(configEntity)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load client TLSConfig ")
 	}
 
-	err = c.loadOrgTLSConfig(networkConfig)
+	//resolve path and load bytes
+	err = c.loadOrgTLSConfig(configEntity)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load org TLSConfig ")
 	}
 
-	err = c.loadOrdererPeerTLSConfig(networkConfig)
+	//resolve path and load bytes
+	err = c.loadOrdererPeerTLSConfig(configEntity)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load orderer/peer TLSConfig ")
 	}
 
-	err = c.loadCATLSConfig(networkConfig)
-	if err != nil {
-		return errors.WithMessage(err, "failed to load CA TLSConfig ")
-	}
-
-	err = c.loadTLSClientCerts(networkConfig)
+	//preload TLS client certs
+	err = c.loadTLSClientCerts(configEntity)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load TLS client certs ")
 	}
@@ -553,21 +636,20 @@ func (c *EndpointConfig) loadAllTLSConfig(networkConfig *fab.NetworkConfig) erro
 }
 
 //loadClientTLSConfig pre-loads all TLSConfig bytes in client config
-func (c *EndpointConfig) loadClientTLSConfig(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadClientTLSConfig(configEntity *endpointConfigEntity) error {
 	//Clients Config
 	//resolve paths and org name
-	networkConfig.Client.Organization = strings.ToLower(networkConfig.Client.Organization)
-	networkConfig.Client.TLSCerts.Path = pathvar.Subst(networkConfig.Client.TLSCerts.Path)
-	networkConfig.Client.TLSCerts.Client.Key.Path = pathvar.Subst(networkConfig.Client.TLSCerts.Client.Key.Path)
-	networkConfig.Client.TLSCerts.Client.Cert.Path = pathvar.Subst(networkConfig.Client.TLSCerts.Client.Cert.Path)
+	configEntity.Client.Organization = strings.ToLower(configEntity.Client.Organization)
+	configEntity.Client.TLSCerts.Client.Key.Path = pathvar.Subst(configEntity.Client.TLSCerts.Client.Key.Path)
+	configEntity.Client.TLSCerts.Client.Cert.Path = pathvar.Subst(configEntity.Client.TLSCerts.Client.Cert.Path)
 
 	//pre load client key and cert bytes
-	err := networkConfig.Client.TLSCerts.Client.Key.LoadBytes()
+	err := configEntity.Client.TLSCerts.Client.Key.LoadBytes()
 	if err != nil {
 		return errors.WithMessage(err, "failed to load client key")
 	}
 
-	err = networkConfig.Client.TLSCerts.Client.Cert.LoadBytes()
+	err = configEntity.Client.TLSCerts.Client.Cert.LoadBytes()
 	if err != nil {
 		return errors.WithMessage(err, "failed to load client cert")
 	}
@@ -576,10 +658,10 @@ func (c *EndpointConfig) loadClientTLSConfig(networkConfig *fab.NetworkConfig) e
 }
 
 //loadOrgTLSConfig pre-loads all TLSConfig bytes in organizations
-func (c *EndpointConfig) loadOrgTLSConfig(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadOrgTLSConfig(configEntity *endpointConfigEntity) error {
 
 	//Organizations Config
-	for org, orgConfig := range networkConfig.Organizations {
+	for org, orgConfig := range configEntity.Organizations {
 		for user, userConfig := range orgConfig.Users {
 			//resolve paths
 			userConfig.Key.Path = pathvar.Subst(userConfig.Key.Path)
@@ -596,17 +678,17 @@ func (c *EndpointConfig) loadOrgTLSConfig(networkConfig *fab.NetworkConfig) erro
 			}
 			orgConfig.Users[user] = userConfig
 		}
-		networkConfig.Organizations[org] = orgConfig
+		configEntity.Organizations[org] = orgConfig
 	}
 
 	return nil
 }
 
 //loadTLSConfig pre-loads all TLSConfig bytes in Orderer and Peer configs
-func (c *EndpointConfig) loadOrdererPeerTLSConfig(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadOrdererPeerTLSConfig(configEntity *endpointConfigEntity) error {
 
 	//Orderers Config
-	for orderer, ordererConfig := range networkConfig.Orderers {
+	for orderer, ordererConfig := range configEntity.Orderers {
 		//resolve paths
 		ordererConfig.TLSCACerts.Path = pathvar.Subst(ordererConfig.TLSCACerts.Path)
 		//pre load key and cert bytes
@@ -614,11 +696,11 @@ func (c *EndpointConfig) loadOrdererPeerTLSConfig(networkConfig *fab.NetworkConf
 		if err != nil {
 			return errors.WithMessage(err, "failed to load orderer cert")
 		}
-		networkConfig.Orderers[orderer] = ordererConfig
+		configEntity.Orderers[orderer] = ordererConfig
 	}
 
 	//Peer Config
-	for peer, peerConfig := range networkConfig.Peers {
+	for peer, peerConfig := range configEntity.Peers {
 		//resolve paths
 		peerConfig.TLSCACerts.Path = pathvar.Subst(peerConfig.TLSCACerts.Path)
 		//pre load key and cert bytes
@@ -626,49 +708,25 @@ func (c *EndpointConfig) loadOrdererPeerTLSConfig(networkConfig *fab.NetworkConf
 		if err != nil {
 			return errors.WithMessage(err, "failed to load peer cert")
 		}
-		networkConfig.Peers[peer] = peerConfig
+		configEntity.Peers[peer] = peerConfig
 	}
 
 	return nil
 }
 
-//loadCATLSConfig pre-loads all TLSConfig bytes in certificate authorities
-func (c *EndpointConfig) loadCATLSConfig(networkConfig *fab.NetworkConfig) error {
-	//CA Config
-	for ca, caConfig := range networkConfig.CertificateAuthorities {
-		//resolve paths
-		caConfig.TLSCACerts.Path = pathvar.Subst(caConfig.TLSCACerts.Path)
-		caConfig.TLSCACerts.Client.Key.Path = pathvar.Subst(caConfig.TLSCACerts.Client.Key.Path)
-		caConfig.TLSCACerts.Client.Cert.Path = pathvar.Subst(caConfig.TLSCACerts.Client.Cert.Path)
-		//pre load key and cert bytes
-		err := caConfig.TLSCACerts.Client.Key.LoadBytes()
-		if err != nil {
-			return errors.WithMessage(err, "failed to load ca key")
-		}
-
-		err = caConfig.TLSCACerts.Client.Cert.LoadBytes()
-		if err != nil {
-			return errors.WithMessage(err, "failed to load ca cert")
-		}
-		networkConfig.CertificateAuthorities[ca] = caConfig
-	}
-
-	return nil
-}
-
-func (c *EndpointConfig) loadPeerConfigsByOrg(networkConfig *fab.NetworkConfig) {
+func (c *EndpointConfig) loadPeerConfigsByOrg() {
 
 	c.peerConfigsByOrg = make(map[string][]fab.PeerConfig)
 
-	for orgName, orgConfig := range networkConfig.Organizations {
+	for orgName, orgConfig := range c.networkConfig.Organizations {
 		orgPeers := orgConfig.Peers
 		peers := []fab.PeerConfig{}
 
 		for _, peerName := range orgPeers {
-			p := networkConfig.Peers[strings.ToLower(peerName)]
+			p := c.networkConfig.Peers[strings.ToLower(peerName)]
 			if err := c.verifyPeerConfig(p, peerName, endpoint.IsTLSEnabled(p.URL)); err != nil {
 				logger.Debugf("Could not verify Peer for [%s], trying with Entity Matchers", peerName)
-				matchingPeerConfig := c.tryMatchingPeerConfig(networkConfig, peerName)
+				matchingPeerConfig := c.tryMatchingPeerConfig(peerName)
 				if matchingPeerConfig == nil {
 					continue
 				}
@@ -682,12 +740,12 @@ func (c *EndpointConfig) loadPeerConfigsByOrg(networkConfig *fab.NetworkConfig) 
 
 }
 
-func (c *EndpointConfig) loadNetworkPeers(networkConfig *fab.NetworkConfig) {
+func (c *EndpointConfig) loadNetworkPeers() {
 
 	var netPeers []fab.NetworkPeer
 	for org, peerConfigs := range c.peerConfigsByOrg {
 
-		orgConfig, ok := networkConfig.Organizations[org]
+		orgConfig, ok := c.networkConfig.Organizations[org]
 		if !ok {
 			continue
 		}
@@ -700,17 +758,17 @@ func (c *EndpointConfig) loadNetworkPeers(networkConfig *fab.NetworkConfig) {
 	c.networkPeers = netPeers
 }
 
-func (c *EndpointConfig) loadOrdererConfigs(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadOrdererConfigs() error {
 
 	ordererConfigs := []fab.OrdererConfig{}
-	for name, ordererConfig := range networkConfig.Orderers {
-		matchedOrderer := c.tryMatchingOrdererConfig(networkConfig, name)
+	for name, ordererConfig := range c.networkConfig.Orderers {
+		matchedOrderer := c.tryMatchingOrdererConfig(name)
 		if matchedOrderer != nil {
 			//if found in entity matcher then use the matched one
 			ordererConfig = *matchedOrderer
 		}
 
-		if len(ordererConfig.TLSCACerts.Bytes()) == 0 && !c.backend.GetBool("client.tlsCerts.systemCertPool") {
+		if ordererConfig.TLSCACert == nil && !c.backend.GetBool("client.tlsCerts.systemCertPool") {
 			//check for TLS config only if secured connection is enabled
 			allowInSecure := ordererConfig.GRPCOptions["allow-insecure"] == true
 			if endpoint.AttemptSecured(ordererConfig.URL, allowInSecure) {
@@ -723,19 +781,19 @@ func (c *EndpointConfig) loadOrdererConfigs(networkConfig *fab.NetworkConfig) er
 	return nil
 }
 
-func (c *EndpointConfig) loadChannelPeers(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadChannelPeers() error {
 
 	channelPeersByChannel := make(map[string][]fab.ChannelPeer)
 
-	for channelID, channelConfig := range networkConfig.Channels {
+	for channelID, channelConfig := range c.networkConfig.Channels {
 		peers := []fab.ChannelPeer{}
 		for peerName, chPeerConfig := range channelConfig.Peers {
 
 			// Get generic peer configuration
-			p, ok := networkConfig.Peers[strings.ToLower(peerName)]
+			p, ok := c.networkConfig.Peers[strings.ToLower(peerName)]
 			if !ok {
 				logger.Debugf("Could not find Peer for [%s], trying with Entity Matchers", peerName)
-				matchingPeerConfig := c.tryMatchingPeerConfig(networkConfig, strings.ToLower(peerName))
+				matchingPeerConfig := c.tryMatchingPeerConfig(strings.ToLower(peerName))
 				if matchingPeerConfig == nil {
 					continue
 				}
@@ -748,7 +806,7 @@ func (c *EndpointConfig) loadChannelPeers(networkConfig *fab.NetworkConfig) erro
 				return err
 			}
 
-			mspID, ok := c.peerMSPID(peerName, networkConfig)
+			mspID, ok := c.peerMSPID(peerName)
 			if !ok {
 				return errors.Errorf("unable to find MSP ID for peer : %s", peerName)
 			}
@@ -767,18 +825,18 @@ func (c *EndpointConfig) loadChannelPeers(networkConfig *fab.NetworkConfig) erro
 	return nil
 }
 
-func (c *EndpointConfig) loadChannelOrderers(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadChannelOrderers() error {
 
 	channelOrderersByChannel := make(map[string][]fab.OrdererConfig)
 
-	for channelID, channelConfig := range networkConfig.Channels {
+	for channelID, channelConfig := range c.networkConfig.Channels {
 		orderers := []fab.OrdererConfig{}
 		for _, ordererName := range channelConfig.Orderers {
-			orderer, ok := networkConfig.Orderers[strings.ToLower(ordererName)]
+			orderer, ok := c.networkConfig.Orderers[strings.ToLower(ordererName)]
 			if !ok {
 				//try entityMatcher
 				logger.Debugf("Could not find Orderer for [%s], trying with Entity Matchers", ordererName)
-				matchingOrdererConfig := c.tryMatchingOrdererConfig(networkConfig, strings.ToLower(ordererName))
+				matchingOrdererConfig := c.tryMatchingOrdererConfig(strings.ToLower(ordererName))
 				if matchingOrdererConfig == nil {
 					return errors.Errorf("Could not find Orderer Config for channel orderer [%s]", ordererName)
 				}
@@ -795,12 +853,29 @@ func (c *EndpointConfig) loadChannelOrderers(networkConfig *fab.NetworkConfig) e
 	return nil
 }
 
+func (c *EndpointConfig) loadTLSCertPool() error {
+
+	c.tlsCertPool = commtls.NewCertPool(c.backend.GetBool("client.tlsCerts.systemCertPool"))
+
+	// preemptively add all TLS certs to cert pool as adding them at request time
+	// is expensive
+	certs, err := c.loadTLSCerts()
+	if err != nil {
+		logger.Infof("could not cache TLS certs: %s", err)
+	}
+
+	if _, err := c.tlsCertPool.Get(certs...); err != nil {
+		return errors.WithMessage(err, "cert pool load failed")
+	}
+	return nil
+}
+
 // loadTLSClientCerts loads the client's certs for mutual TLS
 // It checks the config for embedded pem files before looking for cert files
-func (c *EndpointConfig) loadTLSClientCerts(networkConfig *fab.NetworkConfig) error {
+func (c *EndpointConfig) loadTLSClientCerts(configEntity *endpointConfigEntity) error {
 
 	var clientCerts tls.Certificate
-	cb := networkConfig.Client.TLSCerts.Client.Cert.Bytes()
+	cb := configEntity.Client.TLSCerts.Client.Cert.Bytes()
 	if len(cb) == 0 {
 		// if no cert found in the config, empty cert chain should be used
 		c.tlsClientCerts = []tls.Certificate{clientCerts}
@@ -814,7 +889,7 @@ func (c *EndpointConfig) loadTLSClientCerts(networkConfig *fab.NetworkConfig) er
 	// If CryptoSuite fails to load private key from cert then load private key from config
 	if err != nil || pk == nil {
 		logger.Debugf("Reading pk from config, unable to retrieve from cert: %s", err)
-		tlsClientCerts, err := c.loadPrivateKeyFromConfig(&networkConfig.Client, clientCerts, cb)
+		tlsClientCerts, err := c.loadPrivateKeyFromConfig(&configEntity.Client, clientCerts, cb)
 		if err != nil {
 			return errors.WithMessage(err, "failed to load TLS client certs")
 		}
@@ -842,7 +917,7 @@ func (c *EndpointConfig) getPortIfPresent(url string) (int, bool) {
 	return 0, false
 }
 
-func (c *EndpointConfig) tryMatchingPeerConfig(networkConfig *fab.NetworkConfig, peerName string) *fab.PeerConfig {
+func (c *EndpointConfig) tryMatchingPeerConfig(peerName string) *fab.PeerConfig {
 
 	//Return if no peerMatchers are configured
 	if len(c.peerMatchers) == 0 {
@@ -862,7 +937,7 @@ func (c *EndpointConfig) tryMatchingPeerConfig(networkConfig *fab.NetworkConfig,
 		logger.Debugf("Trying to match peer [%s] with matcher [%s]", peerName, v.String())
 		if v.MatchString(peerName) {
 			logger.Debugf("Peer [%s] matched using matcher [%s]", peerName, v.String())
-			return c.matchPeer(networkConfig, peerName, k, v)
+			return c.matchPeer(peerName, k, v)
 		}
 		logger.Debugf("Peer [%s] did not match using matcher [%s]", peerName, v.String())
 	}
@@ -870,11 +945,11 @@ func (c *EndpointConfig) tryMatchingPeerConfig(networkConfig *fab.NetworkConfig,
 	return nil
 }
 
-func (c *EndpointConfig) matchPeer(networkConfig *fab.NetworkConfig, peerName string, k int, v *regexp.Regexp) *fab.PeerConfig {
+func (c *EndpointConfig) matchPeer(peerName string, k int, v *regexp.Regexp) *fab.PeerConfig {
 	// get the matching matchConfig from the index number
 	peerMatchConfig := c.entityMatchers.matchers["peer"][k]
 	//Get the peerConfig from mapped host
-	peerConfig, ok := networkConfig.Peers[strings.ToLower(peerMatchConfig.MappedHost)]
+	peerConfig, ok := c.networkConfig.Peers[strings.ToLower(peerMatchConfig.MappedHost)]
 	if !ok {
 		return nil
 	}
@@ -948,7 +1023,7 @@ func getPeerConfigURL(c *EndpointConfig, peerName, peerConfigURL string, isPortP
 	return url
 }
 
-func (c *EndpointConfig) tryMatchingOrdererConfig(networkConfig *fab.NetworkConfig, ordererName string) *fab.OrdererConfig {
+func (c *EndpointConfig) tryMatchingOrdererConfig(ordererName string) *fab.OrdererConfig {
 
 	//Return if no ordererMatchers are configured
 	if len(c.ordererMatchers) == 0 {
@@ -966,18 +1041,18 @@ func (c *EndpointConfig) tryMatchingOrdererConfig(networkConfig *fab.NetworkConf
 	for _, k := range keys {
 		v := c.ordererMatchers[k]
 		if v.MatchString(ordererName) {
-			return c.matchOrderer(networkConfig, ordererName, k, v)
+			return c.matchOrderer(ordererName, k, v)
 		}
 	}
 
 	return nil
 }
 
-func (c *EndpointConfig) matchOrderer(networkConfig *fab.NetworkConfig, ordererName string, k int, v *regexp.Regexp) *fab.OrdererConfig {
+func (c *EndpointConfig) matchOrderer(ordererName string, k int, v *regexp.Regexp) *fab.OrdererConfig {
 	// get the matching matchConfig from the index number
 	ordererMatchConfig := c.entityMatchers.matchers["orderer"][k]
 	//Get the ordererConfig from mapped host
-	ordererConfig, ok := networkConfig.Orderers[strings.ToLower(ordererMatchConfig.MappedHost)]
+	ordererConfig, ok := c.networkConfig.Orderers[strings.ToLower(ordererMatchConfig.MappedHost)]
 	if !ok {
 		return nil
 	}
@@ -1127,7 +1202,7 @@ func (c *EndpointConfig) verifyPeerConfig(p fab.PeerConfig, peerName string, tls
 	if p.URL == "" {
 		return errors.Errorf("URL does not exist or empty for peer %s", peerName)
 	}
-	if tlsEnabled && len(p.TLSCACerts.Pem) == 0 && p.TLSCACerts.Path == "" && !c.backend.GetBool("client.tlsCerts.systemCertPool") {
+	if tlsEnabled && p.TLSCACert == nil && !c.backend.GetBool("client.tlsCerts.systemCertPool") {
 		return errors.Errorf("tls.certificate does not exist or empty for peer %s", peerName)
 	}
 	return nil
@@ -1138,23 +1213,13 @@ func (c *EndpointConfig) loadTLSCerts() ([]*x509.Certificate, error) {
 	errs := multi.Errors{}
 
 	for _, peer := range c.networkPeers {
-		cert, ok, err := peer.TLSCACerts.TLSCert()
-		if err != nil {
-			errs = append(errs, errors.WithMessage(err, "for peer: "+peer.URL))
-			continue
-		}
-		if ok {
-			certs = append(certs, cert)
+		if peer.TLSCACert != nil {
+			certs = append(certs, peer.TLSCACert)
 		}
 	}
 	for _, orderer := range c.ordererConfigs {
-		cert, ok, err := orderer.TLSCACerts.TLSCert()
-		if err != nil {
-			errs = append(errs, errors.WithMessage(err, "for orderer: "+orderer.URL))
-			continue
-		}
-		if ok {
-			certs = append(certs, cert)
+		if orderer.TLSCACert != nil {
+			certs = append(certs, orderer.TLSCACert)
 		}
 	}
 	return certs, errs.ToError()
@@ -1163,14 +1228,14 @@ func (c *EndpointConfig) loadTLSCerts() ([]*x509.Certificate, error) {
 //ResetNetworkConfig clears network config cache
 func (c *EndpointConfig) ResetNetworkConfig() error {
 	c.networkConfig = nil
-	return c.loadNetworkConfiguration()
+	return c.loadEndpointConfiguration()
 }
 
 // PeerMSPID returns msp that peer belongs to
-func (c *EndpointConfig) peerMSPID(name string, networkConfig *fab.NetworkConfig) (string, bool) {
+func (c *EndpointConfig) peerMSPID(name string) (string, bool) {
 	var mspID string
 	// Find organisation/msp that peer belongs to
-	for _, org := range networkConfig.Organizations {
+	for _, org := range c.networkConfig.Organizations {
 		for i := 0; i < len(org.Peers); i++ {
 			if strings.EqualFold(org.Peers[i], name) {
 				// peer belongs to this org add org msp
@@ -1225,7 +1290,7 @@ func peerChannelConfigHookFunc() mapstructure.DecodeHookFunc {
 		data interface{}) (interface{}, error) {
 
 		//If target is of type 'fab.PeerChannelConfig', then only hook should work
-		if t == reflect.TypeOf(fab.PeerChannelConfig{}) {
+		if t == reflect.TypeOf(PeerChannelConfig{}) {
 			dataMap, ok := data.(map[string]interface{})
 			if ok {
 				setDefault(dataMap, "endorsingpeer", true)
