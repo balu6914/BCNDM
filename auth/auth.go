@@ -36,11 +36,11 @@ func (ms *authService) Register(user User) error {
 	}
 
 	// Create New user in Fabric network calling fabric-ca
-	if err = ms.fabric.CreateUser(&u); err != nil {
+	if err := ms.fabric.CreateUser(&u); err != nil {
 		return err
 	}
 
-	if err = ms.users.Update(u); err != nil {
+	if err := ms.users.Update(u); err != nil {
 		return err
 	}
 

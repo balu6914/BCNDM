@@ -12,10 +12,11 @@ import (
 
 const wrong string = "wrong-value"
 
-var user auth.User = auth.User{
+var user = auth.User{
 	"user@example.com",
 	"password",
 	bson.NewObjectId(),
+	"user_name",
 	0,
 	[]byte("pub_cert"),
 	[]byte("priv_cert"),
@@ -33,18 +34,23 @@ func newService() auth.Service {
 func TestRegister(t *testing.T) {
 	svc := newService()
 
-	cases := []struct {
-		desc string
+	cases := map[string]struct {
 		user auth.User
 		err  error
 	}{
-		{"register new user", user, nil},
-		{"register existing user", user, auth.ErrConflict},
+		"register new user": {
+			user,
+			nil,
+		},
+		"register existing user": {
+			user,
+			auth.ErrConflict,
+		},
 	}
 
-	for _, tc := range cases {
+	for desc, tc := range cases {
 		err := svc.Register(tc.user)
-		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
 	}
 }
 
@@ -57,8 +63,14 @@ func TestView(t *testing.T) {
 		key string
 		err error
 	}{
-		"View existing user":     {key, nil},
-		"View non-existing user": {wrong, auth.ErrUnauthorizedAccess},
+		"View existing user": {
+			key,
+			nil,
+		},
+		"View non-existing user": {
+			wrong,
+			auth.ErrUnauthorizedAccess,
+		},
 	}
 
 	for desc, tc := range cases {
@@ -79,8 +91,16 @@ func TestUpdate(t *testing.T) {
 		user auth.User
 		err  error
 	}{
-		"Update user email and password":     {key, user, nil},
-		"Update user with wrong credentials": {wrong, user, auth.ErrUnauthorizedAccess},
+		"Update user email and password": {
+			key,
+			user,
+			nil,
+		},
+		"Update user with wrong credentials": {
+			wrong,
+			user,
+			auth.ErrUnauthorizedAccess,
+		},
 	}
 
 	for desc, tc := range cases {
@@ -98,8 +118,14 @@ func TestDelete(t *testing.T) {
 		key string
 		err error
 	}{
-		"Delete user":                        {key, nil},
-		"Delete user with wrong credentials": {wrong, auth.ErrUnauthorizedAccess},
+		"Delete user": {
+			key,
+			nil,
+		},
+		"Delete user with wrong credentials": {
+			wrong,
+			auth.ErrUnauthorizedAccess,
+		},
 	}
 
 	for desc, tc := range cases {
@@ -112,31 +138,26 @@ func TestLogin(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
 
+	user2 := user
+	user2.Email = wrong
+
+	user3 := user
+	user3.Password = wrong
+
 	cases := map[string]struct {
 		user auth.User
 		err  error
 	}{
-		"login with good credentials": {user, nil},
+		"login with good credentials": {
+			user,
+			nil,
+		},
 		"login with wrong e-mail": {
-			auth.User{
-				wrong,
-				user.Password,
-				user.ID,
-				user.Balance,
-				user.PubCert,
-				user.PrivCert,
-			},
+			user2,
 			auth.ErrUnauthorizedAccess,
 		},
 		"login with wrong password": {
-			auth.User{
-				user.Email,
-				wrong,
-				user.ID,
-				user.Balance,
-				user.PubCert,
-				user.PrivCert,
-			},
+			user3,
 			auth.ErrUnauthorizedAccess,
 		},
 	}
@@ -156,8 +177,14 @@ func TestIdentify(t *testing.T) {
 		key string
 		err error
 	}{
-		"valid token's identity":   {key, nil},
-		"invalid token's identity": {"", auth.ErrUnauthorizedAccess},
+		"valid token's identity": {
+			key,
+			nil,
+		},
+		"invalid token's identity": {
+			wrong,
+			auth.ErrUnauthorizedAccess,
+		},
 	}
 
 	for desc, tc := range cases {
