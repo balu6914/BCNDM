@@ -5,7 +5,6 @@ import { NgProgressModule } from 'ngx-progressbar';
 import {RouterModule} from '@angular/router';
 // Layout Cmponents
 import { HeaderComponent } from './header';
-import { SidebarComponent } from './sidebar';
 
 @NgModule({
   imports: [
@@ -16,11 +15,9 @@ import { SidebarComponent } from './sidebar';
   ],
   declarations: [
       HeaderComponent,
-      SidebarComponent
   ],
   exports: [
       HeaderComponent,
-      SidebarComponent
   ]
 })
 export class LayoutModule { }

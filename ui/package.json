@@ -14,21 +14,22 @@
   "dependencies": {
     "@angular-mdl/core": "^4.0.8",
     "@angular-mdl/datepicker": "0.0.4",
-    "@angular/animations": "^4.0.0",
-    "@angular/common": "^4.0.0",
-    "@angular/compiler": "^4.0.0",
-    "@angular/core": "^4.0.0",
-    "@angular/forms": "^4.0.0",
-    "@angular/http": "^4.0.0",
-    "@angular/platform-browser": "^4.0.0",
-    "@angular/platform-browser-dynamic": "^4.0.0",
-    "@angular/router": "^4.0.0",
+    "@angular/animations": "^5.0.0",
+    "@angular/common": "^5.0.0",
+    "@angular/compiler": "^5.0.0",
+    "@angular/core": "^5.0.0",
+    "@angular/forms": "^5.0.0",
+    "@angular/http": "^5.0.0",
+    "@angular/platform-browser": "^5.0.0",
+    "@angular/platform-browser-dynamic": "^5.0.0",
+    "@angular/router": "^5.0.0",
     "@angular2-mdl-ext/popover": "^0.6.0",
     "@angular2-mdl-ext/select": "^0.10.3",
     "@asymmetrik/ngx-leaflet": "^2.5.3",
     "@asymmetrik/ngx-leaflet-draw": "^2.6.1",
     "@swimlane/ngx-datatable": "^11.1.5",
     "animate.css": "^3.5.2",
+    "bootstrap": "^4.1.1",
     "core-js": "^2.4.1",
     "leaflet": "^1.2.0",
     "leaflet-draw": "^0.4.13",
@@ -41,9 +42,9 @@
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
-    "@angular/cli": "1.1.0",
-    "@angular/compiler-cli": "^4.0.0",
-    "@angular/language-service": "^4.0.0",
+    "@angular/cli": "^6.0.0",
+    "@angular/compiler-cli": "^6.0.0",
+    "@angular/language-service": "^5.0.0",
     "@types/jasmine": "2.5.45",
     "@types/node": "~6.0.60",
     "codelyzer": "~3.0.1",
@@ -58,6 +59,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.0.4",
     "tslint": "~5.3.2",
-    "typescript": "2.5.3"
+    "typescript": "2.7.2",
+    "@angular-devkit/build-angular": "~0.6.8"
   }
 }

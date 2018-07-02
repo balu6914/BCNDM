@@ -1,37 +1,46 @@
-<div class="login-container animated fadeIn" mdl-shadow="6">
-    <div *ngIf="errorMsg" class="text-center">
-        <span class="error-message ">{{errorMsg}}</span>
-    </div>
-    <form [formGroup]="form">
-      <p>
-        <mdl-textfield
-            label="Email"
-            name="email"
-            type="text"
+<div class="wrapper">
+  <div class="logo"></div>
+  <div class="box">
+    <p class="box__title">
+      Sign In
+        <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
+    </p>
+    <form  [formGroup]="form" class="needs-validation" novalidate>
+      <div class="form-group row">
+        <label for="staticEmail" class="col-sm-3 col-form-label">Email</label>
+        <div class="col-sm-9">
+          <input type="email"
             formControlName="email"
-            floating-label
-            pattern="^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$"
+            class="form-control"
+            id="staticEmail"
             error-msg="Please provide a valid email!"
-            (focus)="errorMsg=null">
-        </mdl-textfield>
-      </p>
-      <p>
-        <mdl-textfield
-            label="Password"
-            name="password"
-            type="password"
+            (focus)="errorMsg=null"
+            placeholder="Enter email" required>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+        <div class="col-sm-9">
+          <input type="password"
             formControlName="password"
+            class="form-control"
+            id="inputPassword"
+            placeholder="**********"
             disableNativeValidityChecking
-            [error-msg]="'Please provide a correct password!'"
-            floating-label
-            (focus)="errorMsg=null">
-        </mdl-textfield>
-        <p>
-            <button mdl-button (click)="onSubmit(form.value, form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>LOGIN</button>
-        </p>
-        <br>
-        <p class="text-center">
-            <span>Don't have an account ? <a routerLink="/signup">Signup</a></span>
-        </p>
+            error-msg="'Please provide a correct password!'"
+            (focus)="errorMsg=null"
+            required>
+        </div>
+      </div>
+      <p class="box__forgot">
+        <a href="forgot-password.html" class="box__forgot-link">
+            Forgot your password?
+        </a>
+      </p>
+      <button (click)="onSubmit(form.value, form.valid)"  class="btn btn-block btn-primary">Sign In</button>
     </form>
+    <p class="box__action">
+      Don't have an account? <a routerLink="/signup" class="box__action-link">Signup</a>
+    </p>
+  </div>
 </div>
