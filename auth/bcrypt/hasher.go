@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const cost int = 10
+const cost = 10
 
 var _ auth.Hasher = (*bcryptHasher)(nil)
 

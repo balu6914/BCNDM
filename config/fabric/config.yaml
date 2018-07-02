@@ -101,7 +101,7 @@ organizations:
 # The orderers consent on the order of transactions in a block to be committed to the ledger. For the time being only one orderer is needed.
 orderers:
   orderer.monetasa.com:
-    url: grpcs://localhost:7050
+    url: grpcs://orderer.monetasa.com:7050
     grpcOptions:
       ssl-target-name-override: orderer.monetasa.com
       grpc-max-send-message-length: 15
@@ -112,9 +112,9 @@ orderers:
 peers:
   peer0.org1.monetasa.com:
     # this URL is used to send endorsement and query requests
-    url: grpcs://localhost:7051
+    url: grpcs://peer0.org1.monetasa.com:7051
     # this URL is used to connect the EventHub and registering event listeners
-    eventUrl: grpcs://localhost:7053
+    eventUrl: grpcs://peer0.org1.monetasa.com:7053
     # These parameters should be set in coordination with the keepalive policy on the server
     grpcOptions:
       ssl-target-name-override: peer0.org1.monetasa.com
@@ -126,7 +126,8 @@ peers:
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows certificate management to be done via REST APIs.
 certificateAuthorities:
   ca.org1.monetasa.com:
-    url: http://localhost:7054
+    # Change this according to your fabric-ca URL
+    url: http://ca.org1.monetasa.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
     tlsCACerts:
       # Comma-Separated list of paths

@@ -10,7 +10,7 @@ type fabricMock struct {
 	users map[string]string
 }
 
-// NewUserRepository creates in-memory user repository.
+// NewFabricNetwork creates in-memory user repository that simulates blockchain.
 func NewFabricNetwork() auth.FabricNetwork {
 	return &fabricMock{
 		users: make(map[string]string),

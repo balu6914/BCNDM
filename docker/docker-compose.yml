@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Monetasa
-version: "3"
+version: "2"
 
 services:
   ###
@@ -11,6 +11,9 @@ services:
     command: --smallfiles --nojournal
     ports:
       - "27017:27017"
+    networks:
+      # Our network is called "monetasa-net"
+      - monetasa-net
   ###
   # Monetasa Auth
   ###
@@ -24,28 +27,39 @@ services:
       - monetasa-mongodb
     ports:
       - "8080:8080"
+    expose:
+      - "8081"
     environment:
-      MONETASA_AUTH_MONGO_URL: monetasa-mongodb
-      MONETASA_AUTH_URL: monetasa-auth
-      MONETASA_AUTH_SECRET: monetasa
+      - MONETASA_AUTH_MONGO_URL=monetasa-mongodb
+      - MONETASA_AUTH_SECRET=monetasa
+    volumes:
+      - ../config:/go/src/monetasa/config/
+    networks:
+      # Link to monetasa fabric net
+      - fabric_monetasa-bc-net
+      - monetasa-net
 
   ###
-  # Monetasa dApp
+  # Monetasa Transactions
   ###
-  monetasa-dapp:
-    image: monetasa/dapp
-    container_name: monetasa-dapp
+  monetasa-transactions:
+    image: monetasa/transactions
+    container_name: monetasa-transactions
     restart: on-failure
-    links:
-      - monetasa-mongodb
-    depends_on:
-      - monetasa-mongodb
     ports:
-      - "8081:8081"
+      - "8082:8082"
+    expose:
+      - "8083"
     environment:
-      MONETASA_DAPP_MONGO_URL: monetasa-mongodb
-      MONETASA_AUTH_URL: http://monetasa-auth
-      MONETASA_DAPP_URL: http://monetasa-dapp
+      - MONETASA_TRANSACTIONS_HTTP_PORT=8082
+      - MONETASA_TRANSACTIONS_GRPC_PORT=8083
+      - MONETASA_AUTH_URL=monetasa-auth:8081
+    volumes:
+      - ../config:/go/src/monetasa/config/
+    networks:
+      # Link to monetasa fabric net
+      - fabric_monetasa-bc-net
+      - monetasa-net
 
   ###
   # Monetasa UI
@@ -55,7 +69,9 @@ services:
     container_name: monetasa-ui
     restart: on-failure
     ports:
-      - 3000:3000
+      - "3000:3000"
+    networks:
+      - monetasa-net
   ###
   # Nginx
   ###
@@ -65,7 +81,7 @@ services:
     restart: on-failure
     depends_on:
       - monetasa-auth
-      - monetasa-dapp
+      - monetasa-transactions
       - monetasa-ui
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
@@ -75,3 +91,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      # Our network is called "monetasa-net"
+      - monetasa-net
+
+networks:
+  fabric_monetasa-bc-net:
+    external: true
+  monetasa-net:
+    driver: bridge

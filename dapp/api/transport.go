@@ -14,21 +14,15 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"monetasa"
-	"monetasa/auth"
-	"monetasa/auth/client"
 
 	"monetasa/dapp"
 )
 
-var (
-	dappService dapp.Service
-	authClient  client.AuthClient
-)
+var dappService dapp.Service
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
+func MakeHandler(sr dapp.Service) http.Handler {
 	dappService = sr
-	authClient = ac
 
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
@@ -97,28 +91,7 @@ func MakeHandler(sr dapp.Service, ac client.AuthClient) http.Handler {
 	return r
 }
 
-func authenticate(r *http.Request) (string, error) {
-	// apiKey is a JWT token
-	apiKey := r.Header.Get("Authorization")
-
-	if apiKey == "" {
-		return "", auth.ErrUnauthorizedAccess
-	}
-
-	userId, err := authClient.VerifyToken(apiKey)
-	if err != nil {
-		return "", err
-	}
-
-	return userId, nil
-}
-
 func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	var stream dapp.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
@@ -126,7 +99,6 @@ func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	defer r.Body.Close()
 
 	stream.ID = bson.NewObjectId()
-	stream.Owner = userID
 
 	req := createStreamReq{
 		Stream: stream,
@@ -148,11 +120,6 @@ var fields []string = []string{"name", "type", "description",
 	"price", "longitude", "latitude", "url"}
 
 func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	user, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	file, _, err := r.FormFile("csv")
 	if err != nil {
 		return nil, err
@@ -202,7 +169,6 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 		}
 
 		stream := dapp.Stream{
-			Owner:       user,
 			ID:          bson.NewObjectId(),
 			Name:        record[keys["name"]],
 			Type:        record[keys["type"]],
@@ -226,11 +192,6 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 }
 
 func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	user, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	var stream dapp.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
@@ -238,7 +199,6 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	defer r.Body.Close()
 
 	req := updateStreamReq{
-		User:     user,
 		StreamId: bone.GetValue(r, "id"),
 		Stream:   stream,
 	}
@@ -246,11 +206,6 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	_, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	req := readStreamReq{
 		StreamId: bone.GetValue(r, "id"),
 	}
@@ -258,13 +213,7 @@ func decodeReadStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	user, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	req := deleteStreamReq{
-		User:     user,
 		StreamId: bone.GetValue(r, "id"),
 	}
 	return req, nil
@@ -272,10 +221,6 @@ func decodeDeleteStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	if _, err := authenticate(r); err != nil {
-		return nil, err
-	}
-
 	q := r.URL.Query()
 
 	var req searchStreamReq
@@ -293,17 +238,10 @@ func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeSubscriptionRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
 	sub := dapp.Subscription{}
 	if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
 		return nil, err
 	}
-
-	sub.UserID = userID
 
 	req := subscriptionReq{
 		Subscription: sub,
@@ -312,14 +250,7 @@ func decodeSubscriptionRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeGetSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authenticate(r)
-	if err != nil {
-		return nil, err
-	}
-
-	req := getSubsReq{
-		UserID: userID,
-	}
+	req := getSubsReq{}
 	return req, nil
 }
 

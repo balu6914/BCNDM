@@ -8,14 +8,16 @@ package mocks
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
 
+	"crypto/x509"
+
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/test/mockfab"
 	"github.com/pkg/errors"
 )
 
@@ -62,7 +64,7 @@ func NewMockIdentityConfigCustomized(tlsEnabled, mutualTLSEnabled, errorCase boo
 }
 
 // Client ...
-func (c *MockConfig) Client() (*msp.ClientConfig, error) {
+func (c *MockConfig) Client() *msp.ClientConfig {
 	clientConfig := msp.ClientConfig{}
 
 	clientConfig.CredentialStore = msp.CredentialStoreType{
@@ -70,47 +72,48 @@ func (c *MockConfig) Client() (*msp.ClientConfig, error) {
 	}
 
 	if c.mutualTLSEnabled {
-		mutualTLSCerts := endpoint.MutualTLSConfig{
+		key := endpoint.TLSConfig{Path: "../../../test/fixtures/config/mutual_tls/client_sdk_go-key.pem"}
+		cert := endpoint.TLSConfig{Path: "../../../test/fixtures/config/mutual_tls/client_sdk_go.pem"}
 
-			Client: endpoint.TLSKeyPair{
-				Key: endpoint.TLSConfig{
-					Path: "../../../test/fixtures/config/mutual_tls/client_sdk_go-key.pem",
-					Pem:  "",
-				},
-				Cert: endpoint.TLSConfig{
-					Path: "../../../test/fixtures/config/mutual_tls/client_sdk_go.pem",
-					Pem:  "",
-				},
-			},
+		err := key.LoadBytes()
+		if err != nil {
+			panic(err)
 		}
-		clientConfig.TLSCerts = mutualTLSCerts
+
+		err = cert.LoadBytes()
+		if err != nil {
+			panic(err)
+		}
+
+		clientConfig.TLSKey = key.Bytes()
+		clientConfig.TLSCert = cert.Bytes()
 	}
 
-	return &clientConfig, nil
+	return &clientConfig
 }
 
 // CAConfig not implemented
-func (c *MockConfig) CAConfig(org string) (*msp.CAConfig, error) {
+func (c *MockConfig) CAConfig(org string) (*msp.CAConfig, bool) {
 	caConfig := msp.CAConfig{
 		CAName: "org1",
 	}
 
-	return &caConfig, nil
+	return &caConfig, true
 }
 
 //CAServerCerts Read configuration option for the server certificates for given org
-func (c *MockConfig) CAServerCerts(org string) ([][]byte, error) {
-	return nil, nil
+func (c *MockConfig) CAServerCerts(org string) ([][]byte, bool) {
+	return nil, false
 }
 
 //CAClientKey Read configuration option for the fabric CA client key for given org
-func (c *MockConfig) CAClientKey(org string) ([]byte, error) {
-	return nil, nil
+func (c *MockConfig) CAClientKey(org string) ([]byte, bool) {
+	return nil, false
 }
 
 //CAClientCert Read configuration option for the fabric CA client cert for given org
-func (c *MockConfig) CAClientCert(org string) ([]byte, error) {
-	return nil, nil
+func (c *MockConfig) CAClientCert(org string) ([]byte, bool) {
+	return nil, false
 }
 
 //Timeout not implemented
@@ -139,11 +142,11 @@ func (c *MockConfig) PeerConfig(nameOrURL string) (*fab.PeerConfig, bool) {
 }
 
 // TLSCACertPool ...
-func (c *MockConfig) TLSCACertPool(cert ...*x509.Certificate) (*x509.CertPool, error) {
+func (c *MockConfig) TLSCACertPool() fab.CertPool {
 	if c.errorCase {
-		return nil, errors.New("just to test error scenario")
+		return &mockfab.MockCertPool{Err: errors.New("just to test error scenario")}
 	}
-	return nil, nil
+	return &mockfab.MockCertPool{CertPool: x509.NewCertPool()}
 }
 
 // TcertBatchSize ...
@@ -234,8 +237,8 @@ func (c *MockConfig) NetworkConfig() *fab.NetworkConfig {
 }
 
 // ChannelConfig returns the channel configuration
-func (c *MockConfig) ChannelConfig(name string) (*fab.ChannelNetworkConfig, bool) {
-	return &fab.ChannelNetworkConfig{Policies: fab.ChannelPolicies{}}, true
+func (c *MockConfig) ChannelConfig(name string) (*fab.ChannelEndpointConfig, bool) {
+	return &fab.ChannelEndpointConfig{Policies: fab.ChannelPolicies{}}, true
 }
 
 // ChannelPeers returns the channel peers configuration

@@ -70,7 +70,8 @@ func (h *ProposalProcessorHandler) Handle(requestContext *RequestContext, client
 		if requestContext.SelectionFilter != nil {
 			selectionOpts = append(selectionOpts, selectopts.WithPeerFilter(requestContext.SelectionFilter))
 		}
-		endorsers, err := clientContext.Selection.GetEndorsersForChaincode([]string{requestContext.Request.ChaincodeID}, selectionOpts...)
+
+		endorsers, err := clientContext.Selection.GetEndorsersForChaincode(newChaincodeCalls(requestContext.Request), selectionOpts...)
 		if err != nil {
 			requestContext.Error = errors.WithMessage(err, "Failed to get endorsing peers")
 			return
@@ -82,6 +83,18 @@ func (h *ProposalProcessorHandler) Handle(requestContext *RequestContext, client
 	if h.next != nil {
 		h.next.Handle(requestContext, clientContext)
 	}
+}
+
+func newChaincodeCalls(request Request) []*fab.ChaincodeCall {
+	chaincodes := []*fab.ChaincodeCall{{ID: request.ChaincodeID}}
+	for _, ccCall := range request.InvocationChain {
+		if ccCall.ID == chaincodes[0].ID {
+			chaincodes[0].Collections = ccCall.Collections
+		} else {
+			chaincodes = append(chaincodes, ccCall)
+		}
+	}
+	return chaincodes
 }
 
 //EndorsementValidationHandler for transaction proposal response filtering

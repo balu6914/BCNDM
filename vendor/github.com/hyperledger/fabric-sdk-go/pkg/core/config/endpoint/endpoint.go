@@ -91,7 +91,6 @@ func (cfg *TLSConfig) Bytes() []byte {
 
 //LoadBytes preloads bytes from Pem/Path
 //Pem takes precedence over Path
-//TODO to be removed since separate TLSConfig should only be used in parsing
 func (cfg *TLSConfig) LoadBytes() error {
 	var err error
 	if cfg.Pem != "" {
@@ -106,7 +105,6 @@ func (cfg *TLSConfig) LoadBytes() error {
 }
 
 // TLSCert returns the tls certificate as a *x509.Certificate by loading it either from the embedded Pem or Path
-//TODO to be removed since separate TLSConfig should only be used in parsing
 func (cfg *TLSConfig) TLSCert() (*x509.Certificate, bool, error) {
 
 	block, _ := pem.Decode(cfg.bytes)

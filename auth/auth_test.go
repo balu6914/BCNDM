@@ -120,7 +120,7 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestIdentity(t *testing.T) {
+func TestIdentify(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
 	key, _ := svc.Login(user)
@@ -134,7 +134,7 @@ func TestIdentity(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		id, err := svc.Identity(tc.key)
+		id, err := svc.Identify(tc.key)
 		if id != user.ID.Hex() {
 			err = auth.ErrUnauthorizedAccess
 		}
