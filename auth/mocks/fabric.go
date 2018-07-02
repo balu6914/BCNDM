@@ -21,15 +21,15 @@ func (fm *fabricMock) Initialize() error {
 	return nil
 }
 
-func (fm *fabricMock) CreateUser(id, secret string) error {
+func (fm *fabricMock) CreateUser(user *auth.User) error {
 	fm.mu.Lock()
 	defer fm.mu.Unlock()
 
-	if _, ok := fm.users[id]; ok {
+	if _, ok := fm.users[user.ID.Hex()]; ok {
 		return auth.ErrConflict
 	}
 
-	fm.users[id] = secret
+	fm.users[user.ID.Hex()] = user.Password
 	return nil
 }
 

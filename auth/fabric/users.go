@@ -22,7 +22,8 @@ func NewFabricNetwork(fs *auth.FabricSetup) auth.FabricNetwork {
 }
 
 // Add new user to fabric network
-func (fn *fabricNetwork) CreateUser(name, secret string) error {
+func (fn *fabricNetwork) CreateUser(user *auth.User) error {
+
 	sdk := fn.setup.Sdk
 	ctxProvider := sdk.Context()
 	mspClient, err := msp.New(ctxProvider)
@@ -32,25 +33,29 @@ func (fn *fabricNetwork) CreateUser(name, secret string) error {
 
 	// Register the new user
 	enrollmentSecret, err := mspClient.Register(&msp.RegistrationRequest{
-		Name:        name,
+		Name:        user.ID.Hex(),
 		Affiliation: affiliation,
-		Secret:      secret,
+		Secret:      user.Password,
 	})
 	if err != nil {
 		return fmt.Errorf("Registration failed: %v\n", err)
 	}
 
 	// Enroll the new user
-	if err := mspClient.Enroll(name, msp.WithSecret(enrollmentSecret)); err != nil {
+	err = mspClient.Enroll(user.ID.Hex(), msp.WithSecret(enrollmentSecret))
+	if err != nil {
 		return fmt.Errorf("Enroll failed: %v\n", err)
 	}
 
 	// Get the new user's signing identity
-	si, err := mspClient.GetSigningIdentity(name)
+	si, err := mspClient.GetSigningIdentity(user.ID.Hex())
 	if err != nil {
 		return fmt.Errorf("Unable to create a user in the fabric-ca, GetSigningIdentity failed: %v\n", err)
 	}
-	fmt.Printf("User created: %v\n", si)
+
+	// TODO: Private key is "not supported". Understand why.
+	user.PubCert = si.EnrollmentCertificate()
+	user.PrivCert, _ = si.PrivateKey().Bytes()
 
 	return nil
 }

@@ -25,7 +25,8 @@ func (ur *userRepository) Save(user auth.User) error {
 	defer session.Close()
 	collection := session.DB(dbName).C(collectionName)
 
-	if count, _ := collection.Find(bson.M{"email": user.Email}).Count(); count != 0 {
+	// Verify if Email is already taken
+	if count, _ := c.Find(bson.M{"email": user.Email}).Count(); count != 0 {
 		return auth.ErrConflict
 	}
 
