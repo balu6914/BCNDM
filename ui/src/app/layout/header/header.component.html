@@ -12,25 +12,25 @@
       <div class="topbar__collapse">
         <ul *ngIf="isLoggedin && user"  class="topbar__menu">
           <li class="topbar__item">
-            <a href="dashboard.html" class="topbar__link{% if menu_active == 'dashboard' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/me" routerLinkActive="active" class="topbar__link{% if menu_active == 'dashboard' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--dashboard"></span>
               Dashboard
             </a>
           </li>
           <li class="topbar__item">
-            <a href="sell-stream.html" class="topbar__link{% if menu_active == 'sell-stream' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/sell/map" routerLinkActive="active" class="topbar__link{% if menu_active == 'sell-stream' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--sell"></span>
               Sell stream
             </a>
           </li>
           <li class="topbar__item">
-            <a href="buy-stream.html" class="topbar__link{% if menu_active == 'buy-stream' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/buy/map" routerLinkActive="active" class="topbar__link{% if menu_active == 'buy-stream' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--buy"></span>
               Buy stream
             </a>
           </li>
           <li class="topbar__item">
-            <a href="smart-contract.html" class="topbar__link{% if menu_active == 'smart-contract' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/contract/list" routerLinkActive="active" class="topbar__link{% if menu_active == 'smart-contract' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--smart"></span>
               Smart contract
             </a>
@@ -61,7 +61,7 @@
               <span class="user__icon user__icon--settings"></span>
               Settings
             </a>
-            <a class="dropdown-item" href="#">
+            <a class="dropdown-item" (click)="logout()" href="">
               <span class="user__icon user__icon--logout"></span>
               Logout
             </a>
