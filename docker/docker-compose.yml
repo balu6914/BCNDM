@@ -62,6 +62,34 @@ services:
       - monetasa-net
 
   ###
+  # Streams MongoDB
+  ###
+  monetasa-streams-db:
+    image: mongo:latest
+    container_name: monetasa-streams-db
+    command: --smallfiles --nojournal
+    networks:
+      - monetasa-net
+
+  ###
+  # Streams service
+  ###
+  monetasa-streams:
+    image: monetasa/streams:latest
+    container_name: monetasa-streams
+    depends_on:
+      - monetasa-streams-db
+    ports:
+      - 8084:8084
+    environment:
+      MONETASA_STREAMS_PORT: 8084
+      MONETASA_STREAMS_DB_URL : monetasa-streams-db
+      MONETASA_STREAMS_DB_NAME: streams
+      MONETASA_AUTH_URL: monetasa-auth:8081
+    networks:
+      - monetasa-net
+
+  ###
   # Monetasa UI
   ###
   monetasa-ui:
@@ -82,6 +110,7 @@ services:
     depends_on:
       - monetasa-auth
       - monetasa-transactions
+      - monetasa-streams
       - monetasa-ui
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf

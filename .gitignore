@@ -5,6 +5,7 @@ docker/fabric/artifacts/**/**
 !docker/fabric/artifacts/.gitkeep
 fabric-ca-db
 /*.pb.go
+build
 
 # System Files
 .DS_Store

@@ -1,0 +1,276 @@
+swagger: "2.0"
+info:
+  title: Monetasa streams service
+  description: HTTP API for managing data streams.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /streams:
+    post:
+      summary: Adds new stream.
+      description: |
+        Adds a new stream to the list of streams owned by user identified using
+        the provided access token.
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: stream
+          description: JSON-formatted document describing the new stream.
+          in: body
+          schema:
+            $ref: "#/definitions/StreamReq"
+          required: true
+      responses:
+        201:
+          description: Stream created.
+          schema:
+            $ref: '#/definitions/StreamRes'
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Stream already exists.
+        500:
+          $ref: "#/responses/ServiceError"
+  /streams/bulk:
+    post:
+      summary: Adds a bulk of a new streams.
+      description: |
+        Adds a new streams to the list of streams owned by user identified using
+        the provided access token.
+      tags:
+        - streams
+      consumes:
+        - multipart/form-data
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - in: formData
+          name: csv
+          type: file
+          description: The csv file that contains a list of streams to be uploaded.
+      responses:
+        201:
+          description: Stream created.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Stream already exists.
+        500:
+          $ref: "#/responses/ServiceError"
+  /streams/{streamId}:
+    get:
+      summary: Retrieves stream info
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/StreamId"
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/StreamRes'
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Stream does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
+    put:
+      summary: Updates stream info
+      description: |
+        Update is performed by replacing the current resource data with values
+        provided in a request payload. Note that the stream's ID
+        cannot be changed.
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/StreamId"
+        - name: stream
+          description: JSON-formatted document describing the updated stream.
+          in: body
+          schema:
+            $ref: '#/definitions/StreamReq'
+          required: true
+      responses:
+        200:
+          description: Stream updated.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Stream does not exist.
+        415:
+          description: Missing or invalid content type.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Removes a stream.
+      description: |
+        Removes a stream.
+        tags:
+        - stream
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/StreamId"
+      responses:
+        204:
+          description: Stream removed.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /streams/search:
+    get:
+      summary: Retrieves streams by location
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - in: query
+          name: x0
+          type: number
+          description: X value of the first search point. X values represent longitude here.
+        - in: query
+          name: x1
+          type: number
+          required: true
+          description: X value of the second search point. X values represent longitude here.
+        - in: query
+          name: x2
+          type: number
+          required: true
+          description: X value of the third search point. X values represent longitude here.
+        - in: query
+          name: x3
+          type: number
+          required: true
+          description: X value of the fourth search point. X values represent longitude here.
+        - in: query
+          name: y0
+          type: number
+          required: true
+          description: Y value of the first search point. Y values represent latitude here.
+        - in: query
+          name: y1
+          type: number
+          required: true
+          description: Y value of the second search point. Y values represent latitude here.
+        - in: query
+          name: y2
+          type: number
+          required: true
+          description:  Y value of the third search point. Y values represent latitude here.
+        - in: query
+          name: y3
+          type: number
+          required: true
+          description:  Y value of the fourth search point. Y values represent latitude here.
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/StreamRes'
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User's access token.
+    in: header
+    type: string
+    required: true
+  StreamId:
+    name: streamId
+    description: Unique stream identifier.
+    in: path
+    type: string
+    minimum: 1
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  Location:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Type of the location data.
+      coordinates:
+        type: array
+        minItems: 0
+        maxItems: 2
+        items:
+          type: number
+  StreamReq:
+    type: object
+    properties:
+      owner:
+        type: string
+        description: Id of the user who created the stream.
+      id:
+        type: string
+        description: Unique stream identifier generated by the service.
+      name:
+        type: string
+        description: Name of the stream.
+      type:
+        type: string
+        description: Type of the stream.
+      description:
+        type: string
+        description: Description of the stream.
+      url:
+        type: string
+        description: URL of the stream.
+      price:
+        type: integer
+        description: Price of the stream in miTAS.
+      location:
+        $ref: '#/definitions/Location'
+    required:
+      - type
+      - name
+      - description
+      - url
+  StreamRes:
+    type: object
+    properties:
+      owner:
+        type: string
+        description: Id of the user who created the stream.
+      id:
+        type: string
+        description: Unique stream identifier generated by the service.
+      name:
+        type: string
+        description: Name of the stream.
+      type:
+        type: string
+        description: Type of the stream.
+      description:
+        type: string
+        description: Description of the stream.
+      url:
+        type: string
+        description: URL of the stream.
+      price:
+        type: integer
+        description: Price of the stream in miTAS.
+      location:
+        $ref: '#/definitions/Location'

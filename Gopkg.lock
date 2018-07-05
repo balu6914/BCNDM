@@ -35,6 +35,12 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
+
+[[projects]]
   name = "github.com/cloudflare/cfssl"
   packages = [
     "api",
@@ -366,7 +372,6 @@
     "pkg/msp",
     "pkg/msp/api",
     "pkg/msp/test/mockmsp",
-    "pkg/msp/test/mockmspapi",
     "pkg/util/concurrent/futurevalue",
     "pkg/util/concurrent/lazycache",
     "pkg/util/concurrent/lazyref",
@@ -440,9 +445,44 @@
 
 [[projects]]
   name = "github.com/opencontainers/runc"
-  packages = ["libcontainer/user"]
+  packages = [
+    "libcontainer/system",
+    "libcontainer/user"
+  ]
   revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
   version = "v0.1.1"
+
+[[projects]]
+  name = "github.com/ory/dockertest"
+  packages = [
+    ".",
+    "docker",
+    "docker/opts",
+    "docker/pkg/archive",
+    "docker/pkg/fileutils",
+    "docker/pkg/homedir",
+    "docker/pkg/idtools",
+    "docker/pkg/ioutils",
+    "docker/pkg/jsonmessage",
+    "docker/pkg/longpath",
+    "docker/pkg/mount",
+    "docker/pkg/pools",
+    "docker/pkg/stdcopy",
+    "docker/pkg/system",
+    "docker/pkg/term",
+    "docker/pkg/term/windows",
+    "docker/types",
+    "docker/types/blkiodev",
+    "docker/types/container",
+    "docker/types/filters",
+    "docker/types/mount",
+    "docker/types/network",
+    "docker/types/registry",
+    "docker/types/strslice",
+    "docker/types/versions"
+  ]
+  revision = "9bca068bf5e4af2484b9c2e8cfeb3d098d5327d7"
+  version = "v3.3.1"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -662,6 +702,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dc603086c2ad528b169391d1595a30fc2c3fb019d1cacc0b7c62499a452b6c85"
+  inputs-digest = "add8f15c67ad86c4503dd4211fcc7252ac40d90c48ac500694f716470ca91946"
   solver-name = "gps-cdcl"
   solver-version = 1

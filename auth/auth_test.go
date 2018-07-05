@@ -34,23 +34,26 @@ func newService() auth.Service {
 func TestRegister(t *testing.T) {
 	svc := newService()
 
-	cases := map[string]struct {
+	cases := []struct {
+		desc string
 		user auth.User
 		err  error
 	}{
-		"register new user": {
+		{
+			"register new user",
 			user,
 			nil,
 		},
-		"register existing user": {
+		{
+			"register existing user",
 			user,
 			auth.ErrConflict,
 		},
 	}
 
-	for desc, tc := range cases {
+	for _, tc := range cases {
 		err := svc.Register(tc.user)
-		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 
