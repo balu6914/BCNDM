@@ -6,5 +6,6 @@
 export const environment = {
   production: false,
   API_URL : '/api',
-  API_AUTH : '/auth'
+  API_AUTH : '/auth',
+  API_SUBSCRIPTIONS: '/subscriptions',
 };

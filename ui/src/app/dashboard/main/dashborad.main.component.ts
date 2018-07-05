@@ -14,6 +14,8 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { TasPipe } from '../../common/pipes/converter.pipe';
 
+import {Subscription} from '../../common/interfaces/subscription.interface';
+
 @Component({
   selector: 'dashboard-main',
   templateUrl: './dashboard.main.component.html',
@@ -95,36 +97,44 @@ export class DashboardMainComponent {
 
         // Fetch all subscriptions
         this.SubscriptionService.get().subscribe(
-          result => {
-              this.temp2 = [...result];
+          (result: any) => {
+              this.temp2 = [...result.Subscriptions];
 
-              // Create list of user subscriptions
-              this.mySubscriptions = this.temp2;
+              result.Subscriptions.forEach(subscription => {
+                  this.streamService.getStream(subscription["id"]).subscribe(
+                    (result: any) => {
+                        const stream = result.Stream
+                        subscription["stream_name"] = stream["name"]
+                        subscription["stream_price"] = stream["price"]
 
-              for (var i = 0; i < this.mySubscriptions.length; i++) {
-                  // Create marker with stream coordinates
-                  const newMarker = L.marker(
-                  [this.mySubscriptions[i]["stream_data"]["coordinates"][1],
-                   this.mySubscriptions[i]["stream_data"]["coordinates"][0]], {}
-                  );
-                  // Use yellow color for owner streams and blue for others
-                  var defIcon = L.icon({
-                      iconUrl:  '/assets/images/green-marker.png',
-                      iconSize: [45, 45]
-                  });
-                  newMarker.setIcon(defIcon);
-                  // Popup Msg
-                  const msg = "<b>" + this.mySubscriptions[i]["stream_data"]["name"] + "</b>"
-                  // Push marker to the markers list
-                  this.markersSubs.push(newMarker);
-              }
-              // Set markers on the map
-              this.setTabMarkers();
+                        // Create marker with stream coordinate
+                        const newMarker = L.marker(
+                        [stream["location"]["coordinates"][1],
+                         stream["location"]["coordinates"][0]], {}
+                        );
+                        // Use yellow color for owner streams and blue for others
+                        var defIcon = L.icon({
+                            iconUrl:  '/assets/images/green-marker.png',
+                            iconSize: [45, 45]
+                        });
+                        newMarker.setIcon(defIcon);
+                        // Popup Msg
+                        const msg = "<b>" + stream["name"] + "</b>"
+                        // Push marker to the markers list
+                        this.mySubscriptions.push(subscription);
+                        this.markersSubs.push(newMarker);
+
+                        // Set markers on the map
+                        this.setTabMarkers();
+                    },
+                    err => {
+                        console.log(err)
+                    });
+                })
           },
           err => {
               console.log(err)
-          }
-      );
+          });
     }
 
     onMapReady(map: L) {
@@ -282,9 +292,8 @@ export class DashboardMainComponent {
     }
 
     tabChanged(event) {
-        var layers = this.drawnItems.getLayers();
-        this.drawnItems.clearLayers();
         this.tabIndex = event.index;
+        this.drawnItems.clearLayers();
         this.setTabMarkers();
     }
 
