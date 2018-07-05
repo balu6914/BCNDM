@@ -90,6 +90,34 @@ services:
       - monetasa-net
 
   ###
+  # Subscriptions MongoDB
+  ###
+  monetasa-subscriptions-db:
+    image: mongo:latest
+    container_name: monetasa-subscriptions-db
+    command: --smallfiles --nojournal
+    networks:
+      - monetasa-net
+
+  ###
+  # Subscriptions service
+  ###
+  monetasa-streams:
+    image: monetasa/subscriptions:latest
+    container_name: monetasa-subscriptions
+    depends_on:
+      - monetasa-subscriptions-db
+    ports:
+      - 8085:8085
+    environment:
+      MONETASA_SUBSCRIPTIONS_PORT: 8085
+      MONETASA_SUBSCRIPTIONS_DB_URL : monetasa-subscriptions-db
+      MONETASA_SUBSCRIPTIONS_DB_NAME: subscriptions
+      MONETASA_AUTH_URL: monetasa-auth:8081
+    networks:
+      - monetasa-net
+
+  ###
   # Monetasa UI
   ###
   monetasa-ui:

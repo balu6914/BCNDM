@@ -1,0 +1,102 @@
+swagger: "2.0"
+info:
+  title: Go Subscriptions service
+  description: HTTP API for subscriptions management.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /subscriptions:
+    get:
+      summary: Retrieves a list of user subscriptions
+      tags:
+        - subscriptions
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Subscriptions list retrieved.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User don't have any subscription.
+        500:
+          $ref: "#/responses/ServiceError"
+    post:
+      summary: Create a subscription
+      description: |
+        Subscription creation is performed with values provided in a request payload.
+      tags:
+        - subscriptions
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Subscription"
+      responses:
+        200:
+          description: Subscription created.
+        400:
+          description: Failed due to malformed JSON.
+        402:
+          description: Subscription allready taken.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+  Subscription:
+    name: subscription
+    description: JSON-formatted document describing the new subscription.
+    in: body
+    schema:
+      $ref: "#/definitions/SubscriptionReq"
+    required: true
+
+definitions:
+  SubscriptionReq:
+    type: object
+    properties:
+      user_id:
+        type: string
+        description: User ID.
+      stream_id:
+        type: string
+        description: Stream ID.
+      stream_data:
+        type: object
+        properties:
+          streamID:
+            type: string
+            description: Stream ID
+          price:
+            type: integer
+            description: Stream Price per hour
+          location:
+            type: array
+            items:
+              type: integer
+              format: float
+            minItems: 2
+            maxItems: 2
+      hours:
+        type: integer
+        description: Subscription duration.
+      start_date:
+        type: integer
+        description: Start date of subscription.
+      end_date:
+        type: integer
+        description: End date of subscription.
+    required:
+      - stream_id
+      - hours
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.

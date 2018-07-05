@@ -53,5 +53,5 @@ func (fn *fabricNetwork) Balance(name string) (uint64, error) {
 		return 0, auth.ErrFetchingBalance
 	}
 
-	return ub.Value, nil
+	return 0, nil
 }
