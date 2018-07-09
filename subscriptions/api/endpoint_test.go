@@ -74,39 +74,30 @@ func TestCreateSubscriptions(t *testing.T) {
 	ss := newServer(svc, ac)
 	defer ss.Close()
 
-	cases := map[string]struct {
+	cases := []struct {
+		desc        string
 		auth        string
 		contentType string
 		method      string
 		status      int
 	}{
-		"create subscriptions with valid credentials": {
+		{
+			desc:        "create subscriptions with valid credentials",
 			auth:        token,
 			contentType: contentType,
 			method:      http.MethodPost,
 			status:      http.StatusCreated,
 		},
-		"create subscriptions with invalid credentials": {
+		{
+			desc:        "create subscriptions with invalid credentials",
 			auth:        wrong,
 			contentType: contentType,
 			method:      http.MethodPost,
 			status:      http.StatusForbidden,
 		},
-		"get subscriptions with valid credentials": {
-			auth:        token,
-			contentType: contentType,
-			method:      http.MethodGet,
-			status:      http.StatusOK,
-		},
-		"get subscriptions with invalid credentials": {
-			auth:        wrong,
-			contentType: contentType,
-			method:      http.MethodGet,
-			status:      http.StatusForbidden,
-		},
 	}
 
-	for desc, tc := range cases {
+	for _, tc := range cases {
 		req := testRequest{
 			client: ss.Client(),
 			method: tc.method,
@@ -114,9 +105,57 @@ func TestCreateSubscriptions(t *testing.T) {
 			token:  tc.auth,
 		}
 		res, err := req.make()
-		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", desc, err))
-		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", desc, tc.status, res.StatusCode))
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
 		contentType := res.Header.Get("Content-Type")
-		assert.Equal(t, tc.contentType, contentType, fmt.Sprintf("%s: expected content type %s got %s", desc, tc.contentType, contentType))
+		assert.Equal(t, tc.contentType, contentType, fmt.Sprintf("%s: expected content type %s got %s", tc.desc, tc.contentType, contentType))
+	}
+}
+
+func TestViewSubscriptions(t *testing.T) {
+	ac := mocks.NewAuthClient(map[string]string{
+		token: userID,
+	})
+
+	svc := newService()
+	svc.CreateSubscription(userID, subscriptions.Subscription{})
+	ss := newServer(svc, ac)
+	defer ss.Close()
+
+	cases := []struct {
+		desc        string
+		auth        string
+		contentType string
+		method      string
+		status      int
+	}{
+		{
+			desc:        "get subscriptions with valid credentials",
+			auth:        token,
+			contentType: contentType,
+			method:      http.MethodGet,
+			status:      http.StatusOK,
+		},
+		{
+			desc:        "get subscriptions with invalid credentials",
+			auth:        wrong,
+			contentType: contentType,
+			method:      http.MethodGet,
+			status:      http.StatusForbidden,
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client: ss.Client(),
+			method: tc.method,
+			url:    fmt.Sprintf("%s/subscriptions", ss.URL),
+			token:  tc.auth,
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+		contentType := res.Header.Get("Content-Type")
+		assert.Equal(t, tc.contentType, contentType, fmt.Sprintf("%s: expected content type %s got %s", tc.desc, tc.contentType, contentType))
 	}
 }
