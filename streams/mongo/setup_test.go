@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 		fmt.Sprintf("MONGO_INITDB_DATABASE=%s", testDB),
 	}
 
-	container, err := pool.Run("mongo", "3.6-jessie", cfg)
+	container, err := pool.Run("mongo", "3.6", cfg)
 	if err != nil {
 		testLog.Error(fmt.Sprintf("Could not start container: %s", err))
 	}

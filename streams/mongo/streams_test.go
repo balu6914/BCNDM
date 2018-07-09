@@ -131,26 +131,22 @@ func TestSearch(t *testing.T) {
 		desc   string
 		coords [][]float64
 		size   int
-		err    error
 	}{
 		{
 			desc:   "search get all streams",
 			coords: [][]float64{{-180, -90}, {-180, 90}, {180, 90}, {180, -90}},
 			size:   dbSize,
-			err:    nil,
 		},
 		{
 			desc:   "search empty result",
 			coords: [][]float64{{long - 1, lat - 1}, {long, lat - 2}, {long - 3, lat}},
 			size:   0,
-			err:    streams.ErrNotFound,
 		},
 	}
 
 	for _, tc := range cases {
-		resp, err := repo.Search(tc.coords)
+		resp, _ := repo.Search(tc.coords)
 		n := len(resp)
-		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 		assert.Equal(t, tc.size, n, fmt.Sprintf("%s: expected %d got %d\n", tc.desc, tc.size, n))
 	}
 }
