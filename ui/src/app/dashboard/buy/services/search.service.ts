@@ -16,7 +16,7 @@ export class SearchService {
 
      // serach streams
      searchStreams(type, x0, y0, x1, y1, x2, y2, x3 ,y3): Observable<Stream[]> {
-        return this.http.get(`${environment.API_URL}/streams/search?type=${type}&x0=${x0}&y0=${y0}&x1=${x1}&y1=${y1}&x2=${x2}&y2=${y2}&x3=${x3}&y3=${y3}`)
+        return this.http.get(`${environment.API_STREAMS}/search?type=${type}&x0=${x0}&y0=${y0}&x1=${x1}&y1=${y1}&x2=${x2}&y2=${y2}&x3=${x3}&y3=${y3}`)
                          .map((res:Response) => res)
                          .catch((error:any) => Observable.throw(error || 'Server error'));
     }

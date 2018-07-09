@@ -16,27 +16,27 @@ export class StreamService {
 
      // Fetch  stream
      getAll() : Observable<Stream[]> {
-         return this.http.get(`${environment.API_URL}/streams`)
+         return this.http.get(`${environment.API_STREAMS}`)
                          .map((res:Response) => res)
                          .catch((error:any) => Observable.throw(error || 'Server error'));
      }
      getStream(id:string) : Observable<Stream[]> {
-         return this.http.get(`${environment.API_URL}/streams/${id}`)
+         return this.http.get(`${environment.API_STREAMS}/${id}`)
                          .map((res:Response) => res)
                          .catch((error:any) => Observable.throw(error || 'Server error'));
      }
      addStream (data): Observable<Stream[]> {
-        return this.http.post(`${environment.API_URL}/streams`, data)
+        return this.http.post(`${environment.API_STREAMS}`, data)
                          .map((res:Response) => {})
                          .catch((error:any) => Observable.throw(error || 'Server error'));
     }
      removeStream (id:string): Observable<Stream[]> {
-        return this.http.delete(`${environment.API_URL}/streams/${id}`)
+        return this.http.delete(`${environment.API_STREAMS}/${id}`)
                          .map((res:Response) => res)
                          .catch((error:any) => Observable.throw(error || 'Server error'));
     }
      updateStream (id:string, data): Observable<Stream> {
-        return this.http.put(`${environment.API_URL}/streams/${id}`, data)
+        return this.http.put(`${environment.API_STREAMS}/${id}`, data)
                          .map((res:Response) => res)
                          .catch((error:any) => Observable.throw(error || 'Server error'));
     }

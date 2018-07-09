@@ -41,11 +41,10 @@ func (sr mongoRepository) Read(userID string) ([]subscriptions.Subscription, err
 
 	var subs []subscriptions.Subscription
 	if err := c.Find(bson.M{"user_id": userID}).All(&subs); err != nil {
-		if err == mgo.ErrNotFound {
-			return subs, subscriptions.ErrNotFound
-		}
-
-		return subs, err
+		return nil, err
+	}
+	if len(subs) == 0 {
+		return []subscriptions.Subscription{}, nil
 	}
 
 	return subs, nil

@@ -19,7 +19,7 @@ export class AuthService {
   // Get user token
   login(username: string, password: string) {
 
-    return this.http.post(`${environment.API_AUTH}/tokens`, JSON.stringify({
+    return this.http.post(`${environment.API_AUTH_TOKENS}`, JSON.stringify({
         email: username,
         password: password
       }), {
@@ -67,7 +67,7 @@ export class AuthService {
     }
 
     fetchCurrentUser() {
-        return this.http.get(`${environment.API_AUTH}/users`)
+        return this.http.get(`${environment.API_AUTH}`)
         .map((data: Response) =>  {
             this.setCurrentUser(data);
             return data;
