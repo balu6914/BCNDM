@@ -131,7 +131,7 @@ func (sr streamRepository) Search(coords [][]float64) ([]streams.Stream, error) 
 	}).All(&results)
 
 	if results == nil || err != nil {
-		return []streams.Stream{}, streams.ErrNotFound
+		return []streams.Stream{}, nil
 	}
 
 	return results, nil

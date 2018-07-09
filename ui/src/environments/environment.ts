@@ -5,7 +5,8 @@
 
 export const environment = {
   production: false,
-  API_URL : '/api',
-  API_AUTH : '/auth',
+  API_AUTH : '/users',
+  API_AUTH_TOKENS: '/tokens',
   API_SUBSCRIPTIONS: '/subscriptions',
+  API_STREAMS: '/streams',
 };

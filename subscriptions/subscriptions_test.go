@@ -37,7 +37,7 @@ func TestCreateSubscription(t *testing.T) {
 		sub subscriptions.Subscription
 		err error
 	}{
-		"add new subsription": {
+		"create new subsription": {
 			subscription,
 			nil,
 		},
@@ -59,11 +59,11 @@ func TestGetSubscriptions(t *testing.T) {
 		userID string
 		err    error
 	}{
-		"get subsription with valid token": {
+		"read subsription with valid token": {
 			userID,
 			nil,
 		},
-		"get subscriptions with non-existent entity": {
+		"read subscriptions with non-existent entity": {
 			wrong,
 			subscriptions.ErrNotFound,
 		},
