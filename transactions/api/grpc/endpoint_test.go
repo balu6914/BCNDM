@@ -22,42 +22,31 @@ func TestCreateUser(t *testing.T) {
 	defer cancel()
 
 	cases := map[string]struct {
-		id     string
-		secret string
-		key    []byte
-		code   codes.Code
+		id   string
+		key  []byte
+		code codes.Code
 	}{
 		"create new user": {
-			id:     "new_user",
-			secret: secret,
-			key:    []byte(secret),
-			code:   codes.OK,
+			id:   "5281b83afbb7f35cb62d0835",
+			key:  []byte(secret),
+			code: codes.OK,
 		},
 		"create existing user": {
-			id:     id,
-			secret: secret,
-			key:    nil,
-			code:   codes.Internal,
+			id:   id,
+			key:  nil,
+			code: codes.Internal,
 		},
 		"create user with empty id": {
-			id:     "",
-			secret: secret,
-			key:    nil,
-			code:   codes.InvalidArgument,
-		},
-		"create user with empty secret": {
-			id:     "other_user",
-			secret: "",
-			key:    nil,
-			code:   codes.InvalidArgument,
+			id:   "",
+			key:  nil,
+			code: codes.InvalidArgument,
 		},
 	}
 
 	for desc, tc := range cases {
-		key, err := cli.CreateUser(ctx, &monetasa.User{Id: tc.id, Secret: tc.secret})
+		_, err := cli.CreateUser(ctx, &monetasa.ID{Value: tc.id})
 		e, ok := status.FromError(err)
 		assert.True(t, ok, "OK expected to be true")
-		assert.Equal(t, tc.key, key.GetValue(), fmt.Sprintf("%s: expected %s got %s", desc, tc.key, key.GetValue()))
 		assert.Equal(t, tc.code, e.Code(), fmt.Sprintf("%s: expected %s got %s", desc, tc.code, e.Code()))
 	}
 }

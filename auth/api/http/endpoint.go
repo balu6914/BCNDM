@@ -9,29 +9,38 @@ import (
 
 func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(userReq)
+		req := request.(registerReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		err := svc.Register(req.user)
-		return tokenRes{}, err
+		user := auth.User{
+			Email:    req.Email,
+			Password: req.Password,
+			Name:     req.Name,
+		}
+		err := svc.Register(user)
+		return createRes{}, err
 	}
 }
 
 func loginEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(userReq)
+		req := request.(credentialsReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		token, err := svc.Login(req.user)
+		user := auth.User{
+			Email:    req.Email,
+			Password: req.Password,
+		}
+		token, err := svc.Login(user)
 		if err != nil {
 			return nil, err
 		}
 
-		return tokenRes{token}, nil
+		return tokenRes{Token: token}, nil
 	}
 }
 
@@ -42,11 +51,16 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.Update(req.key, req.user); err != nil {
+		user := auth.User{
+			Email:    req.Email,
+			Password: req.Password,
+			Name:     req.Name,
+		}
+		if err := svc.Update(req.key, user); err != nil {
 			return nil, err
 		}
 
-		return userRes{created: true}, nil
+		return updateRes{}, nil
 	}
 }
 
@@ -62,21 +76,11 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return viewRes{user}, nil
-	}
-}
-
-func deleteEndpoint(svc auth.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(identityReq)
-		if err := req.validate(); err != nil {
-			return nil, err
+		res := viewRes{
+			ID:    user.ID,
+			Email: user.Email,
 		}
 
-		if err := svc.Delete(req.key); err != nil {
-			return nil, err
-		}
-
-		return removeRes{}, nil
+		return res, nil
 	}
 }

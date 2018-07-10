@@ -38,7 +38,7 @@ paths:
             $ref: "#/definitions/User"
           required: true
       responses:
-        200:
+        201:
           description: User created.
         400:
           description: Failed due to malformed JSON.
@@ -72,21 +72,6 @@ paths:
           description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
-    delete:
-      summary: Removes a user account
-      description: |
-        Removes user account.
-      tags:
-        - users
-      parameters:
-        - $ref: "#/parameters/Authorization"
-      responses:
-        204:
-          description: User removed.
-        403:
-          description: Missing or invalid access token provided.
-        500:
-          $ref: "#/responses/ServiceError"
   /tokens:
     post:
       summary: User authentication
@@ -111,25 +96,6 @@ paths:
             Failed due to malformed JSON or using an invalid credentials.
         500:
           $ref: "#/responses/ServiceError"
-  /access-grant:
-    get:
-      summary: Checks the token validity
-      description: |
-        If the request is made using valid token, an identifier bound
-        to that token will be returned.
-      tags:
-        - access control
-      parameters:
-        - $ref: "#/parameters/Authorization"
-      responses:
-        200:
-          description: Email retrieved
-          headers:
-            X-client-id:
-              type: string
-              description: Email of the entity bound to the provided access key.
-        403:
-          description: Missing or invalid access token provided.
 
 parameters:
   Authorization:

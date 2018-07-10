@@ -29,6 +29,11 @@ type Service interface {
 	// non-nil error value is returned.
 	Register(User) error
 
+	// Login authenticates the user given its credentials. Successful
+	// authentication generates new access token. Failed invocations are
+	// identified by the non-nil error values in the response.
+	Login(User) (string, error)
+
 	// Update updates user account. In case of the failed update, a
 	// non-nil error value is returned.
 	Update(string, User) error
@@ -36,15 +41,6 @@ type Service interface {
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
 	View(string) (User, error)
-
-	// Delete deletes user account. In case of the failed deletion, a
-	// non-nil error value is returned.
-	Delete(string) error
-
-	// Login authenticates the user given its credentials. Successful
-	// authentication generates new access token. Failed invocations are
-	// identified by the non-nil error values in the response.
-	Login(User) (string, error)
 
 	// Identity retrieves Client ID for provided client token.
 	Identify(string) (string, error)

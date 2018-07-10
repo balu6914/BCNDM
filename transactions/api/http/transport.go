@@ -12,6 +12,7 @@ import (
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -39,6 +40,9 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 		encodeResponse,
 		opts...,
 	))
+
+	r.GetFunc("/version", monetasa.Version())
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }

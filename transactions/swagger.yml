@@ -1,0 +1,50 @@
+swagger: "2.0"
+info:
+  title: Monetasa Transactions Service
+  description: HTTP API for managing transactions and balance.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /balance:
+    get:
+      summary: Retrieves users balance
+      tags:
+        - balance
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Users balance retrieved.
+          schema:
+            $ref: "#/definitions/Balance"
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  Balance:
+    type: object
+    properties:
+      balance:
+        type: integer
+        description: Current balance.
+    required:
+      - balance

@@ -3,7 +3,6 @@ package mongo
 import (
 	"monetasa/auth"
 
-	"github.com/asaskevich/govalidator"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -20,34 +19,44 @@ func NewUserRepository(db *mgo.Session) auth.UserRepository {
 	return &userRepository{db}
 }
 
-func (ur *userRepository) Save(user auth.User) error {
+func (ur *userRepository) Save(user auth.User) (string, error) {
+	mu, err := toMongoUser(user)
+	if err != nil {
+		return "", err
+	}
+
 	session := ur.db.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collectionName)
+	collection := session.DB(dbName).C(usersCollection)
 
-	// Verify if Email is already taken
-	if count, _ := collection.Find(bson.M{"email": user.Email}).Count(); count != 0 {
-		return auth.ErrConflict
-	}
-
-	if err := collection.Insert(user); err != nil {
+	if err := collection.Insert(mu); err != nil {
 		if mgo.IsDup(err) {
-			return auth.ErrConflict
+			return "", auth.ErrConflict
 		}
-		return err
+		return "", err
 	}
 
-	return nil
+	return mu.ID.Hex(), nil
 }
 
 func (ur *userRepository) Update(user auth.User) error {
+	mu, err := toMongoUser(user)
+	if err != nil {
+		return err
+	}
+
 	session := ur.db.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collectionName)
+	collection := session.DB(dbName).C(usersCollection)
 
-	query := bson.M{"_id": user.ID}
-	update := bson.M{"$set": user}
-	if err := collection.Update(query, update); err != nil {
+	if err := collection.UpdateId(mu.ID, bson.M{"$set": mu}); err != nil {
+		if err == mgo.ErrNotFound {
+			return auth.ErrNotFound
+		}
+		if mgo.IsDup(err) {
+			return auth.ErrConflict
+		}
+
 		return err
 	}
 
@@ -57,53 +66,96 @@ func (ur *userRepository) Update(user auth.User) error {
 func (ur *userRepository) OneByID(id string) (auth.User, error) {
 	session := ur.db.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collectionName)
+	collection := session.DB(dbName).C(usersCollection)
 
-	user := auth.User{}
-
-	if bson.IsObjectIdHex(id) {
-		objectID := bson.ObjectIdHex(id)
-		if err := collection.Find(bson.M{"_id": objectID}).One(&user); err != nil {
-			if err == mgo.ErrNotFound {
-				return user, auth.ErrNotFound
-			}
-		}
+	mu := mongoUser{}
+	if !bson.IsObjectIdHex(id) {
+		return auth.User{}, auth.ErrMalformedEntity
 	}
 
-	return user, nil
+	oid := bson.ObjectIdHex(id)
+	if err := collection.Find(bson.M{"_id": oid}).One(&mu); err != nil {
+		if err == mgo.ErrNotFound {
+			return auth.User{}, auth.ErrNotFound
+		}
+		return auth.User{}, err
+	}
+
+	return mu.toUser(), nil
 }
 
 func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
 	session := ur.db.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collectionName)
+	collection := session.DB(dbName).C(usersCollection)
 
-	user := auth.User{}
-
-	if govalidator.IsEmail(email) {
-		if err := collection.Find(bson.M{"email": email}).One(&user); err != nil {
-			if err == mgo.ErrNotFound {
-				return user, auth.ErrNotFound
-			}
+	mu := mongoUser{}
+	if err := collection.Find(bson.M{"email": email}).One(&mu); err != nil {
+		if err == mgo.ErrNotFound {
+			return auth.User{}, auth.ErrNotFound
 		}
+		return auth.User{}, err
 	}
 
-	return user, nil
+	return mu.toUser(), nil
 }
 
 func (ur *userRepository) Remove(id string) error {
 	session := ur.db.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collectionName)
+	collection := session.DB(dbName).C(usersCollection)
 
-	if bson.IsObjectIdHex(id) {
-		objectID := bson.ObjectIdHex(id)
-		if err := collection.Remove(bson.M{"_id": objectID}); err != nil {
-			return err
-		}
-
-		return nil
+	if !bson.IsObjectIdHex(id) {
+		return auth.ErrMalformedEntity
 	}
 
-	return auth.ErrUnauthorizedAccess
+	oid := bson.ObjectIdHex(id)
+
+	if err := collection.Remove(bson.M{"_id": oid}); err != nil {
+		if err == mgo.ErrNotFound {
+			return auth.ErrNotFound
+		}
+		return err
+	}
+
+	return nil
+}
+
+type mongoUser struct {
+	Email    string        `bson:"email"`
+	Password string        `bson:"password"`
+	ID       bson.ObjectId `bson:"_id,omitempty"`
+	Name     string        `bson:"name,omitempty"`
+}
+
+func toMongoUser(user auth.User) (mongoUser, error) {
+	if user.ID == "" {
+		return mongoUser{
+			Email:    user.Email,
+			Password: user.Password,
+			ID:       bson.NewObjectId(),
+			Name:     user.Name,
+		}, nil
+	}
+
+	if !bson.IsObjectIdHex(user.ID) {
+		return mongoUser{}, auth.ErrMalformedEntity
+	}
+
+	id := bson.ObjectIdHex(user.ID)
+	return mongoUser{
+		Email:    user.Email,
+		Password: user.Password,
+		ID:       id,
+		Name:     user.Name,
+	}, nil
+}
+
+func (user mongoUser) toUser() auth.User {
+	return auth.User{
+		Email:    user.Email,
+		Password: user.Password,
+		ID:       user.ID.Hex(),
+		Name:     user.Name,
+	}
 }

@@ -1,9 +1,6 @@
 package http
 
-import (
-	"monetasa/auth"
-	"net/http"
-)
+import "net/http"
 
 const contentType = "application/json"
 
@@ -13,21 +10,17 @@ type apiRes interface {
 	empty() bool
 }
 
-type identityRes struct {
-	id string
+type createRes struct{}
+
+func (res createRes) headers() map[string]string {
+	return map[string]string{}
 }
 
-func (res identityRes) headers() map[string]string {
-	return map[string]string{
-		"X-client-id": res.id,
-	}
+func (res createRes) code() int {
+	return http.StatusCreated
 }
 
-func (res identityRes) code() int {
-	return http.StatusOK
-}
-
-func (res identityRes) empty() bool {
+func (res createRes) empty() bool {
 	return true
 }
 
@@ -47,42 +40,23 @@ func (res tokenRes) empty() bool {
 	return res.Token == ""
 }
 
-type removeRes struct{}
+type updateRes struct{}
 
-func (res removeRes) code() int {
-	return http.StatusNoContent
-}
-
-func (res removeRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res removeRes) empty() bool {
-	return true
-}
-
-type userRes struct {
-	created bool
-}
-
-func (res userRes) code() int {
-	if res.created {
-		return http.StatusCreated
-	}
-
+func (res updateRes) code() int {
 	return http.StatusOK
 }
 
-func (res userRes) headers() map[string]string {
+func (res updateRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res userRes) empty() bool {
+func (res updateRes) empty() bool {
 	return true
 }
 
 type viewRes struct {
-	auth.User
+	ID    string `json:"id"`
+	Email string `json:"email"`
 }
 
 func (res viewRes) code() int {

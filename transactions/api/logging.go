@@ -19,7 +19,7 @@ func LoggingMiddleware(svc transactions.Service, logger log.Logger) transactions
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) CreateUser(id, password string) (key []byte, err error) {
+func (lm *loggingMiddleware) CreateUser(id string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method create_user for user %s took %s to complete", id, time.Since(begin))
 		if err != nil {
@@ -30,7 +30,7 @@ func (lm *loggingMiddleware) CreateUser(id, password string) (key []byte, err er
 
 	}(time.Now())
 
-	return lm.svc.CreateUser(id, password)
+	return lm.svc.CreateUser(id)
 }
 
 func (lm *loggingMiddleware) Balance(userID, chanID string) (balance uint64, err error) {

@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+var _ auth.UserRepository = (*userRepositoryMock)(nil)
+
 type userRepositoryMock struct {
 	mu    sync.Mutex
 	users map[string]auth.User
@@ -17,21 +19,21 @@ func NewUserRepository() auth.UserRepository {
 	}
 }
 
-func (urm *userRepositoryMock) Save(user auth.User) error {
+func (urm *userRepositoryMock) Save(user auth.User) (string, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
 	// Save user with two keys. This will allow to simulate
 	// mongo queries by email or _id (login and register or other endpoints)
 	if _, ok := urm.users[user.Email]; ok {
-		return auth.ErrConflict
+		return "", auth.ErrConflict
 	}
-	if _, ok := urm.users[user.ID.Hex()]; ok {
-		return auth.ErrConflict
+	if _, ok := urm.users[user.ID]; ok {
+		return "", auth.ErrConflict
 	}
 
-	urm.users[user.Email], urm.users[user.ID.Hex()] = user, user
-	return nil
+	urm.users[user.Email], urm.users[user.ID] = user, user
+	return user.Email, nil
 }
 
 func (urm *userRepositoryMock) OneByID(id string) (auth.User, error) {
@@ -60,8 +62,12 @@ func (urm *userRepositoryMock) Update(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
+	if _, ok := urm.users[user.ID]; !ok {
+		return auth.ErrNotFound
+	}
+
 	urm.users[user.Email] = user
-	urm.users[urm.users[user.Email].ID.Hex()] = user
+	urm.users[urm.users[user.Email].ID] = user
 
 	return nil
 }
@@ -73,11 +79,7 @@ func (urm *userRepositoryMock) Remove(id string) error {
 	if _, ok := urm.users[id]; !ok {
 		return auth.ErrNotFound
 	}
-	if _, ok := urm.users[urm.users[id].Email]; !ok {
-		return auth.ErrNotFound
-	}
 
-	urm.users[urm.users[id].Email] = auth.User{}
-	urm.users[id] = auth.User{}
+	delete(urm.users, id)
 	return nil
 }

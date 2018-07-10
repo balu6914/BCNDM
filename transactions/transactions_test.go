@@ -10,46 +10,42 @@ import (
 )
 
 const (
-	userID  = "user"
+	userID  = "5281b83afbb7f35cb62d0834"
 	chanID  = "chan"
 	secret  = "secret"
 	balance = 42
 )
 
 func newService() transactions.Service {
+	repo := mocks.NewUserRepository(map[string]string{
+		userID: secret,
+	})
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
 		userID: balance,
 	})
 
-	return transactions.New(bn)
+	return transactions.New(repo, bn)
 }
 
 func TestCreateUser(t *testing.T) {
 	svc := newService()
 
 	cases := map[string]struct {
-		id     string
-		secret string
-		key    []byte
-		err    error
+		id  string
+		err error
 	}{
 		"register new user": {
-			id:     "nonexistent_id",
-			secret: secret,
-			key:    []byte(secret),
-			err:    nil,
+			id:  "5281b83afbb7f35cb62d0835",
+			err: nil,
 		},
 		"register existing user": {
-			id:     userID,
-			secret: secret,
-			key:    []byte{},
-			err:    transactions.ErrFailedUserCreation,
+			id:  userID,
+			err: transactions.ErrConflict,
 		},
 	}
 
 	for desc, tc := range cases {
-		key, err := svc.CreateUser(tc.id, tc.secret)
-		assert.Equal(t, tc.key, key, fmt.Sprintf("%s: expected %s got %s", desc, tc.key, key))
+		err := svc.CreateUser(tc.id)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
 }

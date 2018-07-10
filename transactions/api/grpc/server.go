@@ -7,6 +7,7 @@ import (
 	"monetasa/transactions"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -30,23 +31,23 @@ func NewServer(svc transactions.Service) monetasa.TransactionsServiceServer {
 	return &grpcServer{handler}
 }
 
-func (s grpcServer) CreateUser(ctx context.Context, user *monetasa.User) (*monetasa.Key, error) {
+func (s grpcServer) CreateUser(ctx context.Context, user *monetasa.ID) (*empty.Empty, error) {
 	_, res, err := s.handler.ServeGRPC(ctx, user)
 	if err != nil {
 		return nil, encodeError(err)
 	}
 
-	return res.(*monetasa.Key), nil
+	return res.(*empty.Empty), nil
 }
 
 func decodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.User)
-	return createUserReq{id: req.GetId(), secret: req.GetSecret()}, nil
+	req := grpcReq.(*monetasa.ID)
+	return createUserReq{id: req.GetValue()}, nil
 }
 
 func encodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(createUserRes)
-	return &monetasa.Key{Value: res.key}, encodeError(res.err)
+	return &empty.Empty{}, encodeError(res.err)
 }
 
 func encodeError(err error) error {

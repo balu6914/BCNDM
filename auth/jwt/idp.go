@@ -1,3 +1,4 @@
+// Package jwt provides a JWT identity provider.
 package jwt
 
 import (
@@ -38,11 +39,6 @@ func (idp *jwtIdentityProvider) TemporaryKey(id string) (string, error) {
 	return idp.jwt(claims)
 }
 
-func (idp *jwtIdentityProvider) jwt(claims jwt.StandardClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(idp.secret))
-}
-
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 	token, err := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -61,4 +57,9 @@ func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 	}
 
 	return claims["sub"].(string), nil
+}
+
+func (idp *jwtIdentityProvider) jwt(claims jwt.StandardClaims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(idp.secret))
 }

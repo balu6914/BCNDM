@@ -10,12 +10,39 @@ type apiReq interface {
 	validate() error
 }
 
-type userReq struct {
-	user auth.User
+type registerReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Name     string `json:"name,omitempty"`
 }
 
-func (req userReq) validate() error {
-	return req.user.Validate()
+func (req registerReq) validate() error {
+	if req.Email == "" || req.Password == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if !govalidator.IsEmail(req.Email) {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type credentialsReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (req credentialsReq) validate() error {
+	if req.Email == "" || req.Password == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if !govalidator.IsEmail(req.Email) {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
 }
 
 type identityReq struct {
@@ -31,8 +58,10 @@ func (req identityReq) validate() error {
 }
 
 type updateReq struct {
-	key  string
-	user auth.User
+	key      string
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
 }
 
 func (req updateReq) validate() error {
@@ -40,21 +69,12 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	return req.user.Validate()
-}
-
-type viewReq struct {
-	key string
-	id  string
-}
-
-func (req viewReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
+	if req.Email == "" || req.Password == "" {
+		return auth.ErrMalformedEntity
 	}
 
-	if !govalidator.IsUUID(req.id) {
-		return auth.ErrNotFound
+	if !govalidator.IsEmail(req.Email) {
+		return auth.ErrMalformedEntity
 	}
 
 	return nil
