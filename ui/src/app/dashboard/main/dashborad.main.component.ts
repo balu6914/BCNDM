@@ -1,20 +1,24 @@
 import { Component, ViewChild } from '@angular/core';
+import { MdlDialogService } from '@angular-mdl/core';
 import { HttpClient } from '@angular/common/http';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
+
 import { AuthService } from '../../auth/services/auth.service';
-import { User } from '../../common/interfaces/user.interface';
+import { SearchService } from './services/search.service';
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
-import { SearchService } from './services/search.service';
-import { MdlDialogService } from '@angular-mdl/core';
+import { TasPipe } from '../../common/pipes/converter.pipe';
+import { User } from '../../common/interfaces/user.interface';
 
 import * as L from 'leaflet';
 import { icon, latLng, Layer, marker } from 'leaflet';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
-import { TasPipe } from '../../common/pipes/converter.pipe';
 
-import {Subscription} from '../../common/interfaces/subscription.interface';
+import { Subscription } from '../../common/interfaces/subscription.interface';
+
+import { Chart } from 'chart.js';
+import {} from '@types/googlemaps';
 
 @Component({
   selector: 'dashboard-main',
@@ -135,6 +139,477 @@ export class DashboardMainComponent {
           err => {
               console.log(err)
           });
+
+          let chartData = {
+              type: "line",
+              data: {
+                  labels: [
+                      "Jan 2017",
+                      "Apr 2017",
+                      "Sep 2017",
+                      "Dec 2017",
+                      "Mar 2018",
+                      "Jul 2018",
+                      "Oct 2018",
+                      "Feb 2019"
+                  ],
+                  datasets: [
+                      {
+                          type: "bar",
+                          label: "Dataset 1",
+                          data: [5, 10, 15, 7, 3, 10, 2, 45, 12, 3, 35, 2, 5],
+                          backgroundColor: "rgba(6, 210, 216, 1)",
+                          borderColor: "rgba(6, 210, 216, 1)",
+                          borderWidth: 1,
+                          barThickness: 1
+                      },
+                      {
+                          label: "Dataset 2",data: [25, 43, 38, 33, 52, 65, 62, 49],
+                          backgroundColor: "rgba(0, 125, 255, .1)",
+                          borderColor: "#007DFF",
+                          borderWidth: 4,
+                          pointBackgroundColor: "#ffffff",
+                          pointRadius: 3,
+                          pointBorderWidth: 1
+                      }
+                  ]
+              },
+              options: {
+                  maintainAspectRatio: false,
+                  scaleShowVerticalLines: false,
+                  tooltips: {
+                      backgroundColor: "#007DFF",
+                      xPadding: 15,
+                      yPadding: 5,
+                      titleMarginBottom: 0,
+                      bodySpacing: 2,
+                      cornerRadius: 0,
+                      displayColors: false,
+                      caretSize: 0,
+                      callbacks: {
+                          label: function(tooltipItem, data) {
+                              return tooltipItem.yLabel + " TOK";
+                          },
+                          title: function(tooltipItem, data) {
+                              return;
+                          }
+                      }
+                  },
+                  legend: {
+                      display: false
+                  },
+                  scales: {
+                      yAxes: [
+                          {
+                              afterTickToLabelConversion: function(q) {
+                                  for (var tick in q.ticks) {
+                                      let newLabel = q.ticks[tick] + " TOK ";
+                                      q.ticks[tick] = newLabel;
+                                  }
+                              },
+                              gridLines: {
+                                  color: "rgba(223,233,247,1)",
+                                  zeroLineColor: "rgba(223,233,247,1)",
+                                  borderDash: [15, 15],
+                                  drawBorder: false
+                              },
+                              ticks: {
+                                  fontColor: "rgba(158,175,200, 1)",
+                                  fontSize: 11,
+                                  stepSize: 25
+                              }
+                          }
+                      ],
+                      xAxes: [
+                          {
+                              barPercentage: 10,
+                              categoryPercentage: 0.1,
+                              barThickness: 5,
+                              gridLines: {
+                                  lineWidth: 0,
+                                  color: "rgba(255,255,255,0)",
+                                  zeroLineColor: "rgba(255,255,255,0)"
+                              },
+                              ticks: {
+                                  fontColor: "rgba(158,175,200, 1)",
+                                  fontSize: 11
+                              }
+                          }
+                      ]
+                  }
+              }
+          };
+
+          let c: any = document.getElementById("myChart");
+          let ctx = c.getContext("2d");
+          let chart = new Chart(ctx, chartData);
+
+          // When the window has finished loading create our google map below
+
+          // Basic options for a simple Google Map
+          // For more options see: https://developers.google.com/maps/documentation/javascript/reference#MapOptions
+
+          var bounds = new google.maps.LatLngBounds();
+          let mapOptions : any =  {
+
+              // The latitude and longitude to center the map (always required)
+              center: new google.maps.LatLng(40.67, -73.94), // New York
+
+              // TODO: Fix this
+              // How zoomed in you want the map to start at (always required)
+              zoom: 11,
+              disableDefaultUI: true,
+              zoomControl: true,
+
+              // How you would like to style the map.
+              // This is where you would paste any style found on Snazzy Maps.
+              styles: [
+                  {
+                      featureType: "administrative",
+                      elementType: "labels.text.fill",
+                      stylers: [
+                          {
+                              color: "#444444",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.country",
+                      elementType: "geometry.stroke",
+                      stylers: [
+                          {
+                              color: "#85a9c1",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.country",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.country",
+                      elementType: "labels.text",
+                      stylers: [
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.country",
+                      elementType: "labels.text.fill",
+                      stylers: [
+                          {
+                              color: "#9eafc8",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.province",
+                      elementType: "geometry.stroke",
+                      stylers: [
+                          {
+                              color: "#9eafc8",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.province",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.province",
+                      elementType: "labels.text",
+                      stylers: [
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.locality",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.locality",
+                      elementType: "labels.text",
+                      stylers: [
+                          {
+                              visibility: "on"
+                          },
+                          {
+                              color: "#9eafc8",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.locality",
+                      elementType: "labels.text.fill",
+                      stylers: [
+                          {
+                              color: "#9eafc8",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.locality",
+                      elementType: "labels.text.stroke",
+                      stylers: [
+                          {
+                              color: "#ffffff",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.locality",
+                      elementType: "labels.icon",
+                      stylers: [
+                          {
+                              lightness: "66",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.neighborhood",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "administrative.land_parcel",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "landscape",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              color: "#f2f2f2",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "landscape",
+                      elementType: "geometry.fill",
+                      stylers: [
+                          {
+                              color: "#f3f7fa",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "poi",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              saturation: -100,
+                          },
+                          {
+                              lightness: 45,
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road",
+                      elementType: "geometry.fill",
+                      stylers: [
+                          {
+                              color: "#ffffff",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road",
+                      elementType: "labels.text.fill",
+                      stylers: [
+                          {
+                              color: "#9eafc8",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road.highway",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              visibility: "simplified",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road.highway",
+                      elementType: "labels",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "road.arterial",
+                      elementType: "labels.icon",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "transit",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              visibility: "off",
+                          }
+                      ]
+                  },
+                  {
+                      featureType: "water",
+                      elementType: "all",
+                      stylers: [
+                          {
+                              color: "#c0e4f3",
+                          },
+                          {
+                              visibility: "on",
+                          }
+                      ]
+                  }
+              ]
+          };
+
+          let infoWindowContent = [
+              [
+                  '<div class="map-tooltip">' +
+                      '<p class="map-tooltip__title">Luftdaten Hum 8806</p>' +
+                      '<div id="bodyContent" class="map-tooltip__content">' +
+                      '<p class="map-tooltip__subtitle">Humidity</p>' +
+                      '<p class="map-tooltip__stake">Stake: <span class="map-tooltip__stake-amount">0.043256 TAS</span></p>' +
+                      "</div>" +
+                      "</div>"
+              ],
+              [
+                  '<div class="map-tooltip">' +
+                      '<p class="map-tooltip__title">Lorem Ipsum</p>' +
+                      '<div id="bodyContent" class="map-tooltip__content">' +
+                      '<p class="map-tooltip__subtitle">Humidity</p>' +
+                      '<p class="map-tooltip__stake">Stake: <span class="map-tooltip__stake-amount">0.043256 TAS</span></p>' +
+                      "</div>" +
+                      "</div>"
+              ],
+              [
+                  '<div class="map-tooltip">' +
+                      '<p class="map-tooltip__title">Sold Luftdaten Hum 8806</p>' +
+                      '<div id="bodyContent" class="map-tooltip__content">' +
+                      '<p class="map-tooltip__subtitle">Humidity</p>' +
+                      '<p class="map-tooltip__stake">Stake: <span class="map-tooltip__stake-amount">0.043256 TAS</span></p>' +
+                      "</div>" +
+                      "</div>"
+              ],
+              [
+                  '<div class="map-tooltip">' +
+                      '<p class="map-tooltip__title">Air Cuality</p>' +
+                      '<div id="bodyContent" class="map-tooltip__content">' +
+                      '<p class="map-tooltip__subtitle">Humidity</p>' +
+                      '<p class="map-tooltip__stake">Stake: <span class="map-tooltip__stake-amount">0.043256 TAS</span></p>' +
+                      "</div>" +
+                      "</div>"
+              ]
+          ];
+
+          // Get the HTML DOM element that will contain your map
+          // We are using a div with id="map" seen below in the <body>
+          let mapElement = document.getElementById("map");
+
+          // Create the Google Map using our element and options defined above
+          let map = new google.maps.Map(mapElement, mapOptions);
+
+          // Multiple Markers
+          let markers = [
+              ["Datapace 1", 40.67, -73.94, "assets/img/icons/map-co2.svg"],
+              ["Datapace 2", 40.64, -73.93, "assets/img/icons/map-chart.svg"],
+              ["Datapace 3", 40.68, -73.91, "assets/img/icons/map-temp.svg"],
+              ["Datapace 4", 40.62, -73.91, "assets/img/icons/map-water.svg"]
+          ];
+
+          // Display multiple markers on a map
+          let infoWindow = new google.maps.InfoWindow(),
+              marker,
+              i;
+
+          // Loop through our array of markers & place each one on the map
+          for (i = 0; i < markers.length; i++) {
+              let position = new google.maps.LatLng(Number(markers[i][1]), Number(markers[i][2]));
+              bounds.extend(position);
+              let marker = new google.maps.Marker({
+                  position: position,
+                  map: map,
+                  title: String(markers[i][0]),
+                  icon: String(markers[i][3]),
+              });
+
+              // Allow each marker to have an info window
+              google.maps.event.addListener(
+                  marker,
+                  "click",
+                  (function(marker, i) {
+                      return function() {
+                          infoWindow.setContent(infoWindowContent[i][0]);
+                          infoWindow.open(map, marker);
+                      };
+                  })(marker, i)
+              );
+
+              // Automatically center the map fitting all markers on the screen
+              map.fitBounds(bounds);
+          }
+
+          var styles = {
+              default: null,
+              hide: [
+                  {
+                      featureType: "poi.business",
+                      stylers: [{ visibility: "off" }]
+                  },
+                  {
+                      featureType: "transit",
+                      elementType: "labels.icon",
+                      stylers: [{ visibility: "off" }]
+                  }
+              ]
+          };
     }
 
     onMapReady(map: L) {
