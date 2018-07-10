@@ -14,10 +14,10 @@ func createUserEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		privateKey, err := svc.CreateUser(req.id, req.secret)
-		if err != nil {
+		if err := svc.CreateUser(req.id); err != nil {
 			return createUserRes{}, err
 		}
-		return createUserRes{privateKey, nil}, nil
+
+		return createUserRes{}, nil
 	}
 }

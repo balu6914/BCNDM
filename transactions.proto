@@ -2,15 +2,12 @@ syntax = "proto3";
 
 package monetasa;
 
+import "google/protobuf/empty.proto";
+
 service TransactionsService {
-    rpc CreateUser(User) returns (Key) {}
+    rpc CreateUser(ID) returns (google.protobuf.Empty) {}
 }
 
-message User {
-    string id = 1;
-    string secret = 2;
-}
-
-message Key {
-    bytes value = 1;
+message ID {
+    string value = 1;
 }

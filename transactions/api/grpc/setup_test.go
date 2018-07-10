@@ -15,7 +15,7 @@ import (
 
 const (
 	port    = 8080
-	id      = "id"
+	id      = "5281b83afbb7f35cb62d0834"
 	secret  = "secret"
 	balance = 42
 )
@@ -37,8 +37,12 @@ func startServer() {
 }
 
 func newService() transactions.Service {
+	repo := mocks.NewUserRepository(map[string]string{
+		id: secret,
+	})
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
 		id: balance,
 	})
-	return transactions.New(bn)
+
+	return transactions.New(repo, bn)
 }

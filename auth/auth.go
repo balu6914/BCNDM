@@ -6,16 +6,16 @@ type authService struct {
 	users  UserRepository
 	hasher Hasher
 	idp    IdentityProvider
-	fabric FabricNetwork
+	ts     TransactionsService
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider, fn FabricNetwork) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService) Service {
 	return &authService{
 		users:  users,
 		hasher: hasher,
 		idp:    idp,
-		fabric: fn,
+		ts:     ts,
 	}
 }
 
@@ -26,25 +26,18 @@ func (ms *authService) Register(user User) error {
 	}
 
 	user.Password = hash
-	if err = ms.users.Save(user); err != nil {
-		return err
-	}
-
-	u, err := ms.users.OneByEmail(user.Email)
+	id, err := ms.users.Save(user)
 	if err != nil {
 		return err
 	}
 
-	// Create New user in Fabric network calling fabric-ca
-	if err := ms.fabric.CreateUser(&u); err != nil {
-		return err
-	}
-
-	if err := ms.users.Update(u); err != nil {
+	if err := ms.ts.CreateUser(id); err != nil {
+		ms.users.Remove(id)
 		return err
 	}
 
 	return nil
+
 }
 
 func (ms *authService) Login(user User) (string, error) {
@@ -57,16 +50,11 @@ func (ms *authService) Login(user User) (string, error) {
 		return "", ErrUnauthorizedAccess
 	}
 
-	return ms.idp.TemporaryKey(dbu.ID.Hex())
+	return ms.idp.TemporaryKey(dbu.ID)
 }
 
 func (ms *authService) Update(key string, user User) error {
 	id, err := ms.idp.Identity(key)
-	if err != nil {
-		return ErrUnauthorizedAccess
-	}
-
-	u, err := ms.users.OneByID(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
@@ -76,7 +64,7 @@ func (ms *authService) Update(key string, user User) error {
 		return ErrMalformedEntity
 	}
 	user.Password = hash
-	user.ID = u.ID
+	user.ID = id
 
 	return ms.users.Update(user)
 }
@@ -92,28 +80,7 @@ func (ms *authService) View(key string) (User, error) {
 		return User{}, ErrUnauthorizedAccess
 	}
 
-	// Get balance and update user
-	balance, err := ms.fabric.Balance(user.ID.Hex())
-	if err != nil {
-		return User{}, ErrFetchingBalance
-	}
-	user.Balance = balance
-
 	return user, nil
-}
-
-func (ms *authService) Delete(key string) error {
-	id, err := ms.idp.Identity(key)
-	if err != nil {
-		return ErrUnauthorizedAccess
-	}
-
-	user, err := ms.users.OneByID(id)
-	if err != nil {
-		return ErrUnauthorizedAccess
-	}
-
-	return ms.users.Remove(user.ID.Hex())
 }
 
 func (ms *authService) Identify(key string) (string, error) {

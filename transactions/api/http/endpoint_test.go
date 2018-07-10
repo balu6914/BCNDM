@@ -24,11 +24,14 @@ const (
 )
 
 func newService() transactions.Service {
+	repo := mocks.NewUserRepository(map[string]string{
+		userID: token,
+	})
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
 		userID: balance,
 	})
 
-	return transactions.New(bn)
+	return transactions.New(repo, bn)
 }
 
 func newServer(svc transactions.Service, ac monetasa.AuthServiceClient) *httptest.Server {

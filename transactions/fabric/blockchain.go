@@ -1,3 +1,4 @@
+// Package fabric contains Fabric specific implementation of blockchain network.
 package fabric
 
 import (
@@ -37,12 +38,12 @@ func NewNetwork(sdk *fabsdk.FabricSDK, admin, org, chaincodeID string, logger lo
 	}
 }
 
-func (fn fabricNetwork) CreateUser(id, secret string) ([]byte, error) {
+func (fn fabricNetwork) CreateUser(id, secret string) error {
 	ctx := fn.sdk.Context()
 	mspClient, err := msp.New(ctx)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to create msp client: %s", err))
-		return []byte{}, err
+		return err
 	}
 
 	es, err := mspClient.Register(&msp.RegistrationRequest{
@@ -52,21 +53,15 @@ func (fn fabricNetwork) CreateUser(id, secret string) ([]byte, error) {
 	})
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to register user: %s", err))
-		return []byte{}, err
+		return err
 	}
 
 	if err := mspClient.Enroll(id, msp.WithSecret(es)); err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to enroll user: %s", err))
-		return []byte{}, err
+		return err
 	}
 
-	si, err := mspClient.GetSigningIdentity(id)
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to get signing identity for user: %s", err))
-		return []byte{}, err
-	}
-
-	return si.EnrollmentCertificate(), nil
+	return nil
 }
 
 func (fn fabricNetwork) Balance(userID, chanID string) (uint64, error) {

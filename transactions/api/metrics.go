@@ -25,13 +25,13 @@ func MetricsMiddleware(svc transactions.Service, counter metrics.Counter, latenc
 	}
 }
 
-func (mm *metricsMiddleware) CreateUser(id, password string) ([]byte, error) {
+func (mm *metricsMiddleware) CreateUser(id string) error {
 	defer func(begin time.Time) {
 		mm.counter.With("method", "create_user").Add(1)
 		mm.latency.With("method", "create_user").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return mm.svc.CreateUser(id, password)
+	return mm.svc.CreateUser(id)
 }
 
 func (mm *metricsMiddleware) Balance(userID, chanID string) (uint64, error) {

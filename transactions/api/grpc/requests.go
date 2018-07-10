@@ -1,12 +1,11 @@
 package grpc
 
 type createUserReq struct {
-	id     string
-	secret string
+	id string
 }
 
 func (req createUserReq) validate() error {
-	if req.id == "" || req.secret == "" {
+	if req.id == "" {
 		return errMalformedEntity
 	}
 

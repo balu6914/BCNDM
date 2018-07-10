@@ -26,7 +26,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 
 	r.Post("/users", kithttp.NewServer(
 		registrationEndpoint(svc),
-		decodeCredentials,
+		decodeRegister,
 		encodeResponse,
 		opts...,
 	))
@@ -45,13 +45,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Delete("/users", kithttp.NewServer(
-		deleteEndpoint(svc),
-		decodeIdentity,
-		encodeResponse,
-		opts...,
-	))
-
 	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
@@ -65,9 +58,48 @@ func MakeHandler(svc auth.Service) http.Handler {
 	return r
 }
 
+func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	req := registerReq{
+		Email:    user.Email,
+		Password: user.Password,
+		Name:     user.Name,
+	}
+
+	return req, nil
+}
+
 func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 	req := identityReq{
 		key: r.Header.Get("Authorization"),
+	}
+
+	return req, nil
+}
+
+func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	req := updateReq{
+		key:      r.Header.Get("Authorization"),
+		Email:    user.Email,
+		Password: user.Password,
+		Name:     user.Name,
 	}
 
 	return req, nil
@@ -83,22 +115,9 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 		return nil, err
 	}
 
-	return userReq{user}, nil
-}
-
-func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	if r.Header.Get("Content-Type") != contentType {
-		return nil, errUnsupportedContentType
-	}
-
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		return nil, err
-	}
-
-	req := updateReq{
-		key:  r.Header.Get("Authorization"),
-		user: user,
+	req := credentialsReq{
+		Email:    user.Email,
+		Password: user.Password,
 	}
 
 	return req, nil

@@ -17,16 +17,16 @@ func NewBlockchainNetwork(users map[string]uint64) transactions.BlockchainNetwor
 	return mockNetwork{users: users, mutex: &sync.Mutex{}}
 }
 
-func (mn mockNetwork) CreateUser(id, secret string) ([]byte, error) {
+func (mn mockNetwork) CreateUser(id, secret string) error {
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()
 
 	if _, ok := mn.users[id]; ok {
-		return []byte{}, transactions.ErrFailedUserCreation
+		return transactions.ErrFailedUserCreation
 	}
 
 	mn.users[id] = 0
-	return []byte(secret), nil
+	return nil
 }
 
 func (mn mockNetwork) Balance(name, _ string) (uint64, error) {

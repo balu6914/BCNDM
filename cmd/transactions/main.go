@@ -10,6 +10,7 @@ import (
 	grpcapi "monetasa/transactions/api/grpc"
 	httpapi "monetasa/transactions/api/http"
 	"monetasa/transactions/fabric"
+	"monetasa/transactions/mongo"
 	"net"
 	"net/http"
 	"os"
@@ -21,11 +22,16 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
+	mgo "gopkg.in/mgo.v2"
 )
 
 const (
 	envHTTPPort          = "MONETASA_TRANSACTIONS_HTTP_PORT"
 	envGRPCPort          = "MONETASA_TRANSACTIONS_GRPC_PORT"
+	envMongoURL          = "MONETASA_TRANSACTIONS_MONGO_URL"
+	envMongoUser         = "MONETASA_TRANSACTIONS_MONGO_USER"
+	envMongoPass         = "MONETASA_TRANSACTIONS_MONGO_PASS"
+	envMongoDatabase     = "MONETASA_TRANSACTIONS_MONGO_DB"
 	envFabricOrgAdmin    = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
 	envFabricOrgName     = "MONETASA_TRANSACTIONS_FABRIC_NAME"
 	envFabricConfFile    = "MONETASA_TRANSACTIONS_FABRIC_CONF"
@@ -34,21 +40,34 @@ const (
 
 	defHTTPPort          = "8080"
 	defGRPCPort          = "8081"
+	defMongoURL          = "0.0.0.0"
+	defMongoUser         = ""
+	defMongoPass         = ""
+	defMongoDatabase     = "transactions"
 	defFabricOrgAdmin    = "admin"
 	defFabricOrgName     = "org1"
 	defFabricConfFile    = "/src/monetasa/config/fabric/config.yaml"
 	defFabricChaincodeID = "token"
 	defAuthURL           = "localhost:8081"
+
+	mongoConnectTimeout = 5000
+	mongoSocketTimeout  = 5000
 )
 
 type conf struct {
-	httpPort          string
-	grpcPort          string
-	fabricOrgAdmin    string
-	fabricOrgName     string
-	fabricConfFile    string
-	fabricChaincodeID string
-	authURL           string
+	httpPort            string
+	grpcPort            string
+	mongoURL            string
+	mongoUser           string
+	mongoPass           string
+	mongoDatabase       string
+	mongoConnectTimeout int
+	mongoSocketTimeout  int
+	fabricOrgAdmin      string
+	fabricOrgName       string
+	fabricConfFile      string
+	fabricChaincodeID   string
+	authURL             string
 }
 
 func main() {
@@ -59,12 +78,15 @@ func main() {
 	sdk := newFabricSDK(cfg.fabricConfFile, logger)
 	defer sdk.Close()
 
+	ms := connectToDB(cfg, logger)
+	defer ms.Close()
+
 	conn := newGRPCConn(cfg.authURL, logger)
 	defer conn.Close()
 
 	ac := authapi.NewClient(conn)
 
-	svc := newService(cfg, sdk, logger)
+	svc := newService(cfg, sdk, ms, logger)
 
 	errs := make(chan error, 2)
 
@@ -86,13 +108,19 @@ func loadConfig() conf {
 	confPath := monetasa.Env(envFabricConfFile, defFabricConfFile)
 	fullConfPath := fmt.Sprintf("%s%s", os.Getenv("GOPATH"), confPath)
 	return conf{
-		httpPort:          monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:          monetasa.Env(envGRPCPort, defGRPCPort),
-		fabricOrgAdmin:    monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
-		fabricOrgName:     monetasa.Env(envFabricOrgName, defFabricOrgName),
-		fabricConfFile:    fullConfPath,
-		fabricChaincodeID: monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
-		authURL:           monetasa.Env(envAuthURL, defAuthURL),
+		httpPort:            monetasa.Env(envHTTPPort, defHTTPPort),
+		grpcPort:            monetasa.Env(envGRPCPort, defGRPCPort),
+		mongoURL:            monetasa.Env(envMongoURL, defMongoURL),
+		mongoUser:           monetasa.Env(envMongoUser, defMongoUser),
+		mongoPass:           monetasa.Env(envMongoPass, defMongoPass),
+		mongoDatabase:       monetasa.Env(envMongoDatabase, defMongoDatabase),
+		mongoConnectTimeout: mongoConnectTimeout,
+		mongoSocketTimeout:  mongoSocketTimeout,
+		fabricOrgAdmin:      monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
+		fabricOrgName:       monetasa.Env(envFabricOrgName, defFabricOrgName),
+		fabricConfFile:      fullConfPath,
+		fabricChaincodeID:   monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
+		authURL:             monetasa.Env(envAuthURL, defAuthURL),
 	}
 }
 
@@ -106,10 +134,28 @@ func newFabricSDK(confPath string, logger log.Logger) *fabsdk.FabricSDK {
 	return sdk
 }
 
-func newService(cfg conf, sdk *fabsdk.FabricSDK, logger log.Logger) transactions.Service {
-	bn := fabric.NewNetwork(sdk, cfg.fabricOrgAdmin, cfg.fabricOrgName, cfg.fabricChaincodeID, logger)
+func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
+	ms, err := mongo.Connect(
+		cfg.mongoURL,
+		cfg.mongoConnectTimeout,
+		cfg.mongoSocketTimeout,
+		cfg.mongoDatabase,
+		cfg.mongoUser,
+		cfg.mongoPass,
+	)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to connect to Mongo: %s", err))
+		os.Exit(1)
+	}
 
-	svc := transactions.New(bn)
+	return ms
+}
+
+func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, logger log.Logger) transactions.Service {
+	bn := fabric.NewNetwork(sdk, cfg.fabricOrgAdmin, cfg.fabricOrgName, cfg.fabricChaincodeID, logger)
+	users := mongo.NewUserRepository(ms)
+
+	svc := transactions.New(users, bn)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

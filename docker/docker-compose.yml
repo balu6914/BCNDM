@@ -5,15 +5,14 @@ services:
   ###
   # MongoDB
   ###
-  monetasa-mongodb:
+  monetasa-auth-mongodb:
     image: mongo:latest
-    container_name: monetasa-mongodb
+    container_name: monetasa-auth-mongodb
     command: --smallfiles --nojournal
-    ports:
-      - "27017:27017"
     networks:
       # Our network is called "monetasa-net"
       - monetasa-net
+
   ###
   # Monetasa Auth
   ###
@@ -21,22 +20,27 @@ services:
     image: monetasa/auth
     container_name: monetasa-auth
     restart: on-failure
-    links:
-      - monetasa-mongodb
     depends_on:
-      - monetasa-mongodb
+      - monetasa-auth-mongodb
     ports:
       - "8080:8080"
     expose:
       - "8081"
     environment:
-      - MONETASA_AUTH_MONGO_URL=monetasa-mongodb
+      - MONETASA_AUTH_MONGO_URL=monetasa-auth-mongodb
+      - MONETASA_TRANSACTIONS_URL=monetasa-transactions:8083
       - MONETASA_AUTH_SECRET=monetasa
-    volumes:
-      - ../config:/go/src/monetasa/config/
     networks:
-      # Link to monetasa fabric net
-      - fabric_monetasa-bc-net
+      - monetasa-net
+
+  ###
+  # MongoDB
+  ###
+  monetasa-transactions-mongodb:
+    image: mongo:latest
+    container_name: monetasa-transactions-mongodb
+    command: --smallfiles --nojournal
+    networks:
       - monetasa-net
 
   ###
@@ -46,6 +50,9 @@ services:
     image: monetasa/transactions
     container_name: monetasa-transactions
     restart: on-failure
+    depends_on:
+      - monetasa-auth
+      - monetasa-transactions-mongodb
     ports:
       - "8082:8082"
     expose:
@@ -53,6 +60,7 @@ services:
     environment:
       - MONETASA_TRANSACTIONS_HTTP_PORT=8082
       - MONETASA_TRANSACTIONS_GRPC_PORT=8083
+      - MONETASA_TRANSACTIONS_MONGO_URL=monetasa-transactions-mongodb
       - MONETASA_AUTH_URL=monetasa-auth:8081
     volumes:
       - ../config:/go/src/monetasa/config/
