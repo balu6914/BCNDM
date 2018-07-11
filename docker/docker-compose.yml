@@ -91,7 +91,7 @@ services:
       - 8084:8084
     environment:
       MONETASA_STREAMS_PORT: 8084
-      MONETASA_STREAMS_DB_URL : monetasa-streams-db
+      MONETASA_STREAMS_DB_URL: monetasa-streams-db
       MONETASA_STREAMS_DB_NAME: streams
       MONETASA_AUTH_URL: monetasa-auth:8081
     networks:
@@ -110,7 +110,7 @@ services:
   ###
   # Subscriptions service
   ###
-  monetasa-streams:
+  monetasa-subscriptions:
     image: monetasa/subscriptions:latest
     container_name: monetasa-subscriptions
     depends_on:
@@ -119,7 +119,7 @@ services:
       - 8085:8085
     environment:
       MONETASA_SUBSCRIPTIONS_PORT: 8085
-      MONETASA_SUBSCRIPTIONS_DB_URL : monetasa-subscriptions-db
+      MONETASA_SUBSCRIPTIONS_DB_URL: monetasa-subscriptions-db
       MONETASA_SUBSCRIPTIONS_DB_NAME: subscriptions
       MONETASA_AUTH_URL: monetasa-auth:8081
     networks:

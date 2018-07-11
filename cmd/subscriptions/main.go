@@ -21,12 +21,12 @@ import (
 )
 
 const (
-	envSubsPort      = "MONETASA_SUBS_PORT"
+	envSubsPort      = "MONETASA_SUBSCRIPTIONS_PORT"
 	envAuthURL       = "MONETASA_AUTH_URL"
-	envMongoURL      = "MONETASA_SUBS_MONGO_URL"
-	envMongoUser     = "MONETASA_SUBS_MONGO_USER"
-	envMongoPass     = "MONETASA_SUBS_MONGO_PASS"
-	envMongoDatabase = "MONETASA_SUBS_MONGO_DB"
+	envMongoURL      = "MONETASA_SUBSCRIPTIONS_DB_URL"
+	envMongoUser     = "MONETASA_SUBSCRIPTIONS_DB_USER"
+	envMongoPass     = "MONETASA_SUBSCRIPTIONS_DB_PASS"
+	envMongoDatabase = "MONETASA_SUBSCRIPTIONS_DB_NAME"
 
 	defSubsPort      = "8080"
 	defSubsURL       = "0.0.0.0"
@@ -34,7 +34,7 @@ const (
 	defMongoUser     = ""
 	defMongoPass     = ""
 	defMongoDatabase = "subscriptions"
-	defAuthURL       = "https://localhost:8080"
+	defAuthURL       = "localhost:8080"
 
 	defMongoConnectTimeout = 5000
 	defMongoSocketTimeout  = 5000
