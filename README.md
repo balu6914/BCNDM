@@ -35,10 +35,10 @@ make proto
 make dockers
 ```
 
-Note that minimal demanded version of `protobuf` is `3.6`, and this is not what is provided with
-most of the systems (Debian distro for example, or Alpine docker).
+Note that suggested version of `protobuf` is `3.6`. Outdated `protobuf` versions will
+not work.
 
-For this reason `protoc` can be installed manually from tarball:
+If recent `protoc` version is not provided by your system package manager, it can be installed manually from tarball:
 
 ```
 wget https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip
