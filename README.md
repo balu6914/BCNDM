@@ -17,7 +17,7 @@ git remote set-url origin git@gitlab.com:drasko/monetasa.git
 ### Configure git To Use SSH
 Configure `git` to use `ssh` for GitLab, in order to enable
 `dep` functionality, as explained [here](https://gist.github.com/shurcooL/6927554) -
-otherwise it will break beacuse it can not handle username/password prompt.
+otherwise it will break because it can not handle username/password prompt.
 
 ```
 git config --global url."git@gitlab.com:".insteadOf "https://gitlab.com/"
@@ -27,6 +27,28 @@ git config --global url."git@gitlab.com:".insteadOf "https://gitlab.com/"
 Hyperledger Fabric network and Datapace dApp are deployed in the form of docker composition.
 
 More information can be found in [README](docker/README.md) in `docker` dir.
+
+In order to build backend microservices (i.e. Datapace dApp) you will need to make dockers:
+
+```
+make proto
+make dockers
+```
+
+Note that minimal demanded version of `protobuf` is `3.6`, and this is not what is provided with
+most of the systems (Debian distro for example, or Alpine docker).
+
+For this reason `protoc` can be installed manually from tarball:
+
+```
+wget https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip
+unzip protoc-3.6.0-linux-x86_64.zip -d protoc3
+sudo mv protoc3/bin/* /usr/local/bin/
+sudo mv protoc3/include/* /usr/local/include/
+export PATH=$PATH:/usr/local/bin/protoc
+```
+
+For the installation of Go `protobuf` tools and `gRPC` take a look [here](https://github.com/grpc/grpc-go#faq)
 
 ### Blockchain
 If all crypto-material is generated (as described in aforementioned `docker` README), then blockchain network can be started with:

@@ -1,6 +1,6 @@
 # Fabric Network
 ---
-Following those instractions you will be able to run dockerized Hyperledger Network fully provisioned, with Datapace token chaincoide deployed.
+Following those instructions you will be able to run dockerized Hyperledger Network fully provisioned, with Datapace token chaincoide deployed.
 
 **NOTE:**  All commands are executed from project root.
 
@@ -16,7 +16,7 @@ Make sure that you have all Fabric prerequisites and development tools installed
 ```
 go get github.com/hyperledger/fabric
 cd $GOPATH/src/github.com/hyperledger/fabric
-git checkout v1.1.0
+git checkout v1.2.0
 make -j 16 cryptogen
 make -j 16 configtxgen
 cp build/bin/* $GOBIN
@@ -89,4 +89,4 @@ docker-compose -f docker/docker-compose.yml up
 Now go to `http://localhost` in your browser to see it in action.
 
 **NOTE**: Datapace is available **ONLY** via HTTPS all HTTP requests will be redirected to HTTPS.
-**IMPORTANT:** In development environment we are using selnf-signed SSL certificates so your browser will report you a SSL error fist time when you navigate to `http://localhost`, to solve this click on “ADVANCED” and then on “Proceed to <domain name> (unsafe)”.
+**IMPORTANT:** In development environment we are using self-signed SSL certificates so your browser will report you a SSL error fist time when you navigate to `http://localhost`, to solve this click on “ADVANCED” and then on “Proceed to <domain name> (unsafe)”.
