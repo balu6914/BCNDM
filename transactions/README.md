@@ -14,10 +14,10 @@ default values.
 |----------------------------------------|------------------------------------------|-------------------------------------------|
 | MONETASA_TRANSACTIONS_HTTP_PORT        | Transactions service HTTP port           | 8080                                      |
 | MONETASA_TRANSACTIONS_GRPC_PORT        | Transactions service gRPC port           | 8081                                      |
-| MONETASA_TRANSACTIONS_MONGO_URL        | List of database cluster URLs            | 0.0.0.0                                   |
-| MONETASA_TRANSACTIONS_MONGO_USER       | Database user                            |                                           |
-| MONETASA_TRANSACTIONS_MONGO_PASS       | Database password                        |                                           |
-| MONETASA_TRANSACTIONS_MONGO_DB         | Name of the database used by the service | transactions                              |
+| MONETASA_TRANSACTIONS_DB_URL           | List of database cluster URLs            | 0.0.0.0                                   |
+| MONETASA_TRANSACTIONS_DB_USER          | Database user                            |                                           |
+| MONETASA_TRANSACTIONS_DB_PASS          | Database password                        |                                           |
+| MONETASA_TRANSACTIONS_DB_NAME          | Name of the database used by the service | transactions                              |
 | MONETASA_TRANSACTIONS_FABRIC_ADMIN     | Organization admin for Fabric            | admin                                     |
 | MONETASA_TRANSACTIONS_FABRIC_NAME      | Organization name for Fabric             | org1                                      |
 | MONETASA_TRANSACTIONS_FABRIC_CONF      | Fabric configuration path                | `/src/monetasa/config/fabric/config.yaml` |
@@ -41,7 +41,7 @@ make transactions
 make install
 
 # set the environment variables and run the service
-MONETASA_TRANSACTIONS_HTTP_PORT=[Transactions service HTTP port] MONETASA_TRANSACTIONS_GRPC_PORT=[Transactions service gRPC port] MONETASA_TRANSACTIONS_MONGO_URL=[List of database cluster URLs] MONETASA_TRANSACTIONS_MONGO_USER=[Database user] MONETASA_TRANSACTIONS_MONGO_PASS=[Database password] MONETASA_TRANSACTIONS_MONGO_DB=[Name of the database used by the service] MONETASA_TRANSACTIONS_FABRIC_ADMIN=[Organization admin for Fabric] MONETASA_TRANSACTIONS_FABRIC_NAME=[Organization name for Fabric] MONETASA_TRANSACTIONS_FABRIC_CONF=[Fabric configuration path] MONETASA_TRANSACTIONS_FABRIC_CHAINCODE=[Fabric token chaincode id] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-transactions
+MONETASA_TRANSACTIONS_HTTP_PORT=[Transactions service HTTP port] MONETASA_TRANSACTIONS_GRPC_PORT=[Transactions service gRPC port] MONETASA_TRANSACTIONS_DB_URL=[List of database cluster URLs] MONETASA_TRANSACTIONS_DB_USER=[Database user] MONETASA_TRANSACTIONS_DB_PASS=[Database password] MONETASA_TRANSACTIONS_DB_NAME=[Name of the database used by the service] MONETASA_TRANSACTIONS_FABRIC_ADMIN=[Organization admin for Fabric] MONETASA_TRANSACTIONS_FABRIC_NAME=[Organization name for Fabric] MONETASA_TRANSACTIONS_FABRIC_CONF=[Fabric configuration path] MONETASA_TRANSACTIONS_FABRIC_CHAINCODE=[Fabric token chaincode id] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-transactions
 ```
 
 ## Usage
