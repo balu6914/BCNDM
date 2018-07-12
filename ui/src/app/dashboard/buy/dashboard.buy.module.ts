@@ -29,8 +29,8 @@ import { CommonAppModule } from '../../common/common.module';
     NgPipesModule,
     NgxDatatableModule,
     CommonAppModule,
-    DashboardBuyRoutingModule,
     SubscriptionModule,
+    DashboardBuyRoutingModule,
     LeafletModule.forRoot(),
     LeafletDrawModule.forRoot()
   ],

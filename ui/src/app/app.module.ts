@@ -27,11 +27,11 @@ import { WalletModule } from './dashboard/wallet/wallet.module';
         MdlDatePickerModule,
         // App modules
         AuthModule,
-        AppRoutingModule,
         CommonAppModule,
         LayoutModule,
         DashboardModule,
-        WalletModule
+        WalletModule,
+        AppRoutingModule,
     ],
     declarations: [
         AppComponent,
