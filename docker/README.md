@@ -86,7 +86,8 @@ Run docker composition:
 docker-compose -f docker/docker-compose.yml up
 ```
 
-Now go to `http://localhost` in your browser to see it in action.
+Now go to `https://localhost` in your browser to see it in action.
 
-**NOTE**: Datapace is available **ONLY** via HTTPS all HTTP requests will be redirected to HTTPS.
-**IMPORTANT:** In development environment we are using self-signed SSL certificates so your browser will report you a SSL error fist time when you navigate to `http://localhost`, to solve this click on “ADVANCED” and then on “Proceed to <domain name> (unsafe)”.
+> **NOTE**: Datapace is available **ONLY** via HTTPS all HTTP requests will be redirected to HTTPS.
+
+> **IMPORTANT:** In development environment we are using self-signed SSL certificates so your browser will report you a SSL error fist time when you navigate to `https://localhost`, to solve this click on “ADVANCED” and then on “Proceed to <domain name> (unsafe)”.
