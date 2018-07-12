@@ -28,10 +28,10 @@ import (
 const (
 	envHTTPPort          = "MONETASA_TRANSACTIONS_HTTP_PORT"
 	envGRPCPort          = "MONETASA_TRANSACTIONS_GRPC_PORT"
-	envMongoURL          = "MONETASA_TRANSACTIONS_MONGO_URL"
-	envMongoUser         = "MONETASA_TRANSACTIONS_MONGO_USER"
-	envMongoPass         = "MONETASA_TRANSACTIONS_MONGO_PASS"
-	envMongoDatabase     = "MONETASA_TRANSACTIONS_MONGO_DB"
+	envDBURL             = "MONETASA_TRANSACTIONS_DB_URL"
+	envDBUser            = "MONETASA_TRANSACTIONS_DB_USER"
+	envDBPass            = "MONETASA_TRANSACTIONS_DB_PASS"
+	envDBName            = "MONETASA_TRANSACTIONS_DB_NAME"
 	envFabricOrgAdmin    = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
 	envFabricOrgName     = "MONETASA_TRANSACTIONS_FABRIC_NAME"
 	envFabricConfFile    = "MONETASA_TRANSACTIONS_FABRIC_CONF"
@@ -40,34 +40,34 @@ const (
 
 	defHTTPPort          = "8080"
 	defGRPCPort          = "8081"
-	defMongoURL          = "0.0.0.0"
-	defMongoUser         = ""
-	defMongoPass         = ""
-	defMongoDatabase     = "transactions"
+	defDBURL             = "0.0.0.0"
+	defDBUser            = ""
+	defDBPass            = ""
+	defDBName            = "transactions"
 	defFabricOrgAdmin    = "admin"
 	defFabricOrgName     = "org1"
 	defFabricConfFile    = "/src/monetasa/config/fabric/config.yaml"
 	defFabricChaincodeID = "token"
 	defAuthURL           = "localhost:8081"
 
-	mongoConnectTimeout = 5000
-	mongoSocketTimeout  = 5000
+	dbConnectTimeout = 5000
+	dbSocketTimeout  = 5000
 )
 
 type conf struct {
-	httpPort            string
-	grpcPort            string
-	mongoURL            string
-	mongoUser           string
-	mongoPass           string
-	mongoDatabase       string
-	mongoConnectTimeout int
-	mongoSocketTimeout  int
-	fabricOrgAdmin      string
-	fabricOrgName       string
-	fabricConfFile      string
-	fabricChaincodeID   string
-	authURL             string
+	httpPort          string
+	grpcPort          string
+	dbURL             string
+	dbUser            string
+	dbPass            string
+	dbName            string
+	dbConnectTimeout  int
+	dbSocketTimeout   int
+	fabricOrgAdmin    string
+	fabricOrgName     string
+	fabricConfFile    string
+	fabricChaincodeID string
+	authURL           string
 }
 
 func main() {
@@ -108,19 +108,19 @@ func loadConfig() conf {
 	confPath := monetasa.Env(envFabricConfFile, defFabricConfFile)
 	fullConfPath := fmt.Sprintf("%s%s", os.Getenv("GOPATH"), confPath)
 	return conf{
-		httpPort:            monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:            monetasa.Env(envGRPCPort, defGRPCPort),
-		mongoURL:            monetasa.Env(envMongoURL, defMongoURL),
-		mongoUser:           monetasa.Env(envMongoUser, defMongoUser),
-		mongoPass:           monetasa.Env(envMongoPass, defMongoPass),
-		mongoDatabase:       monetasa.Env(envMongoDatabase, defMongoDatabase),
-		mongoConnectTimeout: mongoConnectTimeout,
-		mongoSocketTimeout:  mongoSocketTimeout,
-		fabricOrgAdmin:      monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
-		fabricOrgName:       monetasa.Env(envFabricOrgName, defFabricOrgName),
-		fabricConfFile:      fullConfPath,
-		fabricChaincodeID:   monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
-		authURL:             monetasa.Env(envAuthURL, defAuthURL),
+		httpPort:          monetasa.Env(envHTTPPort, defHTTPPort),
+		grpcPort:          monetasa.Env(envGRPCPort, defGRPCPort),
+		dbURL:             monetasa.Env(envDBURL, defDBURL),
+		dbUser:            monetasa.Env(envDBUser, defDBUser),
+		dbPass:            monetasa.Env(envDBPass, defDBPass),
+		dbName:            monetasa.Env(envDBName, defDBName),
+		dbConnectTimeout:  dbConnectTimeout,
+		dbSocketTimeout:   dbSocketTimeout,
+		fabricOrgAdmin:    monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
+		fabricOrgName:     monetasa.Env(envFabricOrgName, defFabricOrgName),
+		fabricConfFile:    fullConfPath,
+		fabricChaincodeID: monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
+		authURL:           monetasa.Env(envAuthURL, defAuthURL),
 	}
 }
 
@@ -136,12 +136,12 @@ func newFabricSDK(confPath string, logger log.Logger) *fabsdk.FabricSDK {
 
 func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
 	ms, err := mongo.Connect(
-		cfg.mongoURL,
-		cfg.mongoConnectTimeout,
-		cfg.mongoSocketTimeout,
-		cfg.mongoDatabase,
-		cfg.mongoUser,
-		cfg.mongoPass,
+		cfg.dbURL,
+		cfg.dbConnectTimeout,
+		cfg.dbSocketTimeout,
+		cfg.dbName,
+		cfg.dbUser,
+		cfg.dbPass,
 	)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to connect to Mongo: %s", err))

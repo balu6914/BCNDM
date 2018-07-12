@@ -14,10 +14,10 @@ default values.
 |---------------------------|------------------------------------------|----------------|
 | MONETASA_AUTH_HTTP_PORT   | Auth service HTTP port                   | 8080           |
 | MONETASA_AUTH_GRPC_PORT   | Auth service gRPC port                   | 8081           |
-| MONETASA_AUTH_MONGO_URL   | List of database cluster URLs            | 0.0.0.0        |
-| MONETASA_AUTH_MONGO_USER  | Database user                            |                |
-| MONETASA_AUTH_MONGO_PASS  | Database password                        |                |
-| MONETASA_AUTH_MONGO_DB    | Name of the database used by the service | auth           |
+| MONETASA_AUTH_DB_URL      | List of database cluster URLs            | 0.0.0.0        |
+| MONETASA_AUTH_DB_USER     | Database user                            |                |
+| MONETASA_AUTH_DB_PASS     | Database password                        |                |
+| MONETASA_AUTH_DB_NAME     | Name of the database used by the service | auth           |
 | MONETASA_TRANSACTIONS_URL | Transactions service gRPC URL            | localhost:8081 |
 | MONETASA_AUTH_SECRET      | Authorization secret                     | monetasa       |
 
@@ -38,7 +38,7 @@ make transactions
 make install
 
 # set the environment variables and run the service
-MONETASA_AUTH_HTTP_PORT=[Auth service HTTP port] MONETASA_AUTH_GRPC_PORT=[Auth service gRPC port] MONETASA_AUTH_MONGO_URL=[List of database cluster URLs] MONETASA_AUTH_MONGO_USER=[Database user] MONETASA_AUTH_MONGO_PASS=[Database password] MONETASA_AUTH_MONGO_DB=[Name of the database used by the service] MONETASA_TRANSACTIONS_URL=[Transactions service gRPC URL] MONETASA_AUTH_SECRET=[Authorization secret] $GOBIN/monetasa-auth
+MONETASA_AUTH_HTTP_PORT=[Auth service HTTP port] MONETASA_AUTH_GRPC_PORT=[Auth service gRPC port] MONETASA_AUTH_DB_URL=[List of database cluster URLs] MONETASA_AUTH_DB_USER=[Database user] MONETASA_AUTH_DB_PASS=[Database password] MONETASA_AUTH_DB_NAME=[Name of the database used by the service] MONETASA_TRANSACTIONS_URL=[Transactions service gRPC URL] MONETASA_AUTH_SECRET=[Authorization secret] $GOBIN/monetasa-auth
 ```
 
 ## Usage
