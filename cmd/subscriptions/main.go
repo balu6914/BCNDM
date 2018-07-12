@@ -79,7 +79,7 @@ func main() {
 	}
 	defer ms.Close()
 
-	conn, err := grpc.Dial(defAuthURL, grpc.WithInsecure())
+	conn, err := grpc.Dial(cfg.AuthURL, grpc.WithInsecure())
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to connect to users service: %s", err))
 		os.Exit(1)
