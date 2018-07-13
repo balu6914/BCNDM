@@ -1,10 +1,10 @@
-import { BlocksenseUiPage } from './app.po';
+import { DatapaceUiPage } from './app.po';
 
-describe('blocksense-ui App', () => {
-  let page: BlocksenseUiPage;
+describe('datapace-ui App', () => {
+  let page: DatapaceUiPage;
 
   beforeEach(() => {
-    page = new BlocksenseUiPage();
+    page = new DatapaceUiPage();
   });
 
   it('should display welcome message', done => {

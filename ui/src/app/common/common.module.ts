@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MdlModule } from '@angular-mdl/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutModule } from '../layout'
-import { HttpModule } from "@angular/http";
+import { HttpModule } from '@angular/http';
 // Interfaces
 import { Stream } from './interfaces/stream.interface';
 import { Subscription } from './interfaces/subscription.interface';
@@ -20,7 +20,7 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
     ReactiveFormsModule,
   ],
   declarations: [
-    // Pipies
+    // Pipes
     TasPipe,
     MitasPipe
   ],
