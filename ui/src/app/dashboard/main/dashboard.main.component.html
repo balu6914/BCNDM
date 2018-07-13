@@ -248,11 +248,16 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let sub of mySubscriptions">
-                            <th scope="col">{{ sub.stream_name }}</th>
-                            <th scope="col">{{ sub.stream_price }}</th>
-                            <th scope="col">{{ sub.start_date | date}}</th>
-                            <th scope="col">{{ sub.end_date | date }}</th>
-                            <th scope="col">{{ sub.url }}</th>
+                          <td>{{ sub.stream_name }}</td>
+                          <td nowrap>{{ sub.stream_price }}</td>
+                          <td nowrap>{{ sub.start_date | date}}</td>
+                          <td nowrap>{{ sub.end_date | date }}</td>
+                          <td nowrap>
+                            <div class="action-wrapper">
+                              <a href="#" class="btn btn-primary-alt btn-sm">Open</a>
+                              <a href="#" class="btn btn-primary-alt btn-sm">Copy</a>
+                            </div>
+                          </td>
                         </tr>
                     </tbody>
                   </table>
