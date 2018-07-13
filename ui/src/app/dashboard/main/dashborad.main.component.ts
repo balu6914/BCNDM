@@ -15,6 +15,8 @@ import { Subscription } from '../../common/interfaces/subscription.interface';
 import { Chart } from 'chart.js';
 import {} from '@types/googlemaps';
 
+import {html, render} from 'lit-html';
+
 @Component({
   selector: 'dashboard-main',
   templateUrl: './dashboard.main.component.html',
@@ -495,6 +497,12 @@ export class DashboardMainComponent {
 
         // Check the stream type and set proper icon
         let icon: string;
+        var icons = {
+            'temperature': 'Coke',
+            'humidity': 'Pepsi',
+            'air': 'Lemonade',
+            'default': 'Default item'
+        };
         switch(type) {
             case "temperature": {
                 icon = "assets/img/icons/map-temp.svg";
@@ -522,27 +530,27 @@ export class DashboardMainComponent {
             icon: icon,
         });
 
-        // Allow each marker to have an info window
-        google.maps.event.addListener(
-            marker,
-            "click",
-            (function(marker) {
-                return function() {
-                    let infoWindow = new google.maps.InfoWindow();
-                    let infoWindowContent =
-                            '<div class="map-tooltip">' +
-                                '<p class="map-tooltip__title">' + name + '</p>' +
-                                '<div id="bodyContent" class="map-tooltip__content">' +
-                                '<p class="map-tooltip__subtitle">'+ type +'</p>' +
-                                '<p class="map-tooltip__stake">Stake: <span class="map-tooltip__stake-amount">' +
-                                mitasPrice + ' TAS</span></p>' +
-                                "</div>" +
-                                "</div>"
+        // Create new marker infowindow
+        var infowindow = new google.maps.InfoWindow({
+            content: `
+                <div class="map-tooltip">
+                  <p class="map-tooltip__title"> ${name} </p>
+                  <div id="bodyContent" class="map-tooltip__content">
+                    <p class="map-tooltip__subtitle"> ${type} </p>
+                    <p class="map-tooltip__stake">
+                      Stake: <span class="map-tooltip__stake-amount">
+                      ${mitasPrice} TAS
+                      </span>
+                    </p>
+                  </div>
+                </div>
+          `
+        });
 
-                    infoWindow.setContent(infoWindowContent);
-                    infoWindow.open(this.map, marker);
-                };
-            })(marker)
-        );
+        // Set infowindow to marker
+        marker.addListener('click', function() {
+          infowindow.open(this.map, marker);
+        });
+
     }
 }
