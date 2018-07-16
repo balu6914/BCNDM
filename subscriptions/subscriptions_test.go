@@ -65,7 +65,7 @@ func TestGetSubscriptions(t *testing.T) {
 		},
 		"read subscriptions with non-existent entity": {
 			wrong,
-			subscriptions.ErrUnauthorizedAccess,
+			subscriptions.ErrNotFound,
 		},
 	}
 

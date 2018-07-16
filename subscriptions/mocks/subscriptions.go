@@ -42,5 +42,5 @@ func (srm *subscriptionsRepositoryMock) Read(userId string) ([]subscriptions.Sub
 		return sl, nil
 	}
 
-	return nil, subscriptions.ErrUnauthorizedAccess
+	return []subscriptions.Subscription{}, subscriptions.ErrNotFound
 }
