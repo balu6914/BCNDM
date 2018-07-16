@@ -15,7 +15,6 @@ import { Subscription } from '../../common/interfaces/subscription.interface';
 import { Chart } from 'chart.js';
 import {} from '@types/googlemaps';
 
-import {html, render} from 'lit-html';
 
 @Component({
   selector: 'dashboard-main',

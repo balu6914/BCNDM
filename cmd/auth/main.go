@@ -28,37 +28,37 @@ import (
 const (
 	envHTTPPort        = "MONETASA_AUTH_HTTP_PORT"
 	envGRPCPort        = "MONETASA_AUTH_GRPC_PORT"
-	envMongoURL        = "MONETASA_AUTH_MONGO_URL"
-	envMongoUser       = "MONETASA_AUTH_MONGO_USER"
-	envMongoPass       = "MONETASA_AUTH_MONGO_PASS"
-	envMongoDatabase   = "MONETASA_AUTH_MONGO_DB"
+	envDBURL           = "MONETASA_AUTH_DB_URL"
+	envDBUser          = "MONETASA_AUTH_DB_USER"
+	envDBPass          = "MONETASA_AUTH_DB_PASS"
+	envDBName          = "MONETASA_AUTH_DB_NAME"
 	envTransactionsURL = "MONETASA_TRANSACTIONS_URL"
 	envSecret          = "MONETASA_AUTH_SECRET"
 
 	defHTTPPort        = "8080"
 	defGRPCPort        = "8081"
-	defMongoURL        = "0.0.0.0"
-	defMongoUser       = ""
-	defMongoPass       = ""
-	defMongoDatabase   = "auth"
+	defDBURL           = "0.0.0.0"
+	defDBUser          = ""
+	defDBPass          = ""
+	defDBName          = "auth"
 	defTransactionsURL = "localhost:8081"
 	defSecret          = "monetasa"
 
-	mongoConnectTimeout = 5000
-	mongoSocketTimeout  = 5000
+	dbConnectTimeout = 5000
+	dbSocketTimeout  = 5000
 )
 
 type config struct {
-	httpPort            string
-	grpcPort            string
-	mongoURL            string
-	mongoUser           string
-	mongoPass           string
-	mongoDatabase       string
-	mongoConnectTimeout int
-	mongoSocketTimeout  int
-	transactionsURL     string
-	secret              string
+	httpPort         string
+	grpcPort         string
+	dbURL            string
+	dbUser           string
+	dbPass           string
+	dbName           string
+	dbConnectTimeout int
+	dbSocketTimeout  int
+	transactionsURL  string
+	secret           string
 }
 
 func main() {
@@ -94,27 +94,27 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		httpPort:            monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:            monetasa.Env(envGRPCPort, defGRPCPort),
-		mongoURL:            monetasa.Env(envMongoURL, defMongoURL),
-		mongoUser:           monetasa.Env(envMongoUser, defMongoUser),
-		mongoPass:           monetasa.Env(envMongoPass, defMongoPass),
-		mongoDatabase:       monetasa.Env(envMongoDatabase, defMongoDatabase),
-		mongoConnectTimeout: mongoConnectTimeout,
-		mongoSocketTimeout:  mongoSocketTimeout,
-		transactionsURL:     monetasa.Env(envTransactionsURL, defTransactionsURL),
-		secret:              monetasa.Env(envSecret, defSecret),
+		httpPort:         monetasa.Env(envHTTPPort, defHTTPPort),
+		grpcPort:         monetasa.Env(envGRPCPort, defGRPCPort),
+		dbURL:            monetasa.Env(envDBURL, defDBURL),
+		dbUser:           monetasa.Env(envDBUser, defDBUser),
+		dbPass:           monetasa.Env(envDBPass, defDBPass),
+		dbName:           monetasa.Env(envDBName, defDBName),
+		dbConnectTimeout: dbConnectTimeout,
+		dbSocketTimeout:  dbSocketTimeout,
+		transactionsURL:  monetasa.Env(envTransactionsURL, defTransactionsURL),
+		secret:           monetasa.Env(envSecret, defSecret),
 	}
 }
 
 func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	ms, err := mongo.Connect(
-		cfg.mongoURL,
-		cfg.mongoConnectTimeout,
-		cfg.mongoSocketTimeout,
-		cfg.mongoDatabase,
-		cfg.mongoUser,
-		cfg.mongoPass,
+		cfg.dbURL,
+		cfg.dbConnectTimeout,
+		cfg.dbSocketTimeout,
+		cfg.dbName,
+		cfg.dbUser,
+		cfg.dbPass,
 	)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to connect to Mongo: %s", err))

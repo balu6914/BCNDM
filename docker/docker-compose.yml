@@ -3,48 +3,48 @@ version: "2"
 
 services:
   ###
-  # MongoDB
+  # Auth DB
   ###
-  monetasa-auth-mongodb:
+  monetasa-auth-db:
     image: mongo:latest
-    container_name: monetasa-auth-mongodb
+    container_name: monetasa-auth-db
     command: --smallfiles --nojournal
     networks:
       # Our network is called "monetasa-net"
       - monetasa-net
 
   ###
-  # Monetasa Auth
+  # Auth service
   ###
   monetasa-auth:
     image: monetasa/auth
     container_name: monetasa-auth
     restart: on-failure
     depends_on:
-      - monetasa-auth-mongodb
+      - monetasa-auth-db
     ports:
       - "8080:8080"
     expose:
       - "8081"
     environment:
-      - MONETASA_AUTH_MONGO_URL=monetasa-auth-mongodb
+      - MONETASA_AUTH_DB_URL=monetasa-auth-db
       - MONETASA_TRANSACTIONS_URL=monetasa-transactions:8083
       - MONETASA_AUTH_SECRET=monetasa
     networks:
       - monetasa-net
 
   ###
-  # MongoDB
+  # Transactions DB
   ###
-  monetasa-transactions-mongodb:
+  monetasa-transactions-db:
     image: mongo:latest
-    container_name: monetasa-transactions-mongodb
+    container_name: monetasa-transactions-db
     command: --smallfiles --nojournal
     networks:
       - monetasa-net
 
   ###
-  # Monetasa Transactions
+  # Transactions service
   ###
   monetasa-transactions:
     image: monetasa/transactions
@@ -52,7 +52,7 @@ services:
     restart: on-failure
     depends_on:
       - monetasa-auth
-      - monetasa-transactions-mongodb
+      - monetasa-transactions-db
     ports:
       - "8082:8082"
     expose:
@@ -60,7 +60,7 @@ services:
     environment:
       - MONETASA_TRANSACTIONS_HTTP_PORT=8082
       - MONETASA_TRANSACTIONS_GRPC_PORT=8083
-      - MONETASA_TRANSACTIONS_MONGO_URL=monetasa-transactions-mongodb
+      - MONETASA_TRANSACTIONS_DB_URL=monetasa-transactions-db
       - MONETASA_AUTH_URL=monetasa-auth:8081
     volumes:
       - ../config:/go/src/monetasa/config/
@@ -70,7 +70,7 @@ services:
       - monetasa-net
 
   ###
-  # Streams MongoDB
+  # Streams DB
   ###
   monetasa-streams-db:
     image: mongo:latest
@@ -98,7 +98,7 @@ services:
       - monetasa-net
 
   ###
-  # Subscriptions MongoDB
+  # Subscriptions DB
   ###
   monetasa-subscriptions-db:
     image: mongo:latest

@@ -12,9 +12,6 @@ import { DashboardRoutingModule } from './dashboard.routes';
 // Dashboard components
 import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
-import { DashboardSellModule } from './sell/dashboard.sell.module';
-import { DashboardBuyModule } from './buy/dashboard.buy.module';
-import { DashboardContractsModule } from './contracts/dashboard.contracts.module';
 import { WalletModule } from './wallet/wallet.module';
 import { SubscriptionModule } from './subscription/index';
 
@@ -40,13 +37,10 @@ import { ClipboardModule } from 'ngx-clipboard';
     // App module
     AuthModule,
     CommonAppModule,
-    DashboardRoutingModule,
     LayoutModule,
-    DashboardSellModule,
-    DashboardBuyModule,
-    DashboardContractsModule,
     WalletModule,
     SubscriptionModule,
+    DashboardRoutingModule,
     NgxDatatableModule,
     LeafletModule.forRoot(),
     LeafletDrawModule.forRoot(),
