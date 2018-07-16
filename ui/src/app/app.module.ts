@@ -7,6 +7,7 @@ import {NgPipesModule} from 'ngx-pipes';
 
 
 import { AppRoutingModule } from './app.routes';
+import { AppBootstrapModule } from './app-bootstrap/app-bootstrap.module'
 import { AppComponent } from './app.component';
 import { NoContentComponent } from './no-content';
 
@@ -26,6 +27,7 @@ import { WalletModule } from './dashboard/wallet/wallet.module';
         MdlModule,
         MdlDatePickerModule,
         // App modules
+        AppBootstrapModule,
         AuthModule,
         CommonAppModule,
         LayoutModule,
