@@ -486,6 +486,17 @@ export class DashboardMainComponent {
 
       }
 
+    // Get stream type icon
+    getIcon(type) {
+        var drinks = {
+            'temperature': 'assets/img/icons/map-temp.svg',
+            'humidity': 'assets/img/icons/map-water.svg',
+            'air': 'assets/img/icons/map-co2.svg',
+            'default': 'assets/img/icons/map.svg'
+        };
+        return (drinks[type] || drinks['default']);
+    }
+
     // Display stream marker on a map
     setMarkers(stream) {
         const name = stream["name"];
@@ -494,33 +505,7 @@ export class DashboardMainComponent {
         const position = new google.maps.LatLng(lng, lat);
         const mitasPrice = this.tasPipe.transform(stream["price"])
         const type = stream["type"]
-
-        // Check the stream type and set proper icon
-        let icon: string;
-        var icons = {
-            'temperature': 'Coke',
-            'humidity': 'Pepsi',
-            'air': 'Lemonade',
-            'default': 'Default item'
-        };
-        switch(type) {
-            case "temperature": {
-                icon = "assets/img/icons/map-temp.svg";
-                break;
-            }
-            case "humidity": {
-                icon = "assets/img/icons/map-water.svg";
-                break;
-            }
-            case "air": {
-                icon = "assets/img/icons/map-co2.svg";
-                break;
-            }
-            default: {
-                icon = "assets/img/icons/map.svg";
-                break;
-            }
-        }
+        const icon = this.getIcon(type)
 
         // Create new marker on the map
         let marker = new google.maps.Marker({
