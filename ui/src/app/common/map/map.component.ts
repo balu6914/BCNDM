@@ -8,7 +8,7 @@ import {} from "@types/googlemaps";
 @Component({
   selector: "dpc-map",
   templateUrl: "./map.component.html",
-  styleUrls: ["./map.component.css"]
+  styleUrls: ["./map.component.scss"]
 })
 export class MapComponent implements OnInit {
   map: any;
