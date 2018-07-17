@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 
 import { TasPipe } from "../../common/pipes/converter.pipe";
 import mapStyle from './map-style.json';
@@ -11,15 +11,14 @@ import {} from "@types/googlemaps";
   styleUrls: ["./map.component.css"]
 })
 export class MapComponent implements OnInit {
-  streamList = [];
-  subscriptionList = [];
-  temp = [];
   map: any;
 
-  constructor(private tasPipe: TasPipe) {}
+  @Input() streamList: any;
+  constructor(
+    private tasPipe: TasPipe
+  ) {}
 
-  // Create Google Map
-  create(mapElement: HTMLElement) {
+  ngOnInit() {
     // Basic options for a simple Google Map
     // For more options see: https://developers.google.com/maps/documentation/javascript/reference#MapOptions
     let mapOptions: any = {
@@ -35,6 +34,9 @@ export class MapComponent implements OnInit {
       // This is where you would paste any style found on Snazzy Maps.
       styles: mapStyle,
     };
+
+    let mapElement = document.getElementById("map");
+
     // Create the Google Map using our element and options defined above
     this.map = new google.maps.Map(mapElement, mapOptions);
 
@@ -107,10 +109,4 @@ export class MapComponent implements OnInit {
       infowindow.open(this.map, marker);
     });
   }
-
-  setStreamList(list: any) {
-    this.streamList = list;
-  }
-
-  ngOnInit() {}
 }

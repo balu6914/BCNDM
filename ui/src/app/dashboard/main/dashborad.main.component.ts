@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { MdlDialogService } from '@angular-mdl/core';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 
@@ -10,10 +10,8 @@ import { SubscriptionService } from './services/subscription.service';
 import { TasPipe } from '../../common/pipes/converter.pipe';
 import { User } from '../../common/interfaces/user.interface';
 import { Subscription } from '../../common/interfaces/subscription.interface';
-import { MapComponent } from '../../common/map/map.component';
 
 import { Chart } from 'chart.js';
-
 
 
 @Component({
@@ -24,7 +22,9 @@ import { Chart } from 'chart.js';
 export class DashboardMainComponent {
     user:any;
     subscriptionList = [];
+    streamList = [];
     temp = [];
+    map: any;
 
     constructor(
         private AuthService: AuthService,
@@ -33,7 +33,6 @@ export class DashboardMainComponent {
         private searchService: SearchService,
         private dialogService: MdlDialogService,
         private tasPipe: TasPipe,
-        private mapComponent: MapComponent,
     ) {}
 
     ngOnInit() {
@@ -63,7 +62,7 @@ export class DashboardMainComponent {
                   subscription["stream_price"] = mitasPrice;
 
                   // Set markers on the map
-                  this.mapComponent.addMarker(stream);
+                  this.streamList.push(stream);
                 },
                 err => {
                   console.log(err);
@@ -195,15 +194,9 @@ export class DashboardMainComponent {
             northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
             (result: any) => {
               this.temp = [...result.Streams];
-              this.mapComponent.setStreamList(this.temp);
           },
           err => {
             console.log(err)
           });
-
-          // Get the HTML DOM element that will contain your map
-          // We are using a div with id="map" seen below in the <body>
-          let mapElement = document.getElementById("map");
-          this.mapComponent.create(mapElement);
       }
 }

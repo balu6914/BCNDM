@@ -50,12 +50,12 @@ import { MapComponent } from '../common/map/map.component';
   declarations: [
       DashboardComponent,
       DashboardMainComponent,
+      MapComponent,
   ],
   providers: [
       SubscriptionService,
       StreamService,
       SearchService,
-      MapComponent,
   ],
  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
