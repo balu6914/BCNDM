@@ -34,7 +34,7 @@ const (
 	defMongoUser     = ""
 	defMongoPass     = ""
 	defMongoDatabase = "subscriptions"
-	defAuthURL       = "localhost:8080"
+	defAuthURL       = "localhost:8081"
 
 	defMongoConnectTimeout = 5000
 	defMongoSocketTimeout  = 5000
