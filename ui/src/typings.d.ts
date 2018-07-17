@@ -5,7 +5,7 @@ interface NodeModule {
 }
 
 /* Map Wildcard Module */
-declare module "map-style.json" {
+declare module "*.json" {
     const value: any;
     export default value;
 }
