@@ -10,6 +10,7 @@ import { Subscription } from './interfaces/subscription.interface';
 import { User } from './interfaces/user.interface';
 // Pipes
 import { MitasPipe, TasPipe} from './pipes/converter.pipe';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
   declarations: [
     // Pipes
     TasPipe,
-    MitasPipe
+    MitasPipe,
+    MapComponent,
   ],
   providers: [
       TasPipe,

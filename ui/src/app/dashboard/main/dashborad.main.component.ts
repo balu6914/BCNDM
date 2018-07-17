@@ -1,19 +1,19 @@
 import { Component, ViewChild } from '@angular/core';
 import { MdlDialogService } from '@angular-mdl/core';
-import { HttpClient } from '@angular/common/http';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { AuthService } from '../../auth/services/auth.service';
 import { SearchService } from './services/search.service';
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
+
 import { TasPipe } from '../../common/pipes/converter.pipe';
 import { User } from '../../common/interfaces/user.interface';
-
 import { Subscription } from '../../common/interfaces/subscription.interface';
+import { MapComponent } from '../../common/map/map.component';
 
 import { Chart } from 'chart.js';
-import {} from '@types/googlemaps';
+
 
 
 @Component({
@@ -23,21 +23,17 @@ import {} from '@types/googlemaps';
 })
 export class DashboardMainComponent {
     user:any;
-    mySubscriptions = [];
-    myStreamsList = [];
-    temp2 = [];
+    subscriptionList = [];
     temp = [];
-    map: any;
 
-    @ViewChild(DatatableComponent) table: DatatableComponent;
     constructor(
         private AuthService: AuthService,
-        private SubscriptionService: SubscriptionService,
+        private subscriptionService: SubscriptionService,
         private streamService: StreamService,
-        public searchService: SearchService,
-        public http: HttpClient,
+        private searchService: SearchService,
         private dialogService: MdlDialogService,
-        private tasPipe: TasPipe
+        private tasPipe: TasPipe,
+        private mapComponent: MapComponent,
     ) {}
 
     ngOnInit() {
@@ -53,33 +49,35 @@ export class DashboardMainComponent {
         );
 
         // Fetch all subscriptions
-        this.SubscriptionService.get().subscribe(
+        this.subscriptionService.get().subscribe(
           (result: any) => {
-              this.temp2 = [...result.Subscriptions];
-              result.Subscriptions.forEach(subscription => {
-                  this.streamService.getStream(subscription["id"]).subscribe(
-                    (result: any) => {
-                        const stream = result.Stream
+            this.temp = [...result.Subscriptions];
+            result.Subscriptions.forEach(subscription => {
+              this.streamService.getStream(subscription["id"]).subscribe(
+                (result: any) => {
+                  const stream = result.Stream;
 
-                        // Create name and price field in susbcription
-                        subscription["stream_name"] = stream["name"]
-                        const mitasPrice = this.tasPipe.transform(stream["price"])
-                        subscription["stream_price"] = mitasPrice
+                  // Create name and price field in susbcription
+                  subscription["stream_name"] = stream["name"];
+                  const mitasPrice = this.tasPipe.transform(stream["price"]);
+                  subscription["stream_price"] = mitasPrice;
 
-                        // Set markers on the map
-                        this.setMarkers(stream);
-                    },
-                    err => {
-                        console.log(err)
-                    });
+                  // Set markers on the map
+                  this.mapComponent.addMarker(stream);
+                },
+                err => {
+                  console.log(err);
+                }
+              );
 
-                    // Push marker to the markers list
-                    this.mySubscriptions.push(subscription);
-                });
+              // Push marker to the markers list
+              this.subscriptionList.push(subscription);
+            });
           },
           err => {
-              console.log(err)
-          });
+            console.log(err);
+          }
+        );
 
           let chartData = {
               type: "line",
@@ -185,356 +183,27 @@ export class DashboardMainComponent {
           let ctx = c.getContext("2d");
           let chart = new Chart(ctx, chartData);
 
-          // When the window has finished loading create our google map below
+          // TODO: Replace this coordinates with map bounds
+          const southWestLng = -180;
+          const southWestLat = -90;
+          const northEastLng = 180;
+          const northEastLat = 90;
 
-          // Basic options for a simple Google Map
-          // For more options see: https://developers.google.com/maps/documentation/javascript/reference#MapOptions
-          let mapOptions : any =  {
-
-              // The latitude and longitude to center the map (always required)
-              center: new google.maps.LatLng(48.86, 2.34), // Paris
-
-              // How zoomed in you want the map to start at (always required)
-              zoom: 6,
-              disableDefaultUI: true,
-              zoomControl: true,
-
-              // How you would like to style the map.
-              // This is where you would paste any style found on Snazzy Maps.
-              styles: [
-                  {
-                      featureType: "administrative",
-                      elementType: "labels.text.fill",
-                      stylers: [
-                          {
-                              color: "#444444",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.country",
-                      elementType: "geometry.stroke",
-                      stylers: [
-                          {
-                              color: "#85a9c1",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.country",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.country",
-                      elementType: "labels.text",
-                      stylers: [
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.country",
-                      elementType: "labels.text.fill",
-                      stylers: [
-                          {
-                              color: "#9eafc8",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.province",
-                      elementType: "geometry.stroke",
-                      stylers: [
-                          {
-                              color: "#9eafc8",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.province",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.province",
-                      elementType: "labels.text",
-                      stylers: [
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.locality",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.locality",
-                      elementType: "labels.text",
-                      stylers: [
-                          {
-                              visibility: "on"
-                          },
-                          {
-                              color: "#9eafc8",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.locality",
-                      elementType: "labels.text.fill",
-                      stylers: [
-                          {
-                              color: "#9eafc8",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.locality",
-                      elementType: "labels.text.stroke",
-                      stylers: [
-                          {
-                              color: "#ffffff",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.locality",
-                      elementType: "labels.icon",
-                      stylers: [
-                          {
-                              lightness: "66",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.neighborhood",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "administrative.land_parcel",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "landscape",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              color: "#f2f2f2",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "landscape",
-                      elementType: "geometry.fill",
-                      stylers: [
-                          {
-                              color: "#f3f7fa",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "poi",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              saturation: -100,
-                          },
-                          {
-                              lightness: 45,
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road",
-                      elementType: "geometry.fill",
-                      stylers: [
-                          {
-                              color: "#ffffff",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road",
-                      elementType: "labels.text.fill",
-                      stylers: [
-                          {
-                              color: "#9eafc8",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road.highway",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              visibility: "simplified",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road.highway",
-                      elementType: "labels",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "road.arterial",
-                      elementType: "labels.icon",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "transit",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              visibility: "off",
-                          }
-                      ]
-                  },
-                  {
-                      featureType: "water",
-                      elementType: "all",
-                      stylers: [
-                          {
-                              color: "#c0e4f3",
-                          },
-                          {
-                              visibility: "on",
-                          }
-                      ]
-                  }
-              ]
-          };
+          // Search streams on drawed region
+          this.searchService.searchStreams(
+            "geo", southWestLng, southWestLat, southWestLng, northEastLat,
+            northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
+            (result: any) => {
+              this.temp = [...result.Streams];
+              this.mapComponent.setStreamList(this.temp);
+          },
+          err => {
+            console.log(err)
+          });
 
           // Get the HTML DOM element that will contain your map
           // We are using a div with id="map" seen below in the <body>
           let mapElement = document.getElementById("map");
-
-          // Create the Google Map using our element and options defined above
-          this.map = new google.maps.Map(mapElement, mapOptions);
-
-          const that = this;
-          google.maps.event.addListener(this.map, 'idle', function(ev){
-              let bounds = that.map.getBounds();
-              var southWestLng = bounds.getSouthWest().lng();
-              var southWestLat = bounds.getSouthWest().lat();
-              var northEastLng = bounds.getNorthEast().lng();
-              var northEastLat = bounds.getNorthEast().lat();
-
-              // Search streams on drawed region
-              that.searchService.searchStreams(
-                "geo", southWestLng, southWestLat, southWestLng, northEastLat,
-                       northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
-                  (result: any) => {
-                      that.temp = [...result.Streams];
-
-                      result.Streams.forEach(stream => {
-                          // TODO: set Sell Streams markers
-                          //that.setMarkers(stream);
-                      });
-                  },
-                  err => {
-                      console.log(err)
-                  });
-          });
-
-          // Automatically center the map fitting all markers on the screen
-          //map.fitBounds(bounds);
-
+          this.mapComponent.create(mapElement);
       }
-
-    // Get stream type icon
-    getIcon(type) {
-        var drinks = {
-            'temperature': 'assets/img/icons/map-temp.svg',
-            'humidity': 'assets/img/icons/map-water.svg',
-            'air': 'assets/img/icons/map-co2.svg',
-            'default': 'assets/img/icons/map.svg'
-        };
-        return (drinks[type] || drinks['default']);
-    }
-
-    // Display stream marker on a map
-    setMarkers(stream) {
-        const name = stream["name"];
-        const lng = stream["location"]["coordinates"][1];
-        const lat = stream["location"]["coordinates"][0];
-        const position = new google.maps.LatLng(lng, lat);
-        const mitasPrice = this.tasPipe.transform(stream["price"])
-        const type = stream["type"]
-        const icon = this.getIcon(type)
-
-        // Create new marker on the map
-        let marker = new google.maps.Marker({
-            position: position,
-            map: this.map,
-            title: name,
-            icon: icon,
-        });
-
-        // Create new marker infowindow
-        var infowindow = new google.maps.InfoWindow({
-            content: `
-                <div class="map-tooltip">
-                  <p class="map-tooltip__title"> ${name} </p>
-                  <div id="bodyContent" class="map-tooltip__content">
-                    <p class="map-tooltip__subtitle"> ${type} </p>
-                    <p class="map-tooltip__stake">
-                      Stake: <span class="map-tooltip__stake-amount">
-                      ${mitasPrice} TAS
-                      </span>
-                    </p>
-                  </div>
-                </div>
-          `
-        });
-
-        // Set infowindow to marker
-        marker.addListener('click', function() {
-          infowindow.open(this.map, marker);
-        });
-
-    }
 }
