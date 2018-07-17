@@ -6,8 +6,8 @@ import { AuthLoggedinGuardService as AuthGuard } from './guardians/auth.loggedin
 
 // Define our Auth Routes
 const routes: Routes = [
-   { path: 'login',  component: LoginComponent, },
-   { path: 'signup',  component: SignupComponent, },
+   { path: 'login',  component: LoginComponent, canActivate: [AuthGuard]},
+   { path: 'signup',  component: SignupComponent, canActivate: [AuthGuard]},
 ];
 
 @NgModule({
