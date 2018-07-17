@@ -247,7 +247,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let sub of subscriptionList">
+                        <tr *ngFor="let sub of subscriptions">
                           <td>{{ sub.stream_name }}</td>
                           <td nowrap>{{ sub.stream_price }}</td>
                           <td nowrap>{{ sub.start_date | date}}</td>
@@ -298,7 +298,7 @@
               Bought streams
             </p>
           </div>
-          <dpc-map [streamList]="streamList"></dpc-map>
+          <dpc-map [streamList]="streams"></dpc-map>
         </div>
       </div>
     </div>

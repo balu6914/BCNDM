@@ -21,8 +21,8 @@ import { Chart } from 'chart.js';
 })
 export class DashboardMainComponent {
     user:any;
-    subscriptionList = [];
-    streamList = [];
+    subscriptions = [];
+    streams = [];
     temp = [];
     map: any;
 
@@ -62,7 +62,7 @@ export class DashboardMainComponent {
                   subscription["stream_price"] = mitasPrice;
 
                   // Set markers on the map
-                  this.streamList.push(stream);
+                  this.streams.push(stream);
                 },
                 err => {
                   console.log(err);
@@ -70,7 +70,7 @@ export class DashboardMainComponent {
               );
 
               // Push marker to the markers list
-              this.subscriptionList.push(subscription);
+              this.subscriptions.push(subscription);
             });
           },
           err => {
