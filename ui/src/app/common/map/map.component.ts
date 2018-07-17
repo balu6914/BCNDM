@@ -58,13 +58,13 @@ export class MapComponent implements OnInit {
 
   // Get stream type icon
   getIcon(type) {
-    var drinks = {
+    var icons = {
       temperature: "assets/img/icons/map-temp.svg",
       humidity: "assets/img/icons/map-water.svg",
       air: "assets/img/icons/map-co2.svg",
       default: "assets/img/icons/map.svg"
     };
-    return drinks[type] || drinks["default"];
+    return icons[type] || icons["default"];
   }
 
   // Display stream marker on a map
