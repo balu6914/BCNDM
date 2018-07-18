@@ -22,7 +22,7 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
   declarations: [
     // Pipes
     TasPipe,
-    MitasPipe
+    MitasPipe,
   ],
   providers: [
       TasPipe,
