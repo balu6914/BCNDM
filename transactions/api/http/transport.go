@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"monetasa"
 	"monetasa/transactions"
 	"net/http"
@@ -34,7 +33,7 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 	}
 
 	r := bone.New()
-	r.Get("/channels/:chanID/balance", kithttp.NewServer(
+	r.Get("/balance", kithttp.NewServer(
 		balanceEndpoint(svc),
 		decodeBalanceReq,
 		encodeResponse,
@@ -53,12 +52,7 @@ func decodeBalanceReq(_ context.Context, r *http.Request) (interface{}, error) {
 		return nil, err
 	}
 
-	chanID := bone.GetValue(r, "chanID")
-
-	req := balanceReq{
-		userID: id,
-		chanID: chanID,
-	}
+	req := balanceReq{userID: id}
 
 	return req, nil
 }
@@ -108,12 +102,10 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case errMalformedEntity:
 		w.WriteHeader(http.StatusBadRequest)
+	case transactions.ErrNotFound:
+		w.WriteHeader(http.StatusNotFound)
 	case errUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
-	case io.ErrUnexpectedEOF:
-		w.WriteHeader(http.StatusBadRequest)
-	case io.EOF:
-		w.WriteHeader(http.StatusBadRequest)
 	default:
 		switch err.(type) {
 		case *json.SyntaxError:

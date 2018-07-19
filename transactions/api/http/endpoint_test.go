@@ -18,7 +18,6 @@ import (
 const (
 	token       = "token"
 	userID      = "user"
-	chanID      = "chan"
 	balance     = 42
 	contentType = "application/json"
 )
@@ -82,37 +81,26 @@ func TestBalance(t *testing.T) {
 
 	cases := map[string]struct {
 		auth        string
-		chanID      string
 		contentType string
 		status      int
 		balance     uint64
 	}{
 		"get balance of existing user": {
 			auth:        token,
-			chanID:      chanID,
 			contentType: contentType,
 			status:      http.StatusOK,
 			balance:     balance,
 		},
 		"get balance of nonexistent user": {
 			auth:        "invalid-token",
-			chanID:      chanID,
 			contentType: contentType,
 			status:      http.StatusForbidden,
 			balance:     0,
 		},
 		"get balance with empty token": {
 			auth:        "",
-			chanID:      chanID,
 			contentType: contentType,
 			status:      http.StatusForbidden,
-			balance:     0,
-		},
-		"get balance with invalid channel id": {
-			auth:        token,
-			chanID:      "",
-			contentType: contentType,
-			status:      http.StatusBadRequest,
 			balance:     0,
 		},
 	}
@@ -121,7 +109,7 @@ func TestBalance(t *testing.T) {
 		req := testRequest{
 			client: ts.Client(),
 			method: http.MethodGet,
-			url:    fmt.Sprintf("%s/channels/%s/balance", ts.URL, tc.chanID),
+			url:    fmt.Sprintf("%s/balance", ts.URL),
 			token:  tc.auth,
 		}
 		res, err := req.make()

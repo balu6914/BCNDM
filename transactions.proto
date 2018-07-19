@@ -6,8 +6,15 @@ import "google/protobuf/empty.proto";
 
 service TransactionsService {
     rpc CreateUser(ID) returns (google.protobuf.Empty) {}
+    rpc Transfer(TransferData) returns (google.protobuf.Empty) {}
 }
 
 message ID {
     string value = 1;
+}
+
+message TransferData {
+    string from  = 1;
+    string to = 2;
+    uint64 value = 3;
 }

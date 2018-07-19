@@ -29,14 +29,33 @@ func (mn mockNetwork) CreateUser(id, secret string) error {
 	return nil
 }
 
-func (mn mockNetwork) Balance(name, _ string) (uint64, error) {
+func (mn mockNetwork) Balance(name string) (uint64, error) {
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()
 
 	balance, ok := mn.users[name]
 	if !ok {
-		return 0, transactions.ErrFailedBalanceFetch
+		return 0, transactions.ErrNotFound
 	}
 
 	return balance, nil
+}
+
+func (mn mockNetwork) Transfer(from, to string, value uint64) error {
+	mn.mutex.Lock()
+	defer mn.mutex.Unlock()
+
+	balance, ok := mn.users[from]
+	if !ok {
+		return transactions.ErrFailedTransfer
+	}
+
+	if balance < value {
+		return transactions.ErrFailedTransfer
+	}
+
+	mn.users[to] = mn.users[to] + value
+	mn.users[from] = mn.users[from] - value
+
+	return nil
 }
