@@ -1,0 +1,38 @@
+<div [ngSwitch]="rowType">
+  <tr *ngSwitchCase="types.Dashboard">
+      <td>{{row.name}}</td>
+      <td nowrap>{{row.price}}</td>
+      <td nowrap>{{row.startDate| date}</td>
+      <td nowrap>{{row.endDate | date}}</td>
+      <td nowrap>
+        <div class="action-wrapper">
+          <a href="{{row.url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
+          <a (click)="copyToClipboard()"  class="btn btn-primary-alt btn-sm" >Copy</a>
+        </div>
+      </td>
+  </tr>
+  <tr *ngSwitchDefault>
+    <td>
+      <a href="#" class="table-link-arrow js-flip-card-trigger">
+        {{row.name}}
+      </a>
+    </td>
+    <td>{{row.type}}</td>
+    <td>{{row.price | tas}} TAS</td>
+    <td *ngIf="rowType==types.Buy" class="table--right-aligned">
+      <div class="action-wrapper">
+        <a href="#" class="action action--color-1" data-toggle="modal" data-target="#modalBuyStream">
+          <span class="action__icon action--buy"></span>
+        </a>
+      </div>
+    </td>
+    <td *ngIf="rowType==types.Sell" nowrap class="table--right-aligned">
+      <div class="action-wrapper">
+        <a href="#" class="action action--color-1">
+          <span class="action__icon action--edit"></span>
+        </a>
+        <dpc-delete-button></dpc-delete-button>
+      </div>
+    </td>
+  </tr>
+</div>
