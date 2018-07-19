@@ -14,7 +14,7 @@ func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		balance, err := svc.Balance(req.userID, req.chanID)
+		balance, err := svc.Balance(req.userID)
 		if err != nil {
 			return nil, err
 		}

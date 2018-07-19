@@ -1,4 +1,3 @@
-// Package fabric contains Fabric specific implementation of blockchain network.
 package fabric
 
 import (
@@ -15,6 +14,8 @@ import (
 const (
 	affiliation = "org1"
 	balanceFcn  = "balance"
+	transferFcn = "transferFrom"
+	chanID      = "myc"
 )
 
 var _ transactions.BlockchainNetwork = (*fabricNetwork)(nil)
@@ -64,7 +65,7 @@ func (fn fabricNetwork) CreateUser(id, secret string) error {
 	return nil
 }
 
-func (fn fabricNetwork) Balance(userID, chanID string) (uint64, error) {
+func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
 		fabsdk.WithUser(fn.admin),
@@ -74,36 +75,70 @@ func (fn fabricNetwork) Balance(userID, chanID string) (uint64, error) {
 	client, err := channel.New(ctx)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
-		return 0, err
+		return 0, transactions.ErrNotFound
 	}
 
-	ub := userBalance{User: userID}
+	req := balanceReq{Owner: userID}
 
-	balanceReq, err := json.Marshal(ub)
+	data, err := json.Marshal(req)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to serialize balance request: %s", err))
-		return 0, err
+		return 0, transactions.ErrFailedBalanceFetch
 	}
 
 	balance, err := client.Query(channel.Request{
 		ChaincodeID: fn.chaincodeID,
 		Fcn:         balanceFcn,
-		Args:        [][]byte{balanceReq},
+		Args:        [][]byte{data},
 	})
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to query blockchain for balance: %s", err))
-		return 0, err
+		return 0, transactions.ErrFailedBalanceFetch
 	}
 
-	if err := json.Unmarshal(balance.Payload, &ub); err != nil {
+	var res balanceRes
+	if err := json.Unmarshal(balance.Payload, &res); err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to deserialize balance payload: %s", err))
-		return 0, err
+		return 0, transactions.ErrFailedBalanceFetch
 	}
 
-	return ub.Value, nil
+	return res.Value, nil
 }
 
-type userBalance struct {
-	User  string `json:"user"`
-	Value uint64 `json:"value"`
+func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
+	ctx := fn.sdk.ChannelContext(
+		chanID,
+		fabsdk.WithUser(fn.admin),
+		fabsdk.WithOrg(fn.org),
+	)
+
+	client, err := channel.New(ctx)
+	if err != nil {
+		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
+		return transactions.ErrNotFound
+	}
+
+	req := transferFromReq{
+		From:  from,
+		To:    to,
+		Value: value,
+	}
+
+	data, err := json.Marshal(req)
+	if err != nil {
+		fn.logger.Warn(fmt.Sprintf("failed to serialize transfer_from request: %s", err))
+		return transactions.ErrFailedTransfer
+	}
+
+	_, err = client.Execute(channel.Request{
+		ChaincodeID: fn.chaincodeID,
+		Fcn:         transferFcn,
+		Args:        [][]byte{data},
+	})
+	if err != nil {
+		fn.logger.Warn(fmt.Sprintf("failed to execute transfer_from chaincode: %s", err))
+		return transactions.ErrFailedTransfer
+	}
+
+	return nil
 }

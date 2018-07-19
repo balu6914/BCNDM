@@ -79,8 +79,12 @@ func (tc tokenChaincode) BalanceOf(stub shim.ChaincodeStubInterface, owner strin
 
 	// if the user cn is not in the state, then the balance is 0
 	data, err := stub.GetState(key)
-	if err != nil || data == nil {
+	if err != nil {
 		return 0, ErrGettingState
+	}
+
+	if data == nil {
+		return 0, nil
 	}
 
 	return binary.LittleEndian.Uint64(data), nil

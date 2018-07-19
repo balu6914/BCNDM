@@ -1,8 +1,6 @@
 package transactions
 
-import (
-	"crypto/rand"
-)
+import "crypto/rand"
 
 const (
 	letters   = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -42,13 +40,12 @@ func (ts transactionService) CreateUser(id string) error {
 	return nil
 }
 
-func (ts transactionService) Balance(userID, chanID string) (uint64, error) {
-	balance, err := ts.bn.Balance(userID, chanID)
-	if err != nil {
-		return 0, ErrFailedBalanceFetch
-	}
+func (ts transactionService) Balance(userID string) (uint64, error) {
+	return ts.bn.Balance(userID)
+}
 
-	return balance, nil
+func (ts transactionService) Transfer(from, to string, value uint64) error {
+	return ts.bn.Transfer(from, to, value)
 }
 
 func generate(n uint) string {

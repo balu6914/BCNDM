@@ -181,7 +181,7 @@ func TestBalanceOf(t *testing.T) {
 		},
 		"get balance of nonexistent user": {
 			args:   util.ToChaincodeArgs("balanceOf", string(nonexistentBalanceData)),
-			status: int32(shim.ERROR),
+			status: int32(shim.OK),
 		},
 		"get balance with invalid request": {
 			args:   util.ToChaincodeArgs("balanceOf", "}"),

@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	userID  = "5281b83afbb7f35cb62d0834"
+	userID1 = "5281b83afbb7f35cb62d0834"
+	userID2 = "5281b83afbb7f35cb62d0835"
 	chanID  = "chan"
 	secret  = "secret"
 	balance = 42
@@ -18,10 +19,12 @@ const (
 
 func newService() transactions.Service {
 	repo := mocks.NewUserRepository(map[string]string{
-		userID: secret,
+		userID1: secret,
+		userID2: secret,
 	})
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
-		userID: balance,
+		userID1: balance,
+		userID2: balance,
 	})
 
 	return transactions.New(repo, bn)
@@ -35,11 +38,11 @@ func TestCreateUser(t *testing.T) {
 		err error
 	}{
 		"register new user": {
-			id:  "5281b83afbb7f35cb62d0835",
+			id:  "5281b83afbb7f35cb62d0836",
 			err: nil,
 		},
 		"register existing user": {
-			id:  userID,
+			id:  userID1,
 			err: transactions.ErrConflict,
 		},
 	}
@@ -60,22 +63,52 @@ func TestBalance(t *testing.T) {
 		err     error
 	}{
 		"fetch balance of existing user": {
-			userID:  userID,
-			chanID:  chanID,
+			userID:  userID1,
 			balance: balance,
 			err:     nil,
 		},
 		"fetch balance of nonexistent user": {
 			userID:  "nonexistent_user",
-			chanID:  chanID,
 			balance: 0,
-			err:     transactions.ErrFailedBalanceFetch,
+			err:     transactions.ErrNotFound,
 		},
 	}
 
 	for desc, tc := range cases {
-		balance, err := svc.Balance(tc.userID, tc.chanID)
+		balance, err := svc.Balance(tc.userID)
 		assert.Equal(t, tc.balance, balance, fmt.Sprintf("%s: expected %d got %d", desc, tc.balance, balance))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
+	}
+}
+
+func TestTransfer(t *testing.T) {
+	svc := newService()
+
+	cases := []struct {
+		desc  string
+		from  string
+		to    string
+		value uint64
+		err   error
+	}{
+		{
+			desc:  "transfer money from one account to another",
+			from:  userID1,
+			to:    userID2,
+			value: balance,
+			err:   nil,
+		},
+		{
+			desc:  "transfer too much money from one account to another",
+			from:  userID1,
+			to:    userID2,
+			value: balance,
+			err:   transactions.ErrFailedTransfer,
+		},
+	}
+
+	for _, tc := range cases {
+		err := svc.Transfer(tc.from, tc.to, tc.value)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
 	}
 }
