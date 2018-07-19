@@ -1,0 +1,10 @@
+<a class="action action--color-2" (click)="openModal(template)">
+  <span class="action__icon action--delete"></span>
+</a>
+<ng-template #template>
+  <div class="modal-body text-center">
+    <p>Are you sure?</p>
+    <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
+    <button type="button" class="btn btn-danger" (click)="decline()">No</button>
+  </div>
+</ng-template>
