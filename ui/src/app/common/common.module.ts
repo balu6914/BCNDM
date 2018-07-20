@@ -10,6 +10,8 @@ import { Subscription } from './interfaces/subscription.interface';
 import { User } from './interfaces/user.interface';
 // Pipes
 import { MitasPipe, TasPipe} from './pipes/converter.pipe';
+// Google Map
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   imports: [
@@ -23,6 +25,7 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
     // Pipes
     TasPipe,
     MitasPipe,
+    MapComponent,
   ],
   providers: [
       TasPipe,
@@ -30,7 +33,8 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
   ],
   exports: [
       TasPipe,
-      MitasPipe
+      MitasPipe,
+      MapComponent,
   ]
 })
 export class CommonAppModule { }

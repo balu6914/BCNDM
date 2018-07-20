@@ -25,7 +25,6 @@ import { SearchService } from './main/services/search.service';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { ClipboardModule } from 'ngx-clipboard';
-import { MapComponent } from '../common/map/map.component';
 
 @NgModule({
   imports: [
@@ -50,7 +49,6 @@ import { MapComponent } from '../common/map/map.component';
   declarations: [
       DashboardComponent,
       DashboardMainComponent,
-      MapComponent,
   ],
   providers: [
       SubscriptionService,
