@@ -16,7 +16,7 @@
         <p class="action-buttons__item">
           <button routerLink="/dashboard/sell/add" type="button" class="btn btn-primary btn-media" data-toggle="modal" data-target="#newStream">
           <span class="btn-media__icon btn-media__icon--add">
-            <input type="file" (change)="onFileChange($event)" style="display:none">
+          <input type="file" (change)="onFileChange($event)" style="display:none">
           </span>
           Add manually
           </button>
@@ -99,7 +99,6 @@
         </div>
       </div>
     </div>
-
     <div class="row row-grow">
       <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block js-showMap-content">
         <div class="box box-grow">
@@ -108,8 +107,8 @@
               Your streams
             </p>
           </div>
-            <!-- The element that will contain our Google Map. This is used in both the Javascript and CSS above. -->
-            <dpc-map [streamList]="streams"></dpc-map>
+          <!-- The element that will contain our Google Map. This is used in both the Javascript and CSS above. -->
+          <dpc-map [streamList]="streams"></dpc-map>
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
@@ -160,7 +159,7 @@
                           </a>
                         </td>
                         <td nowrap> {{ str.type }} </td>
-                        <td nowrap> {{ str.price }} </td>
+                        <td nowrap> {{ str.price }} TAS </td>
                         <td nowrap class="table--right-aligned">
                           <div class="action-wrapper">
                             <a href="#" class="action action--color-1">
@@ -261,9 +260,8 @@
                         Example reading(s)
                       </div>
                       <div class="stream-data__text">
-                      <code class="stream-data__code">
-                      <pre class="stream-data__pre">
-
+                        <code class="stream-data__code">
+                          <pre class="stream-data__pre">
                             "sensor_id": "8746",
                             "sensor_type": "DHT22",
                             "location": "4409",
@@ -273,7 +271,6 @@
                             "temperature": "5.20"
                           </pre>
                         </code>
-
                       </div>
                     </div>
                   </div>

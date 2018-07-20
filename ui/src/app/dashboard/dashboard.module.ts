@@ -22,8 +22,6 @@ import { SubscriptionService } from './main/services/subscription.service';
 import { StreamService } from './main/services/stream.service';
 import { SearchService } from './main/services/search.service';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
@@ -42,9 +40,7 @@ import { ClipboardModule } from 'ngx-clipboard';
     SubscriptionModule,
     DashboardRoutingModule,
     NgxDatatableModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot(),
-    ClipboardModule
+    ClipboardModule,
   ],
   declarations: [
       DashboardComponent,

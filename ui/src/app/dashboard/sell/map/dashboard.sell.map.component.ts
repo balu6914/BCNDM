@@ -8,63 +8,16 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 
-import * as L from 'leaflet';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
-import { icon, latLng, Layer, marker, tileLayer } from 'leaflet';
-
 @Component({
   selector: 'dashboard-sell-map',
   templateUrl: './dashboard.sell.map.component.html',
   styleUrls: [ './dashboard.sell.map.component.scss' ]
 })
 export class DashboardSellMapComponent {
-    options = {
-		layers: [
-            L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjdbxg3f6c6sq2smdj7cp4wwa/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 18,
-                id: 'mapbox.dark',
-                accessToken: 'pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ'
-            })
-		],
-		zoom: 5,
-		center: L.latLng({ lat: 48.864716, lng: 2.349014 })
-	};
-
-	drawOptions = {
-        position: 'topright',
-        draw: {
-            marker: false,
-            polygon: false,
-            polyline: false,
-            circle: false,
-            circlemarker: false,
-
-        },
-        edit: {
-            remove: false,
-            edit: false
-        }
-	};
-
-    tableColumns = [
-        { prop: 'name' },
-        { name: 'type' },
-        { name: 'description' },
-        { name: 'price'}
-    ];
-
+    temp = [];
     streams = [];
     user: any;
-    subscription: any;
-    temp = [];
-    temp2 = [];
-    userEventFlag = 0;
-    markerInd: any;
-    markers: Layer[] = [];
 
-    @ViewChild(DatatableComponent) table: DatatableComponent;
 
     constructor(
         private streamService: StreamService,

@@ -17,8 +17,6 @@ import { DashboardSellEditComponent } from './edit';
 import { DashboardSellMapComponent } from './map';
 
 import { CommonAppModule } from '../../common/common.module';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 
 @NgModule({
   imports: [
@@ -30,8 +28,6 @@ import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
     NgxDatatableModule,
     CommonAppModule,
     DashboardSellRoutingModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot()
   ],
   declarations: [
       DashboardSellComponent,
