@@ -1,5 +1,4 @@
 import { Component, ViewChild, Input } from '@angular/core';
-import { MdlDialogService } from '@angular-mdl/core';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { AuthService } from '../../auth/services/auth.service';
@@ -21,6 +20,8 @@ import { Chart } from 'chart.js';
 })
 export class DashboardMainComponent {
     user:any;
+    // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+    mockBalance: any;
     subscriptions = [];
     streams = [];
     temp = [];
@@ -31,16 +32,23 @@ export class DashboardMainComponent {
         private subscriptionService: SubscriptionService,
         private streamService: StreamService,
         private searchService: SearchService,
-        private dialogService: MdlDialogService,
         private tasPipe: TasPipe,
     ) {}
 
     ngOnInit() {
         // Fetch current User
         this.user = {};
+        // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+        this.mockBalance = {
+          amount: 1000.1232,
+          symbol: 'TAS',
+          fiatAmount: 1200,
+          fiatSymbol: 'USD'
+        }
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
+              console.log(this.user)
             },
             err => {
                 console.log(err)
@@ -198,5 +206,6 @@ export class DashboardMainComponent {
           err => {
             console.log(err)
           });
+
       }
 }

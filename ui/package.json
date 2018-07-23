@@ -12,8 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-mdl/core": "^4.0.8",
-    "@angular-mdl/datepicker": "0.0.4",
     "@angular/animations": "^5.2.11",
     "@angular/common": "^5.0.0",
     "@angular/compiler": "^5.0.0",
@@ -23,8 +21,6 @@
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
     "@angular/router": "^5.0.0",
-    "@angular2-mdl-ext/popover": "^0.6.0",
-    "@angular2-mdl-ext/select": "^0.10.3",
     "@asymmetrik/ngx-leaflet": "^2.5.3",
     "@asymmetrik/ngx-leaflet-draw": "^2.6.1",
     "@swimlane/ngx-datatable": "^11.1.5",

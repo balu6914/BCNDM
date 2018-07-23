@@ -1,6 +1,5 @@
-import { Component, ViewContainerRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  } from '@angular/forms';
-import { MdlDialogService, MdlDialogOutletService } from '@angular-mdl/core';
 import { Router } from '@angular/router';
 
 import { StreamService } from '../services/stream.service';
@@ -18,12 +17,8 @@ export class DashboardSellAddComponent {
     constructor(
         private router: Router,
         private fb: FormBuilder,
-        private dialogService: MdlDialogService,
         private StreamService: StreamService,
-        private mdlDialogService: MdlDialogOutletService,
-        private vcRef: ViewContainerRef
     ) {
-        this.mdlDialogService.setDefaultViewContainerRef(this.vcRef);
     }
     ngOnInit() {
         this.form = this.fb.group({
@@ -41,36 +36,36 @@ export class DashboardSellAddComponent {
         if(isValid) {
             // Confirm dialog
             let confirmMsg = 'Your Stream will be published automatically on the market, affter creation. Do you Agree ?'
-            let result = this.dialogService.confirm(confirmMsg, 'Cancel', 'Yes, publish it!');
-             result.subscribe( () => {
-                 console.log('confirmed');
-                 // Convert to miTAS
-                 var mitas = model["price"] * Math.pow(10, 6);
-                 model["price"] = mitas;
-                 model["location"] = {
-                     "type": "Point",
-                     "coordinates": [parseFloat(model["long"]),
-                                     parseFloat(model["lat"])]
-                                 }
-                delete model["long"];
-                delete model["lat"];
-
-                 this.StreamService.addStream(model).subscribe(
-                     response => {
-                         this.router.navigate(['/dashboard/sell/map'])
-                     },
-                     err => {
-                         console.log(err);
-                     });
-               },
-               (err: any) => {
-                 console.log('declined');
-               }
-             );
-             // if you only need the confirm answer
-             result.onErrorResumeNext().subscribe( () => {
-               console.log('confirmed 2');
-             });
+            // let result = this.dialogService.confirm(confirmMsg, 'Cancel', 'Yes, publish it!');
+            //  result.subscribe( () => {
+            //      console.log('confirmed');
+            //      // Convert to miTAS
+            //      var mitas = model["price"] * Math.pow(10, 6);
+            //      model["price"] = mitas;
+            //      model["location"] = {
+            //          "type": "Point",
+            //          "coordinates": [parseFloat(model["long"]),
+            //                          parseFloat(model["lat"])]
+            //                      }
+            //     delete model["long"];
+            //     delete model["lat"];
+            //
+            //      this.StreamService.addStream(model).subscribe(
+            //          response => {
+            //              this.router.navigate(['/dashboard/sell/map'])
+            //          },
+            //          err => {
+            //              console.log(err);
+            //          });
+            //    },
+            //    (err: any) => {
+            //      console.log('declined');
+            //    }
+            //  );
+            //  // if you only need the confirm answer
+            //  result.onErrorResumeNext().subscribe( () => {
+            //    console.log('confirmed 2');
+            //  });
         }
     }
 }

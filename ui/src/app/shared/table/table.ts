@@ -1,5 +1,5 @@
 
-import { Stream, Subscription } from '../common/interfaces';
+import { Stream, Subscription } from '../../common/interfaces';
 
 export enum TableType {
   Buy,

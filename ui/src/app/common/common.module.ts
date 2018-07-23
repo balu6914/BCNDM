@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
@@ -9,7 +8,6 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
 @NgModule({
   imports: [
     CommonModule,
-    MdlModule,
     FormsModule,
     HttpModule,
     ReactiveFormsModule,
