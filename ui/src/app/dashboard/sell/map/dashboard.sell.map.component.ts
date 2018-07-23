@@ -7,6 +7,7 @@ import { SearchService } from '../services/search.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
+import { Table, TableType } from '../../../shared/table';
 
 @Component({
   selector: 'dashboard-sell-map',
@@ -17,7 +18,7 @@ export class DashboardSellMapComponent {
     temp = [];
     streams = [];
     user: any;
-
+    table: Table = new Table();
 
     constructor(
         private streamService: StreamService,
@@ -39,6 +40,11 @@ export class DashboardSellMapComponent {
         }
     );
 
+    // Config table
+    this.table.title = "Streams";
+    this.table.tableType = TableType.Sell;
+    this.table.headers = ["Stream Name", "Stream Type","Stream Price"];
+
     // TODO: Replace this coordinates with map bounds
     const southWestLng = -180;
     const southWestLat = -90;
@@ -53,14 +59,16 @@ export class DashboardSellMapComponent {
         this.temp = [...result.Streams];
         result.Streams.forEach(stream => {
           if (stream.owner == this.user.id) {
-            this.streams.push(stream)
+            this.streams.push(stream);
           }
-
         });
-    },
-    err => {
-      console.log(err)
-    });
+        // Set table content
+        this.table.content = this.streams;
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   // Add Bulk event

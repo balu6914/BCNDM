@@ -23,6 +23,7 @@ import { StreamService } from './main/services/stream.service';
 import { SearchService } from './main/services/search.service';
 
 import { ClipboardModule } from 'ngx-clipboard';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { ClipboardModule } from 'ngx-clipboard';
     DashboardRoutingModule,
     NgxDatatableModule,
     ClipboardModule,
+    SharedModule,
   ],
   declarations: [
       DashboardComponent,

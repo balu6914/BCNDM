@@ -17,6 +17,7 @@ import { DashboardSellEditComponent } from './edit';
 import { DashboardSellMapComponent } from './map';
 
 import { CommonAppModule } from '../../common/common.module';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { CommonAppModule } from '../../common/common.module';
     NgxDatatableModule,
     CommonAppModule,
     DashboardSellRoutingModule,
+    SharedModule,
   ],
   declarations: [
       DashboardSellComponent,

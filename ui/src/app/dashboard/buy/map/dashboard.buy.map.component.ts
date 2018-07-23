@@ -4,17 +4,18 @@ import { HttpClient } from '@angular/common/http';
 import { SearchService } from '../services/search.service';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { AuthService } from '../../../auth/services/auth.service';
+import { Table, TableType } from '../../../shared/table';
 
 @Component({
   selector: 'buy-map-container',
   templateUrl: './dashboard.buy.map.component.html',
   styleUrls: [ './dashboard.buy.map.component.scss' ]
 })
-
 export class DashboardBuyMapComponent {
     temp = [];
     streams = [];
     user: any;
+    table: Table = new Table();
 
     constructor(
         private AuthService: AuthService,
@@ -23,6 +24,10 @@ export class DashboardBuyMapComponent {
     ) { }
 
     ngOnInit() {
+      this.table.title = "Streams";
+      this.table.tableType =  TableType.Buy;
+      this.table.headers = ["Stream Name", "Stream Type","Stream Price"];
+
       // Fetch current User
       this.user = {};
       this.AuthService.getCurrentUser().subscribe(
@@ -50,8 +55,10 @@ export class DashboardBuyMapComponent {
             if (stream.owner != this.user.id) {
               this.streams.push(stream)
             }
-
-          });
+          }
+        );
+        // Set table content
+        this.table.content = this.streams;
       },
       err => {
         console.log(err)

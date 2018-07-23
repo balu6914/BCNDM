@@ -1,9 +1,9 @@
 <div [ngSwitch]="rowType">
   <tr *ngSwitchCase="types.Dashboard">
-      <td>{{row.name}}</td>
-      <td nowrap>{{row.price}}</td>
-      <td nowrap>{{row.startDate| date}</td>
-      <td nowrap>{{row.endDate | date}}</td>
+      <td>{{ row.stream_name }}</td>
+      <td nowrap>{{ row.stream_price }}</td>
+      <td nowrap>{{ row.start_date| date }}</td>
+      <td nowrap>{{ row.end_date | date }}</td>
       <td nowrap>
         <div class="action-wrapper">
           <a href="{{row.url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>

@@ -16,6 +16,7 @@ import { DashboardBuyMapComponent } from './map';
 import { SubscriptionModule } from '../subscription';
 
 import { CommonAppModule } from '../../common/common.module';
+import { SharedModule } from '../../shared/shared.module';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { CommonAppModule } from '../../common/common.module';
     CommonAppModule,
     SubscriptionModule,
     DashboardBuyRoutingModule,
+    SharedModule,
   ],
   declarations: [
       DashboardBuyComponent,
