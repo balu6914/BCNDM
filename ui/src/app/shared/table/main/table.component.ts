@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Table } from '../../table';
+import { Table } from '../table';
 
 @Component({
   selector: 'dpc-table',

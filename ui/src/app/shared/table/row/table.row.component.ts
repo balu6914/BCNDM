@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ngCopy } from 'angular-6-clipboard';
 import { Stream, Subscription } from '../../../common/interfaces';
-import { TableType } from '../../table';
+import { TableType } from '../table';
 
 @Component({
   selector: 'dpc-table-row',

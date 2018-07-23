@@ -1,5 +1,4 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { MdlDialogReference, MdlDialogService } from '@angular-mdl/core';
 
 import { MitasPipe } from '../../../common/pipes/converter.pipe';
 
@@ -16,8 +15,6 @@ export class WalletAddComponent implements OnInit {
     public showButton: boolean = true;
 
     constructor(
-        private dialogRef: MdlDialogReference,
-        private mdlDialogService: MdlDialogService,
         private mitasPipe: MitasPipe
     ) {}
 
@@ -26,7 +23,6 @@ export class WalletAddComponent implements OnInit {
 
    @HostListener('keydown.esc')
    public onEsc(): void {
-       this.dialogRef.hide();
    }
 
    public didPaypalScriptLoad: boolean = false;
@@ -41,8 +37,8 @@ export class WalletAddComponent implements OnInit {
            if (!this.paymentAmount || this.paymentAmount > 10000) {
                this.showLoading = false;
                const msg = "Payment amount must be between 1 and 10000 TAS";
-               this.dialogRef.hide();
-               this.mdlDialogService.confirm(msg, "", "OK");
+               // this.dialogRef.hide();
+               // this.mdlDialogService.confirm(msg, "", "OK");
            } else {
            return paypal.request({
                method: 'post',
@@ -76,12 +72,12 @@ export class WalletAddComponent implements OnInit {
                // Hide loading
                this.showLoading = false;
                const mitas = this.mitasPipe.transform(this.paymentAmount.toString());
-               this.dialogRef.hide(mitas);
+               // this.dialogRef.hide(mitas);
                // Display msg with tranfer value in TAS
                let successMsg = `Success! We just transfered ` +
                                 this.paymentAmount.toString() +
                                 ` TAS to your account balance!`
-               this.mdlDialogService.confirm(successMsg, "", "OK");
+               // this.mdlDialogService.confirm(successMsg, "", "OK");
            });
        }
    };
