@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MdlModule } from '@angular-mdl/core';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Sell routes
 import { DashboardSellRoutingModule } from './dashboard.sell.routes';
 // // Add services
@@ -26,7 +25,6 @@ import { SharedModule } from '../../shared/shared.module';
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,
-    NgxDatatableModule,
     CommonAppModule,
     DashboardSellRoutingModule,
     SharedModule,

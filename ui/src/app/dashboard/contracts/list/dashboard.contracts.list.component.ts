@@ -1,6 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
@@ -35,9 +34,6 @@ export class DashboardContractsListComponent {
         emptyMessage: "You don't have any smart contracts yet..."
     }
 
-
-    @ViewChild(DatatableComponent) table: DatatableComponent;
-
     constructor(
         private AuthService: AuthService,
         private router: Router
@@ -51,21 +47,4 @@ export class DashboardContractsListComponent {
               });
             this.temp = [...this.myContractsList];
     }
-
-    // Mystreams table fileter
-    updateMyStreams(event) {
-        const val = event.target.value.toLowerCase();
-        // filter our data
-        const temp = this.temp.filter(function(d) {
-            const n =  d.stream.name.toLowerCase().indexOf(val) !== -1 || !val;
-            const t =  d.stream.price.toLowerCase().indexOf(val) !== -1 || !val;
-            return n || t;
-        });
-        // update the rows
-        this.myContractsList = temp;
-        // Whenever the filter changes, always go back to the first page
-        this.table.offset = 0;
-    }
-
-
 }

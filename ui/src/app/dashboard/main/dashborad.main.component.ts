@@ -1,6 +1,5 @@
 import { Component, ViewChild, Input } from '@angular/core';
 import { MdlDialogService } from '@angular-mdl/core';
-import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { AuthService } from '../../auth/services/auth.service';
 import { SearchService } from './services/search.service';

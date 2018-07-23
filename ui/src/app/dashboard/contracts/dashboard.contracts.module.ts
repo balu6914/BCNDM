@@ -5,7 +5,6 @@ import { NgPipesModule } from 'ngx-pipes';
 import { MdlSelectModule } from '@angular2-mdl-ext/select';
 import { MdlDatePickerModule } from '@angular-mdl/datepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Sell routes
 import { DashboardContractsRoutingModule } from './dashboard.contracts.routes';
 // Components
@@ -23,7 +22,6 @@ import { CommonAppModule } from '../../common/common.module';
     ReactiveFormsModule,
     NgPipesModule,
     CommonModule,
-    NgxDatatableModule,
     CommonAppModule,
     DashboardContractsRoutingModule
   ],

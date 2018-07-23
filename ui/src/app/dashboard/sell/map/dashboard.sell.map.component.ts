@@ -1,6 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { StreamService } from '../services/stream.service';
 import { SearchService } from '../services/search.service';

@@ -16,7 +16,6 @@ import { WalletModule } from './wallet/wallet.module';
 import { SubscriptionModule } from './subscription/index';
 
 import { CommonAppModule } from '../common/common.module';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Import subscription module
 import { SubscriptionService } from './main/services/subscription.service';
 import { StreamService } from './main/services/stream.service';
@@ -40,7 +39,6 @@ import { SharedModule } from '../shared/shared.module';
     WalletModule,
     SubscriptionModule,
     DashboardRoutingModule,
-    NgxDatatableModule,
     ClipboardModule,
     SharedModule,
   ],
