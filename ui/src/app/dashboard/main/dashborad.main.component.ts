@@ -11,7 +11,7 @@ import { User } from '../../common/interfaces/user.interface';
 import { Subscription } from '../../common/interfaces/subscription.interface';
 
 import { Chart } from 'chart.js';
-import { Table, TableType } from '../../shared/table';
+import { Table, TableType } from '../../shared/table/table';
 
 
 @Component({
@@ -21,6 +21,8 @@ import { Table, TableType } from '../../shared/table';
 })
 export class DashboardMainComponent {
     user:any;
+    // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+    mockBalance: any;
     subscriptions = [];
     streams = [];
     temp = [];
@@ -32,7 +34,6 @@ export class DashboardMainComponent {
         private subscriptionService: SubscriptionService,
         private streamService: StreamService,
         private searchService: SearchService,
-        private dialogService: MdlDialogService,
         private tasPipe: TasPipe,
     ) {}
 
@@ -43,9 +44,17 @@ export class DashboardMainComponent {
 
         // Fetch current User
         this.user = {};
+        // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+        this.mockBalance = {
+          amount: 1000.1232,
+          symbol: 'TAS',
+          fiatAmount: 1200,
+          fiatSymbol: 'USD'
+        }
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
+              console.log(this.user)
             },
             err => {
                 console.log(err)

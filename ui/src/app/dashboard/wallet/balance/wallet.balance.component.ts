@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewContainerRef } from '@angular/core';
-import { MdlDialogService, MdlDialogReference, MdlDialogOutletService } from '@angular-mdl/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AuthService } from '../../../auth/services/auth.service';
 import { User } from '../../../common/interfaces/user.interface';
@@ -17,11 +16,7 @@ export class WalletBalanceComponent implements OnInit {
   subscription: any;
   constructor(
     private AuthService: AuthService,
-    private dialogService: MdlDialogService,
-    private mdlDialogService: MdlDialogOutletService,
-    private vcRef: ViewContainerRef
 ) {
-    this.mdlDialogService.setDefaultViewContainerRef(this.vcRef);
 }
 
     ngOnInit() {
@@ -37,21 +32,21 @@ export class WalletBalanceComponent implements OnInit {
 
     // Open BUY tokens dialog
     public onBuyTokensClick($event: MouseEvent) {
-          let pDialog = this.dialogService.showCustomDialog({
-            component: WalletAddComponent,
-            isModal: true,
-            styles: {'width': '350px'},
-            clickOutsideToClose: true,
-            enterTransitionDuration: 400,
-            leaveTransitionDuration: 400
-          });
-          pDialog.subscribe( dialogRef => {
-              dialogRef.onHide().subscribe(data => {
-                  // Check if balance is updated
-                  if(data) {
-                      this.user.balance = this.user.balance + data;
-                  }
-            });
-          });
+          // let pDialog = this.dialogService.showCustomDialog({
+          //   component: WalletAddComponent,
+          //   isModal: true,
+          //   styles: {'width': '350px'},
+          //   clickOutsideToClose: true,
+          //   enterTransitionDuration: 400,
+          //   leaveTransitionDuration: 400
+          // });
+          // pDialog.subscribe( dialogRef => {
+          //     dialogRef.onHide().subscribe(data => {
+          //         // Check if balance is updated
+          //         if(data) {
+          //             this.user.balance = this.user.balance + data;
+          //         }
+          //   });
+          // });
     }
   }

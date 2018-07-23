@@ -12,8 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-mdl/core": "^4.0.8",
-    "@angular-mdl/datepicker": "0.0.4",
     "@angular/animations": "^5.2.11",
     "@angular/common": "^5.0.0",
     "@angular/compiler": "^5.0.0",

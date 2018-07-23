@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
-import { Table, TableType } from '../../../shared/table';
+import { Table, TableType } from '../../../shared/table/table';
 import { Contract } from '../../../common/interfaces'
 
 @Component({

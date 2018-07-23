@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
@@ -11,7 +10,6 @@ import { MapComponent } from './map/map.component';
 @NgModule({
   imports: [
     CommonModule,
-    MdlModule,
     FormsModule,
     HttpModule,
     ReactiveFormsModule,

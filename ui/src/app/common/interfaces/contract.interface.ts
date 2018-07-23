@@ -1,7 +1,7 @@
 export class Contract {
   constructor(
-    public id: number,
-    public stream: string,
+    public id: string,
+    public stream: object,
     public creationDate: string,
     public expirationDate: string,
     public share: string,

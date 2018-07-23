@@ -6,7 +6,7 @@ import { SearchService } from '../services/search.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
-import { Table, TableType } from '../../../shared/table';
+import { Table, TableType } from '../../../shared/table/table';
 
 @Component({
   selector: 'dashboard-sell-map',

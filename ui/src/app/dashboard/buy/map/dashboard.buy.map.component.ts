@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { SearchService } from '../services/search.service';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Table, TableType } from '../../../shared/table';
+import { Table, TableType } from '../../../shared/table/table';
 
 @Component({
   selector: 'buy-map-container',
