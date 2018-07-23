@@ -15,9 +15,8 @@ import { DashboardBuyMapComponent } from './map';
 // Import subscription module
 import { SubscriptionModule } from '../subscription';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { CommonAppModule } from '../../common/common.module';
+import { SharedModule } from '../../shared/shared.module';
 
 
 @NgModule({
@@ -29,10 +28,9 @@ import { CommonAppModule } from '../../common/common.module';
     NgPipesModule,
     NgxDatatableModule,
     CommonAppModule,
-    DashboardBuyRoutingModule,
     SubscriptionModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot()
+    DashboardBuyRoutingModule,
+    SharedModule,
   ],
   declarations: [
       DashboardBuyComponent,

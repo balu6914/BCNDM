@@ -36,7 +36,7 @@
             </a>
           </li>
           <li class="topbar__item">
-            <a href="my-wallet.html" class="topbar__link{% if menu_active == 'my-wallet' %} topbar__link--selected{% endif %}">
+            <a [routerLink]="['dashboard/wallet/balance']" class="topbar__link{% if menu_active == 'my-wallet' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--wallet"></span>
               My wallet
             </a>
@@ -51,17 +51,20 @@
           52.765123 TAS
         </div>
       </div>
+
+
+
       <div *ngIf="isLoggedin && user"  class="user">
-        <div class="dropdown">
-          <a class="user__toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="dropdown" dropdown>
+          <a class="user__toggle" aria-haspopup="true" aria-expanded="false" dropdownToggle>
             <span class="user__toggle-icon"></span>
           </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-            <a class="dropdown-item" href="#">
+          <div class="dropdown-menu dropdown-menu-right"  *dropdownMenu>
+            <a class="dropdown-item">
               <span class="user__icon user__icon--settings"></span>
               Settings
             </a>
-            <a class="dropdown-item" (click)="logout()" href="">
+            <a class="dropdown-item" (click)="logout()">
               <span class="user__icon user__icon--logout"></span>
               Logout
             </a>

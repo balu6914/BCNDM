@@ -2,14 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MdlModule } from '@angular-mdl/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LayoutModule } from '../layout'
-import { HttpModule } from "@angular/http";
-// Interfaces
-import { Stream } from './interfaces/stream.interface';
-import { Subscription } from './interfaces/subscription.interface';
-import { User } from './interfaces/user.interface';
+import { HttpModule } from '@angular/http';
 // Pipes
 import { MitasPipe, TasPipe} from './pipes/converter.pipe';
+// Google Map
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   imports: [
@@ -20,9 +17,10 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
     ReactiveFormsModule,
   ],
   declarations: [
-    // Pipies
+    // Pipes
     TasPipe,
-    MitasPipe
+    MitasPipe,
+    MapComponent,
   ],
   providers: [
       TasPipe,
@@ -30,7 +28,8 @@ import { MitasPipe, TasPipe} from './pipes/converter.pipe';
   ],
   exports: [
       TasPipe,
-      MitasPipe
+      MitasPipe,
+      MapComponent,
   ]
 })
 export class CommonAppModule { }

@@ -12,9 +12,6 @@ import { DashboardRoutingModule } from './dashboard.routes';
 // Dashboard components
 import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
-import { DashboardSellModule } from './sell/dashboard.sell.module';
-import { DashboardBuyModule } from './buy/dashboard.buy.module';
-import { DashboardContractsModule } from './contracts/dashboard.contracts.module';
 import { WalletModule } from './wallet/wallet.module';
 import { SubscriptionModule } from './subscription/index';
 
@@ -25,9 +22,8 @@ import { SubscriptionService } from './main/services/subscription.service';
 import { StreamService } from './main/services/stream.service';
 import { SearchService } from './main/services/search.service';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { ClipboardModule } from 'ngx-clipboard';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -40,17 +36,13 @@ import { ClipboardModule } from 'ngx-clipboard';
     // App module
     AuthModule,
     CommonAppModule,
-    DashboardRoutingModule,
     LayoutModule,
-    DashboardSellModule,
-    DashboardBuyModule,
-    DashboardContractsModule,
     WalletModule,
     SubscriptionModule,
+    DashboardRoutingModule,
     NgxDatatableModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot(),
-    ClipboardModule
+    ClipboardModule,
+    SharedModule,
   ],
   declarations: [
       DashboardComponent,
