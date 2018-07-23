@@ -9,10 +9,7 @@
 
   <!-- Left column -->
   <div class="mdl-cell mdl-cell--6-col contracts-container-section">
-    <div class="table-search" mdl-shadow="2">
-      <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateMyStreams($event)' autocomplete="name">
-      </mdl-textfield>
-    </div>
+    <dpc-table [table]="table "></dpc-table>
   </div>
 
   <!-- Right column -->

@@ -13,6 +13,7 @@ import { DashboardContractsEmptyListComponent } from './empty-list/dashboard.con
 import { DashboardContractsDetailsComponent } from './contract-details/dashboard.contracts.details.component'
 import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
 import { CommonAppModule } from '../../common/common.module';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { CommonAppModule } from '../../common/common.module';
     NgPipesModule,
     CommonModule,
     CommonAppModule,
-    DashboardContractsRoutingModule
+    DashboardContractsRoutingModule,
+    SharedModule,
   ],
   declarations: [
       DashboardContractsListComponent,

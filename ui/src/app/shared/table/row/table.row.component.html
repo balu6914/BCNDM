@@ -11,6 +11,17 @@
         </div>
       </td>
   </tr>
+  <tr *ngSwitchCase="types.Contract">
+      <td>{{ row.stream.name }}</td>
+      <td nowrap>{{ row.stream.price | tas }}</td>
+      <td nowrap>{{ row.share }} %</td>
+      <td nowrap> {{row.expirationDate | date: 'MMM d, y'}}</td>
+      <td nowrap>
+          <i *ngIf="row.signed && !row.expired" class="material-icons" title="Signed">lock</i>
+          <i *ngIf="!row.signed && !row.expired" class="material-icons" title="Waiting for a signature">lock_open</i>
+          <i *ngIf="row.expired" class="material-icons" title="Contract Expiered">error_outline</i>
+      </td>
+  </tr>
   <tr *ngSwitchDefault>
     <td>
       <a href="#" class="table-link-arrow js-flip-card-trigger">
