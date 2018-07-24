@@ -186,70 +186,14 @@
             </p>
             <ul class="nav box-nav">
               <li class="box-nav__item">
-                <a class="box-nav__link active" data-toggle="pill" href="" role="tab" aria-controls="sold-stream" aria-selected="true">Sold streams</a>
+                <a class="box-nav__link active" data-toggle="pill" href="#sold-stream" role="tab" aria-controls="sold-stream" aria-selected="true">Bought streams</a>
               </li>
               <li class="box-nav__item">
-                <a class="box-nav__link" data-toggle="pill" href="" role="tab" aria-controls="bought-stream" aria-selected="false">Bought streams</a>
+                <a class="box-nav__link" data-toggle="pill" href="#bought-stream" role="tab" aria-controls="bought-stream" aria-selected="false">Sold streams</a>
               </li>
             </ul>
           </div>
-          <div class="box__content">
-            <div class="tab-content">
-              <div class="tab-pane fade show active" id="sold-stream" role="tabpanel" aria-labelledby="sold-stream-tab">
-                <div class="table-responsive table-scroll-vertical">
-                  <table class="table table-borderless table-hover">
-                    <thead>
-                      <tr>
-                        <th scope="col">Stream Name</th>
-                        <th scope="col">Price Paid</th>
-                        <th scope="col">Start Date</th>
-                        <th scope="col">End Date</th>
-                        <th scope="col">Stream URL</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let sub of subscriptions">
-                          <td>{{ sub.stream_name }}</td>
-                          <td nowrap>{{ sub.stream_price }}</td>
-                          <td nowrap>{{ sub.start_date | date}}</td>
-                          <td nowrap>{{ sub.end_date | date }}</td>
-                          <td nowrap>
-                            <div class="action-wrapper">
-                              <a href="#" class="btn btn-primary-alt btn-sm">Open</a>
-                              <a href="#" class="btn btn-primary-alt btn-sm">Copy</a>
-                            </div>
-                          </td>
-                        </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <nav>
-                  <ul class="pagination justify-content-center">
-                    <li class="page-item page-item-prev disabled">
-                      <a class="page-link" href="#" tabindex="-1">
-                      Previous
-                      </a>
-                    </li>
-                    <li class="page-item page-item-first"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link active" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><span class="page-link" href="#">...</span></li>
-                    <li class="page-item page-item-last"><a class="page-link" href="#">76</a></li>
-                    <li class="page-item page-item-next">
-                      <a class="page-link" href="#">
-                      Next
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-              <div class="tab-pane fade" id="bought-stream" role="tabpanel" aria-labelledby="bought-stream-tab">
-                <div class="table__nodata">
-                  No data to display
-                </div>
-              </div>
-            </div>
-          </div>
+          <dpc-table [table]="table"></dpc-table>
         </div>
       </div>
       <div class="col-lg-5 order-1 order-sm-2">

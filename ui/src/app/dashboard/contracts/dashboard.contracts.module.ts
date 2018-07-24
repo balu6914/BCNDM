@@ -5,7 +5,6 @@ import { NgPipesModule } from 'ngx-pipes';
 import { MdlSelectModule } from '@angular2-mdl-ext/select';
 import { MdlDatePickerModule } from '@angular-mdl/datepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Sell routes
 import { DashboardContractsRoutingModule } from './dashboard.contracts.routes';
 // Components
@@ -14,6 +13,7 @@ import { DashboardContractsEmptyListComponent } from './empty-list/dashboard.con
 import { DashboardContractsDetailsComponent } from './contract-details/dashboard.contracts.details.component'
 import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
 import { CommonAppModule } from '../../common/common.module';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -23,9 +23,9 @@ import { CommonAppModule } from '../../common/common.module';
     ReactiveFormsModule,
     NgPipesModule,
     CommonModule,
-    NgxDatatableModule,
     CommonAppModule,
-    DashboardContractsRoutingModule
+    DashboardContractsRoutingModule,
+    SharedModule,
   ],
   declarations: [
       DashboardContractsListComponent,

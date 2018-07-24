@@ -1,5 +1,4 @@
-
-import { Stream, Subscription } from '../../common/interfaces';
+import { Stream, Subscription, Contract } from '../../common/interfaces';
 
 export enum TableType {
   Buy,
@@ -12,7 +11,7 @@ export enum TableType {
 export class Table {
   title: string;
   headers: string[];
-  content: Stream[] | Subscription[]
+  content: Stream[] | Subscription[] | Contract[]
   tableType: TableType
 
   constructor() {

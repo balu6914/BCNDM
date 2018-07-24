@@ -1,10 +1,10 @@
 export class Subscription {
   constructor(
-    public streamId: string,
-    public userId: string,
+    public id: string,
+    public user_id: string,
     public price: number,
-    public startDate: number,
-    public endDate: number,
-    public streamUrl: string
+    public start_date: number,
+    public end_date: number,
+    public url: string
   ) { }
 }

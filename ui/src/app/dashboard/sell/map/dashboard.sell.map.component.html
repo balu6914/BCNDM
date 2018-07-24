@@ -1,86 +1,207 @@
-<div class="stream-map-container">
-<div class="mdl-cell mdl-cell--12-col">
-    <div class="mdl-grid animated fadeIn">
-        <h4 class="mdl-cell mdl-cell--8-col">MY STREAMS</h4>
-
-        <div class="mdl-button-group" style="">
-          <label class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored pull-right">
-              <input type="file" (change)="onFileChange($event)" style="display:none">
-              <i class="material-icons md-dark">list</i> ADD CSV
-          </label>
-          <button routerLink="/dashboard/sell/add" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored pull-right">
-              <i class="material-icons md-dark">add</i> ADD STREAM
-          </button>
+<div class="container-fluid">
+  <div class="page-wrapper">
+    <div class="page-header">
+      <div class="page-header-xs--map">
+        <h1 class="page-title">
+          Sell stream
+        </h1>
+        <div class="page-header-xs--right">
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
+            <label class="form-check-label" for="showMap">Show Map</label>
+          </div>
         </div>
-
-        <div class="mdl-cell mdl-cell--12-col">
-            <div
-            leaflet style="height: 400px;"
-            leafletDraw
-            [leafletOptions]="options"
-            [leafletDrawOptions]="drawOptions"
-            (leafletMapReady)="onMapReady($event)">
+      </div>
+      <div class="action-buttons">
+        <p class="action-buttons__item">
+          <button routerLink="/dashboard/sell/add" type="button" class="btn btn-primary btn-media" data-toggle="modal" data-target="#newStream">
+          <span class="btn-media__icon btn-media__icon--add">
+          <input type="file" (change)="onFileChange($event)" style="display:none">
+          </span>
+          Add manually
+          </button>
+        </p>
+        <p class="action-buttons__item">
+          <a href="#" class="btn btn-primary btn-media">
+          <span class="btn-media__icon btn-media__icon--upload"></span>
+          Upload CSV
+          </a>
+        </p>
+      </div>
+      <!-- Modal -->
+      <div class="modal fade" id="newStream" tabindex="-1" role="dialog" aria-labelledby="newStreamLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newStreamLabel">New Stream</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-        <div class="mdl-cell mdl-cell--12-col">
-
-
-        <div class="mdl-cell mdl-cell--12-col">
-            <div class="table-search">
-                <mdl-textfield
-                class="search-input"
-                type='text'
-                autofocus
-                label='Type your search...'
-                (keyup)='updateMyStreams($event)'
-                autocomplete="name">
-                </mdl-textfield>
-            </div>
-
-     <ngx-datatable
-       #table
-       class='material'
-       [columns]="tableColumns"
-       [columnMode]="'force'"
-       [headerHeight]="50"
-       [footerHeight]="50"
-       [rowHeight]="'auto'"
-       [limit]="20"
-       [rows]='streamList'
-       (activate)='onUserEvent($event)'>
-       <ngx-datatable-column name="Name">
-           <ng-template let-row="row" ngx-datatable-cell-template>
-               {{row.name}}
-           </ng-template>
-       </ngx-datatable-column>
-       <ngx-datatable-column name="Stream Type">
-           <ng-template let-row="row" ngx-datatable-cell-template>
-               {{row.type}}
-           </ng-template>
-       </ngx-datatable-column>
-       <ngx-datatable-column name="Description">
-           <ng-template let-row="row" ngx-datatable-cell-template>
-               {{row.description}}
-           </ng-template>
-       </ngx-datatable-column>
-       <ngx-datatable-column name="Tokens per hour">
-           <ng-template let-row="row" ngx-datatable-cell-template>
-               {{row.price | tas}}
-           </ng-template>
-       </ngx-datatable-column>
-       <ngx-datatable-column name="Latitude, Longitude">
-           <ng-template let-row="row" ngx-datatable-cell-template>
-               {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
-           </ng-template>
-       </ngx-datatable-column>
-
-        <ngx-datatable-column name="Action">
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <div class="btn-edit-stream">
-                  <a [routerLink]="['/dashboard/sell/edit', row.id]" class="mdl-button mdl-js-button mdl-button--accent">EDIT</a>
+            <div class="modal-body">
+              <div class="container-fluid">
+                <!--
+                  Validation
+                  http://getbootstrap.com/docs/4.1/components/forms/#validation
+                  -->
+                <form class="needs-validation" novalidate>
+                  <div class="form-group row">
+                    <label for="streamName" class="col-sm-4 col-form-label">Name*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamName" value="Luftdaten Hum 8806" required>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="streamDescribe" class="col-sm-4 col-form-label">Describe your stream*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamDescribe" required>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="streamURL" class="col-sm-4 col-form-label">Stream URL*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamURL" required>
+                      <small class="form-text text-muted">
+                      Visible only to users who buy your stream
+                      </small>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="streamTokensPerHour" class="col-sm-4 col-form-label">Tokens per hour*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamTokensPerHour" required>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="streamLat" class="col-sm-4 col-form-label">Latitude of the sensor*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamLat" required>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="streamLong" class="col-sm-4 col-form-label">Longitude of the sensor*</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="streamLong" required>
+                    </div>
+                  </div>
+                </form>
               </div>
-          </ng-template>
-          </ngx-datatable-column>
-     </ngx-datatable>
-   </div>
-</div>
+            </div>
+            <div class="modal-footer">
+              <div class="modal-footer__nav">
+                <div class="modal__required">
+                  * required fields
+                </div>
+                <button type="button" class="btn btn-primary btn-padding-lg btn-xs-full">Add stream</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row row-grow">
+      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block js-showMap-content">
+        <div class="box box-grow">
+          <div class="box__header">
+            <p class="box__title">
+              Your streams
+            </p>
+          </div>
+          <!-- The element that will contain our Google Map. This is used in both the Javascript and CSS above. -->
+          <dpc-map [streamList]="streams"></dpc-map>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-sm-2">
+        <div class="flip-card js-flip-card">
+          <div class="front">
+            <dpc-table [table]="table"></dpc-table>
+          </div>
+          <!-- /front -->
+          <div class="back js-flip-card-back is-flip-card-hidden">
+            <div class="box">
+              <div class="box__header">
+                <p class="box__title">
+                  <a href="#" class="box__title-link box__title--arrow-left js-flip-card-close">
+                  Luftdaten Hum 8806
+                  </a>
+                </p>
+                <div class="box__buttons">
+                  <a href="#" class="action action--color-1">
+                  <span class="action__icon action--edit"></span>
+                  </a>
+                  <a href="#" class="action action--color-2">
+                  <span class="action__icon action--delete"></span>
+                  </a>
+                </div>
+              </div>
+              <div class="box__content">
+                <div class="row">
+                  <div class="col-sm-4 col-md-12">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="stream__title">
+                          Stream Type
+                        </div>
+                        <div class="stream__text">
+                          Air Cuality
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="stream__title">
+                          Tokens per hour
+                        </div>
+                        <div class="stream__text">
+                          0.043256 TAS
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="stream__title">
+                          Description
+                        </div>
+                        <div class="stream__text">
+                          Leverage strategic supply-chains
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="stream__title">
+                          Latitude, Longitude
+                        </div>
+                        <div class="stream__text">
+                          50.0478165, 23.4271937
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-8 col-md-12">
+                    <div class="stream-data">
+                      <div class="stream-data__title">
+                        Example reading(s)
+                      </div>
+                      <div class="stream-data__text">
+                        <code class="stream-data__code">
+                          <pre class="stream-data__pre">
+                            "sensor_id": "8746",
+                            "sensor_type": "DHT22",
+                            "location": "4409",
+                            "lat": "50.873",
+                            "lon": "4.698",
+                            "timestamp": "2018-03-09T00:02:09",
+                            "temperature": "5.20"
+                          </pre>
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /back -->
+        </div>
+        <!-- /js-card -->
+      </div>
+    </div>
+  </div>
 </div>

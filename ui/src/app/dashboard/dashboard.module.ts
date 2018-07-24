@@ -8,8 +8,6 @@ import { LayoutModule } from '../layout'
 import { AuthModule } from '../auth/auth.module';
 
 import { DashboardRoutingModule } from './dashboard.routes';
-import { CommonAppModule } from '../common/common.module';
-import { SharedModule } from '../shared/shared.module';
 
 // Dashboard components
 import { DashboardComponent } from './dashboard.component';
@@ -17,16 +15,14 @@ import { DashboardMainComponent } from './main';
 import { WalletModule } from './wallet/wallet.module';
 import { SubscriptionModule } from './subscription/index';
 
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { CommonAppModule } from '../common/common.module';
 // Import subscription module
 import { SubscriptionService } from './main/services/subscription.service';
 import { StreamService } from './main/services/stream.service';
 import { SearchService } from './main/services/search.service';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { ClipboardModule } from 'ngx-clipboard';
-import { MapComponent } from '../common/map/map.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -43,15 +39,12 @@ import { MapComponent } from '../common/map/map.component';
     WalletModule,
     SubscriptionModule,
     DashboardRoutingModule,
-    NgxDatatableModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot(),
-    ClipboardModule
+    ClipboardModule,
+    SharedModule,
   ],
   declarations: [
       DashboardComponent,
       DashboardMainComponent,
-      MapComponent,
   ],
   providers: [
       SubscriptionService,

@@ -5,6 +5,10 @@
 // Import Lib's
 
 @import '~bootstrap/scss/bootstrap.scss';
+// Import MDL additinal extensions
+@import '~@angular2-mdl-ext/popover/popover.css';
+@import '~@angular2-mdl-ext/select/select.css';
+@import '~@angular-mdl/datepicker/datepicker';
 
 @import "_global.scss";
 @import "_vars.scss";

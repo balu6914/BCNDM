@@ -9,41 +9,7 @@
 
   <!-- Left column -->
   <div class="mdl-cell mdl-cell--6-col contracts-container-section">
-    <div class="table-search" mdl-shadow="2">
-      <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateMyStreams($event)' autocomplete="name">
-      </mdl-textfield>
-    </div>
-
-    <ngx-datatable #table class='material' [columns]="tableColumns" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [selected]="selectedContract" [selectionType]="'single'" [messages]="tableMessages" [rows]='myContractsList'>
-      <ngx-datatable-column name="Stream">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row.stream.name}}
-        </ng-template>
-      </ngx-datatable-column>
-      <ngx-datatable-column name="Tokens per hour">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row.stream.price | tas}}
-        </ng-template>
-      </ngx-datatable-column>
-      <ngx-datatable-column name="Share offered">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row.share }} %
-        </ng-template>
-      </ngx-datatable-column>
-      <ngx-datatable-column name="Exparation Date">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row.exparationDate | date: 'MMM d, y'}}
-        </ng-template>
-      </ngx-datatable-column>
-      <ngx-datatable-column name="Status">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          <i *ngIf="row.signed && !row.expiered" class="material-icons" title="Signed">lock</i>
-          <i *ngIf="!row.signed && !row.expiered" class="material-icons" title="Waiting for a signature">lock_open</i>
-          <i *ngIf="row.expiered" class="material-icons" title="Contract Expiered">error_outline</i>
-        </ng-template>
-      </ngx-datatable-column>
-
-    </ngx-datatable>
+    <dpc-table [table]="table "></dpc-table>
   </div>
 
   <!-- Right column -->
