@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { Stream } from '../../../common/interfaces/stream.interface'
-import { Subscription } from '../../../common/interfaces/subscription.interface'
+import { environment } from '../../../environments/environment';
+import { Stream } from '../interfaces/stream.interface'
+import { Subscription } from '../interfaces/subscription.interface'
 import { Observable } from 'rxjs/Rx';
 
 // Import RxJs required methods

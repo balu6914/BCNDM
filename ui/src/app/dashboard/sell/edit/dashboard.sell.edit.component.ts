@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { StreamService } from '../services/stream.service';
+import { StreamService } from '../../../common/services/stream.service';
 import { Stream } from '../../../common/interfaces/stream.interface';
 import { TasPipe, MitasPipe } from '../../../common/pipes/converter.pipe';
 

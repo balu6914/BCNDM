@@ -16,10 +16,6 @@ import { WalletModule } from './wallet/wallet.module';
 import { SubscriptionModule } from './subscription/index';
 
 import { CommonAppModule } from '../common/common.module';
-// Import subscription module
-import { SubscriptionService } from './main/services/subscription.service';
-import { StreamService } from './main/services/stream.service';
-import { SearchService } from './main/services/search.service';
 
 import { ClipboardModule } from 'ngx-clipboard';
 import { SharedModule } from '../shared/shared.module';
@@ -45,11 +41,6 @@ import { SharedModule } from '../shared/shared.module';
   declarations: [
       DashboardComponent,
       DashboardMainComponent,
-  ],
-  providers: [
-      SubscriptionService,
-      StreamService,
-      SearchService,
   ],
  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

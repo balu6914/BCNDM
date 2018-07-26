@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { SearchService } from '../services/search.service';
+import { StreamService } from '../../../common/services/stream.service';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Table, TableType } from '../../../shared/table/table';
@@ -19,7 +19,7 @@ export class DashboardBuyMapComponent {
 
     constructor(
         private AuthService: AuthService,
-        public searchService: SearchService,
+        public streamService: StreamService,
         private tasPipe: TasPipe
     ) { }
 
@@ -46,7 +46,7 @@ export class DashboardBuyMapComponent {
       const northEastLat = 90;
 
       // Search streams on drawed region
-      this.searchService.searchStreams(
+      this.streamService.searchStreams(
         "geo", southWestLng, southWestLat, southWestLng, northEastLat,
         northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
         (result: any) => {
