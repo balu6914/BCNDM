@@ -5,10 +5,6 @@ import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // Sell routes
 import { DashboardSellRoutingModule } from './dashboard.sell.routes';
-// // Add services
-import { SearchService } from './services/search.service';
-import { StreamService } from './services/stream.service';
-import { TokenInterceptor } from '../../auth/services/token.http.interceptor.service';
 // Sell components
 import { DashboardSellComponent } from './index';
 import { DashboardSellAddComponent } from './add';
@@ -35,9 +31,5 @@ import { SharedModule } from '../../shared/shared.module';
       DashboardSellEditComponent,
       DashboardSellMapComponent,
   ],
-  providers: [
-      StreamService,
-      SearchService,
-  ]
 })
 export class DashboardSellModule { }

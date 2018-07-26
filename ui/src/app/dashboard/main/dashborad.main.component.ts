@@ -2,9 +2,8 @@ import { Component, ViewChild, Input } from '@angular/core';
 import { MdlDialogService } from '@angular-mdl/core';
 
 import { AuthService } from '../../auth/services/auth.service';
-import { SearchService } from './services/search.service';
-import { StreamService } from './services/stream.service';
-import { SubscriptionService } from './services/subscription.service';
+import { StreamService } from '../../common/services/stream.service';
+import { SubscriptionService } from '../../common/services/subscription.service';
 
 import { TasPipe } from '../../common/pipes/converter.pipe';
 import { User } from '../../common/interfaces/user.interface';
@@ -33,7 +32,6 @@ export class DashboardMainComponent {
         private AuthService: AuthService,
         private subscriptionService: SubscriptionService,
         private streamService: StreamService,
-        private searchService: SearchService,
         private tasPipe: TasPipe,
     ) {}
 
@@ -101,7 +99,7 @@ export class DashboardMainComponent {
           const northEastLat = 90;
 
           // Search streams on drawed region
-          this.searchService.searchStreams(
+          this.streamService.searchStreams(
             "geo", southWestLng, southWestLat, southWestLng, northEastLat,
             northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
             (result: any) => {

@@ -4,8 +4,8 @@ import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  }
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { AuthService } from '../../../auth/services/auth.service';
-import { SubscriptionSrvice } from '../services/subscription.service';
-import { StreamService } from '../../sell/services/stream.service';
+import { SubscriptionService } from '../../../common/services/subscription.service';
+import { StreamService } from '../../../common/services/stream.service';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 
 @Component({
@@ -21,7 +21,7 @@ export class SubscriptionAddComponent {
     public form: FormGroup;
     constructor(
         private authService: AuthService,
-        private subscriptionService: SubscriptionSrvice,
+        private subscriptionService: SubscriptionService,
         private streamService: StreamService,
         private router: Router,
         private route: ActivatedRoute,

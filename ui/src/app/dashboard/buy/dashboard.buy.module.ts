@@ -5,9 +5,6 @@ import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // Buy routes
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
-// // Add services
-import { SearchService } from './services/search.service';
-import { TokenInterceptor } from '../../auth/services/token.http.interceptor.service';
 // Buy components
 import { DashboardBuyComponent } from './index';
 import { DashboardBuyMapComponent } from './map';
@@ -34,8 +31,5 @@ import { SharedModule } from '../../shared/shared.module';
       DashboardBuyComponent,
       DashboardBuyMapComponent,
   ],
-  providers: [
-      SearchService,
-  ]
 })
 export class DashboardBuyModule { }

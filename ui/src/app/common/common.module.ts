@@ -4,6 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
 import { MitasPipe, TasPipe} from './pipes/converter.pipe';
+// services
+import { StreamService } from './services/stream.service';
+import { SubscriptionService } from './services/subscription.service';
+
+
 // Google Map
 import { MapComponent } from './map/map.component';
 
@@ -22,7 +27,9 @@ import { MapComponent } from './map/map.component';
   ],
   providers: [
       TasPipe,
-      MitasPipe
+      MitasPipe,
+      StreamService,
+      SubscriptionService
   ],
   exports: [
       TasPipe,
