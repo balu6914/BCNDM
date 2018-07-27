@@ -13,10 +13,12 @@ import { DashboardSellMapComponent } from './map';
 
 import { CommonAppModule } from '../../common/common.module';
 import { SharedModule } from '../../shared/shared.module';
+import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    AppBootstrapModule,
     MdlModule,
     FormsModule,
     ReactiveFormsModule,

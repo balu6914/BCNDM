@@ -1,10 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { BsModalService } from 'ngx-bootstrap/modal';
 
+import { DashboardSellAddComponent } from '../add/dashboard.sell.add.component';
 import { StreamService } from '../../../common/services/stream.service';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Router } from '@angular/router';
-import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { Table, TableType } from '../../../shared/table/table';
 
 @Component({
@@ -13,17 +13,18 @@ import { Table, TableType } from '../../../shared/table/table';
   styleUrls: [ './dashboard.sell.map.component.scss' ]
 })
 export class DashboardSellMapComponent {
+    user: any;
     temp = [];
     streams = [];
-    user: any;
     table: Table = new Table();
 
     constructor(
         private streamService: StreamService,
         private AuthService: AuthService,
         private router: Router,
-        private tasPipe: TasPipe
-    ) { }
+        private modalService: BsModalService,
+    ) {
+    }
 
   ngOnInit() {
     // Fetch current User
@@ -54,6 +55,7 @@ export class DashboardSellMapComponent {
       northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
       (result: any) => {
         this.temp = [...result.Streams];
+        // Push owner streams to map markers list
         result.Streams.forEach(stream => {
           if (stream.owner == this.user.id) {
             this.streams.push(stream);
@@ -82,5 +84,10 @@ export class DashboardSellMapComponent {
         error => console.log(error),
     );
     }
+  }
+
+  openModal() {
+    // Open DashboardSellAddComponent Modal
+    this.modalService.show(DashboardSellAddComponent);
   }
 }
