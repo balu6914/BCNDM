@@ -2,13 +2,17 @@ import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 import { DashboardSellEditComponent } from './edit/dashboard.sell.edit.component';
-import { DashboardSellMapComponent } from './map/dashboard.sell.map.component';
 import { DashboardSellComponent } from './dashboard.sell.component';
 import { SubscriptionAddComponent } from '../../dashboard/subscription/add';
 import { AuthGuardService as AuthGuard } from '../../auth/guardians/auth.guardian';
 
 // Define our Auth Routes
 const routes: Routes = [
+    {
+        path: '',
+        component: DashboardSellComponent ,
+        canActivate: [AuthGuard]
+    },
     {
         path: 'add',
         component: DashboardSellAddComponent ,
@@ -19,11 +23,6 @@ const routes: Routes = [
         component: DashboardSellEditComponent ,
         canActivate: [AuthGuard],
     },
-    {
-        path: 'map',
-        component: DashboardSellMapComponent ,
-        canActivate: [AuthGuard]
-    }
 ];
 
 @NgModule({

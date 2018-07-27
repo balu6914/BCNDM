@@ -49,7 +49,7 @@ export class SignupComponent {
                     console.log("here is a response", response)
                     this.AuthService.login(model.email, model.password)
                       .subscribe(
-                        (token: any) => this.router.navigate(['/dashboard/me']),
+                        (token: any) => this.router.navigate(['/dashboard']),
                         err => { console.log(err) }
                       );
                 },
