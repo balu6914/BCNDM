@@ -54,7 +54,7 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		req.stream.ID = bson.ObjectIdHex(req.id)
+		req.stream.ID = bson.ObjectIdHex(req.streamID)
 
 		if err := svc.UpdateStream(req.owner, req.stream); err != nil {
 			return nil, err

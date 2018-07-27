@@ -28,17 +28,17 @@ func (req createStreamReq) validate() error {
 }
 
 type updateStreamReq struct {
-	owner  string
-	id     string
-	stream streams.Stream
+	owner    string
+	streamID string
+	stream   streams.Stream
 }
 
 func (req updateStreamReq) validate() error {
-	if req.id == "" {
+	if req.streamID == "" {
 		return streams.ErrMalformedData
 	}
 
-	if !bson.IsObjectIdHex(req.id) {
+	if !bson.IsObjectIdHex(req.streamID) {
 		return streams.ErrMalformedData
 	}
 

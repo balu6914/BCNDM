@@ -223,8 +223,9 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	defer r.Body.Close()
 
 	req := updateStreamReq{
-		owner:  owner,
-		stream: stream,
+		owner:    owner,
+		streamID: bone.GetValue(r, "id"),
+		stream:   stream,
 	}
 	return req, nil
 }
