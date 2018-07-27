@@ -135,7 +135,7 @@ certificateAuthorities:
     httpOptions:
       verify: false
     registrar:
-      enrollId: admin
+      enrollId: Admin@org1.monetasa.com
       enrollSecret: adminpw
     caName: ca.org1.monetasa.com
 
