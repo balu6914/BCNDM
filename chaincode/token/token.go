@@ -1,257 +1,247 @@
-/*
-Copyright Vadim Uvin (Swisscom AG). 2017 All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-		 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package main
 
 import (
+	"encoding/binary"
 	"encoding/json"
-	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-type TokenChaincode struct {
+const (
+	keyToken       = "__token"
+	indexBalance   = "cn~balance"
+	indexAllowance = "cn~allowance"
+)
+
+var _ Service = (*tokenChaincode)(nil)
+
+type tokenChaincode struct{}
+
+// NewService returns new ERC20 implementation instance.
+func NewService() Service {
+	return tokenChaincode{}
 }
 
-const KeyToken = "__token"
-const IndexBalance = "cn~balance"
-const IndexAllowance = "cn~allowance"
-
-func (t *TokenChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+func (tc tokenChaincode) Init(stub shim.ChaincodeStubInterface) error {
 	function, args := stub.GetFunctionAndParameters()
 
 	if function != "init" {
-		return shim.Error("Expeted 'init' function.")
+		return ErrInvalidFuncCall
 	}
 
 	if len(args) != 1 {
-		return shim.Error("Expectd 1 argument")
+		return ErrInvalidNumOfArgs
 	}
 
 	// get token data from JSON
-	token := Token{}
-	err := json.Unmarshal([]byte(args[0]), &token)
-	if err != nil {
-		return shim.Error("Error parsing token json")
+	var ti tokenInfo
+	if err := json.Unmarshal([]byte(args[0]), &ti); err != nil {
+		return ErrInvalidArgument
 	}
 
-	err = stub.PutState(KeyToken, []byte(args[0]))
-	if err != nil {
-		return shim.Error("Error saving token data")
+	if err := stub.PutState(keyToken, []byte(args[0])); err != nil {
+		return ErrSettingState
 	}
 
 	// get caller CN from his certificate
-	caller, err := CallerCN(stub)
+	caller, err := callerCN(stub)
 	if err != nil {
-		return shim.Error("Error getting caller cn")
+		return ErrUnauthorized
 	}
 
 	// set the balance using a helper function
-	err = t.setBalance(stub, caller, token.TotalSupply)
-	if err != nil {
-		return shim.Error("Error setting caller balance")
+	if err := setBalance(stub, caller, ti.TotalSupply); err != nil {
+		return ErrFailedBalanceSet
 	}
 
-	return shim.Success(nil)
+	return nil
 }
 
-func (t *TokenChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	function, args := stub.GetFunctionAndParameters()
-
-	// call routing
-	switch function {
-	/**
-	 * Returns a Token info, such as totalSupply, symbol, etc...
-	 * @type {[type]}
-	 */
-	case "info":
-		info, _ := stub.GetState(KeyToken)
-		return shim.Success(info)
-	/**
-	 * Transfers _value amount of tokens to address _to
-	 */
-	case "transfer":
-		return t.transfer(stub, args)
-	/**
-	 * Returns the account balance of another account.
-	 */
-	case "balance":
-		return t.balanceAsJson(stub, args)
-	/**
-	 * Allows _spender to withdraw from your account multiple times, up to the _value amount.
-	 * If this function is called again it overwrites the current allowance with _value.
-	 */
-	case "approve":
-		return t.approve(stub, args)
-	/**
-	 * Returns the amount which _spender is still allowed to withdraw from _owner.
-	 */
-	case "allowances":
-		return t.allowancesAsJson(stub, args)
-	/**
-	 * Transfers _value amount of tokens from address _from to address _to
-	 */
-	case "transferFrom":
-		return t.transferFrom(stub, args)
+func (tc tokenChaincode) TotalSupply(stub shim.ChaincodeStubInterface) (uint64, error) {
+	data, err := stub.GetState(keyToken)
+	if err != nil {
+		return 0, ErrGettingState
 	}
 
-	return shim.Error("Incorrect function name: " + function)
+	var ti tokenInfo
+	if err := json.Unmarshal(data, &ti); err != nil {
+		return 0, ErrInvalidStateData
+	}
+
+	return ti.TotalSupply, nil
 }
 
-func (t *TokenChaincode) transfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
-		return shim.Error("Transfer expected 1 argument")
-	}
-
-	transfer := Transfer{}
-	err := json.Unmarshal([]byte(args[0]), &transfer)
+func (tc tokenChaincode) BalanceOf(stub shim.ChaincodeStubInterface, owner string) (uint64, error) {
+	key, err := stub.CreateCompositeKey(indexBalance, []string{owner})
 	if err != nil {
-		return shim.Error("Error parsing transfer json")
+		return 0, ErrFailedKeyCreation
 	}
 
-	from, err := CallerCN(stub)
+	// if the user cn is not in the state, then the balance is 0
+	data, err := stub.GetState(key)
 	if err != nil {
-		return shim.Error("Error getting from data")
+		return 0, ErrGettingState
 	}
 
-	// to prevent "generating" tokens because of
-	// committed state reading
-	if from == transfer.To {
-		return shim.Success(nil)
+	if data == nil {
+		return 0, nil
 	}
 
-	// get the balances from state
-	fromBalance, err := t.balance(stub, from)
-	toBalance, err := t.balance(stub, transfer.To)
-	if err != nil {
-		return shim.Error("Error getting to or from balance")
-	}
-	// Check if sender have enough funds for transfer
-	if fromBalance < transfer.Value {
-		return shim.Error("Not enough balance")
-	}
-
-	//if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-	if toBalance+transfer.Value < toBalance {
-		return shim.Error("Receiver balance overflow")
-	}
-
-	// balanceOf[msg.sender] -= _value;
-	err = t.setBalance(stub, from, fromBalance-transfer.Value)
-	// balanceOf[_to] += _value;
-	err = t.setBalance(stub, transfer.To, toBalance+transfer.Value)
-	if err != nil {
-		return shim.Error("Error setting to or from balance")
-	}
-
-	transfer.From = from
-	evtData, _ := json.Marshal(transfer)
-	//Transfer(msg.sender, _to, _value);
-	stub.SetEvent("Transfer", evtData)
-
-	return shim.Success(nil)
+	return binary.LittleEndian.Uint64(data), nil
 }
 
-func (t *TokenChaincode) approve(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
-		return shim.Error("Transfer expected 1 argument")
-	}
-
-	// get the approval data
-	approve := Approve{}
-	err := json.Unmarshal([]byte(args[0]), &approve)
+func (tc tokenChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, value uint64) bool {
+	from, err := callerCN(stub)
 	if err != nil {
-		return shim.Error("Error parsing transfer json")
+		return false
 	}
 
-	from, err := CallerCN(stub)
-	if err != nil {
-		return shim.Error("Error getting from data")
-	}
-
-	//allowance[msg.sender][_spender] = _value;
-	t.setAllowance(stub, from, approve.Spender, approve.Value)
-	stub.SetEvent("Approve", []byte(args[0]))
-
-	return shim.Success(nil)
+	return tc.transfer(stub, from, to, value)
 }
 
-func (t *TokenChaincode) transferFrom(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
-		return shim.Error("Transfer expected 1 argument")
-	}
-
-	transfer := Transfer{}
-	err := json.Unmarshal([]byte(args[0]), &transfer)
+func (tc tokenChaincode) TransferFrom(stub shim.ChaincodeStubInterface, from, to string, value uint64) bool {
+	spender, err := callerCN(stub)
 	if err != nil {
-		return shim.Error("Error parsing transfer json")
+		return false
 	}
 
-	spender, err := CallerCN(stub)
+	allowance, err := tc.Allowance(stub, from, spender)
 	if err != nil {
-		return shim.Error("Error getting caller data")
+		allowance = 0
 	}
 
-	if transfer.From == transfer.To {
-		return shim.Success(nil)
+	if allowance < value {
+		return false
 	}
 
-	// retrieving balances and allowances
-	fromBalance, err := t.balance(stub, transfer.From)
-	toBalance, err := t.balance(stub, transfer.To)
-	allowance, err := t.allowance(stub, transfer.From, spender)
-	if err != nil {
-		return shim.Error("Error getting to or from balance or allowance")
+	// allowance[_from][msg.sender] -= _value
+	if err := setAllowance(stub, from, spender, allowance-value); err != nil {
+		return false
 	}
 
-	//if (balanceOf[_from] < _value) throw;
-	if fromBalance < transfer.Value {
-		return shim.Error("Not enough balance")
-	}
-
-	//if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-	if toBalance+transfer.Value < toBalance {
-		return shim.Error("Receiver balance overflow")
-	}
-
-	//if (_value > allowance[_from][msg.sender]) throw;
-	if transfer.Value > allowance {
-		return shim.Error("Spender not allowed to transfer this amount")
-	}
-
-	//balanceOf[_from] -= _value;
-	//balanceOf[_to] += _value;
-	//allowance[_from][msg.sender] -= _value;
-	err = t.setBalance(stub, transfer.From, fromBalance-transfer.Value)
-	err = t.setBalance(stub, transfer.To, toBalance+transfer.Value)
-	err = t.setAllowance(stub, transfer.From, spender, allowance-transfer.Value)
-	if err != nil {
-		return shim.Error("Error setting to or from balance or allowance")
-	}
-
-	//Transfer(_from, _to, _value);
-	stub.SetEvent("Transfer", []byte(args[0]))
-
-	return shim.Success(nil)
+	return tc.transfer(stub, from, to, value)
 }
 
-func main() {
-	err := shim.Start(&TokenChaincode{})
+func (tc tokenChaincode) Approve(stub shim.ChaincodeStubInterface, spender string, value uint64) bool {
+	from, err := callerCN(stub)
 	if err != nil {
-		fmt.Errorf("Error starting Token chaincode: %s", err)
+		return false
 	}
+
+	// allowance[msg.sender][_spender] = _value
+	if err := setAllowance(stub, from, spender, value); err != nil {
+		return false
+	}
+
+	a := approve{
+		Spender: spender,
+		Value:   value,
+	}
+	approveData, err := json.Marshal(a)
+	if err != nil {
+		return false
+	}
+
+	err = stub.SetEvent("Approval", approveData)
+	return err == nil
+}
+
+func (tc tokenChaincode) Allowance(stub shim.ChaincodeStubInterface, owner, spender string) (uint64, error) {
+	key, err := stub.CreateCompositeKey(indexAllowance, []string{owner, spender})
+	if err != nil {
+		return 0, ErrFailedKeyCreation
+	}
+
+	data, err := stub.GetState(key)
+	if err != nil {
+		return 0, ErrGettingState
+	}
+
+	// if the key is not in the state, then the value is 0
+	if data == nil {
+		return 0, nil
+	}
+
+	return binary.LittleEndian.Uint64(data), nil
+}
+
+func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to string, value uint64) bool {
+	if from == to {
+		return true
+	}
+
+	// retrieving balances
+	fromBalance, err := tc.BalanceOf(stub, from)
+	if err != nil {
+		return false
+	}
+
+	toBalance, err := tc.BalanceOf(stub, to)
+	if err != nil {
+		toBalance = 0
+	}
+
+	// if (balanceOf[_from] < _value) throw
+	if fromBalance < value {
+		return false
+	}
+
+	// if (balanceOf[_to] + _value < balanceOf[_to]) throw
+	if toBalance+value < toBalance {
+		return false
+	}
+
+	// balanceOf[_from] -= _value
+	if err := setBalance(stub, from, fromBalance-value); err != nil {
+		return false
+	}
+
+	// balanceOf[_to] += _value
+	if err := setBalance(stub, to, toBalance+value); err != nil {
+		return false
+	}
+
+	t := transfer{
+		From:  from,
+		To:    to,
+		Value: value,
+	}
+	transferData, err := json.Marshal(t)
+	if err != nil {
+		return false
+	}
+
+	// Transfer(msg.sender, _to, _value)
+	err = stub.SetEvent("Transfer", transferData)
+	return err == nil
+}
+
+func setBalance(stub shim.ChaincodeStubInterface, cn string, balance uint64) error {
+	key, err := stub.CreateCompositeKey(indexBalance, []string{cn})
+	if err != nil {
+		return ErrFailedKeyCreation
+	}
+
+	data := make([]byte, 8)
+	binary.LittleEndian.PutUint64(data, balance)
+	if err := stub.PutState(key, data); err != nil {
+		return ErrSettingState
+	}
+
+	return nil
+}
+
+func setAllowance(stub shim.ChaincodeStubInterface, from, spender string, value uint64) error {
+	key, err := stub.CreateCompositeKey(indexAllowance, []string{from, spender})
+	if err != nil {
+		return ErrFailedKeyCreation
+	}
+
+	data := make([]byte, 8)
+	binary.LittleEndian.PutUint64(data, value)
+	if err := stub.PutState(key, data); err != nil {
+		return ErrSettingState
+	}
+
+	return nil
 }

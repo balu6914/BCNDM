@@ -7,6 +7,21 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
+func buyEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(buyReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.BuyTokens(req.userID, req.Amount); err != nil {
+			return nil, err
+		}
+
+		return buyRes{}, nil
+	}
+}
+
 func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(balanceReq)
@@ -14,11 +29,11 @@ func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		balance, err := svc.Balance(req.userID, req.chanID)
+		balance, err := svc.Balance(req.userID)
 		if err != nil {
 			return nil, err
 		}
 
-		return balanceRes{Balance: balance}, err
+		return balanceRes{Balance: balance}, nil
 	}
 }
