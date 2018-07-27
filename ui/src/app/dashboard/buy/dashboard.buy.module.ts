@@ -7,7 +7,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
 // Buy components
 import { DashboardBuyComponent } from './index';
-import { DashboardBuyMapComponent } from './map';
 // Import subscription module
 import { SubscriptionModule } from '../subscription';
 
@@ -29,7 +28,6 @@ import { SharedModule } from '../../shared/shared.module';
   ],
   declarations: [
       DashboardBuyComponent,
-      DashboardBuyMapComponent,
   ],
 })
 export class DashboardBuyModule { }

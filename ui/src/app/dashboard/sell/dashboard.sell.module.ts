@@ -9,7 +9,6 @@ import { DashboardSellRoutingModule } from './dashboard.sell.routes';
 import { DashboardSellComponent } from './index';
 import { DashboardSellAddComponent } from './add';
 import { DashboardSellEditComponent } from './edit';
-import { DashboardSellMapComponent } from './map';
 
 import { CommonAppModule } from '../../common/common.module';
 import { SharedModule } from '../../shared/shared.module';
@@ -31,7 +30,6 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
       DashboardSellComponent,
       DashboardSellAddComponent,
       DashboardSellEditComponent,
-      DashboardSellMapComponent,
   ],
 })
 export class DashboardSellModule { }

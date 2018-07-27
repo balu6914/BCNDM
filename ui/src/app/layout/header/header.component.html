@@ -12,19 +12,19 @@
       <div class="topbar__collapse">
         <ul *ngIf="isLoggedin && user"  class="topbar__menu">
           <li class="topbar__item">
-            <a routerLink="/dashboard/me" routerLinkActive="active" class="topbar__link{% if menu_active == 'dashboard' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard" routerLinkActive="active" class="topbar__link{% if menu_active == 'dashboard' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--dashboard"></span>
               Dashboard
             </a>
           </li>
           <li class="topbar__item">
-            <a routerLink="/dashboard/sell/map" routerLinkActive="active" class="topbar__link{% if menu_active == 'sell-stream' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/sell" routerLinkActive="active" class="topbar__link{% if menu_active == 'sell-stream' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--sell"></span>
               Sell stream
             </a>
           </li>
           <li class="topbar__item">
-            <a routerLink="/dashboard/buy/map" routerLinkActive="active" class="topbar__link{% if menu_active == 'buy-stream' %} topbar__link--selected{% endif %}">
+            <a routerLink="/dashboard/buy" routerLinkActive="active" class="topbar__link{% if menu_active == 'buy-stream' %} topbar__link--selected{% endif %}">
               <span class="topbar__icon topbar__icon--buy"></span>
               Buy stream
             </a>
