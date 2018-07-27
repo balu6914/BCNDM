@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"monetasa"
 	"monetasa/transactions"
 	"net/http"
@@ -19,9 +20,10 @@ import (
 const contentType = "application/json"
 
 var (
-	errMalformedEntity    = errors.New("malformed entity")
-	errUnauthorizedAccess = errors.New("missing or invalid credentials provided")
-	auth                  monetasa.AuthServiceClient
+	errMalformedEntity        = errors.New("malformed entity")
+	errUnauthorizedAccess     = errors.New("missing or invalid credentials provided")
+	errUnsupportedContentType = errors.New("unsupported content type")
+	auth                      monetasa.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
@@ -33,9 +35,15 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 	}
 
 	r := bone.New()
-	r.Get("/balance", kithttp.NewServer(
+	r.Get("/tokens", kithttp.NewServer(
 		balanceEndpoint(svc),
 		decodeBalanceReq,
+		encodeResponse,
+		opts...,
+	))
+	r.Post("/tokens/buy", kithttp.NewServer(
+		buyEndpoint(svc),
+		decodeBuyReq,
 		encodeResponse,
 		opts...,
 	))
@@ -53,6 +61,26 @@ func decodeBalanceReq(_ context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	req := balanceReq{userID: id}
+
+	return req, nil
+}
+
+func decodeBuyReq(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	id, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var req buyReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.userID = id
 
 	return req, nil
 }
@@ -106,6 +134,12 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 	case errUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
+	case errUnsupportedContentType:
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+	case io.ErrUnexpectedEOF:
+		w.WriteHeader(http.StatusBadRequest)
+	case io.EOF:
+		w.WriteHeader(http.StatusBadRequest)
 	default:
 		switch err.(type) {
 		case *json.SyntaxError:

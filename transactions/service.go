@@ -39,4 +39,7 @@ type Service interface {
 	// Transfer receives from and to ids and amount of tokens that it should
 	// transfer. It returns error only if transfer failed.
 	Transfer(string, string, uint64) error
+
+	// BuyTokens transfers tokens to user's account.
+	BuyTokens(string, uint64) error
 }

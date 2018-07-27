@@ -19,10 +19,10 @@ type mockAuthClient struct {
 
 // NewAuthClient returns auth client mock instance.
 func NewAuthClient(users map[string]string) monetasa.AuthServiceClient {
-	return mockAuthClient{users: users, mutex: &sync.Mutex{}}
+	return &mockAuthClient{users: users, mutex: &sync.Mutex{}}
 }
 
-func (mac mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserID, error) {
+func (mac *mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserID, error) {
 	mac.mutex.Lock()
 	defer mac.mutex.Unlock()
 

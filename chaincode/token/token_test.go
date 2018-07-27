@@ -398,7 +398,7 @@ func TestAllowance(t *testing.T) {
 		},
 		"read allowance for empty spender and owner": {
 			args:   util.ToChaincodeArgs("allowance", string(invalidAd)),
-			status: int32(shim.ERROR),
+			status: int32(shim.OK),
 		},
 	}
 

@@ -159,7 +159,7 @@ func (tc tokenChaincode) Allowance(stub shim.ChaincodeStubInterface, owner, spen
 
 	// if the key is not in the state, then the value is 0
 	if data == nil {
-		return 0, ErrGettingState
+		return 0, nil
 	}
 
 	return binary.LittleEndian.Uint64(data), nil

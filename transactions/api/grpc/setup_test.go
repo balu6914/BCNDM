@@ -14,11 +14,12 @@ import (
 )
 
 const (
-	port    = 8080
-	id1     = "5281b83afbb7f35cb62d0834"
-	id2     = "5281b83afbb7f35cb62d0835"
-	secret  = "secret"
-	balance = 42
+	port            = 8080
+	id1             = "5281b83afbb7f35cb62d0834"
+	id2             = "5281b83afbb7f35cb62d0835"
+	secret          = "secret"
+	balance         = 42
+	remainingTokens = 100
 )
 
 var svc transactions.Service
@@ -45,7 +46,7 @@ func newService() transactions.Service {
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
 		id1: balance,
 		id2: balance,
-	})
+	}, remainingTokens)
 
 	return transactions.New(repo, bn)
 }

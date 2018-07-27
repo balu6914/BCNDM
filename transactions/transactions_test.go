@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	userID1 = "5281b83afbb7f35cb62d0834"
-	userID2 = "5281b83afbb7f35cb62d0835"
-	chanID  = "chan"
-	secret  = "secret"
-	balance = 42
+	userID1         = "5281b83afbb7f35cb62d0834"
+	userID2         = "5281b83afbb7f35cb62d0835"
+	chanID          = "chan"
+	secret          = "secret"
+	balance         = 42
+	remainingTokens = 100
 )
 
 func newService() transactions.Service {
@@ -25,7 +26,7 @@ func newService() transactions.Service {
 	bn := mocks.NewBlockchainNetwork(map[string]uint64{
 		userID1: balance,
 		userID2: balance,
-	})
+	}, remainingTokens)
 
 	return transactions.New(repo, bn)
 }
@@ -70,7 +71,7 @@ func TestBalance(t *testing.T) {
 		"fetch balance of nonexistent user": {
 			userID:  "nonexistent_user",
 			balance: 0,
-			err:     transactions.ErrNotFound,
+			err:     transactions.ErrFailedBalanceFetch,
 		},
 	}
 
@@ -109,6 +110,35 @@ func TestTransfer(t *testing.T) {
 
 	for _, tc := range cases {
 		err := svc.Transfer(tc.from, tc.to, tc.value)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
+	}
+}
+
+func TestBuyTokens(t *testing.T) {
+	svc := newService()
+
+	cases := []struct {
+		desc  string
+		to    string
+		value uint64
+		err   error
+	}{
+		{
+			desc:  "transfer token to user account",
+			to:    userID1,
+			value: 1,
+			err:   nil,
+		},
+		{
+			desc:  "transfer too many tokens to user account",
+			to:    userID1,
+			value: remainingTokens,
+			err:   transactions.ErrFailedTransfer,
+		},
+	}
+
+	for _, tc := range cases {
+		err := svc.BuyTokens(tc.to, tc.value)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
 	}
 }

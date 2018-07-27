@@ -23,3 +23,19 @@ func (res balanceRes) code() int {
 func (res balanceRes) empty() bool {
 	return false
 }
+
+type buyRes struct {
+	Balance uint64 `json:"balance"`
+}
+
+func (res buyRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res buyRes) code() int {
+	return http.StatusOK
+}
+
+func (res buyRes) empty() bool {
+	return true
+}
