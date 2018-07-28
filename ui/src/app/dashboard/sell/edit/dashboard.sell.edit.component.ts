@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { StreamService } from '../../../common/services/stream.service';
 import { Stream } from '../../../common/interfaces/stream.interface';
-import { TasPipe, MitasPipe } from '../../../common/pipes/converter.pipe';
+import { MitasPipe } from '../../../common/pipes/converter.pipe';
 
 @Component({
   selector: 'dashboard-sell-edit',
@@ -12,119 +12,64 @@ import { TasPipe, MitasPipe } from '../../../common/pipes/converter.pipe';
   styleUrls: [ './dashboard.sell.edit.component.scss' ]
 })
 export class DashboardSellEditComponent {
-    user:any;
-    stream: any;
-    editName: string;
-    editType: string;
-    editDescription: string;
-    editUrl: string;
-    public form: FormGroup;
+  user:any;
+  form: FormGroup;
+  modalMsg: string;
+  submitted: boolean = false;
+  formEdit: any;
 
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private fb: FormBuilder,
-        private StreamService: StreamService,
-        private tasPipe: TasPipe,
-        private mitasPipe: MitasPipe,
-    ) {
-    }
-    ngOnInit() {
-        // Fetch stream
-        let id = this.route.snapshot.params['id'];
-        this.StreamService.getStream(id).subscribe(
-                (result: any) => {
-                    this.stream = result.Stream;
-                    // Convert to TAS
-                    this.stream["price"] = this.tasPipe.transform(this.stream["price"]);
-                    // Pre-set FormGroup with stream values
-                    this.form.controls['name'].setValue(this.stream["name"]);
-                    this.form.controls['type'].setValue(this.stream["type"]);
-                    this.form.controls['description'].setValue(this.stream["description"]);
-                    this.form.controls['url'].setValue(this.stream["url"]);
-                    this.form.controls['price'].setValue(this.stream["price"]);
-                    this.form.controls['long'].setValue(this.stream["location"]["coordinates"][0]);
-                    this.form.controls['lat'].setValue(this.stream["location"]["coordinates"][1]);
-                },
-                err => { console.log(err) }
-              );
+  constructor(
+      private streamService: StreamService,
+      private mitasPipe: MitasPipe,
+      private formBuilder: FormBuilder,
+      public  modalNewStream: BsModalRef,
+  ) {
+    this.form = formBuilder.group({
+      'name':        ['', Validators.required],
+      'type':        ['', Validators.required],
+      'description': ['', Validators.required],
+      'url':         ['', Validators.required],
+      'price':       ['', Validators.required],
+      'lat':         ['', Validators.required],
+      'long':        ['', Validators.required]
+    })
+  }
 
-              this.form = this.fb.group({
-                      name       : ['', [<any>Validators.required, <any>Validators.minLength(3)]],
-                      type       : ['', [<any>Validators.required]],
-                      description: ['', [<any>Validators.required, <any>Validators.minLength(5)]],
-                      url        : ['', [<any>Validators.required]],
-                      price      : ['', [<any>Validators.required]],
-                      long       : ['', [<any>Validators.required]],
-                      lat        : ['', [<any>Validators.required]]
-              });
-    }
+  ngOnInit() {
+    this.form.controls.name.setValue(this.formEdit.name);
+    this.form.controls.type.setValue(this.formEdit.type);
+    this.form.controls.description.setValue(this.formEdit.description);
+    this.form.controls.url.setValue(this.formEdit.url);
+    this.form.controls.price.setValue(this.formEdit.price);
+    this.form.controls.lat.setValue(this.formEdit.lat);
+    this.form.controls.long.setValue(this.formEdit.long);
+  }
 
-    onSubmit(model: Stream, isValid: boolean) {
-        if(isValid) {
-            // Confirm dialog
-            let confirmMsg = 'Your Stream will be published automatically on the market affter edition. Do you Agree ?'
-            // let result = this.dialogService.confirm(confirmMsg, 'Cancel', 'Yes, publish it!');
-            // result.subscribe( () => {
-            //     // Convert to miTAS
-            //     model["price"] = this.mitasPipe.transform(model["price"]);
-            //     model["location"] = {
-            //         "type": "Point",
-            //         "coordinates": [parseFloat(model["long"]),
-            //                         parseFloat(model["lat"])]
-            //     }
-            //     delete model["long"];
-            //     delete model["lat"];
-            //
-            //     this.StreamService.updateStream(this.stream["id"], model).subscribe(
-            //         response => {
-            //             console.log(response);
-            //         },
-            //         err => {
-            //             if (err.status == 200) {
-            //                 this.router.navigate(['/dashboard/sell/map'])
-            //             } else {
-            //                 console.log(err);
-            //             }
-            //         });
-            //     },
-            //     (err: any) => {
-            //         console.log('declined');
-            //     }
-            // );
-            // // if you only need the confirm answer
-            // result.onErrorResumeNext().subscribe( () => {
-            //     console.log('confirmed 2');
-            // });
-        }
-    }
+  onSubmit() {
+    const stream: Stream = {
+      name: this.form.value.name,
+      type: this.form.value.type,
+      description: this.form.value.description,
+      url: this.form.value.url,
+      price: this.mitasPipe.transform(this.form.value.price),
+      location: {
+        "type": "Point",
+        "coordinates": [parseFloat(this.form.value.long),
+                        parseFloat(this.form.value.lat)]
+      }
+    };
 
-    onDelete() {
-        let id = this.route.snapshot.params['id'];
-        // Confirm dialog
-        let confirmMsg = 'Your Stream will be removed from the market. Do you Agree ?'
-        // let result = this.dialogService.confirm(confirmMsg, 'Cancel', 'Yes, remove it!');
-        //  result.subscribe( () => {
-        //      console.log('confirmed');
-        //      this.StreamService.removeStream(id).subscribe(
-        //          response => {
-        //              console.log(response);
-        //          },
-        //          err => {
-        //              if (err.status == 200) {
-        //                  this.router.navigate(['/dashboard/sell/map'])
-        //              } else {
-        //                  console.log(err);
-        //              }
-        //          });
-        //    },
-        //    (err: any) => {
-        //      console.log('declined');
-        //    }
-        //  );
-        //  // if you only need the confirm answer
-        //  result.onErrorResumeNext().subscribe( () => {
-        //    console.log('confirmed 2');
-        //  });
-    }
+    // Send addStream request
+    this.streamService.updateStream(this.formEdit.id, stream).subscribe(
+      response => {
+        this.modalMsg = `Stream succesfully updated!`;
+      },
+      err => {
+        console.log(err);
+        this.modalMsg = `Status: ${err.status} - ${err.statusText}`;
+    });
+
+    // Hide modalNewStream and show modalResponse
+    this.submitted = true;
+  }
 }
