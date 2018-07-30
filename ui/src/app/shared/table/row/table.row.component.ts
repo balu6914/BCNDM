@@ -5,6 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { DashboardSellEditComponent } from '../../../dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from '../../../dashboard/sell/delete';
+import { SubscriptionAddComponent } from '../../../dashboard/buy/add';
 import { Stream, Subscription } from '../../../common/interfaces';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { TableType } from '../table';
@@ -42,8 +43,7 @@ export class TableRowComponent implements OnInit {
   openModal(row: any) {
     // Parameter formEdit is set on modal component
     const initialState = {
-      formEdit: {
-        id:          row.id,
+      editData: {
         name:        row.name,
         type:        row.type,
         description: row.description,
@@ -52,6 +52,7 @@ export class TableRowComponent implements OnInit {
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
       },
+      streamID: row.id,
     };
     // Open DashboardSellAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState});

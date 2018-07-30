@@ -16,7 +16,8 @@ export class DashboardSellEditComponent {
   form: FormGroup;
   modalMsg: string;
   submitted: boolean = false;
-  formEdit: any;
+  editData: any;
+  streamID: any;
 
   constructor(
       private streamService: StreamService,
@@ -36,13 +37,7 @@ export class DashboardSellEditComponent {
   }
 
   ngOnInit() {
-    this.form.controls.name.setValue(this.formEdit.name);
-    this.form.controls.type.setValue(this.formEdit.type);
-    this.form.controls.description.setValue(this.formEdit.description);
-    this.form.controls.url.setValue(this.formEdit.url);
-    this.form.controls.price.setValue(this.formEdit.price);
-    this.form.controls.lat.setValue(this.formEdit.lat);
-    this.form.controls.long.setValue(this.formEdit.long);
+    this.form.setValue(this.editData);
   }
 
   onSubmit() {
@@ -60,7 +55,7 @@ export class DashboardSellEditComponent {
     };
 
     // Send addStream request
-    this.streamService.updateStream(this.formEdit.id, stream).subscribe(
+    this.streamService.updateStream(this.streamID, stream).subscribe(
       response => {
         this.modalMsg = `Stream succesfully updated!`;
       },
