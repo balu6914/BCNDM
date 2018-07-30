@@ -1,12 +1,18 @@
-image: gitlab/dind
-
-variables:
-  DOCKER_DRIVER: overlay2
-
 stages:
     - develop
 
+build_ui:
+  image: node:latest
+  stage: develop
+  script:
+    - cd ui
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build
+
 install_and_test:
+  image: gitlab/dind
+  variables:
+    DOCKER_DRIVER: overlay2
   stage: develop
   script:
     - apt-get update
