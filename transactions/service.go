@@ -20,6 +20,9 @@ var (
 
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound = errors.New("non-existent entity")
+
+	// ErrFailedTransfer indicates that token transfer failed.
+	ErrFailedTransfer = errors.New("failed to transfer tokens")
 )
 
 // Service specifies an API that must be fulfilled by the domain service
@@ -29,9 +32,14 @@ type Service interface {
 	// blockchain and stores its cert.
 	CreateUser(string) error
 
-	// Balance receives user unique identifier and channel id and returns its
-	// balance read from blockchain.
-	Balance(string, string) (uint64, error)
+	// Balance receives user unique identifier and returns its balance read from
+	// blockchain.
+	Balance(string) (uint64, error)
 
-	// TODO: add transfer method
+	// Transfer receives from and to ids and amount of tokens that it should
+	// transfer. It returns error only if transfer failed.
+	Transfer(string, string, uint64) error
+
+	// BuyTokens transfers tokens to user's account.
+	BuyTokens(string, uint64) error
 }

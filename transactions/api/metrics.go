@@ -34,11 +34,29 @@ func (mm *metricsMiddleware) CreateUser(id string) error {
 	return mm.svc.CreateUser(id)
 }
 
-func (mm *metricsMiddleware) Balance(userID, chanID string) (uint64, error) {
+func (mm *metricsMiddleware) Balance(userID string) (uint64, error) {
 	defer func(begin time.Time) {
 		mm.counter.With("method", "balance").Add(1)
 		mm.latency.With("method", "balance").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return mm.svc.Balance(userID, chanID)
+	return mm.svc.Balance(userID)
+}
+
+func (mm *metricsMiddleware) Transfer(from, to string, value uint64) error {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "transfer").Add(1)
+		mm.latency.With("method", "transfer").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.Transfer(from, to, value)
+}
+
+func (mm *metricsMiddleware) BuyTokens(account string, value uint64) error {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "buy_tokens").Add(1)
+		mm.latency.With("method", "buy_tokens").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.BuyTokens(account, value)
 }

@@ -1,234 +1,481 @@
-/*
-Copyright Vadim Uvin (Swisscom AG). 2017 All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-		 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-package main
+package main_test
 
 import (
-	"encoding/binary"
 	"encoding/json"
-	"errors"
+	"fmt"
+	token "monetasa/chaincode/token"
+	"monetasa/chaincode/token/mocks"
 	"testing"
-
-	"monetasa/chaincode/token/mock"
-	"monetasa/chaincode/token/testdata"
 
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-var fabricToken = Token{
-	Name:        "FabricToken",
-	Symbol:      "FT",
-	Decimals:    2,
-	TotalSupply: 10000,
+const (
+	user1CN = "testUser"
+	user2CN = "testUser2"
+	user3CN = "testUser3"
+
+	user1Cert = `
+-----BEGIN CERTIFICATE-----
+MIIB9DCCAZqgAwIBAgIUDda1JZnuPZ5dlcwSlOmU/KWSn7MwCgYIKoZIzj0EAwIw
+fzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh
+biBGcmFuY2lzY28xHzAdBgNVBAoTFkludGVybmV0IFdpZGdldHMsIEluYy4xDDAK
+BgNVBAsTA1dXVzEUMBIGA1UEAxMLZXhhbXBsZS5jb20wHhcNMTcwMjEzMTQyOTAw
+WhcNMTgwMTEyMjIyOTAwWjATMREwDwYDVQQDEwh0ZXN0VXNlcjBZMBMGByqGSM49
+AgEGCCqGSM49AwEHA0IABKqm8JxN53RW1/muhqPxO7F7dnEMhguy23MVj4CXybqP
+rY70z4AJdXKZTxPeU06kIwb1c0NMii+NMUAjp624z0qjYDBeMA4GA1UdDwEB/wQE
+AwICBDAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBT6YW1Vq07nRK502xj3Y76/lqsu
+3zAfBgNVHSMEGDAWgBQXZ0I9qp6CP8TFHZ9bw5nRtZxIEDAKBggqhkjOPQQDAgNI
+ADBFAiEA5tzFnCPvASFWQku49vrGNGhmJeASlbo2W1ipWarkTlQCIHpI4eWFj6na
+4Xtb5djZAMGlfC2jJl/FTKzFj/xd4s3E
+-----END CERTIFICATE-----`
+
+	user2Cert = `
+-----BEGIN CERTIFICATE-----
+MIIB9TCCAZugAwIBAgIUSkK6FlbMHMj8lUytz1/l0IJPw7swCgYIKoZIzj0EAwIw
+fzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh
+biBGcmFuY2lzY28xHzAdBgNVBAoTFkludGVybmV0IFdpZGdldHMsIEluYy4xDDAK
+BgNVBAsTA1dXVzEUMBIGA1UEAxMLZXhhbXBsZS5jb20wHhcNMTcwMzEzMTAxODAw
+WhcNMTgwMjA5MTgxODAwWjAUMRIwEAYDVQQDEwl0ZXN0VXNlcjIwWTATBgcqhkjO
+PQIBBggqhkjOPQMBBwNCAAQYEbEXfqVfArb9u2p8JHiqSwEiE9cQ5mn9CKr76prT
+yjZYVmYnImQparjDhtYfiab2cEJaOqJ2J7Au16C6jJ/so2AwXjAOBgNVHQ8BAf8E
+BAMCAgQwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUN0EDf71qzYVtIxW5PQQzFvje
+7L8wHwYDVR0jBBgwFoAUF2dCPaqegj/ExR2fW8OZ0bWcSBAwCgYIKoZIzj0EAwID
+SAAwRQIhAPmJKZYTYiJwvtHbG41XAeIBytyEYA0usiLEvevhN1oFAiB+sLNsJ5Y+
+BtcMVPta45X0/aZ5oyI/IJYFWBGSpvgyRQ==
+-----END CERTIFICATE-----`
+
+	user3Cert = `
+-----BEGIN CERTIFICATE-----
+MIIB9DCCAZugAwIBAgIUSC46fLwShh0o0HEzRpvqBe0LEZ0wCgYIKoZIzj0EAwIw
+fzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh
+biBGcmFuY2lzY28xHzAdBgNVBAoTFkludGVybmV0IFdpZGdldHMsIEluYy4xDDAK
+BgNVBAsTA1dXVzEUMBIGA1UEAxMLZXhhbXBsZS5jb20wHhcNMTcwMzEzMTAxOTAw
+WhcNMTgwMjA5MTgxOTAwWjAUMRIwEAYDVQQDEwl0ZXN0VXNlcjMwWTATBgcqhkjO
+PQIBBggqhkjOPQMBBwNCAAQaCAMezFMF7K1xwBy6pR9LP/zVKo/Nh45LMqAuM2IL
+mE1ZTFCqc1HJ3ijiSyid+uMOQyo9Jdu2ylj2qECEwYoRo2AwXjAOBgNVHQ8BAf8E
+BAMCAgQwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUcXgf0aeO1taJyaDs0c2B274w
+h1gwHwYDVR0jBBgwFoAUF2dCPaqegj/ExR2fW8OZ0bWcSBAwCgYIKoZIzj0EAwID
+RwAwRAIgJP9ARAqRHl6f2KxB+YJ6ICA9YyYAEkqRnBY4UcTMSIUCID7LFYDewEj3
+LmQ6Yvctwv0WEeTCLAuRSmPZL9+hNzX+
+-----END CERTIFICATE-----`
+
+	invalid = "invalid"
+	mspID   = "default"
+	ccID    = "1"
+	ccName  = "token"
+)
+
+var td = tokenData{
+	Name:        "DatapaceToken",
+	Symbol:      "TAS",
+	Decimals:    8,
+	TotalSupply: 1000,
 }
 
-func initToken(t *testing.T) *mock.FullMockStub {
-	token := &TokenChaincode{}
+func TestInit(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
 
-	stub := mock.NewFullMockStub("token", token)
-	stub.MockCreator("default", testdata.TestUser1Cert)
+	reqPayload, err := json.Marshal(td)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
-	tokenBytes, _ := json.Marshal(fabricToken)
-	res := stub.MockInit("1", util.ToChaincodeArgs("init", string(tokenBytes)))
-	if res.Status != shim.OK {
-		t.Error("Token cc init failed: " + res.Message)
+	cases := []struct {
+		desc   string
+		cert   string
+		args   [][]byte
+		status int32
+	}{
+		{
+			desc:   "create token with valid user",
+			cert:   user1Cert,
+			args:   util.ToChaincodeArgs("init", string(reqPayload)),
+			status: int32(shim.OK),
+		},
+		{
+			desc:   "create token with invalid user",
+			cert:   invalid,
+			args:   util.ToChaincodeArgs("init", string(reqPayload)),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "create token with invalid data",
+			cert:   user1Cert,
+			args:   util.ToChaincodeArgs("init", "{"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "create token with invalid num of arguments",
+			cert:   user1Cert,
+			args:   util.ToChaincodeArgs("init", string(reqPayload), "other_arg"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "create token with invalid function name",
+			cert:   user1Cert,
+			args:   util.ToChaincodeArgs(invalid, string(reqPayload), "other_arg"),
+			status: int32(shim.ERROR),
+		},
 	}
 
-	var tokenDataBytes []byte = nil
-	var callerBalanceBytes []byte = nil
-	for key, val := range stub.State {
-		if key == KeyToken {
-			tokenDataBytes = val
-		} else {
-			callerBalanceBytes = val
-		}
+	for _, tc := range cases {
+		stub.MockCreator(mspID, tc.cert)
+		res := stub.MockInit(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", tc.desc, tc.status, res.Status))
 	}
-
-	if tokenDataBytes == nil || callerBalanceBytes == nil {
-		t.Error("Expected value not found in the state")
-		t.FailNow()
-	}
-
-	callerBalance := binary.LittleEndian.Uint64(callerBalanceBytes)
-	if callerBalance != fabricToken.TotalSupply {
-		t.Error("Caller balance should be equal to the token total supply")
-	}
-
-	if string(tokenBytes) != string(tokenDataBytes) {
-		t.Error("Expected token data to be saved in the state")
-	}
-
-	return stub
 }
 
-func TestInitToken(t *testing.T) {
-	initToken(t)
+func TestTotalSupply(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
+
+	createToken(t, stub)
+
+	res := stub.MockInvoke(ccID, util.ToChaincodeArgs("totalSupply"))
+	assert.Equal(t, int32(shim.OK), res.Status, fmt.Sprintf("get token total supply: expected %d got %d", int32(shim.OK), res.Status))
 }
 
-func balance(stub *mock.FullMockStub, cn string) (Balance, error) {
-	balanceRq := Balance{User: cn}
-	balanceRqBytes, _ := json.Marshal(balanceRq)
-	balanceRes := stub.MockInvoke("1", util.ToChaincodeArgs("balance", string(balanceRqBytes)))
-	balance := Balance{}
-	err := json.Unmarshal(balanceRes.Payload, &balance)
-	return balance, err
-}
+func TestBalanceOf(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
 
-func allAllowances(stub *mock.FullMockStub, cn string) ([]Approve, error) {
-	rq := Balance{User: cn}
-	rqBytes, _ := json.Marshal(rq)
-	allowancesData := stub.MockInvoke("1", util.ToChaincodeArgs("allowances", string(rqBytes)))
-	allowances := []Approve{}
-	if allowancesData.Status != shim.OK {
-		return allowances, errors.New("CC call returned error: " + allowancesData.Message)
+	// Prepare data
+	createToken(t, stub)
+
+	tr := transferReq{
+		To:    user2CN,
+		Value: 100,
 	}
-	err := json.Unmarshal(allowancesData.Payload, &allowances)
-	return allowances, err
+	transferData, err := json.Marshal(tr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	// Transfer some tokens to user 2.
+	res := stub.MockInvoke(ccID, util.ToChaincodeArgs("transfer", string(transferData)))
+	require.Equal(t, int32(shim.OK), res.Status, fmt.Sprintf("initial transfer failed: expected %d got %d", int32(shim.OK), res.Status))
+
+	br := balanceReq{
+		Owner: user2CN,
+	}
+	balanceData, err := json.Marshal(br)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	nonexistentBr := balanceReq{
+		Owner: user3CN,
+	}
+	nonexistentBalanceData, err := json.Marshal(nonexistentBr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := map[string]struct {
+		args   [][]byte
+		status int32
+	}{
+		"get balance of existing user": {
+			args:   util.ToChaincodeArgs("balanceOf", string(balanceData)),
+			status: int32(shim.OK),
+		},
+		"get balance of nonexistent user": {
+			args:   util.ToChaincodeArgs("balanceOf", string(nonexistentBalanceData)),
+			status: int32(shim.OK),
+		},
+		"get balance with invalid request": {
+			args:   util.ToChaincodeArgs("balanceOf", "}"),
+			status: int32(shim.ERROR),
+		},
+		"get balance with invalid number of requests": {
+			args:   util.ToChaincodeArgs("balanceOf", string(balanceData), ""),
+			status: int32(shim.ERROR),
+		},
+	}
+
+	for desc, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", desc, tc.status, res.Status))
+	}
 }
 
 func TestTransfer(t *testing.T) {
-	stub := initToken(t)
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
 
-	stub.MockCreator("default", testdata.TestUser1Cert)
-	transferData := `{"to": "testUser2", "value": 100}`
-	res := stub.MockInvoke("1", util.ToChaincodeArgs("transfer", transferData))
+	// Prepare data
+	createToken(t, stub)
 
-	if res.Status != shim.OK {
-		t.Errorf("Failed to transfer: %s", res.Message)
-		t.FailNow()
+	tr := transferReq{
+		To:    user2CN,
+		Value: 100,
+	}
+	transferData, err := json.Marshal(tr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	bigTr := transferReq{
+		To:    user2CN,
+		Value: 10000,
+	}
+	bigTransferData, err := json.Marshal(bigTr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := []struct {
+		desc   string
+		args   [][]byte
+		status int32
+	}{
+		{
+			desc:   "transfer tokens to valid account",
+			args:   util.ToChaincodeArgs("transfer", string(transferData)),
+			status: int32(shim.OK),
+		},
+		{
+			desc:   "transfer too many tokens",
+			args:   util.ToChaincodeArgs("transfer", string(bigTransferData)),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "transfer tokens with invalid request",
+			args:   util.ToChaincodeArgs("transfer", "}"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "transfer tokens with too many arguments",
+			args:   util.ToChaincodeArgs("transfer", string(transferData), ""),
+			status: int32(shim.ERROR),
+		},
 	}
 
-	balanceFrom, err := balance(stub, testdata.TestUser1CN)
-	balanceTo, err := balance(stub, "testUser2")
-	if err != nil {
-		t.Error("Could not unmarshal balance")
-	}
-
-	if balanceFrom.Value != 9900 || balanceTo.Value != 100 {
-		t.Error("Transfer does not work as expected")
-	}
-}
-
-func TestTransferToMyself(t *testing.T) {
-	stub := initToken(t)
-
-	stub.MockCreator("default", testdata.TestUser1Cert)
-	transferData := `{"to": "testUser", "value": 100}`
-	res := stub.MockInvoke("1", util.ToChaincodeArgs("transfer", transferData))
-
-	if res.Status != shim.OK {
-		t.Errorf("Failed to transfer: %s", res.Message)
-		t.FailNow()
-	}
-
-	balance, err := balance(stub, testdata.TestUser1CN)
-	if err != nil {
-		t.Error("Could not unmarshal balance")
-	}
-
-	if balance.Value != 10000 {
-		t.Error("Transfer does not work as expected")
-	}
-}
-
-func TestApprove(t *testing.T) {
-	stub := initToken(t)
-
-	stub.MockCreator("default", testdata.TestUser1Cert)
-
-	approveData := `{"spender": "testUser2", "value": 100}`
-	res := stub.MockInvoke("1", util.ToChaincodeArgs("approve", approveData))
-	if res.Status != shim.OK {
-		t.Errorf("Failed to approve: %s", res.Message)
-		t.FailNow()
-	}
-
-	approveData = `{"spender": "testUser3", "value": 200}`
-	res = stub.MockInvoke("1", util.ToChaincodeArgs("approve", approveData))
-	if res.Status != shim.OK {
-		t.Errorf("Failed to approve: %s", res.Message)
-		t.FailNow()
-	}
-
-	allowances, err := allAllowances(stub, testdata.TestUser1CN)
-	if err != nil {
-		t.Error("Could not get allowances")
-		t.FailNow()
-	}
-
-	if len(allowances) != 2 {
-		t.Error("Expected 2 allowances")
-	}
-
-	if allowances[0].Spender != "testUser2" && allowances[0].Value != 100 {
-		t.Error("Allowance 0 is invalid")
-	}
-
-	if allowances[1].Spender != "testUser3" && allowances[1].Value != 200 {
-		t.Error("Allowance 1 is invalid")
-	}
-
-	allowances, err = allAllowances(stub, testdata.TestUser3CN)
-	if err != nil {
-		t.Error("Could not get allowances for user without allowances")
-		t.FailNow()
-	}
-	if len(allowances) != 0 {
-		t.Error("Expected 0 allowances if they were not added before")
+	for _, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", tc.desc, tc.status, res.Status))
 	}
 }
 
 func TestTransferFrom(t *testing.T) {
-	stub := initToken(t)
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
 
-	stub.MockCreator("default", testdata.TestUser1Cert)
-	approveData := `{"spender": "testUser2", "value": 500}`
-	stub.MockInvoke("1", util.ToChaincodeArgs("approve", approveData))
+	// Prepare data
+	createToken(t, stub)
 
-	stub.MockCreator("default", testdata.TestUser2Cert)
-	transferData := `{"from": "testUser", "to": "testUser3", "value": 100}`
-	res := stub.MockInvoke("1", util.ToChaincodeArgs("transferFrom", transferData))
-	if res.Status != shim.OK {
-		t.Errorf("Failed to transfer: %s", res.Message)
-		t.FailNow()
+	setupTransfers(t, stub)
+
+	stub.MockCreator(mspID, user1Cert)
+
+	tr := transferFromReq{
+		From:  user2CN,
+		To:    user3CN,
+		Value: 100,
+	}
+	transferData, err := json.Marshal(tr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	noAllowanceTr := transferFromReq{
+		From:  user3CN,
+		To:    user2CN,
+		Value: 100,
+	}
+	noAllowanceTd, err := json.Marshal(noAllowanceTr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := []struct {
+		desc   string
+		args   [][]byte
+		status int32
+	}{
+		{
+			desc:   "transfer tokens from one account to other",
+			args:   util.ToChaincodeArgs("transferFrom", string(transferData)),
+			status: int32(shim.OK),
+		},
+		{
+			desc:   "transfer tokens from one account to other with no allowance",
+			args:   util.ToChaincodeArgs("transferFrom", string(noAllowanceTd)),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "transfer tokens with invalid request",
+			args:   util.ToChaincodeArgs("transferFrom", "}"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "transfer tokens with invalid number of arguments",
+			args:   util.ToChaincodeArgs("transferFrom", string(transferData), ""),
+			status: int32(shim.ERROR),
+		},
 	}
 
-	balanceFrom, err := balance(stub, testdata.TestUser1CN)
-	balanceTo, err := balance(stub, testdata.TestUser3CN)
-	allowances, err := allAllowances(stub, testdata.TestUser1CN)
-	if err != nil {
-		t.Error("Could not unmarshal balance")
+	for _, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", tc.desc, tc.status, res.Status))
+	}
+}
+
+func TestApprove(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
+
+	createToken(t, stub)
+
+	ar := approveReq{
+		Spender: user2CN,
+		Value:   100,
+	}
+	ad, err := json.Marshal(ar)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := []struct {
+		desc   string
+		args   [][]byte
+		status int32
+	}{
+		{
+			desc:   "approve allowance for spender",
+			args:   util.ToChaincodeArgs("approve", string(ad)),
+			status: int32(shim.OK),
+		},
+		{
+			desc:   "approve allowance with invalid request",
+			args:   util.ToChaincodeArgs("approve", "}"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "approve allowance with invalid number of arguments",
+			args:   util.ToChaincodeArgs("approve", string(ad), ""),
+			status: int32(shim.ERROR),
+		},
 	}
 
-	if balanceFrom.Value != 9900 || balanceTo.Value != 100 || len(allowances) != 1 || allowances[0].Value != 400 {
-		t.Errorf("TransferFrom does not work as expected: (%d, %d)", balanceFrom.Value, balanceTo.Value)
+	for _, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", tc.desc, tc.status, res.Status))
+	}
+}
+
+func TestAllowance(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
+
+	createToken(t, stub)
+
+	stub.MockCreator(mspID, user2Cert)
+
+	approve := approveReq{
+		Spender: user1CN,
+		Value:   100,
+	}
+	approveData, err := json.Marshal(approve)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	approveRes := stub.MockInvoke(ccID, util.ToChaincodeArgs("approve", string(approveData)))
+	require.Equal(t, int32(shim.OK), approveRes.Status, fmt.Sprintf("expected %d got %d", int32(shim.OK), approveRes.Status))
+
+	stub.MockCreator(mspID, user1Cert)
+
+	ar := allowanceReq{
+		Owner:   user2CN,
+		Spender: user1CN,
+	}
+	ad, err := json.Marshal(ar)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	invalidAr := allowanceReq{}
+	invalidAd, err := json.Marshal(invalidAr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := map[string]struct {
+		args   [][]byte
+		status int32
+	}{
+		"read allowance for given spender owner pair": {
+			args:   util.ToChaincodeArgs("allowance", string(ad)),
+			status: int32(shim.OK),
+		},
+		"read allowance for empty spender and owner": {
+			args:   util.ToChaincodeArgs("allowance", string(invalidAd)),
+			status: int32(shim.OK),
+		},
 	}
 
-	transferData = `{"from": "testUser", "to": "testUser3", "value": 1000}`
-	res = stub.MockInvoke("1", util.ToChaincodeArgs("transferFrom", transferData))
-	if res.Status == shim.OK {
-		t.Error("Should fail when transfer value is too big")
-		t.FailNow()
+	for desc, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", desc, tc.status, res.Status))
 	}
+}
 
-	transferData = `{"from": "testUser2", "to": "testUser3", "value": 1000}`
-	res = stub.MockInvoke("1", util.ToChaincodeArgs("transferFrom", transferData))
-	if res.Status == shim.OK {
-		t.Error("Should fail when no allowance")
-		t.FailNow()
+type tokenData struct {
+	Name        string `json:"name"`
+	Symbol      string `json:"symbol"`
+	Decimals    uint8  `json:"decimals"`
+	TotalSupply uint64 `json:"totalSupply"`
+}
+
+type balanceReq struct {
+	Owner string `json:"owner"`
+}
+
+type transferReq struct {
+	To    string `json:"to"`
+	Value uint64 `json:"value"`
+}
+
+type transferFromReq struct {
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Value uint64 `json:"value"`
+}
+
+type approveReq struct {
+	Spender string `json:"spender"`
+	Value   uint64 `json:"value"`
+}
+
+type allowanceReq struct {
+	Owner   string `json:"owner"`
+	Spender string `json:"spender"`
+}
+
+func createToken(t *testing.T, stub *mocks.FullMockStub) {
+	reqPayload, err := json.Marshal(td)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	stub.MockCreator(mspID, user1Cert)
+	res := stub.MockInit(ccID, util.ToChaincodeArgs("init", string(reqPayload)))
+	require.Equal(t, int32(shim.OK), res.Status, fmt.Sprintf("creating token failed"))
+}
+
+func setupTransfers(t *testing.T, stub *mocks.FullMockStub) {
+	firstTr := transferReq{
+		To:    user2CN,
+		Value: 100,
 	}
+	firstTransferData, err := json.Marshal(firstTr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	res := stub.MockInvoke(ccID, util.ToChaincodeArgs("transfer", string(firstTransferData)))
+	require.Equal(t, int32(shim.OK), res.Status, fmt.Sprintf("expected %d got %d", int32(shim.OK), res.Status))
+
+	otherTr := transferReq{
+		To:    user3CN,
+		Value: 100,
+	}
+	otherTransferData, err := json.Marshal(otherTr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	otherRes := stub.MockInvoke(ccID, util.ToChaincodeArgs("transfer", string(otherTransferData)))
+	require.Equal(t, int32(shim.OK), otherRes.Status, fmt.Sprintf("expected %d got %d", int32(shim.OK), otherRes.Status))
+
+	stub.MockCreator(mspID, user2Cert)
+
+	ar := approveReq{
+		Spender: user1CN,
+		Value:   100,
+	}
+	approveData, err := json.Marshal(ar)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	approveRes := stub.MockInvoke(ccID, util.ToChaincodeArgs("approve", string(approveData)))
+	require.Equal(t, int32(shim.OK), approveRes.Status, fmt.Sprintf("expected %d got %d", int32(shim.OK), approveRes.Status))
 }
