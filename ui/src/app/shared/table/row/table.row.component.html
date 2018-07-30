@@ -32,7 +32,7 @@
     <td>{{row.price | tas}} TAS</td>
     <td *ngIf="rowType==types.Buy" class="table--right-aligned">
       <div class="action-wrapper">
-        <a href="#" class="action action--color-1" data-toggle="modal" data-target="#modalBuyStream">
+        <a class="action action--color-1" (click)="openModalSubscription(row)">
           <span class="action__icon action--buy"></span>
         </a>
       </div>

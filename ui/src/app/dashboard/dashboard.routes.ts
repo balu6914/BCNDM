@@ -24,10 +24,6 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/buy/dashboard.buy.module#DashboardBuyModule',
            },
            {
-               path: 'subscription',
-               loadChildren: 'app/dashboard/subscription/subscription.module#SubscriptionModule',
-           },
-           {
                path: 'wallet',
                loadChildren: 'app/dashboard/wallet/wallet.module#WalletModule',
            },

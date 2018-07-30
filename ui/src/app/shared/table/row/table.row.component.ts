@@ -72,4 +72,17 @@ export class TableRowComponent implements OnInit {
     // Open DashboardSellAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardSellDeleteComponent, {initialState});
   }
+
+  openModalSubscription(row: any) {
+    // Parameter stream is set on modal component
+    const initialState = {
+      stream: {
+        id:         row.id,
+        name:       row.name,
+        price:      row.price,
+      },
+    };
+    // Open DashboardSellAddComponent Modal
+    this.bsModalRef = this.modalService.show(SubscriptionAddComponent, {initialState});
+  }
 }
