@@ -7,8 +7,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
 // Buy components
 import { DashboardBuyComponent } from './index';
-// Import subscription coimponent
-import { SubscriptionAddComponent } from '../../dashboard/buy/add';
+// Import add subscription component
+import { DashboardBuyAddComponent } from '../../dashboard/buy/add';
 
 import { CommonAppModule } from '../../common/common.module';
 import { SharedModule } from '../../shared/shared.module';
@@ -28,10 +28,10 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
   ],
   declarations: [
     DashboardBuyComponent,
-    SubscriptionAddComponent,
+    DashboardBuyAddComponent,
   ],
   entryComponents: [
-    SubscriptionAddComponent,
+    DashboardBuyAddComponent,
   ],
 })
 export class DashboardBuyModule { }

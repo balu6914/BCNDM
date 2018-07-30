@@ -5,7 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { DashboardSellEditComponent } from '../../../dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from '../../../dashboard/sell/delete';
-import { SubscriptionAddComponent } from '../../../dashboard/buy/add';
+import { DashboardBuyAddComponent } from '../../../dashboard/buy/add';
 import { Stream, Subscription } from '../../../common/interfaces';
 import { TasPipe } from '../../../common/pipes/converter.pipe';
 import { TableType } from '../table';
@@ -83,6 +83,6 @@ export class TableRowComponent implements OnInit {
       },
     };
     // Open DashboardSellAddComponent Modal
-    this.bsModalRef = this.modalService.show(SubscriptionAddComponent, {initialState});
+    this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 }

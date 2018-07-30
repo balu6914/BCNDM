@@ -1,1 +1,1 @@
-export * from './subscription.add.component'
+export * from './dashboard.buy.add.component'

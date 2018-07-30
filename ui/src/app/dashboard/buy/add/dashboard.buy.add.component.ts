@@ -5,11 +5,11 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { SubscriptionService } from '../../../common/services/subscription.service';
 
 @Component({
-  selector: 'subscription-add',
-  templateUrl: './subscription.add.component.html',
-  styleUrls: [ './subscription.add.component.scss' ]
+  selector: 'dashboard-buy-add',
+  templateUrl: './dashboard.buy.add.component.html',
+  styleUrls: [ './dashboard.buy.add.component.scss' ]
 })
-export class SubscriptionAddComponent {
+export class DashboardBuyAddComponent {
     user:any;
     form: FormGroup;
     stream: any;
