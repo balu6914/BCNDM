@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mock
+package mocks
 
 import (
+	"fmt"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/msp"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -38,7 +40,11 @@ func NewFullMockStub(name string, cc shim.Chaincode) *FullMockStub {
 }
 
 func (stub *FullMockStub) MockCreator(mspID string, cert string) {
-	stub.mockCreator, _ = msp.NewSerializedIdentity(mspID, []byte(cert))
+	mockCreator, err := msp.NewSerializedIdentity(mspID, []byte(cert))
+	if err != nil {
+		fmt.Println(err)
+	}
+	stub.mockCreator = mockCreator
 }
 
 func (stub *FullMockStub) MockInit(uuid string, args [][]byte) pb.Response {

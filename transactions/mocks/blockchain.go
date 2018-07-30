@@ -8,16 +8,21 @@ import (
 var _ transactions.BlockchainNetwork = (*mockNetwork)(nil)
 
 type mockNetwork struct {
-	users map[string]uint64
-	mutex *sync.Mutex
+	users     map[string]uint64
+	remaining uint64
+	mutex     *sync.Mutex
 }
 
 // NewBlockchainNetwork returns mock instance of blockchain network.
-func NewBlockchainNetwork(users map[string]uint64) transactions.BlockchainNetwork {
-	return mockNetwork{users: users, mutex: &sync.Mutex{}}
+func NewBlockchainNetwork(users map[string]uint64, remaining uint64) transactions.BlockchainNetwork {
+	return &mockNetwork{
+		users:     users,
+		remaining: remaining,
+		mutex:     &sync.Mutex{},
+	}
 }
 
-func (mn mockNetwork) CreateUser(id, secret string) error {
+func (mn *mockNetwork) CreateUser(id, secret string) error {
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()
 
@@ -29,14 +34,47 @@ func (mn mockNetwork) CreateUser(id, secret string) error {
 	return nil
 }
 
-func (mn mockNetwork) Balance(name, _ string) (uint64, error) {
+func (mn *mockNetwork) Balance(name string) (uint64, error) {
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()
 
 	balance, ok := mn.users[name]
 	if !ok {
-		return 0, transactions.ErrFailedBalanceFetch
+		return 0, transactions.ErrNotFound
 	}
 
 	return balance, nil
+}
+
+func (mn *mockNetwork) Transfer(from, to string, value uint64) error {
+	mn.mutex.Lock()
+	defer mn.mutex.Unlock()
+
+	balance, ok := mn.users[from]
+	if !ok {
+		return transactions.ErrFailedTransfer
+	}
+
+	if balance < value {
+		return transactions.ErrFailedTransfer
+	}
+
+	mn.users[to] = mn.users[to] + value
+	mn.users[from] = mn.users[from] - value
+
+	return nil
+}
+
+func (mn *mockNetwork) BuyTokens(account string, value uint64) error {
+	mn.mutex.Lock()
+	defer mn.mutex.Unlock()
+
+	if value > mn.remaining {
+		return transactions.ErrFailedTransfer
+	}
+
+	mn.users[account] = mn.users[account] + value
+	mn.remaining = mn.remaining - value
+
+	return nil
 }

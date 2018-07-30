@@ -7,6 +7,21 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
+func transferEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(transferReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.Transfer(req.from, req.to, req.value); err != nil {
+			return nil, err
+		}
+
+		return transferRes{}, nil
+	}
+}
+
 func createUserEndpoint(svc transactions.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createUserReq)
@@ -15,7 +30,7 @@ func createUserEndpoint(svc transactions.Service) endpoint.Endpoint {
 		}
 
 		if err := svc.CreateUser(req.id); err != nil {
-			return createUserRes{}, err
+			return nil, err
 		}
 
 		return createUserRes{}, nil

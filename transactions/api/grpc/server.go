@@ -17,22 +17,41 @@ var errMalformedEntity = errors.New("malformed entity")
 var _ monetasa.TransactionsServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
-	handler kitgrpc.Handler
+	createUser kitgrpc.Handler
+	transfer   kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
 func NewServer(svc transactions.Service) monetasa.TransactionsServiceServer {
-	handler := kitgrpc.NewServer(
+	createUser := kitgrpc.NewServer(
 		createUserEndpoint(svc),
 		decodeCreateUserRequest,
 		encodeCreateUserResponse,
 	)
 
-	return &grpcServer{handler}
+	transfer := kitgrpc.NewServer(
+		transferEndpoint(svc),
+		decodeTransferRequest,
+		encodeTransferResponse,
+	)
+
+	return &grpcServer{
+		createUser: createUser,
+		transfer:   transfer,
+	}
 }
 
 func (s grpcServer) CreateUser(ctx context.Context, user *monetasa.ID) (*empty.Empty, error) {
-	_, res, err := s.handler.ServeGRPC(ctx, user)
+	_, res, err := s.createUser.ServeGRPC(ctx, user)
+	if err != nil {
+		return nil, encodeError(err)
+	}
+
+	return res.(*empty.Empty), nil
+}
+
+func (s grpcServer) Transfer(ctx context.Context, td *monetasa.TransferData) (*empty.Empty, error) {
+	_, res, err := s.transfer.ServeGRPC(ctx, td)
 	if err != nil {
 		return nil, encodeError(err)
 	}
@@ -47,6 +66,20 @@ func decodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{
 
 func encodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(createUserRes)
+	return &empty.Empty{}, encodeError(res.err)
+}
+
+func decodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*monetasa.TransferData)
+	return transferReq{
+		from:  req.GetFrom(),
+		to:    req.GetTo(),
+		value: req.GetValue(),
+	}, nil
+}
+
+func encodeTransferResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
+	res := grpcRes.(transferRes)
 	return &empty.Empty{}, encodeError(res.err)
 }
 

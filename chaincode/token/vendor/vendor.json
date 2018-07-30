@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "kMA3IoI8xhSIuCsn3CMOFzIZiYo=",
+			"checksumSHA1": "7jUK9OzL1arQsSuop5KmgKxM2Pc=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "95483dd862a768c588c2582e88f6b9da37a47ed7",
-			"revisionTime": "2018-07-05T11:28:05Z"
+			"revision": "682d586814545c8d90950f5d6c2d61d74a4f63d4",
+			"revisionTime": "2018-07-27T05:08:44Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/token"
