@@ -72,7 +72,7 @@ func viewStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		s, err := svc.ViewStream(req.streamID)
+		s, err := svc.ViewStream(req.id)
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func removeStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.RemoveStream(req.owner, req.streamID); err != nil {
+		if err := svc.RemoveStream(req.owner, req.id); err != nil {
 			return nil, err
 		}
 
