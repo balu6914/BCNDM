@@ -223,9 +223,9 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	defer r.Body.Close()
 
 	req := updateStreamReq{
-		owner:    owner,
-		streamID: bone.GetValue(r, "id"),
-		stream:   stream,
+		owner:  owner,
+		id:     bone.GetValue(r, "id"),
+		stream: stream,
 	}
 	return req, nil
 }
@@ -236,7 +236,7 @@ func decodeViewStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 	}
 
 	req := readStreamReq{
-		streamID: bone.GetValue(r, "id"),
+		id: bone.GetValue(r, "id"),
 	}
 	return req, nil
 }
@@ -248,8 +248,8 @@ func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{},
 	}
 
 	req := deleteStreamReq{
-		owner:    owner,
-		streamID: bone.GetValue(r, "id"),
+		owner: owner,
+		id:    bone.GetValue(r, "id"),
 	}
 	return req, nil
 }

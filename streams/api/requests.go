@@ -28,17 +28,17 @@ func (req createStreamReq) validate() error {
 }
 
 type updateStreamReq struct {
-	owner    string
-	streamID string
-	stream   streams.Stream
+	owner  string
+	id     string
+	stream streams.Stream
 }
 
 func (req updateStreamReq) validate() error {
-	if req.streamID == "" {
+	if req.id == "" {
 		return streams.ErrMalformedData
 	}
 
-	if !bson.IsObjectIdHex(req.streamID) {
+	if !bson.IsObjectIdHex(req.id) {
 		return streams.ErrMalformedData
 	}
 
@@ -61,15 +61,15 @@ func (req createBulkStreamReq) validate() error {
 }
 
 type readStreamReq struct {
-	streamID string
+	id string
 }
 
 func (req readStreamReq) validate() error {
-	if req.streamID == "" {
+	if req.id == "" {
 		return streams.ErrMalformedData
 	}
 
-	if !bson.IsObjectIdHex(req.streamID) {
+	if !bson.IsObjectIdHex(req.id) {
 		return streams.ErrMalformedData
 	}
 
@@ -77,16 +77,16 @@ func (req readStreamReq) validate() error {
 }
 
 type deleteStreamReq struct {
-	owner    string
-	streamID string
+	owner string
+	id    string
 }
 
 func (req deleteStreamReq) validate() error {
-	if req.streamID == "" {
+	if req.id == "" {
 		return streams.ErrMalformedData
 	}
 
-	if !bson.IsObjectIdHex(req.streamID) {
+	if !bson.IsObjectIdHex(req.id) {
 		return streams.ErrMalformedData
 	}
 
