@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 import { User } from '../../../common/interfaces/user.interface';
 import {WalletAddComponent} from '../add'
+import { BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'user-wallet-balance',
@@ -16,6 +17,8 @@ export class WalletBalanceComponent implements OnInit {
   subscription: any;
   constructor(
     private AuthService: AuthService,
+    private modalService: BsModalService,
+
 ) {
 }
 
@@ -31,7 +34,10 @@ export class WalletBalanceComponent implements OnInit {
     }
 
     // Open BUY tokens dialog
-    public onBuyTokensClick($event: MouseEvent) {
+    public onBuyTokensClick() {
+      // Open DashboardSellAddComponent Modal
+        this.modalService.show(WalletAddComponent);
+
           // let pDialog = this.dialogService.showCustomDialog({
           //   component: WalletAddComponent,
           //   isModal: true,
