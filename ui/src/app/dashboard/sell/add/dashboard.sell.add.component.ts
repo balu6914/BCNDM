@@ -12,7 +12,6 @@ import { MitasPipe } from '../../../common/pipes/converter.pipe';
   styleUrls: [ './dashboard.sell.add.component.scss' ]
 })
 export class DashboardSellAddComponent {
-    user:any;
     form: FormGroup;
     modalMsg: string;
     submitted: boolean = false;

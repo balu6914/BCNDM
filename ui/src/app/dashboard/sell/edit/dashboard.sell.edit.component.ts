@@ -12,7 +12,6 @@ import { MitasPipe } from '../../../common/pipes/converter.pipe';
   styleUrls: [ './dashboard.sell.edit.component.scss' ]
 })
 export class DashboardSellEditComponent {
-  user:any;
   form: FormGroup;
   modalMsg: string;
   submitted: boolean = false;
