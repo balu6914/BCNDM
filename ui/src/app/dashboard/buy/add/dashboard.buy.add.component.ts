@@ -39,7 +39,7 @@ export class DashboardBuyAddComponent {
       // Send subscription request
       this.subscriptionService.add(subsReq).subscribe(
         response => {
-          this.modalMsg = `Stream succesfully added!`;`Success! You now have access to ${streamName} in next ${subsReq.hours} hours`
+          this.modalMsg = `Success! You now have access to ${streamName} stream in next ${subsReq.hours} hours`
         },
         err => {
           this.modalMsg = `Status: ${err.status} - ${err.statusText}`;
