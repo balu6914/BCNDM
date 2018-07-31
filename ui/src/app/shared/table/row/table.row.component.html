@@ -1,51 +1,49 @@
-<div [ngSwitch]="rowType">
-  <tr *ngSwitchCase="types.Dashboard">
-      <td>{{ row.stream_name }}</td>
-      <td nowrap>{{ row.stream_price }}</td>
-      <td nowrap>{{ row.start_date| date }}</td>
-      <td nowrap>{{ row.end_date | date }}</td>
-      <td nowrap>
-        <div class="action-wrapper">
-          <a href="{{row.url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
-          <a (click)="copyToClipboard()"  class="btn btn-primary-alt btn-sm" >Copy</a>
-        </div>
-      </td>
-  </tr>
-  <tr *ngSwitchCase="types.Contract">
-      <td>{{ row.stream.name }}</td>
-      <td nowrap>{{ row.stream.price | tas }}</td>
-      <td nowrap>{{ row.share }} %</td>
-      <td nowrap> {{row.expirationDate | date: 'MMM d, y'}}</td>
-      <td nowrap>
-          <i *ngIf="row.signed && !row.expired" class="material-icons" title="Signed">lock</i>
-          <i *ngIf="!row.signed && !row.expired" class="material-icons" title="Waiting for a signature">lock_open</i>
-          <i *ngIf="row.expired" class="material-icons" title="Contract Expiered">error_outline</i>
-      </td>
-  </tr>
-  <tr *ngSwitchDefault>
-    <td>
-      <a href="#" class="table-link-arrow js-flip-card-trigger">
-        {{row.name}}
+<tr *ngIf="rowType === types.Dashboard">
+  <td>{{ row.stream_name }}</td>
+  <td nowrap>{{ row.stream_price }}</td>
+  <td nowrap>{{ row.start_date| date }}</td>
+  <td nowrap>{{ row.end_date | date }}</td>
+  <td nowrap>
+    <div class="action-wrapper">
+      <a href="{{row.url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
+      <a (click)="copyToClipboard()" class="btn btn-primary-alt btn-sm">Copy</a>
+    </div>
+  </td>
+</tr>
+<tr *ngIf="rowType === types.Contract">
+  <td>{{ row.stream.name }}</td>
+  <td nowrap>{{ row.stream.price | tas }}</td>
+  <td nowrap>{{ row.share }} %</td>
+  <td nowrap> {{row.expirationDate | date: 'MMM d, y'}}</td>
+  <td nowrap>
+    <i *ngIf="row.signed && !row.expired" class="material-icons" title="Signed">lock</i>
+    <i *ngIf="!row.signed && !row.expired" class="material-icons" title="Waiting for a signature">lock_open</i>
+    <i *ngIf="row.expired" class="material-icons" title="Contract Expired">error_outline</i>
+  </td>
+</tr>
+<tr *ngIf="rowType === types.Buy || rowType === types.Sell">
+  <td>
+    <a href="" class="table-link-arrow js-flip-card-trigger">
+      {{row.name}}
+    </a>
+  </td>
+  <td>{{row.type}}</td>
+  <td>{{row.price | tas}} TAS</td>
+  <td *ngIf="rowType === types.Buy" class="table--right-aligned">
+    <div class="action-wrapper">
+      <a class="action action--color-1" (click)="openModalSubscription(row)">
+        <span class="action__icon action--buy"></span>
       </a>
-    </td>
-    <td>{{row.type}}</td>
-    <td>{{row.price | tas}} TAS</td>
-    <td *ngIf="rowType==types.Buy" class="table--right-aligned">
-      <div class="action-wrapper">
-        <a class="action action--color-1" (click)="openModalSubscription(row)">
-          <span class="action__icon action--buy"></span>
-        </a>
-      </div>
-    </td>
-    <td *ngIf="rowType==types.Sell" nowrap class="table--right-aligned">
-      <div class="action-wrapper">
-        <a (click)="openModal(row)" class="action action--color-1">
-          <span class="action__icon action--edit"></span>
-        </a>
-        <a class="action action--color-2" (click)="openModalDelete(row)">
-          <span class="action__icon action--delete"></span>
-        </a>
-      </div>
-    </td>
-  </tr>
-</div>
+    </div>
+  </td>
+  <td *ngIf="rowType === types.Sell" nowrap class="table--right-aligned">
+    <div class="action-wrapper">
+      <a class="action action--color-1" (click)="openModal(row)">
+        <span class="action__icon action--edit"></span>
+      </a>
+      <a class="action action--color-2" (click)="openModalDelete(row)">
+        <span class="action__icon action--delete"></span>
+      </a>
+    </div>
+  </td>
+</tr>
