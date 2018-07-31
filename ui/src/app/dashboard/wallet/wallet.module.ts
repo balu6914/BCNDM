@@ -5,6 +5,7 @@ import {
     FormsModule,
     ReactiveFormsModule
 } from '@angular/forms';
+import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 // Add wallet routes
 import { DashboardWalletRoutingModule } from './wallet.routes';
 // Add components
@@ -18,6 +19,7 @@ import { CommonAppModule } from '../../common/common.module';
     MdlModule,
     FormsModule,
     ReactiveFormsModule,
+    AppBootstrapModule,
     CommonAppModule,
     DashboardWalletRoutingModule,
   ],
