@@ -42,13 +42,6 @@ export class DashboardMainComponent {
 
         // Fetch current User
         this.user = {};
-        // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
-        this.mockBalance = {
-          amount: 1000.1232,
-          symbol: 'TAS',
-          fiatAmount: 1200,
-          fiatSymbol: 'USD'
-        }
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
