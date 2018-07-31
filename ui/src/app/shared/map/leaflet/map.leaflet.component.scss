@@ -1,0 +1,57 @@
+
+
+// Fill boxes to 100% in height of the remaining screen height
+
+
+
+html,
+body {
+  height: 100%;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 71px;) // minus topbar height
+}
+.row-grow {
+  flex-grow: 1;
+  .flip-card {
+    height: calc(100%);
+    height: calc(100% - 2rem);
+    .box-grow {
+      height: 100%;
+    }
+  }
+}
+.box-grow {
+  height: calc(100% - 2rem);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  .box__content,
+  .table-responsive,
+  .map-wrapper,
+  .tab-content,
+  .tab-content>.active {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .table-responsive {
+    margin-bottom: 1rem;
+    .table {
+      margin-bottom: 0;
+      flex-grow: 1;
+      tbody {
+        height: 250px;
+      }
+    }
+  }
+  .map-wrapper {
+    min-height: 300px;
+    .map {
+      flex-grow: 1;
+    }
+  }
+}
