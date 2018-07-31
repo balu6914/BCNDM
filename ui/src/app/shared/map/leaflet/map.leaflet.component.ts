@@ -1,15 +1,12 @@
 import { Component, OnInit, Input } from "@angular/core";
 
+import { StreamService } from 'app/common/services/stream.service';
 import { TasPipe } from "app/common/pipes/converter.pipe";
-import mapStyle from './map-style.json';
-
-import {} from "@types/googlemaps";
 
 import * as L from 'leaflet';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { icon, latLng, Layer, marker, tileLayer } from 'leaflet';
-import { StreamService } from 'app/common/services/stream.service';
 
 @Component({
   selector: "dpc-map-leaflet",
