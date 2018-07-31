@@ -12,7 +12,6 @@ import { MitasPipe } from '../../../common/pipes/converter.pipe';
   styleUrls: [ './dashboard.sell.add.component.scss' ]
 })
 export class DashboardSellAddComponent {
-    user:any;
     form: FormGroup;
     modalMsg: string;
     submitted: boolean = false;
@@ -24,9 +23,9 @@ export class DashboardSellAddComponent {
         public  modalNewStream: BsModalRef,
     ) {
       this.form = formBuilder.group({
-        'name':        ['', Validators.required],
+        'name':        ['', [<any>Validators.required, <any>Validators.minLength(3)]],
         'type':        ['', Validators.required],
-        'description': ['', Validators.required],
+        'description': ['', [<any>Validators.required, <any>Validators.minLength(5)]],
         'url':         ['', Validators.required],
         'price':       ['', Validators.required],
         'lat':         ['', Validators.required],

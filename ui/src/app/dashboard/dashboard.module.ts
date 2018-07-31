@@ -13,7 +13,6 @@ import { DashboardRoutingModule } from './dashboard.routes';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
 import { WalletModule } from './wallet/wallet.module';
-import { SubscriptionModule } from './subscription/index';
 
 import { CommonAppModule } from '../common/common.module';
 
@@ -33,7 +32,6 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
     LayoutModule,
     WalletModule,
-    SubscriptionModule,
     DashboardRoutingModule,
     ClipboardModule,
     SharedModule,
