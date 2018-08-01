@@ -47,7 +47,7 @@ export class MapComponent implements OnInit {
 
   // Get stream type icon
   getIcon(type) {
-    var icons = {
+    const icons = {
       temperature: "assets/img/icons/map-temp.svg",
       humidity: "assets/img/icons/map-water.svg",
       air: "assets/img/icons/map-co2.svg",
