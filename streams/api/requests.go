@@ -7,11 +7,12 @@ import (
 )
 
 const (
-	minLongitude = -180
-	maxLongitude = 180
-	minLatitude  = -90
-	maxLatitude  = 90
-	typeGeo      = "geo"
+	minLongitude        = -180
+	maxLongitude        = 180
+	minLatitude         = -90
+	maxLatitude         = 90
+	defLimit     uint64 = 20
+	maxLimit     uint64 = 100
 )
 
 type apiReq interface {
@@ -24,6 +25,10 @@ type createStreamReq struct {
 }
 
 func (req createStreamReq) validate() error {
+	if req.stream.Owner != "" && req.stream.Owner != req.owner {
+		return streams.ErrMalformedData
+	}
+
 	return req.stream.Validate()
 }
 
@@ -38,7 +43,11 @@ func (req updateStreamReq) validate() error {
 		return streams.ErrMalformedData
 	}
 
-	if !bson.IsObjectIdHex(req.id) {
+	if req.stream.ID != "" && req.id != req.stream.ID.Hex() {
+		return streams.ErrMalformedData
+	}
+
+	if req.stream.Owner != "" && req.owner != req.stream.Owner {
 		return streams.ErrMalformedData
 	}
 
@@ -65,10 +74,6 @@ type readStreamReq struct {
 }
 
 func (req readStreamReq) validate() error {
-	if req.id == "" {
-		return streams.ErrMalformedData
-	}
-
 	if !bson.IsObjectIdHex(req.id) {
 		return streams.ErrMalformedData
 	}
@@ -94,20 +99,30 @@ func (req deleteStreamReq) validate() error {
 }
 
 type searchStreamReq struct {
-	locationType string
-	// Points are represented as Longitude and Latitude respectively.
+	// Coords are represented as Longitude and Latitude respectively.
 	// It's important to note what the order of coordinates is.
-	points [][]float64
+	Name       string      `alias:"name"`
+	StreamType string      `alias:"type"`
+	Coords     [][]float64 `alias:"coords"`
+	Page       uint64      `alias:"page"`
+	Limit      uint64      `alias:"limit"`
+	MinPrice   *uint64     `alias:"minPrice"`
+	MaxPrice   *uint64     `alias:"maxPrice"`
+}
+
+func newSearchStreamReq() searchStreamReq {
+	// Set default page and offset.
+	return searchStreamReq{Limit: defLimit}
 }
 
 func (req searchStreamReq) validate() error {
-	if req.locationType != typeGeo {
-		return streams.ErrUnknownType
+	if req.MinPrice != nil && req.MaxPrice != nil {
+		if *req.MaxPrice < *req.MinPrice {
+			return streams.ErrMalformedData
+		}
 	}
 
-	n := len(req.points)
-	for i := 0; i < n; i++ {
-		p := req.points[i]
+	for _, p := range req.Coords {
 		if p[0] < minLongitude || p[0] > maxLongitude ||
 			p[1] < minLatitude || p[1] > maxLatitude {
 			return streams.ErrMalformedData

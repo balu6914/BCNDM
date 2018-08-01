@@ -5,13 +5,14 @@ import (
 	"sync"
 
 	"monetasa/streams"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 var _ streams.StreamRepository = (*streamRepositoryMock)(nil)
 
 type streamRepositoryMock struct {
 	mu      sync.Mutex
-	counter int
 	streams map[string]streams.Stream
 }
 
@@ -39,6 +40,7 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 
 func (srm *streamRepositoryMock) SaveAll(bulk []streams.Stream) error {
 	for _, stream := range bulk {
+		stream.ID = bson.NewObjectId()
 		if _, err := srm.Save(stream); err != nil {
 			return err
 		}
@@ -75,9 +77,47 @@ func (srm *streamRepositoryMock) One(id string) (streams.Stream, error) {
 	return streams.Stream{}, streams.ErrNotFound
 }
 
-func (srm *streamRepositoryMock) Search(coords [][]float64) ([]streams.Stream, error) {
+func inRange(price uint64, min, max *uint64) bool {
+	if min != nil && max != nil {
+		return price >= *min && price < *max
+	}
+	if min != nil {
+		return price >= *min
+	}
+	if max != nil {
+		return price < *max
+	}
+	return true
+}
+
+func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, error) {
+	ret := []streams.Stream{}
+	for _, stream := range srm.streams {
+		if strings.Contains(stream.Name, query.Name) && strings.Contains(stream.Type, query.StreamType) &&
+			inRange(stream.Price, query.MinPrice, query.MaxPrice) {
+			ret = append(ret, stream)
+		}
+	}
+	start := query.Page * query.Limit
+	end := start + query.Limit
+	page := streams.Page{
+		Total:   uint64(len(ret)),
+		Limit:   query.Limit,
+		Page:    query.Page,
+		Content: []streams.Stream{},
+	}
+	n := uint64(len(ret))
+	if start >= n {
+		return page, nil
+	}
+	if end >= n {
+		end = n
+	}
+	ret = ret[start:end]
+	page.Content = ret
+
 	// Geolocation search mock is not used.
-	return nil, streams.ErrNotFound
+	return page, nil
 }
 
 func (srm *streamRepositoryMock) Remove(owner, id string) error {
@@ -85,11 +125,6 @@ func (srm *streamRepositoryMock) Remove(owner, id string) error {
 	defer srm.mu.Unlock()
 
 	dbKey := key(owner, id)
-
-	if _, ok := srm.streams[dbKey]; !ok {
-		return streams.ErrNotFound
-	}
-
 	delete(srm.streams, dbKey)
 
 	return nil

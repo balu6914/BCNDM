@@ -1,8 +1,8 @@
 package streams
 
-import "errors"
-
-const defLocation = "Point"
+import (
+	"errors"
+)
 
 var (
 	// ErrConflict indicates usage of the existing stream id for the new stream.
@@ -15,8 +15,8 @@ var (
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound = errors.New("non-existent entity")
 
-	// ErrUnknownType indicates a unknown type error.
-	ErrUnknownType = errors.New("unknown type")
+	// ErrWrongType indicates wrong contant type error.
+	ErrWrongType = errors.New("wrong type")
 
 	// ErrMalformedData indicates a malformed request.
 	ErrMalformedData = errors.New("malformed data")
@@ -41,7 +41,7 @@ type Service interface {
 	ViewStream(string) (Stream, error)
 
 	// Retrieves data about subset of streams given geolocation coordinates.
-	SearchStreams([][]float64) ([]Stream, error)
+	SearchStreams(Query) (Page, error)
 
 	// Removes the stream identified with the provided id, that
 	// belongs to the user identified by the provided id.
@@ -60,43 +60,39 @@ func NewService(streams StreamRepository) Service {
 }
 
 func (ss streamService) AddStream(owner string, stream Stream) (string, error) {
-	stream.Owner = owner
-	if stream.Location.Type == "" {
-		stream.Location.Type = defLocation
-	}
-
 	return ss.streams.Save(stream)
 }
 
 func (ss streamService) AddBulkStream(owner string, streams []Stream) error {
-	if len(streams) < 1 {
-		return ErrMalformedData
-	}
-	for _, stream := range streams {
-		stream.Owner = owner
-		if stream.Location.Type == "" {
-			stream.Location.Type = defLocation
-		}
-	}
-
 	return ss.streams.SaveAll(streams)
 }
 
 func (ss streamService) UpdateStream(owner string, stream Stream) error {
-	stream.Owner = owner
-	if stream.Location.Type == "" {
-		stream.Location.Type = defLocation
-	}
-
 	return ss.streams.Update(stream)
 }
 
 func (ss streamService) ViewStream(id string) (Stream, error) {
-	return ss.streams.One(id)
+	s, err := ss.streams.One(id)
+	if err != nil {
+		return s, err
+	}
+
+	s.URL = ""
+	return s, nil
 }
 
-func (ss streamService) SearchStreams(coords [][]float64) ([]Stream, error) {
-	return ss.streams.Search(coords)
+func (ss streamService) SearchStreams(query Query) (Page, error) {
+	p, err := ss.streams.Search(query)
+	if err != nil {
+		return p, err
+	}
+
+	// Workaround to prevent sending real URL to the end user.
+	for i := range p.Content {
+		p.Content[i].URL = ""
+	}
+
+	return p, nil
 }
 
 func (ss streamService) RemoveStream(owner string, id string) error {

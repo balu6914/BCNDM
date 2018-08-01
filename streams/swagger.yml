@@ -37,6 +37,82 @@ paths:
           description: Stream already exists.
         500:
           $ref: "#/responses/ServiceError"
+    get:
+      summary: Retrieves streams by query parameters
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - in: query
+          name: x0
+          type: number
+          description: X value of the first search point. X values represent longitude here.
+        - in: query
+          name: x1
+          type: number
+          required: false
+          description: X value of the second search point. X values represent longitude here.
+        - in: query
+          name: x2
+          type: number
+          required: false
+          description: X value of the third search point. X values represent longitude here.
+        - in: query
+          name: x3
+          type: number
+          required: false
+          description: X value of the fourth search point. X values represent longitude here.
+        - in: query
+          name: y0
+          type: number
+          required: false
+          description: Y value of the first search point. Y values represent latitude here.
+        - in: query
+          name: y1
+          type: number
+          required: false
+          description: Y value of the second search point. Y values represent latitude here.
+        - in: query
+          name: y2
+          type: number
+          required: false
+          description: Y value of the third search point. Y values represent latitude here.
+        - in: query
+          name: y3
+          type: number
+          required: false
+          description: Y value of the fourth search point. Y values represent latitude here.
+        - in: query
+          name: name
+          type: string
+          required: false
+          description: Name of the stream to be found.
+        - in: query
+          name: type
+          type: string
+          required: false
+          description: Type of the stream to be found.
+        - in: query
+          name: minPrice
+          type: number
+          minimum: 0
+          required: false
+          description: Lower bound of price range search. Entries with value equal to this will be included in result set.
+        - in: query
+          name: maxPrice
+          type: number
+          minimum: 0
+          required: false
+          description: Lower bound of price range search. Entries with value equal to this will not be included in result set.
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/Page'
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
   /streams/bulk:
     post:
       summary: Adds a bulk of a new streams.
@@ -125,61 +201,6 @@ paths:
       responses:
         204:
           description: Stream removed.
-        403:
-          description: Missing or invalid access token provided.
-        500:
-          $ref: "#/responses/ServiceError"
-  /streams/search:
-    get:
-      summary: Retrieves streams by location
-      tags:
-        - streams
-      parameters:
-        - $ref: "#/parameters/Authorization"
-        - in: query
-          name: x0
-          type: number
-          description: X value of the first search point. X values represent longitude here.
-        - in: query
-          name: x1
-          type: number
-          required: true
-          description: X value of the second search point. X values represent longitude here.
-        - in: query
-          name: x2
-          type: number
-          required: true
-          description: X value of the third search point. X values represent longitude here.
-        - in: query
-          name: x3
-          type: number
-          required: true
-          description: X value of the fourth search point. X values represent longitude here.
-        - in: query
-          name: y0
-          type: number
-          required: true
-          description: Y value of the first search point. Y values represent latitude here.
-        - in: query
-          name: y1
-          type: number
-          required: true
-          description: Y value of the second search point. Y values represent latitude here.
-        - in: query
-          name: y2
-          type: number
-          required: true
-          description:  Y value of the third search point. Y values represent latitude here.
-        - in: query
-          name: y3
-          type: number
-          required: true
-          description:  Y value of the fourth search point. Y values represent latitude here.
-      responses:
-        200:
-          description: Data retrieved.
-          schema:
-            $ref: '#/definitions/StreamRes'
         403:
           description: Missing or invalid access token provided.
         500:
@@ -274,3 +295,23 @@ definitions:
         description: Price of the stream in miTAS.
       location:
         $ref: '#/definitions/Location'
+  Page:
+    type: object
+    description: Represent paged response.
+    properties:
+      page:
+        type: number
+        minimum: 0
+        description: Number of page returned by service.
+      limit:
+        type: number
+        minimum: 20
+        description: Preferred size of the page content. Size of returned set might be less than limit, but must not be more then limit.
+      total:
+        type: number
+        minimum: 0
+        description: Total number of elements satisfying query.
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/StreamRes'

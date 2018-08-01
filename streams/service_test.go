@@ -84,6 +84,9 @@ func TestUpdateStream(t *testing.T) {
 	svc := newService()
 	svc.AddStream(key, s)
 
+	wrongOwner := s
+	wrongOwner.Owner = bson.NewObjectId().Hex()
+
 	cases := []struct {
 		desc   string
 		stream streams.Stream
@@ -104,8 +107,8 @@ func TestUpdateStream(t *testing.T) {
 		},
 		{
 			desc:   "update an existing stream with wrong owner",
-			stream: s,
-			owner:  bson.NewObjectId().Hex(),
+			stream: wrongOwner,
+			owner:  "",
 			err:    streams.ErrNotFound,
 		},
 	}
@@ -128,20 +131,17 @@ func TestRemoveStream(t *testing.T) {
 		err      error
 	}{
 		{
-			desc:     "remove existing stream with wrong owner",
-			streamId: s.ID,
-			owner:    "",
-			err:      streams.ErrNotFound},
-		{
-			desc:     "remove existing stream",
+			desc:     "remove an existing stream",
 			streamId: s.ID,
 			owner:    s.Owner,
-			err:      nil},
+			err:      nil,
+		},
 		{
-			desc:     "remove non-existing stream",
+			desc:     "remove a non-existing stream",
 			streamId: bson.NewObjectId(),
 			owner:    s.Owner,
-			err:      streams.ErrNotFound},
+			err:      nil,
+		},
 	}
 
 	for _, tc := range cases {
@@ -169,7 +169,8 @@ func TestAddBulkStreams(t *testing.T) {
 			desc:    "add 0 streams",
 			streams: []streams.Stream{},
 			key:     key,
-			err:     streams.ErrMalformedData},
+			err:     nil,
+		},
 	}
 
 	for _, tc := range cases {
