@@ -5,6 +5,7 @@ export class Stream {
     public description: string,
     public url: string,
     public price: number,
-    public location: object
+    public location: object,
+    public owner?: string
   ) { }
 }

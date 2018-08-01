@@ -11,6 +11,9 @@ import { Subscription } from '../../common/interfaces/subscription.interface';
 
 import { Chart } from 'chart.js';
 import { Table, TableType } from '../../shared/table/table';
+import { Query } from '../../common/interfaces/query.interface';
+import { Page } from '../../common/interfaces/page.interface';
+import { Stream } from '../../common/interfaces';
 
 
 @Component({
@@ -85,18 +88,12 @@ export class DashboardMainComponent {
           }
         );
 
-          // TODO: Replace this coordinates with map bounds
-          const southWestLng = -180;
-          const southWestLat = -90;
-          const northEastLng = 180;
-          const northEastLat = 90;
+          const query = new Query();
 
           // Search streams on drawed region
-          this.streamService.searchStreams(
-            "geo", southWestLng, southWestLat, southWestLng, northEastLat,
-            northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
-            (result: any) => {
-              this.temp = [...result.Streams];
+          this.streamService.searchStreams(query).subscribe(
+            (result: Page<Stream>) => {
+              this.temp = result.content;
           },
           err => {
             console.log(err)

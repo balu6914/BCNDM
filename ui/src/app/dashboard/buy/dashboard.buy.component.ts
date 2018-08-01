@@ -5,6 +5,7 @@ import { StreamService } from '../../common/services/stream.service';
 import { TasPipe } from '../../common/pipes/converter.pipe';
 import { AuthService } from '../../auth/services/auth.service';
 import { Table, TableType } from '../../shared/table/table';
+import { Query } from '../../common/interfaces/query.interface';
 
 @Component({
   selector: 'dashboard-buy',
@@ -39,20 +40,13 @@ export class DashboardBuyComponent {
           }
       );
 
-      // TODO: Replace this coordinates with map bounds
-      const southWestLng = -180;
-      const southWestLat = -90;
-      const northEastLng = 180;
-      const northEastLat = 90;
+      const query = new Query();
 
-      // Search streams on drawed region
-      this.streamService.searchStreams(
-        "geo", southWestLng, southWestLat, southWestLng, northEastLat,
-        northEastLng, northEastLat, northEastLng, southWestLat).subscribe(
+      this.streamService.searchStreams(query).subscribe(
         (result: any) => {
-          this.temp = [...result.Streams];
-          result.Streams.forEach(stream => {
-            if (stream.owner != this.user.id) {
+          this.temp = result.content;
+          result.content.forEach(stream => {
+            if (stream.owner !== this.user.id) {
               this.streams.push(stream)
             }
           }
