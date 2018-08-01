@@ -17,11 +17,11 @@ import { TableType } from '../table';
 })
 
 export class TableRowComponent implements OnInit {
-  types = TableType
+  types = TableType;
   bsModalRef: BsModalRef;
 
   @Input() row: Stream | Subscription;
-  @Input() rowType: TableType
+  @Input() rowType: TableType;
   constructor(
     private modalService: BsModalService,
     private tasPipe: TasPipe,
@@ -36,7 +36,7 @@ export class TableRowComponent implements OnInit {
 
   public copyToClipboard() {
     if (this.isStream(this.row)) {
-      ngCopy(this.row.url, null)
+      ngCopy(this.row.url, null);
     }
   }
 

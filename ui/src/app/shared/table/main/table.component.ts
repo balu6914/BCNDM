@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Table } from '../table';
+import { Table, TableType } from '../table';
 
 @Component({
   selector: 'dpc-table',
@@ -7,6 +7,7 @@ import { Table } from '../table';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit {
+  types = TableType;
 
   @Input() table: Table = new Table();
   constructor() { }
