@@ -28,6 +28,8 @@
     "@asymmetrik/ngx-leaflet": "^4.0.0",
     "@asymmetrik/ngx-leaflet-draw": "^3.1.0",
     "@types/googlemaps": "^3.30.11",
+    "@types/leaflet": "^1.2.9",
+    "@types/leaflet-draw": "^0.4.13",
     "angular-6-clipboard": "^1.0.0",
     "animate.css": "^3.5.2",
     "bootstrap": "^4.1.1",

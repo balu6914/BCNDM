@@ -4,9 +4,6 @@ import { StreamService } from 'app/common/services/stream.service';
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
 import * as L from 'leaflet';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
-import { icon, latLng, Layer, marker, tileLayer } from 'leaflet';
 
 @Component({
   selector: "dpc-map-leaflet",
@@ -56,7 +53,7 @@ export class MapComponent implements OnInit {
     return icons[type] || icons["default"];
   }
 
-  onMapReady(map: L) {
+  onMapReady(map: L.Map) {
     const that = this;
 
     map.on('move', function(e) {
