@@ -1,5 +1,5 @@
-<div class="front" *ngIf="table.content && table.content.length" >
-  <div class="box box-grow">
+<div class="front">
+  <div class="box box-grow" *ngIf="table.content && table.content.length">
     <div class="box__header">
       <p class="box__title">
         {{table.title}}
@@ -34,6 +34,21 @@
         </table>
       </div>
       <dpc-table-pagination></dpc-table-pagination>
+    </div>
+  </div>
+  <div class="jumbotron" *ngIf="table.content && !table.content.length">
+    <h1 class="display-1">No content :(</h1>
+    <div *ngIf="table.tableType === types.Sell">
+      <p class="lead">
+        You haven't added any streams yet. Use
+        <span class="badge badge-primary">Add button</span> to add a new stream.
+      </p>
+    </div>
+    <div *ngIf="table.tableType === types.Buy">
+      <p class="lead">There are currently no streams for you.</p>
+    </div>
+    <div *ngIf="table.tableType === types.Contract">
+      <p class="lead">You have no contracts yet. Start buying and selling streams today!</p>
     </div>
   </div>
 </div>
