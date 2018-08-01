@@ -205,7 +205,8 @@ func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interfac
 		return nil, streams.ErrMalformedData
 	}
 
-	for _, stream := range s {
+	for i := range s {
+		stream := &s[i]
 		stream.Owner = owner
 		if stream.Location.Type == "" {
 			stream.Location.Type = defLocType
