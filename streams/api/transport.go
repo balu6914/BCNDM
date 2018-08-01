@@ -16,18 +16,17 @@ import (
 	"monetasa/streams"
 )
 
+const defLocType = "Point"
+
 var (
-	streamsService streams.Service
 	authService    streams.Authorization
-	searchFields   = [4][2]string{{"x0", "y0"}, {"x1", "y1"}, {"x2", "y2"}, {"x3", "y3"}}
-	fileFields     = []string{"name", "type", "description", "price", "longitude", "latitude", "url"}
+	locationPoints = [4][2]string{{"x0", "y0"}, {"x1", "y1"}, {"x2", "y2"}, {"x3", "y3"}}
+	fields         = []string{"name", "type", "description", "price", "longitude", "latitude", "url"}
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
-	streamsService = svc
 	authService = auth
-
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
@@ -35,20 +34,20 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	r := bone.New()
 
 	r.Post("/streams", kithttp.NewServer(
-		addStreamEndpoint(svc),
-		decodeAddStreamRequest,
+		createStreamEndpoint(svc),
+		decodeCreateStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
 	r.Post("/streams/bulk", kithttp.NewServer(
-		addBulkStreamEndpoint(svc),
-		decodeAddBulkStreamRequest,
+		createBulkStreamEndpoint(svc),
+		decodeCreateBulkStreamRequest,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Get("/streams/search", kithttp.NewServer(
+	r.Get("/streams", kithttp.NewServer(
 		searchStreamEndpoint(svc),
 		decodeSearchStreamRequest,
 		encodeResponse,
@@ -81,7 +80,7 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	return r
 }
 
-func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCreateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	owner, err := authService.Authorize(r)
 	if err != nil {
 		return nil, err
@@ -93,21 +92,16 @@ func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, er
 	}
 	defer r.Body.Close()
 
+	if stream.Location.Type == "" {
+		stream.Location.Type = defLocType
+	}
+
+	stream.Owner = owner
 	req := createStreamReq{
 		owner:  owner,
 		stream: stream,
 	}
 	return req, nil
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, s := range list {
-		if s == a {
-			return true
-		}
-	}
-
-	return false
 }
 
 type csvFile struct {
@@ -124,15 +118,16 @@ func readFile(r *http.Request) (*csvFile, error) {
 	reader := csv.NewReader(file)
 
 	content, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
+	if err != nil || len(content) < 2 {
+		return nil, streams.ErrMalformedData
 	}
 
 	columns, records := content[0], content[1:]
 	for idx, field := range columns {
 		columns[idx] = strings.ToLower(field)
 	}
-	for _, field := range fileFields {
+
+	for _, field := range fields {
 		if !stringInSlice(field, columns) {
 			return nil, streams.ErrMalformedData
 		}
@@ -175,7 +170,11 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 	return ret, nil
 }
 
-func decodeAddBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCreateBulkStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	if !strings.Contains(r.Header.Get("Content-Type"), fileContentType) {
+		return nil, streams.ErrWrongType
+	}
+
 	owner, err := authService.Authorize(r)
 	if err != nil {
 		return nil, err
@@ -202,6 +201,17 @@ func decodeAddBulkStreamRequest(_ context.Context, r *http.Request) (interface{}
 		s = append(s, *stream)
 	}
 
+	if len(s) < 1 {
+		return nil, streams.ErrMalformedData
+	}
+
+	for _, stream := range s {
+		stream.Owner = owner
+		if stream.Location.Type == "" {
+			stream.Location.Type = defLocType
+		}
+	}
+
 	req := createBulkStreamReq{
 		owner:   owner,
 		Streams: s,
@@ -222,8 +232,13 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	}
 	defer r.Body.Close()
 
+	if stream.Location.Type == "" {
+		stream.Location.Type = defLocType
+	}
+
 	req := updateStreamReq{
 		owner:  owner,
+		id:     bone.GetValue(r, "id"),
 		stream: stream,
 	}
 	return req, nil
@@ -235,7 +250,7 @@ func decodeViewStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 	}
 
 	req := readStreamReq{
-		streamID: bone.GetValue(r, "id"),
+		id: bone.GetValue(r, "id"),
 	}
 	return req, nil
 }
@@ -247,8 +262,8 @@ func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{},
 	}
 
 	req := deleteStreamReq{
-		owner:    owner,
-		streamID: bone.GetValue(r, "id"),
+		owner: owner,
+		id:    bone.GetValue(r, "id"),
 	}
 	return req, nil
 }
@@ -259,24 +274,14 @@ func decodeSearchStreamRequest(_ context.Context, r *http.Request) (interface{},
 	}
 
 	q := r.URL.Query()
-	req := searchStreamReq{}
-	if len(q["type"]) != 1 {
-		return nil, streams.ErrMalformedData
+	req := newSearchStreamReq()
+
+	if err := searchFields(&req, q); err != nil {
+		return nil, err
 	}
-	req.locationType = q["type"][0]
-	var err error
-	for i, v := range searchFields {
-		// X and Y coordinates are q[v[0]] and q[v[1]] respectively.
-		if len(q[v[0]]) != 1 || len(q[v[1]]) != 1 {
-			return nil, streams.ErrMalformedData
-		}
-		req.points = append(req.points, []float64{0, 0})
-		for j := range v {
-			req.points[i][j], err = strconv.ParseFloat(q[v[j]][0], 64)
-			if err != nil {
-				return nil, streams.ErrMalformedData
-			}
-		}
+
+	if err := locationFields(&req, q); err != nil {
+		return nil, err
 	}
 
 	return req, nil
@@ -310,6 +315,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusForbidden)
 	case streams.ErrNotFound:
 		w.WriteHeader(http.StatusNotFound)
+	case streams.ErrWrongType:
+		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case streams.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
 	case io.ErrUnexpectedEOF:

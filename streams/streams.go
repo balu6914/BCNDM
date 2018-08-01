@@ -29,6 +29,14 @@ type Stream struct {
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
 }
 
+// Page represents paged result for list response.
+type Page struct {
+	Page    uint64   `json:"page"`
+	Limit   uint64   `json:"limit"`
+	Total   uint64   `json:"total"`
+	Content []Stream `json:"content"`
+}
+
 // Validate returns an error if user representation is invalid.
 func (s *Stream) Validate() error {
 	if s.Name == "" || s.Type == "" ||
@@ -37,6 +45,14 @@ func (s *Stream) Validate() error {
 	}
 
 	if !govalidator.IsURL(s.URL) {
+		return ErrMalformedData
+	}
+
+	if s.ID != "" && !bson.IsObjectIdHex(s.Owner) {
+		return ErrMalformedData
+	}
+
+	if s.Owner != "" && !bson.IsObjectIdHex(s.Owner) {
 		return ErrMalformedData
 	}
 
@@ -60,8 +76,8 @@ type StreamRepository interface {
 	// One retrieves a stream by its unique identifier (i.e. id).
 	One(string) (Stream, error)
 
-	// Search for streams by means of geolocation parameters.
-	Search([][]float64) ([]Stream, error)
+	// Search for streams by specified query parameters.
+	Search(Query) (Page, error)
 
 	// Removes the stream having the provided identifier, that is owned
 	// by the specified user.

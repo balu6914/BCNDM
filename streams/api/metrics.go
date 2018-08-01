@@ -61,13 +61,13 @@ func (ms *metricsMiddleware) ViewStream(id string) (streams.Stream, error) {
 	return ms.svc.ViewStream(id)
 }
 
-func (ms *metricsMiddleware) SearchStreams(coords [][]float64) ([]streams.Stream, error) {
+func (ms *metricsMiddleware) SearchStreams(query streams.Query) (streams.Page, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "search_streams").Add(1)
 		ms.latency.With("method", "search_streams").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.SearchStreams(coords)
+	return ms.svc.SearchStreams(query)
 }
 
 func (ms *metricsMiddleware) RemoveStream(key, id string) error {
