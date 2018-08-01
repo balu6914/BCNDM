@@ -48,16 +48,18 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateStreamReq)
 
+		if req.stream.Owner == "" {
+			req.stream.Owner = req.owner
+		}
+
+		// Need to set owner before the validation because
+		// stream.Validate() won't pass otherwise.
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
 		if req.stream.ID == "" {
 			req.stream.ID = bson.ObjectIdHex(req.id)
-		}
-
-		if req.stream.Owner == "" {
-			req.stream.Owner = req.owner
 		}
 
 		if err := svc.UpdateStream(req.owner, req.stream); err != nil {

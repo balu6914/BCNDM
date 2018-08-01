@@ -78,9 +78,9 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 	c := s.DB(dbName).C(collection)
 	bulk := c.Bulk()
 
-	var arr []interface{}
-	for _, stream := range blk {
-		arr = append(arr, &stream)
+	arr := make([]interface{}, len(blk))
+	for i := range blk {
+		arr[i] = blk[i]
 	}
 
 	bulk.Insert(arr...)
