@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	dbName     string = "monetasa"
+	dbName     string = "monetasa-streams"
 	collection string = "streams"
 )
 
@@ -27,19 +27,31 @@ func New(db *mgo.Session) streams.StreamRepository {
 		Key:  []string{"owner"},
 	}
 	locIdx := mgo.Index{
-		Name: "location",
+		Name: "locations",
 		Key:  []string{"$2d:location.coordinates"},
 	}
+	namesIdx := mgo.Index{
+		Name: "names",
+		Key:  []string{"name"},
+	}
+	typeIdx := mgo.Index{
+		Name: "types",
+		Key:  []string{"type"},
+	}
+	priceIdx := mgo.Index{
+		Name: "prices",
+		Key:  []string{"price"},
+	}
+
 	c.EnsureIndex(ownersIdx)
 	c.EnsureIndex(locIdx)
+	c.EnsureIndex(namesIdx)
+	c.EnsureIndex(typeIdx)
+	c.EnsureIndex(priceIdx)
 	return &streamRepository{db}
 }
 
 func (sr streamRepository) Save(stream streams.Stream) (string, error) {
-	if !bson.IsObjectIdHex(stream.Owner) {
-		return "", streams.ErrMalformedData
-	}
-
 	s := sr.db.Copy()
 	defer s.Close()
 
@@ -109,32 +121,46 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 		if err == mgo.ErrNotFound {
 			return stream, streams.ErrNotFound
 		}
-
 		return stream, err
 	}
 
 	return stream, nil
 }
 
-func (sr streamRepository) Search(coords [][]float64) ([]streams.Stream, error) {
+func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
 	s := sr.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collection)
+	limit := int(query.Limit)
+	page := int(query.Page)
 
-	var results []streams.Stream
-	err := c.Find(bson.M{
-		"location": bson.M{
-			"$within": bson.M{
-				"$polygon": coords,
-			},
-		},
-	}).All(&results)
-
-	if results == nil || err != nil {
-		return []streams.Stream{}, nil
+	ret := streams.Page{
+		Page:    query.Page,
+		Limit:   query.Limit,
+		Content: []streams.Stream{},
 	}
 
-	return results, nil
+	var results []streams.Stream
+	q := streams.GenerateQuery(&query)
+
+	total, err := c.Find(q).Count()
+	if err != nil {
+		return ret, err
+	}
+
+	ret.Total = uint64(total)
+	start := limit * page
+	if total < start {
+		return ret, nil
+	}
+
+	err = c.Find(q).Skip(start).Limit(limit).All(&results)
+	if results == nil || err != nil {
+		return ret, nil
+	}
+
+	ret.Content = results
+	return ret, nil
 }
 
 func (sr streamRepository) Remove(owner, id string) error {
@@ -143,8 +169,8 @@ func (sr streamRepository) Remove(owner, id string) error {
 	c := s.DB(dbName).C(collection)
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	_id := bson.ObjectIdHex(id)
-	if err := c.Remove(bson.M{"_id": _id, "owner": owner}); err != nil {
+	removeID := bson.ObjectIdHex(id)
+	if err := c.Remove(bson.M{"_id": removeID, "owner": owner}); err != nil {
 		if err == mgo.ErrNotFound {
 			return nil
 		}
