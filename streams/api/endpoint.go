@@ -2,14 +2,13 @@ package api
 
 import (
 	"context"
+	"monetasa/streams"
 
 	"github.com/go-kit/kit/endpoint"
 	"gopkg.in/mgo.v2/bson"
-
-	"monetasa/streams"
 )
 
-func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
+func createStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createStreamReq)
 
@@ -18,7 +17,6 @@ func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 
 		id, err := svc.AddStream(req.owner, req.stream)
-
 		if err != nil {
 			return nil, err
 		}
@@ -30,7 +28,7 @@ func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	}
 }
 
-func addBulkStreamEndpoint(svc streams.Service) endpoint.Endpoint {
+func createBulkStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createBulkStreamReq)
 
@@ -42,7 +40,7 @@ func addBulkStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return createBulkStreamResponse{}, nil
+		return createBulkStreamRes{}, nil
 	}
 }
 
@@ -54,13 +52,19 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		req.stream.ID = bson.ObjectIdHex(req.id)
+		if req.stream.ID == "" {
+			req.stream.ID = bson.ObjectIdHex(req.id)
+		}
+
+		if req.stream.Owner == "" {
+			req.stream.Owner = req.owner
+		}
 
 		if err := svc.UpdateStream(req.owner, req.stream); err != nil {
 			return nil, err
 		}
 
-		return modifyStreamRes{}, nil
+		return editStreamRes{}, nil
 	}
 }
 
@@ -77,7 +81,7 @@ func viewStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		res := readStreamRes{
+		res := viewStreamRes{
 			Stream: s,
 		}
 		return res, nil
@@ -96,7 +100,7 @@ func removeStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return modifyStreamRes{}, nil
+		return removeStreamRes{}, nil
 	}
 }
 
@@ -107,14 +111,22 @@ func searchStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		streams, err := svc.SearchStreams(req.points)
+		q := streams.Query{
+			Name:       req.Name,
+			StreamType: req.StreamType,
+			Coords:     req.Coords,
+			Page:       req.Page,
+			Limit:      req.Limit,
+			MinPrice:   req.MinPrice,
+			MaxPrice:   req.MaxPrice,
+		}
+
+		page, err := svc.SearchStreams(q)
 		if err != nil {
 			return nil, err
 		}
 
-		res := searchStreamRes{
-			Streams: streams,
-		}
+		res := searchStreamRes{page}
 		return res, nil
 	}
 }

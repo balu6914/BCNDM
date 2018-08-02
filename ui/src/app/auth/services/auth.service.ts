@@ -59,10 +59,11 @@ export class AuthService {
 
     getCurrentUser() {
         if(this.user) {
-            console.log("Yes we have user , here it is", this.user)
             return Observable.of(this.user)
         } else {
-            return this.fetchCurrentUser()
+            if(this.isLoggedin()) {
+              return this.fetchCurrentUser()
+            }
         }
     }
 

@@ -1,133 +1,154 @@
-<div class="mdl-grid animated fadeIn">
-  <!-- Left card -->
-  <mdl-card class="dashboard-card card-welcome mdl-paper mdl-paper--1  mdl-cell mdl-cell--6-col mdl-cell--6-desktop" mdl-shadow="2">
-      <div class="mdl-cell mdl-cell--12-col" >
-          <div leaflet style="height: 300px"
-          leafletDraw
-          [leafletOptions]="options"
-          [leafletDrawOptions]="drawOptions"
-          (leafletMapReady)="onMapReady($event)">
-          </div>
-      </div>
-  </mdl-card>
-  <!-- right card -->
-  <mdl-card class="dashboard-card card-balance mdl-paper mdl-paper--1 mdl-card mdl-background--card mdl-cell mdl-cell--6-col mdl-cell--6-desktop" mdl-shadow="2">
-    <mdl-card-title mdl-card-expand>
-      <h5>BALANCE</h5>
-    </mdl-card-title>
-    <mdl-card-title mdl-card-expand class="text-center">
-        <h3 class="card-title-center">
-            <mdl-icon>account_balance_wallet</mdl-icon>
-            {{user.balance | tas}} TAS
-        </h3>
-    </mdl-card-title>
-    <mdl-card-actions mdl-card-border>
-      <button [routerLink]="['../wallet/balance']" mdl-button mdl-colored mdl-ripple>
-                <mdl-icon>account_balance_wallet</mdl-icon> MY WALLET
+<div class="container-fluid">
+  <div class="page-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">
+        Dashboard
+      </h1>
+    </div>
+    <div class="row">
+      <div class="col-md-4 col-lg-3">
+      <!-- Balance wallet widget -->
+      <dpc-balance-widget [balance]="mockBalance"></dpc-balance-widget>
+        <div class="modal fade" id="modalWithdrawTas" tabindex="-1" role="dialog" aria-labelledby="modalWithdrawTasLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalWithdrawTasLabel">Withdraw TAS</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
                 </button>
-      <mdl-layout-spacer></mdl-layout-spacer>
-
-    </mdl-card-actions>
-  </mdl-card>
-
-  <!--Tabs -->
-  <div class="mdl-cell mdl-cell--12-col dashboard-tabs">
-
-<mdl-tabs mdl-ripple mdl-tab-active-index="0" (mdl-tab-active-changed)="tabChanged($event)">
-    <mdl-tab-panel>
-        <mdl-tab-panel-title>
-         <span mdl-badge="{{mySubscriptions.length}}">BOUGHT STREAMS</span>
-        </mdl-tab-panel-title>
-        <mdl-tab-panel-content>
-
-          <div class="table-search">
-            <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateSubscriptions($event)' autocomplete="name">
-            </mdl-textfield>
-          </div>
-          <ngx-datatable #table class='material' [columns]="" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [rows]='mySubscriptions' [messages]="tableSubsMessages">
-            <ngx-datatable-column name="Stream Name">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.stream_name}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Price Paid">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.stream_price | tas}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Start Date">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.start_date | date}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="End Date">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.end_date | date}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Stream URL">
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                    <a class="button" href="{{row.stream_url}}" target="_blank"
-                     mdl-button mdl-button-type="raised"
-                     mdl-ripple>OPEN</a>
-                    <button mdl-button mdl-button-type="raised" mdl-ripple
-                     ngxClipboard [cbContent]="row.stream_url" >COPY</button>
-                </ng-template>
-            </ngx-datatable-column>
-          </ngx-datatable>
-
-        </mdl-tab-panel-content>
-      </mdl-tab-panel>
-
-      <mdl-tab-panel>
-        <mdl-tab-panel-title>
-          <span mdl-badge="{{myStreamsList.length}}">SOLD STREAMS</span>
-        </mdl-tab-panel-title>
-        <mdl-tab-panel-content>
-          <div class="table-search">
-            <mdl-textfield class="search-input" type='text' autofocus label='Type your search...' (keyup)='updateMyStreams($event)' autocomplete="name">
-            </mdl-textfield>
-          </div>
-
-          <ngx-datatable #table class='material' [columns]="tableColumns" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [rows]='myStreamsList' [messages]="tableStreamsMessages">
-            <ngx-datatable-column name="Name">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.name}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Stream Type">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.type}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Description">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.description}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Tokens per hour">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.price | tas}}
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="Latitude, Longitude">
-              <ng-template let-row="row" ngx-datatable-cell-template>
-                {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
-              </ng-template>
-            </ngx-datatable-column>
-
-            <ngx-datatable-column name="Action">
-              <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <div class="btn-buy-stream">
-                  <a [routerLink]="['/dashboard/sell/edit', row.id]" class="mdl-button mdl-js-button mdl-button--accent">EDIT</a>
+              </div>
+              <div class="modal-body">
+                <div class="container-fluid">
+                  <div class="modal-section-border">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="modal__subtitle">
+                          Ratio
+                        </div>
+                      </div>
+                      <div class="col-9">
+                        <div class="modal__ratio">
+                          1$ = 1 TAS
+                        </div>
+                        <!--
+                          Validation
+                          http://getbootstrap.com/docs/4.1/components/forms/#validation
+                          -->
+                        <form class="form-inline float-right buy-tas needs-validation" novalidate>
+                          <div class="form-group">
+                            <label for="tokenAmount" class="form-label mr-2">Token amount</label>
+                            <input type="text" class="form-control buy-tas__input" id="tokenAmount" value="25">
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-3">
+                      <div class="modal__subtitle">
+                        Summary
+                      </div>
+                    </div>
+                    <div class="col-9">
+                      <div class="modal__summary">
+                        25$
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </ng-template>
-            </ngx-datatable-column>
-          </ngx-datatable>
-
-
-        </mdl-tab-panel-content>
-      </mdl-tab-panel>
-    </mdl-tabs>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-padding-lg">Withdraw TAS</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 col-lg-9">
+        <div class="box">
+          <div class="box__header">
+            <p class="box__title">
+              Statistics
+            </p>
+            <!-- Mobile version of the chart caption -->
+            <div class="chart-caption d-sm-none">
+              <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
+              <span class="chart-caption__color chart-caption--color-2">Sold streams</span>
+            </div>
+            <!-- Desktop version of the navigation -->
+            <ul class="box-nav d-none d-sm-block">
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last week</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last month</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last year</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link active">All</a>
+              </li>
+            </ul>
+          </div>
+          <div class="box__content">
+            <div class="chart-container" style="position: relative; max-height: 148px;">
+              <canvas id="myChart"></canvas>
+            </div>
+            <!-- Desktop version of the chart caption -->
+            <div class="chart-caption d-none d-sm-block">
+              <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
+              <span class="chart-caption__color chart-caption--color-2">Sold streams</span>
+            </div>
+            <!-- Mobile version of the nav -->
+            <ul class="box-nav box-nav--xs d-sm-none">
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last week</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last month</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link">Last year</a>
+              </li>
+              <li class="box-nav__item">
+                <a href="#" class="box-nav__link active">All</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row row-grow">
+      <div class="col-lg-7 order-2 order-sm-1">
+        <div class="box box-grow">
+          <div class="box__header">
+            <p class="box__title">
+              Streams
+            </p>
+            <ul class="nav box-nav">
+              <li class="box-nav__item">
+                <a class="box-nav__link active" data-toggle="pill" href="#sold-stream" role="tab" aria-controls="sold-stream" aria-selected="true">Bought streams</a>
+              </li>
+              <li class="box-nav__item">
+                <a class="box-nav__link" data-toggle="pill" href="#bought-stream" role="tab" aria-controls="bought-stream" aria-selected="false">Sold streams</a>
+              </li>
+            </ul>
+          </div>
+          <dpc-table [table]="table"></dpc-table>
+        </div>
+      </div>
+      <div class="col-lg-5 order-1 order-sm-2">
+        <div class="box box-grow">
+          <div class="box__header">
+            <p class="box__title">
+              Bought streams
+            </p>
+          </div>
+          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

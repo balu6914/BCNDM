@@ -1,90 +1,81 @@
-<div class="mdl-grid animated fadeIn">
-    <div class="dashboard-sell-edit-container" mdl-shadow="4">
-        <h4 class="mdl-cell mdl-cell--12-col">EDIT STREAM
-              <a routerLink="/dashboard/sell/map" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
-                  <i class="material-icons md-dark">close</i>
-              </a>
-        </h4>
-        <div class="mdl-cell mdl-cell--12-col">
-            <form class="form-full-width-filds" [formGroup]="form">
-                <p>
-                    <mdl-textfield
-                        label="Name (required)"
-                        name="name"
-                        type="text"
-                        formControlName="name"
-                        floating-label
-                        error-msg="Stream name is required!">
-                    </mdl-textfield>
-                <p>
-                    <mdl-textfield
-                        label="Stream Type"
-                        name="type"
-                        type="text"
-                        formControlName="type"
-                        [error-msg]="'Please provide a type of your stream (example: sensor)!'"
-                        floating-label>
-                    </mdl-textfield>
-                </p>
-                <p>
-                    <mdl-textfield
-                        label="Describe your stream (required)"
-                        name="description"
-                        type="text"
-                        formControlName="description"
-                        disableNativeValidityChecking
-                        [error-msg]="'Please provide a description (min length is 20 chars)!'"
-                        floating-label>
-                    </mdl-textfield>
-                </p>
-                <p>
-                    <mdl-textfield
-                        label="Stream URL (visible only to users who buy your stream, required)"
-                        name="url"
-                        type="text"
-                        formControlName="url"
-                        [error-msg]="'Please provide a  your stream URL!'"
-                        floating-label>
-                    </mdl-textfield>
-                </p>
-                <p>
-                    <mdl-textfield
-                        label="Token per hour (required)"
-                        name="price"
-                        type="float"
-                        formControlName="price"
-                        [error-msg]="'Please provide stream price per hour!'"
-                        floating-label>
-                    </mdl-textfield>
-                    <mdl-textfield
-                        label="Latitude of the sensor (required)"
-                        name="latitude"
-                        type="float"
-                        formControlName="lat"
-                        [error-msg]="'Please provide the latitude price per hour!'"
-                        floating-label>
-                    </mdl-textfield>
-                    <mdl-textfield
-                        label="Longitude  of sensor (required)"
-                        name="longitude"
-                        type="float"
-                        formControlName="long"
-                        [error-msg]="'Please provide longitude price per hour!'"
-                        floating-label>
-                    </mdl-textfield>
-                </p>
-                <p>
-                    <a routerLink="/dashboard/sell/map" mdl-button mdl-button-type="raised" mdl-ripple>
-                        CANCEL
-                    </a>
-                    <button mdl-button (click)="onSubmit(form.value, form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>SAVE CHANGES</button>
-                    <button mdl-button (click)="onDelete()" mdl-button mdl-button-type="raised" mdl-ripple style="float:right">DELETE STREAM</button>
-                </p>
-                <br>
-                <p class="text-center">
-                    <strong>DISCLAIMER: </strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-            </form>
+<!-- Add Stream Response -->
+<div *ngIf="submitted" class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">{{ modalMsg }}</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalNewStream.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <button type="button" class="btn btn-primary btn-padding-lg btn-xs-full" (click)="modalNewStream.hide()">Close</button>
+  </div>
+</div>
+
+<!-- Add Stream -->
+<div *ngIf="!submitted" lass="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="newStreamLabel">New Stream</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalNewStream.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid">
+      <form class="needs-validation" [formGroup]="form" novalidate>
+        <div class="form-group row">
+          <label for="streamName" class="col-sm-4 col-form-label">Name*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="name" class="form-control" required>
+          </div>
         </div>
+        <div class="form-group row">
+          <label for="streamName" class="col-sm-4 col-form-label">Type*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="type" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamDescribe" class="col-sm-4 col-form-label">Describe your stream*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="description" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamURL" class="col-sm-4 col-form-label">Stream URL*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="url" class="form-control" required>
+            <small class="form-text text-muted">
+            Visible only to users who buy your stream
+            </small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamTokensPerHour" class="col-sm-4 col-form-label">Tokens per hour*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="price" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamLat" class="col-sm-4 col-form-label">Latitude of the sensor*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="lat" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamLong" class="col-sm-4 col-form-label">Longitude of the sensor*</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="long" class="form-control" required>
+          </div>
+        </div>
+      </form>
     </div>
+  </div>
+  <div class="modal-footer">
+    <div class="modal-footer__nav">
+      <div class="modal__required">
+        * required fields
+      </div>
+      <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Edit stream</button>
+    </div>
+  </div>
 </div>

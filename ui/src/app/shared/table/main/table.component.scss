@@ -1,0 +1,144 @@
+@import "_vars.scss";
+@import "~bootstrap/scss/bootstrap";
+
+@include media-breakpoint-up(md) {
+  html,
+  body {
+    height: 100%;
+  }
+
+  .page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 71px) // minus top bar height
+  }
+  .row-grow {
+    flex-grow: 1;
+    .flip-card {
+      height: calc(100%);
+      height: calc(100% - 2rem);
+      .box-grow {
+        height: 100%;
+      }
+    }
+  }
+  .box-grow {
+    height: calc(100% - 2rem);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    .box__content,
+    .table-responsive,
+    .map-wrapper,
+    .tab-content,
+    .tab-content>.active {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-responsive {
+      margin-bottom: 1rem;
+      .table {
+        margin-bottom: 0;
+        flex-grow: 1;
+        tbody {
+          height: 250px;
+        }
+      }
+    }
+    .map-wrapper {
+      min-height: 300px;
+      .map {
+        flex-grow: 1;
+      }
+    }
+  }
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  margin-left: 0;
+  border: none;
+  font-weight: $font-weight-medium;
+  color: $text-color-1;
+  line-height: 1;
+  padding: .3rem .5rem;
+  transition: $transition-base;
+}
+
+.page-link:hover,
+.page-link.active {
+  background-color: theme-color("primary");
+  color: #fff;
+}
+
+.page-item {
+  border-top: 1px solid #DFE9F7;
+  border-bottom: 1px solid #DFE9F7;
+  padding: 10px 0;
+  @include media-breakpoint-up(sm) {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
+.page-item-prev,
+.page-item-next {
+  border: none;
+}
+
+.page-item-prev {
+  border-right: 1px solid #DFE9F7;
+  padding-right: 10px;
+}
+
+.page-item-next {
+  border-left: 1px solid #DFE9F7;
+  padding-left: 10px;
+}
+
+.page-item.disabled .page-link {
+  opacity: .3;
+}
+
+.page-item-first {
+  padding-left: 10px;
+}
+
+.page-item-last {
+  padding-right: 10px;
+}
+
+.page-item-prev .page-link,
+.page-item-next .page-link {
+  position: relative;
+  &:before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: 50%;
+    margin-top: -4px;
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    width: 6px;
+    height: 9px;
+  }
+}
+.page-item-prev .page-link {
+  padding-left: 1rem;
+  &:before {
+    left: 5px;
+    background-image: url($asset-path+'/img/icons/arrow-left.svg');
+  }
+}
+
+.page-item-next .page-link {
+  padding-right: 1rem;
+  &:before {
+    right: 5px;
+    background-image: url($asset-path+'/img/icons/arrow-right.svg');
+  }
+}

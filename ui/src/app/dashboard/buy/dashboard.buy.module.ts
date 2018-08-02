@@ -1,45 +1,37 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MdlModule } from '@angular-mdl/core';
-import {NgPipesModule} from 'ngx-pipes';
+import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Buy routes
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
-// // Add services
-import { SearchService } from './services/search.service';
-import { TokenInterceptor } from '../../auth/services/token.http.interceptor.service';
 // Buy components
 import { DashboardBuyComponent } from './index';
-import { DashboardBuyMapComponent } from './map';
-// Import subscription module
-import { SubscriptionModule } from '../subscription';
+// Import add subscription component
+import { DashboardBuyAddComponent } from '../../dashboard/buy/add';
 
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
 import { CommonAppModule } from '../../common/common.module';
-
+import { SharedModule } from '../../shared/shared.module';
+import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    AppBootstrapModule,
     MdlModule,
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,
-    NgxDatatableModule,
     CommonAppModule,
     DashboardBuyRoutingModule,
-    SubscriptionModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot()
+    SharedModule,
   ],
   declarations: [
-      DashboardBuyComponent,
-      DashboardBuyMapComponent,
+    DashboardBuyComponent,
+    DashboardBuyAddComponent,
   ],
-  providers: [
-      SearchService,
-  ]
+  entryComponents: [
+    DashboardBuyAddComponent,
+  ],
 })
 export class DashboardBuyModule { }

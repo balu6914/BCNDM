@@ -46,7 +46,7 @@ export class LoginComponent {
               .subscribe(
                 (token: any) => {
                     console.log("subscribe", token)
-                    this.router.navigate(['/dashboard/me'])
+                    this.router.navigate(['/dashboard'])
                 },
                 err => {
                     console.log("LOGION ERRRO")

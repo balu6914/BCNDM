@@ -1,0 +1,41 @@
+  <div class="box wallet">
+          <div class="box__header">
+            <p class="box__title">
+              My wallet
+            </p>
+          </div>
+          <div class="box__content">
+            <div class="wallet__coin">
+              <span class="wallet__coin-amount">
+              {{balance.amount}}
+              </span>
+              <span class="wallet__coin-currency">
+              {{balance.symbol}}
+              </span>
+            </div>
+            <div class="wallet__price">
+              <span class="wallet__price-amount">
+              {{balance.fiatAmount}}
+              </span>
+              <span class="wallet__price-currency">
+              {{balance.fiatSymbol}}
+              </span>
+            </div>
+            <div class="row">
+              <div class="col-6 col-md-12">
+                <p>
+                  <button type="button" (click)="onBuyTokensClick()" class="btn btn-block btn-primary">
+                  Buy TAS
+                  </button>
+                </p>
+              </div>
+              <div class="col-6 col-md-12">
+                <p class="box--element-no-margin">
+                  <button type="button" class="btn btn-block btn-outline-secondary" data-toggle="modal" data-target="#modalWithdrawTas">
+                  Withdraw
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>

@@ -1,1 +1,265 @@
-<!-- <router-outlet></router-outlet> -->
+<div class="container-fluid">
+  <div class="page-wrapper">
+    <div class="page-header">
+      <div class="page-header-xs--map">
+        <h1 class="page-title">
+          Buy stream
+        </h1>
+        <div class="page-header-xs--right">
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
+            <label class="form-check-label" for="showMap">Show Map</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row row-grow">
+      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block js-showMap-content">
+        <div class="box box-grow">
+          <div class="box__header">
+            <p class="box__title">
+              Map
+            </p>
+          </div>
+          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-sm-2">
+        <div class="flip-card js-flip-card">
+          <div class="front">
+            <dpc-table [table]="table "></dpc-table>
+          </div>
+          <!-- /front -->
+          <div class="back js-flip-card-back is-flip-card-hidden">
+            <div class="box">
+              <div class="box__header">
+                <p class="box__title">
+                  <a href="#" class="box__title-link box__title--arrow-left js-flip-card-close">
+                  Luftdaten Hum 8806
+                  </a>
+                </p>
+                <div class="box__buttons">
+                  <a href="#" class="action action--color-1">
+                  <span class="action__icon action--buy"></span>
+                  </a>
+                </div>
+              </div>
+              <div class="box__content">
+                <div class="row">
+                  <div class="col-sm-4 col-md-12">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="stream__title">
+                          Stream Type
+                        </div>
+                        <div class="stream__text">
+                          Air Cuality
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="stream__title">
+                          Tokens per hour
+                        </div>
+                        <div class="stream__text">
+                          0.043256 TAS
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="stream__title">
+                          Description
+                        </div>
+                        <div class="stream__text">
+                          Leverage strategic supply-chains
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="stream__title">
+                          Latitude, Longitude
+                        </div>
+                        <div class="stream__text">
+                          50.0478165, 23.4271937
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-8 col-md-12">
+                    <div class="stream-data">
+                      <div class="stream-data__title">
+                        Example reading(s)
+                      </div>
+                      <div class="stream-data__text">
+                        <pre class="stream-data__pre">
+                          <code class="stream-data__code">
+                            "sensor_id": "8746",
+                            "sensor_type": "DHT22",
+                            "location": "4409",
+                            "lat": "50.873",
+                            "lon": "4.698",
+                            "timestamp": "2018-03-09T00:02:09",
+                            "temperature": "5.20"
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /back -->
+        </div>
+        <!-- /js-card -->
+      </div>
+    </div>
+    <a
+      class="offcanvas-trigger js-offcanvas-trigger"
+      href="#off-canvas" id="triggerButton"
+      data-offcanvas-trigger="off-canvas-id">
+    Filter
+    </a>
+    <!--
+      When filtering is active,
+      add class "is-filter-active" to the above a tag to make the icon active (blue colored icon)
+      code example:
+      <a
+        class="js-offcanvas-trigger offcanvas-trigger is-filter-active"
+        href="#off-canvas" id="triggerButton"
+        data-offcanvas-trigger="off-canvas-id">
+        Filter
+      </a>
+      -->
+    <aside
+      id="off-canvas-id"
+      class="js-offcanvas c-offcanvas c-offcanvas--left c-offcanvas--overlay is-closed">
+      <!--
+        To load the filters overlay on a page load add class "js-open"
+        code example:
+        <aside
+          id="off-canvas-id"
+          class="js-offcanvas c-offcanvas c-offcanvas--left c-offcanvas--overlay is-closed js-open">
+        -->
+      <div class="filters">
+        <div class="filters__header">
+          <p class="filters__title">
+            Filter
+          </p>
+          <a href="#" class="btn-close filters__close js-offcanvas-close"></a>
+        </div>
+        <div class="filters__content">
+          <form>
+            <div class="form-group">
+              <label for="exampleFormControlSelect1" class="form-label">City</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect1"  data-live-search="true" title="Select City">
+                <option>Berlin</option>
+                <option>London</option>
+                <option>New York</option>
+                <option>Copenhagen</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2" class="form-label">Type</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect2" data-live-search="true" title="Select Type">
+                <option>Air Quality</option>
+                <option>London</option>
+                <option>New York</option>
+                <option>Copenhagen</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect3" class="form-label">Company</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect3" data-live-search="true" title="Select Company">
+                <option>EthWorks</option>
+                <option>Google</option>
+                <option>Apple</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Price range</label>
+              <input type="text" id="price_range" name="price_range" value="" class="range-slider-price" />
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Periodicity</label>
+              <input type="text" id="periodicity" name="periodicity" value="" class="range-slider-periodicity" />
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Certified</label>
+              <div class="form-buttons-radio">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn active">
+                  <input type="radio" name="certified" id="certified_yes" autocomplete="off" checked> Yes
+                  </label>
+                  <label class="btn">
+                  <input type="radio" name="certified" id="certified_no" autocomplete="off"> No
+                  </label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-block btn-primary">
+            Filters
+            </button>
+            <button type="submit" class="btn btn-block btn-outline-secondary">
+            Clear Filters
+            </button>
+          </form>
+        </div>
+      </div>
+    </aside>
+    <div class="modal fade" id="modalBuyStream" tabindex="-1" role="dialog" aria-labelledby="modalBuyStreamLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalBuyStreamLabel">Luftdaten Hum 8806</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <div class="modal-section-border">
+                <div class="row">
+                  <div class="col-3">
+                    <div class="modal__subtitle">
+                      Tokens per hour
+                    </div>
+                  </div>
+                  <div class="col-9">
+                    <div class="modal__ratio">
+                      0.037478 TAS
+                    </div>
+                    <!--
+                      Validation
+                      http://getbootstrap.com/docs/4.1/components/forms/#validation
+                      -->
+                    <form class="form-inline float-right buy-tas needs-validation" novalidate>
+                      <div class="form-group">
+                        <label for="tokenAmount" class="form-label mr-2">Subscription hours</label>
+                        <input type="text" class="form-control buy-tas__input" id="tokenAmount" value="2">
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 col-sm-5">
+                  <div class="modal__subtitle">
+                    Subscription charge
+                  </div>
+                </div>
+                <div class="col-9 col-sm-7">
+                  <div class="modal__summary">
+                    0.074956 TAS
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-padding-lg">Buy Stream</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

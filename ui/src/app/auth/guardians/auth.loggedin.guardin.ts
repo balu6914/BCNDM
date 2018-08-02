@@ -8,7 +8,7 @@ export class AuthLoggedinGuardService implements CanActivate {
 
   canActivate(): boolean {
     if (this.auth.isLoggedin()) {
-      this.router.navigate(['dashboard/me']);
+      this.router.navigate(['dashboard']);
       return false;
     }
     return true;
