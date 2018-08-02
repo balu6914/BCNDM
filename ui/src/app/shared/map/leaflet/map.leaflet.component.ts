@@ -1,6 +1,5 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 
-import { StreamService } from 'app/common/services/stream.service';
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
 import * as L from 'leaflet';
@@ -10,7 +9,7 @@ import * as L from 'leaflet';
   templateUrl: "./map.leaflet.component.html",
   styleUrls: ["./map.leaflet.component.scss"]
 })
-export class MapComponent implements OnInit {
+export class MapComponent {
   options = {
     layers: [
       L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yrl8kaavm2smu4bx3okrh/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
@@ -36,11 +35,7 @@ export class MapComponent implements OnInit {
   @Input() streamList: any;
   constructor(
     private tasPipe: TasPipe,
-    private streamService: StreamService,
   ) {}
-
-  ngOnInit() {
-  }
 
   // Get stream type icon
   getIcon(type) {
