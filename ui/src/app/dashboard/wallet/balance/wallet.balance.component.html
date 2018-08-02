@@ -3,69 +3,60 @@
     My Wallet
   </h1>
 </div>
-
-
 <div class="row">
-
   <div class="col-md-4 col-lg-3">
-
     <div class="box wallet">
-  <div class="box__header">
-    <p class="box__title">
-      My wallet
-    </p>
-  </div>
-  <div class="box__content">
-    <div class="wallet__coin">
-      <span class="wallet__coin-amount">
-        52.765123
-      </span>
-      <span class="wallet__coin-currency">
-        TAS
-      </span>
-    </div>
-    <div class="wallet__price">
-      <span class="wallet__price-amount">
-        340.23
-      </span>
-      <span class="wallet__price-currency">
-        USD
-      </span>
-    </div>
-    <div class="row">
-      <div class="col-6 col-md-12">
-        <p>
-          <button type="button" (click)="onBuyTokensClick()" class="btn btn-block btn-primary">
-            Buy TAS
-          </button>
+      <div class="box__header">
+        <p class="box__title">
+          My wallet
         </p>
       </div>
-      <div class="col-6 col-md-12">
-        <p class="box--element-no-margin">
-          <button type="button" class="btn btn-block btn-outline-secondary">
-            Withdraw
-          </button>
-        </p>
+      <div class="box__content">
+        <div class="wallet__coin">
+          <span class="wallet__coin-amount">
+          52.765123
+          </span>
+          <span class="wallet__coin-currency">
+          TAS
+          </span>
+        </div>
+        <div class="wallet__price">
+          <span class="wallet__price-amount">
+          340.23
+          </span>
+          <span class="wallet__price-currency">
+          USD
+          </span>
+        </div>
+        <div class="row">
+          <div class="col-6 col-md-12">
+            <p>
+              <button type="button" (click)="onBuyTokensClick()" class="btn btn-block btn-primary">
+              Buy TAS
+              </button>
+            </p>
+          </div>
+          <div class="col-6 col-md-12">
+            <p class="box--element-no-margin">
+              <button type="button" class="btn btn-block btn-outline-secondary">
+              Withdraw
+              </button>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-  </div>
-
   <div class="col-md-8 col-lg-9">
-
     <div class="box">
       <div class="box__header">
         <p class="box__title">
           Statistics
         </p>
-
         <!-- Mobile version of the chart caption -->
         <div class="chart-caption d-sm-none">
           <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
         </div>
-
         <!-- Desktop version of the navigation -->
         <ul class="box-nav d-none d-sm-block">
           <li class="box-nav__item">
@@ -81,16 +72,16 @@
             <a href="#" class="box-nav__link active">All</a>
           </li>
         </ul>
-
       </div>
       <div class="box__content">
         <!-- Shart goes here -->
-
+        <div class="chart-container" style="position: relative; max-height: 148px;">
+          <canvas id="myChart"></canvas>
+        </div>
         <!-- Desktop version of the chart caption -->
         <div class="chart-caption d-none d-sm-block">
           <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
         </div>
-
         <!-- Mobile version of the nav -->
         <ul class="box-nav box-nav--xs d-sm-none">
           <li class="box-nav__item">
@@ -106,25 +97,17 @@
             <a href="#" class="box-nav__link active">All</a>
           </li>
         </ul>
-
       </div>
     </div>
-
   </div>
-
 </div>
-
-
 <div class="row row-grow">
-
   <div class="col-12">
-
     <div class="box box-grow">
       <div class="box__header">
         <p class="box__title">
           Transactions
         </p>
-
         <ul class="nav box-nav">
           <li class="box-nav__item">
             <a class="box-nav__link" data-toggle="pill" href="#transactions-outcome" role="tab" aria-controls="transactions-outcome" aria-selected="true">Outcome</a>
@@ -136,13 +119,10 @@
             <a class="box-nav__link active" data-toggle="pill" href="#transactions-all" role="tab" aria-controls="transactions-all" aria-selected="true">All</a>
           </li>
         </ul>
-
       </div>
       <div class="box__content">
-
         <div class="tab-content">
           <div class="tab-pane fade show active" id="transactions-all" role="tabpanel" aria-labelledby="transactions-all-tab">
-
             <div class="table-responsive table-scroll-vertical">
               <table class="table table-borderless">
                 <thead>
@@ -178,25 +158,24 @@
               </table>
             </div>
             <nav>
-  <ul class="pagination justify-content-center">
-    <li class="page-item page-item-prev disabled">
-      <a class="page-link" href="#" tabindex="-1">
-        Previous
-      </a>
-    </li>
-    <li class="page-item page-item-first"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link active" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><span class="page-link" href="#">...</span></li>
-    <li class="page-item page-item-last"><a class="page-link" href="#">76</a></li>
-    <li class="page-item page-item-next">
-      <a class="page-link" href="#">
-        Next
-      </a>
-    </li>
-  </ul>
-</nav>
-
+              <ul class="pagination justify-content-center">
+                <li class="page-item page-item-prev disabled">
+                  <a class="page-link" href="#" tabindex="-1">
+                  Previous
+                  </a>
+                </li>
+                <li class="page-item page-item-first"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link active" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><span class="page-link" href="#">...</span></li>
+                <li class="page-item page-item-last"><a class="page-link" href="#">76</a></li>
+                <li class="page-item page-item-next">
+                  <a class="page-link" href="#">
+                  Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
           <div class="tab-pane fade" id="transactions-outcome" role="tabpanel" aria-labelledby="transactions-outcome-tab">
             <div class="table__nodata">
@@ -209,10 +188,7 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
-
 </div>
