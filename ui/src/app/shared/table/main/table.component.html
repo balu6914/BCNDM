@@ -1,5 +1,5 @@
 <div class="front">
-  <div class="box box-grow" *ngIf="table.content && table.content.length">
+  <div class="box box-grow" *ngIf="table.page.content.length && !loading">
     <div class="box__header">
       <p class="box__title">
         {{table.title}}
@@ -27,16 +27,17 @@
             </tr>
           </thead>
           <tbody>
-            <div *ngFor="let row of table.content">
+            <div *ngFor="let row of table.page.content">
               <dpc-table-row [rowType]="table.tableType" [row]="row"></dpc-table-row>
             </div>
           </tbody>
         </table>
       </div>
-      <dpc-table-pagination></dpc-table-pagination>
+      <dpc-table-pagination [page]="table.page.page" [limit]="table.page.limit" [total]="table.page.total" (pageChanged)="onPageChange($event)">
+      </dpc-table-pagination>
     </div>
   </div>
-  <div class="jumbotron" *ngIf="table.content && !table.content.length">
+  <div class="jumbotron" *ngIf="table.page.content && !table.page.content.length">
     <h1 class="display-1">No content :(</h1>
     <div *ngIf="table.tableType === types.Sell">
       <p class="lead">
@@ -52,3 +53,4 @@
     </div>
   </div>
 </div>
+<div *ngIf="loading" id="loader"></div>

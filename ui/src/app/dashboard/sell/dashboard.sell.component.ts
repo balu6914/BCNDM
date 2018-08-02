@@ -56,8 +56,9 @@ export class DashboardSellComponent {
             this.streams.push(stream);
           }
         });
+        result.content = this.streams;
         // Set table content
-        this.table.content = this.streams;
+        this.table.page = result;
       },
       err => {
         console.log(err);

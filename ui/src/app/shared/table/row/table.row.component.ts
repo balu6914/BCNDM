@@ -85,4 +85,5 @@ export class TableRowComponent implements OnInit {
     // Open DashboardSellAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
+
 }

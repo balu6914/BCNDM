@@ -27,7 +27,7 @@
       <div class="col-lg-6 order-1 order-sm-2">
         <div class="flip-card js-flip-card">
           <div class="front">
-            <dpc-table [table]="table "></dpc-table>
+            <dpc-table [table]="table" (pageChanged)="onPageChanged($event)"></dpc-table>
           </div>
           <!-- /front -->
           <div class="back js-flip-card-back is-flip-card-hidden">

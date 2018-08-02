@@ -1,29 +1,17 @@
 <nav>
-    <ul class="pagination justify-content-center">
-      <li class="page-item page-item-prev disabled">
-        <a class="page-link" href="#" tabindex="-1">
-          Previous
-        </a>
-      </li>
-      <li class="page-item page-item-first">
-        <a class="page-link" href="#">1</a>
-      </li>
-      <li class="page-item">
-        <a class="page-link active" href="#">2</a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" href="#">3</a>
-      </li>
-      <li class="page-item">
-        <span class="page-link" href="#">...</span>
-      </li>
-      <li class="page-item page-item-last">
-        <a class="page-link" href="#">76</a>
-      </li>
-      <li class="page-item page-item-next">
-        <a class="page-link" href="#">
-          Next
-        </a>
-      </li>
-    </ul>
-  </nav>
+  <ul class="pagination justify-content-center">
+    <li class="page-item page-item-prev" [ngClass]="page === 0 ? 'disabled' : ''">
+      <a class="page-link" tabindex="-1" (click)="pageChange(page + 1)">
+        Previous
+      </a>
+    </li>
+    <li *ngFor="let p of pages" class="page-item" [ngClass]="p === page+1 ? 'active' : ''">
+      <a class="page-link" (click)="pageChange(p)">{{p}}</a>
+    </li>
+    <li class="page-item page-item-next" [ngClass]="last ? 'disabled' : ''">
+      <a class="page-link" (click)="pageChange(page + 1)">
+        Next
+      </a>
+    </li>
+  </ul>
+</nav>
