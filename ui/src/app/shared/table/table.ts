@@ -1,4 +1,5 @@
 import { Stream, Subscription, Contract } from '../../common/interfaces';
+import { Page } from '../../common/interfaces/page.interface';
 
 export enum TableType {
   Buy,
@@ -10,9 +11,10 @@ export enum TableType {
 export class Table {
   title: string;
   headers: string[];
-  content: Stream[] | Subscription[] | Contract[];
+  page: Page<Stream | Subscription | Contract>;
   tableType: TableType;
 
   constructor() {
+    this.page = new Page(0, 20, 0, []);
   }
 }

@@ -1,11 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { StreamService } from '../../common/services/stream.service';
-import { TasPipe } from '../../common/pipes/converter.pipe';
+import { Component } from '@angular/core';
 import { AuthService } from '../../auth/services/auth.service';
-import { Table, TableType } from '../../shared/table/table';
 import { Query } from '../../common/interfaces/query.interface';
+import { TasPipe } from '../../common/pipes/converter.pipe';
+import { StreamService } from '../../common/services/stream.service';
+import { Table, TableType } from '../../shared/table/table';
+
 
 @Component({
   selector: 'dashboard-buy',
@@ -51,11 +50,35 @@ export class DashboardBuyComponent {
             }
           }
         );
+        result.content = this.streams;
         // Set table content
-        this.table.content = this.streams;
+        this.table.page = result;
       },
       err => {
         console.log(err)
       });
+    }
+
+    onPageChanged(page: number) {
+      const query = new Query();
+      query.page = page;
+      this.streamService.searchStreams(query).subscribe(
+        (result: any) => {
+          this.streams = [];
+          result.content.forEach(stream => {
+            if (stream.owner !== this.user.id) {
+              this.streams.push(stream);
+            }
+          }
+        );
+        const temp = Object.assign({}, this.table);
+        temp.page.content = this.streams;
+        // Set table content
+        this.table = temp;
+      },
+      err => {
+        console.log(err);
+      });
+
     }
 }

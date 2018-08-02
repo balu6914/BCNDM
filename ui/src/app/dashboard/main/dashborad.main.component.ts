@@ -80,8 +80,9 @@ export class DashboardMainComponent {
               // Push marker to the markers list
               this.subscriptions.push(subscription);
             });
+            result.content = this.subscriptions;
             // Set table content
-            this.table.content = this.subscriptions;
+            this.table.page = result;
           },
           err => {
             console.log(err);
