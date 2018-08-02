@@ -13,6 +13,8 @@
 @import "_global.scss";
 @import "_vars.scss";
 
+@import '~leaflet/dist/leaflet.css';
+@import '~leaflet-draw/dist/leaflet.draw.css';
 
 .mdl-layout__drawer {
   overflow: hidden;

@@ -2,13 +2,19 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { TableModule } from './table/table.module';
 import { BalanceModule } from './balance/balance.module';
+import { MapModule } from './map/map.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TableModule,
-    BalanceModule
+    BalanceModule,
+    MapModule,
   ],
-  exports: [TableModule, BalanceModule]
+  exports: [
+    TableModule,
+    BalanceModule,
+    MapModule,
+  ]
 })
 export class SharedModule { }
