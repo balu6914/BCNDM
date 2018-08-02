@@ -74,10 +74,6 @@ type readStreamReq struct {
 }
 
 func (req readStreamReq) validate() error {
-	if req.id == "" {
-		return streams.ErrMalformedData
-	}
-
 	if !bson.IsObjectIdHex(req.id) {
 		return streams.ErrMalformedData
 	}
