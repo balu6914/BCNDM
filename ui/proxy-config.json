@@ -16,7 +16,7 @@
 		"secure": false
 	},
 	"/subscriptions/*": {
-		"target": "http://localhost:8085",
+		"target": "http://localhost:8086",
 		"secure": false
 	}
 }
