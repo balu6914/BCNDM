@@ -144,10 +144,18 @@ func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
 	return nil
 }
 
-func (fn fabricNetwork) BuyTokens(to string, value uint64) error {
+func (fn fabricNetwork) BuyTokens(account string, value uint64) error {
+	return fn.transfer(fn.admin, account, value)
+}
+
+func (fn fabricNetwork) WithdrawTokens(account string, value uint64) error {
+	return fn.transfer(account, fn.admin, value)
+}
+
+func (fn fabricNetwork) transfer(from, to string, value uint64) error {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(fn.admin),
+		fabsdk.WithUser(from),
 		fabsdk.WithOrg(fn.org),
 	)
 

@@ -68,6 +68,14 @@ func (ts transactionService) BuyTokens(account string, value uint64) error {
 	return nil
 }
 
+func (ts transactionService) WithdrawTokens(account string, value uint64) error {
+	if err := ts.bn.WithdrawTokens(account, value); err != nil {
+		return ErrFailedTransfer
+	}
+
+	return nil
+}
+
 func generate(n uint) string {
 	output := make([]byte, n)
 	randomness := make([]byte, n)
