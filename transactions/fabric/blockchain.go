@@ -12,11 +12,10 @@ import (
 )
 
 const (
-	affiliation     = "org1"
-	balanceFcn      = "balanceOf"
-	transferFromFcn = "transferFrom"
-	transferFcn     = "transfer"
-	chanID          = "myc"
+	affiliation = "org1"
+	balanceFcn  = "balanceOf"
+	transferFcn = "transfer"
+	chanID      = "myc"
 )
 
 var _ transactions.BlockchainNetwork = (*fabricNetwork)(nil)
@@ -109,7 +108,7 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(fn.admin),
+		fabsdk.WithUser(from),
 		fabsdk.WithOrg(fn.org),
 	)
 
@@ -119,8 +118,7 @@ func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
 		return err
 	}
 
-	req := transferFromReq{
-		From:  from,
+	req := transferReq{
 		To:    to,
 		Value: value,
 	}
@@ -133,7 +131,7 @@ func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
 
 	_, err = client.Execute(channel.Request{
 		ChaincodeID: fn.chaincodeID,
-		Fcn:         transferFromFcn,
+		Fcn:         transferFcn,
 		Args:        [][]byte{data},
 	})
 	if err != nil {

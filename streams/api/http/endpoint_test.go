@@ -1,4 +1,4 @@
-package api_test
+package http_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"monetasa/streams"
-	"monetasa/streams/api"
+	httpapi "monetasa/streams/api/http"
 	"monetasa/streams/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	validFilePath   = "../../assets/test/validBulkTest.csv"
-	invalidFilePath = "../../assets/test/invalidBulkTest.csv"
+	validFilePath   = "../../../assets/test/validBulkTest.csv"
+	invalidFilePath = "../../../assets/test/invalidBulkTest.csv"
 )
 
 var (
@@ -74,7 +74,7 @@ func newService() streams.Service {
 
 func newServer(svc streams.Service) *httptest.Server {
 	auth := mocks.NewAuth([]string{validKey})
-	mux := api.MakeHandler(svc, auth)
+	mux := httpapi.MakeHandler(svc, auth)
 	return httptest.NewServer(mux)
 }
 

@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package monetasa;
+
+message ID {
+    string value = 1;
+}

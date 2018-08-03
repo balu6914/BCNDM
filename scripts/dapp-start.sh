@@ -40,7 +40,8 @@ $BUILD/monetasa-transactions &
 ###
 # Streams
 ###
-MONETASA_STREAMS_PORT=8084                  \
+MONETASA_STREAMS_HTTP_PORT=8084             \
+MONETASA_STREAMS_GRPC_PORT=8085             \
 MONETASA_STREAMS_DB_URL=localhost           \
 MONETASA_STREAMS_DB_NAME=monetasa-streams   \
 MONETASA_AUTH_URL=localhost:8081            \
@@ -49,7 +50,7 @@ $BUILD/monetasa-streams &
 ###
 # Subscriptions
 ###
-MONETASA_SUBSCRIPTIONS_PORT=8085                        \
+MONETASA_SUBSCRIPTIONS_PORT=8086                        \
 MONETASA_SUBSCRIPTIONS_DB_URL=localhost                 \
 MONETASA_SUBSCRIPTIONS_DB_NAME=monetasa-subscriptions   \
 MONETASA_AUTH_URL=localhost:8081                        \

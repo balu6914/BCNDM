@@ -21,6 +21,8 @@ default values.
 | MONETASA_SUBSCRIPTIONS_DB_USER | Database user                            |                |
 | MONETASA_SUBSCRIPTIONS_DB_PASS | Database password                        |                |
 | MONETASA_AUTH_URL              | Auth service gRPC URL                    | localhost:8081 |
+| MONETASA_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081 |
+| MONETASA_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081 |
 
 ## Deployment
 
