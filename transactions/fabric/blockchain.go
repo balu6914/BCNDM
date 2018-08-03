@@ -106,40 +106,7 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 }
 
 func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
-	ctx := fn.sdk.ChannelContext(
-		chanID,
-		fabsdk.WithUser(from),
-		fabsdk.WithOrg(fn.org),
-	)
-
-	client, err := channel.New(ctx)
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
-		return err
-	}
-
-	req := transferReq{
-		To:    to,
-		Value: value,
-	}
-
-	data, err := json.Marshal(req)
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to serialize transfer_from request: %s", err))
-		return err
-	}
-
-	_, err = client.Execute(channel.Request{
-		ChaincodeID: fn.chaincodeID,
-		Fcn:         transferFcn,
-		Args:        [][]byte{data},
-	})
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to execute transfer_from chaincode: %s", err))
-		return err
-	}
-
-	return nil
+	return fn.transfer(from, to, value)
 }
 
 func (fn fabricNetwork) BuyTokens(account string, value uint64) error {
