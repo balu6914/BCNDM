@@ -24,3 +24,16 @@ func (req buyReq) validate() error {
 
 	return nil
 }
+
+type withdrawReq struct {
+	userID string
+	Amount uint64 `json:"amount"`
+}
+
+func (req withdrawReq) validate() error {
+	if req.Amount == 0 {
+		return errMalformedEntity
+	}
+
+	return nil
+}

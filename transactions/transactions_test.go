@@ -142,3 +142,32 @@ func TestBuyTokens(t *testing.T) {
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
 	}
 }
+
+func TestWithdrawTokens(t *testing.T) {
+	svc := newService()
+
+	cases := []struct {
+		desc    string
+		account string
+		value   uint64
+		err     error
+	}{
+		{
+			desc:    "transfer token to admin account",
+			account: userID1,
+			value:   1,
+			err:     nil,
+		},
+		{
+			desc:    "transfer too many tokens to admin account",
+			account: userID1,
+			value:   remainingTokens,
+			err:     transactions.ErrFailedTransfer,
+		},
+	}
+
+	for _, tc := range cases {
+		err := svc.WithdrawTokens(tc.account, tc.value)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
+	}
+}

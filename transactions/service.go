@@ -42,4 +42,7 @@ type Service interface {
 
 	// BuyTokens transfers tokens to user's account.
 	BuyTokens(string, uint64) error
+
+	// WithdrawTokens exchanges tokens for real money.
+	WithdrawTokens(string, uint64) error
 }
