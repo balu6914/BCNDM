@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ngCopy } from 'angular-6-clipboard';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -22,6 +22,8 @@ export class TableRowComponent implements OnInit {
 
   @Input() row: Stream | Subscription;
   @Input() rowType: TableType;
+  @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
+  @Output() editEvt: EventEmitter<any> = new EventEmitter();
   constructor(
     private modalService: BsModalService,
     private tasPipe: TasPipe,
@@ -40,26 +42,31 @@ export class TableRowComponent implements OnInit {
     }
   }
 
-  openModal(row: any) {
-    // Parameter formEdit is set on modal component
+  openModalEdit(row: any) {
+    // Parameters editData and streamID are used in DashboardSellEditComponent
     const initialState = {
       editData: {
         name:        row.name,
         type:        row.type,
         description: row.description,
-        url:         row.url,
+        url:         "fakeurl.com", //TODO: use stream URL
         price:       this.tasPipe.transform(row.price),
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
       },
       streamID: row.id,
     };
-    // Open DashboardSellAddComponent Modal
-    this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState});
+    // Open DashboardSellEditComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
+      .content.streamEdited.subscribe(
+        stream => {
+          this.editEvt.emit(stream);
+        }
+      );
   }
 
   openModalDelete(row: any) {
-    // Parameter stream is set on modal component
+    // Parameter stream is used in DashboardSellDeleteComponent
     const initialState = {
       stream: {
         id:          row.id,
@@ -69,8 +76,14 @@ export class TableRowComponent implements OnInit {
         price:       this.tasPipe.transform(row.price),
       },
     };
-    // Open DashboardSellAddComponent Modal
-    this.bsModalRef = this.modalService.show(DashboardSellDeleteComponent, {initialState});
+    // Open DashboardSellDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardSellDeleteComponent, {initialState})
+      .content.streamDeleted.subscribe(
+        id => {
+          // Emit event to TableComponent
+          this.deleteEvt.emit(id);
+        }
+      );
   }
 
   openModalSubscription(row: any) {

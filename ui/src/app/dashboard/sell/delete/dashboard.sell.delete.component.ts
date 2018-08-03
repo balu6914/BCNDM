@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
@@ -14,6 +14,7 @@ export class DashboardSellDeleteComponent implements OnInit {
   modalMsg: string;
   submitted: boolean = false;
 
+  @Output() streamDeleted: EventEmitter<any> = new EventEmitter();
   constructor(
     private streamService: StreamService,
     public  modalDeleteStream: BsModalRef,
@@ -23,8 +24,9 @@ export class DashboardSellDeleteComponent implements OnInit {
   confirm(): void {
     // Send addStream request
     this.streamService.removeStream(this.stream.id).subscribe(
-      response => {
+      res => {
         this.modalMsg = `Stream succesfully removed!`;
+        this.streamDeleted.emit(this.stream.id)
       },
       err => {
         this.modalMsg = `Status: ${err.status} - ${err.statusText}`;

@@ -81,8 +81,17 @@ export class DashboardSellComponent {
     }
   }
 
-  openModal() {
-    // Open DashboardSellAddComponent Modal
-    this.modalService.show(DashboardSellAddComponent);
+  openModalAdd() {
+    // Show DashboardSellAddComponent as Modal
+    this.modalService.show(DashboardSellAddComponent)
+      .content.streamCreated.subscribe(
+        data => {
+          // Push new stream to table
+          this.streams.push(data);
+        },
+        err => {
+          console.log(err)
+        }
+    );
   }
 }

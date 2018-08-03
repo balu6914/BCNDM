@@ -24,7 +24,7 @@ export class StreamService {
 
   addStream(data) {
     return this.http.post(`${environment.API_STREAMS}`, data)
-      .map((res: Response) => { })
+      .map((res: Response) => res)
       .catch((error: any) => Observable.throw(error || 'Server error'));
   }
 
