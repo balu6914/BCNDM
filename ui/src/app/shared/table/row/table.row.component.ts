@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { ngCopy } from 'angular-6-clipboard';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -22,6 +22,8 @@ export class TableRowComponent implements OnInit {
 
   @Input() row: Stream | Subscription;
   @Input() rowType: TableType;
+  @Output() rowSelected = new EventEmitter<Stream | Subscription>();
+
   constructor(
     private modalService: BsModalService,
     private tasPipe: TasPipe,
@@ -86,4 +88,9 @@ export class TableRowComponent implements OnInit {
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 
+  // Select/Click on Row emits a selectedRow event and pass selected row data
+  // In order to show row details.
+  selectRow(row: any) {
+    this.rowSelected.emit(row);
+  }
 }

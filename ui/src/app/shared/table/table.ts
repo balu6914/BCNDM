@@ -13,6 +13,7 @@ export class Table {
   headers: string[];
   page: Page<Stream | Subscription | Contract>;
   tableType: TableType;
+  hasDetails: Boolean = false;
 
   constructor() {
     this.page = new Page(0, 20, 0, []);
