@@ -27,6 +27,7 @@ export class DashboardBuyComponent {
       this.table.title = "Streams";
       this.table.tableType =  TableType.Buy;
       this.table.headers = ["Stream Name", "Stream Type","Stream Price"];
+      this.table.hasDetails = true;
 
       // Fetch current User
       this.user = {};
@@ -59,7 +60,7 @@ export class DashboardBuyComponent {
       });
     }
 
-    onPageChanged(page: number) {
+    onPageChange(page: number) {
       const query = new Query();
       query.page = page;
       this.streamService.searchStreams(query).subscribe(
@@ -72,6 +73,7 @@ export class DashboardBuyComponent {
           }
         );
         const temp = Object.assign({}, this.table);
+        temp.page = result;
         temp.page.content = this.streams;
         // Set table content
         this.table = temp;

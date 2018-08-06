@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { provideRouterInitializer } from '@angular/router/src/router_module';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'dpc-table-pagination',
@@ -22,23 +24,34 @@ export class TablePaginationComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.pages = [];
     const totalPages = Math.ceil(this.total / this.limit);
-    this.last = this.page === totalPages;
+    let first = 0;
+    let last = 0;
 
-    const start = this.size >= this.page ? 1 : this.page - this.size + 1;
-    let end = start === 1 ? 2 * this.size : this.page + this.size;
-    end = end < totalPages ? end + 1 : totalPages;
+    last = this.page + this.size;
+    if (this.page > this.size) {
+      first = this.page - this.size;
+      if (totalPages - this.page <= this.size) {
+        first = first - (this.size - (totalPages - this.page) + 1);
+      }
+    } else {
+      last = 2 * this.size;
+    }
 
-    for (let i = start; i <= end; i++) {
+    first = first < 0 ? 0 : first;
+    last = last < totalPages ? last : totalPages - 1;
+    this.last = this.page === last;
+
+    for (let i = first; i <= last; i++) {
       this.pages.push(i);
     }
   }
 
   pageChange(page: number) {
-    if (this.page === page - 1) {
+    if (this.page === page) {
       return;
     }
 
-    this.page = page - 1;
+    this.page = page;
     this.pageChanged.emit(this.page);
   }
 

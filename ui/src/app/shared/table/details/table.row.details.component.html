@@ -1,0 +1,82 @@
+<div class="box">
+  <div class="box__header">
+    <p class="box__title">
+      <span (click)="close()" class="box__title-link box__title--arrow-left js-flip-card-close">
+          {{stream.name}}
+        </span>
+    </p>
+    <div class="box__buttons">
+      <a href="#" class="action action--color-1">
+          <span class="action__icon action--edit"></span>
+        </a>
+      <a href="#" class="action action--color-2">
+          <span class="action__icon action--delete"></span>
+        </a>
+    </div>
+  </div>
+  <div class="box__content">
+    <div class="row">
+      <div class="col-sm-4 col-md-12">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="stream__title">
+              Stream Type
+            </div>
+            <div class="stream__text">
+              {{stream.type}}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="stream__title">
+              Tokens per hour
+            </div>
+            <div class="stream__text">
+              {{stream.price | tas}} TAS
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="stream__title">
+              Description
+            </div>
+            <div class="stream__text">
+              {{stream.description}}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="stream__title">
+              Latitude, Longitude
+            </div>
+            <div class="stream__text" *ngIf="stream.location && stream.location.coordinates">
+              {{stream.location.coordinates[1]}}, {{stream.location.coordinates[0]}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-8 col-md-12">
+        <div class="stream-data">
+          <div class="stream-data__title">
+            Example reading(s)
+          </div>
+          <div class="stream-data__text">
+            <pre class="stream-data__pre">
+              <code class="stream-data__code">
+                Exmaple response goes here
+                <!-- {
+                "sensor_id": "8746",
+                "sensor_type": "DHT22",
+                "location": "4409",
+                "lat": "50.873",
+                "lon": "4.698",
+                "timestamp": "2018-03-09T00:02:09",
+                "temperature": "5.20"
+              } -->
+            </code>
+          </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,56 +1,62 @@
-<div class="front">
-  <div class="box box-grow" *ngIf="table.page.content.length && !loading">
-    <div class="box__header">
-      <p class="box__title">
-        {{table.title}}
-      </p>
-      <form>
-        <div class="form-search">
-          <label class="sr-only" for="inlineFormInputGroup">Username</label>
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <div class="input-group-text">
-                <img src="../../../assets/img/icons/search.svg" alt="">
+<div class="tp-wrapper">
+  <div class="tp-box" [@flipState]="flip">
+    <div class="front tp-box__side tp-box__front">
+      <div class="box box-grow" *ngIf="table.page.content.length">
+        <div class="box__header">
+          <p class="box__title">
+            {{table.title}}
+          </p>
+          <form>
+            <div class="form-search">
+              <label class="sr-only" for="inlineFormInputGroup">Username</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <img src="../../../assets/img/icons/search.svg" alt="">
+                  </div>
+                </div>
+                <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search">
               </div>
             </div>
-            <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search">
-          </div>
+          </form>
         </div>
-      </form>
-    </div>
-    <div class="box__content">
-      <div class="table-responsive table-scroll-vertical">
-        <table class="table table-borderless table-hover">
-          <thead>
-            <tr>
-              <th scope="col" *ngFor="let header of table.headers">{{header}}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <div *ngFor="let row of table.page.content">
-              <dpc-table-row [rowType]="table.tableType" [row]="row"></dpc-table-row>
-            </div>
-          </tbody>
-        </table>
+        <div class="box__content">
+          <div class="table-responsive table-scroll-vertical">
+            <table class="table table-borderless table-hover">
+              <thead>
+                <tr>
+                  <th scope="col" *ngFor="let header of table.headers">{{header}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div *ngFor="let row of table.page.content">
+                  <dpc-table-row [rowType]="table.tableType" [row]="row" (rowSelected)="showRowDetails($event)"></dpc-table-row>
+                </div>
+              </tbody>
+            </table>
+          </div>
+          <dpc-table-pagination [page]="table.page.page" [limit]="table.page.limit" [total]="table.page.total" (pageChanged)="onPageChange($event)">
+          </dpc-table-pagination>
+        </div>
       </div>
-      <dpc-table-pagination [page]="table.page.page" [limit]="table.page.limit" [total]="table.page.total" (pageChanged)="onPageChange($event)">
-      </dpc-table-pagination>
+      <div class="jumbotron" *ngIf="table.page.content && !table.page.content.length">
+        <h1 class="display-1">No content :(</h1>
+        <div *ngIf="table.tableType === types.Sell">
+          <p class="lead">
+            You haven't added any streams yet. Use
+            <span class="badge badge-primary">Add button</span> to add a new stream.
+          </p>
+        </div>
+        <div *ngIf="table.tableType === types.Buy">
+          <p class="lead">There are currently no streams for you.</p>
+        </div>
+        <div *ngIf="table.tableType === types.Contract">
+          <p class="lead">You have no contracts yet. Start buying and selling streams today!</p>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="jumbotron" *ngIf="table.page.content && !table.page.content.length">
-    <h1 class="display-1">No content :(</h1>
-    <div *ngIf="table.tableType === types.Sell">
-      <p class="lead">
-        You haven't added any streams yet. Use
-        <span class="badge badge-primary">Add button</span> to add a new stream.
-      </p>
-    </div>
-    <div *ngIf="table.tableType === types.Buy">
-      <p class="lead">There are currently no streams for you.</p>
-    </div>
-    <div *ngIf="table.tableType === types.Contract">
-      <p class="lead">You have no contracts yet. Start buying and selling streams today!</p>
+    <div class="back tp-box__side tp-box__back">
+      <dpc-table-row-details [stream]="selectedRow" (backClicked)="flip = 'inactive'"></dpc-table-row-details>
     </div>
   </div>
 </div>
-<div *ngIf="loading" id="loader"></div>

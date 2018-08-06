@@ -45,6 +45,7 @@ export class DashboardSellComponent {
     this.table.title = 'Streams';
     this.table.tableType = TableType.Sell;
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.hasDetails = true;
 
     const query = new Query();
 
