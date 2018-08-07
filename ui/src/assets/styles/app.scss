@@ -1315,3 +1315,31 @@ body {
 }
 
 }
+
+/** Sidebar global style **/
+.ng-sidebar {
+
+  position: absolute !important;
+  position: fixed !important;
+  top: 72px !important;
+}
+
+.filters-sidebar {
+  box-shadow: 0px 4px 20px 0px rgba(220,226,230,.4);
+  background: #fff;
+  min-height: 100%;
+  max-height: none;
+  top: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@include media-breakpoint-down(sm) {
+  .filters-sidebar {
+    width: 100%;
+  }
+  .offcanvas-trigger.is-active {
+    transform: translate3d(100%, 0, 0);
+  }
+}

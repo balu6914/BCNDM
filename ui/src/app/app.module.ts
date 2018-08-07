@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { NgProgressModule, NgProgressInterceptor } from 'ngx-progressbar';
 import { NgPipesModule } from 'ngx-pipes';
 
-
 import { AppRoutingModule } from './app.routes';
 import { AppBootstrapModule } from './app-bootstrap/app-bootstrap.module'
 import { AppComponent } from './app.component';

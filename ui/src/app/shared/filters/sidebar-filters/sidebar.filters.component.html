@@ -1,0 +1,78 @@
+<a (click)="_toggleSidebar()" class="offcanvas-trigger c-button" [ngClass]="{'is-filter-active': _opened, 'is-active': _opened}" id="triggerButton" role="button" aria-controls="off-canvas-id" aria-expanded="false">
+    <span class="c-button__text">
+      Filter
+    </span>
+</a>
+<ng-sidebar-container>
+  <!-- A sidebar -->
+  <ng-sidebar [(opened)]="_opened" sidebarClass="filters-sidebar" keyClose="true">
+    <!-- Page content -->
+    <div ng-sidebar-content>
+      <div class="filters">
+        <div class="filters__header">
+          <p class="filters__title">
+            Filter
+          </p>
+          <a (click)="_toggleSidebar()" class="btn-close filters__close"></a>
+        </div>
+        <div class="filters__content">
+          <form>
+            <div class="form-group">
+              <label for="exampleFormControlSelect1" class="form-label">City</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect1" data-live-search="true" title="Select City">
+            <option>Berlin</option>
+            <option>London</option>
+            <option>New York</option>
+            <option>Copenhagen</option>
+          </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2" class="form-label">Type</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect2" data-live-search="true" title="Select Type">
+            <option>Air Quality</option>
+            <option>London</option>
+            <option>New York</option>
+            <option>Copenhagen</option>
+          </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect3" class="form-label">Company</label>
+              <select class="form-control selectpicker" id="exampleFormControlSelect3" data-live-search="true" title="Select Company">
+            <option>EthWorks</option>
+            <option>Google</option>
+            <option>Apple</option>
+          </select>
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Price range</label>
+              <input type="text" id="price_range" name="price_range" value="" class="range-slider-price" />
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Periodicity</label>
+              <input type="text" id="periodicity" name="periodicity" value="" class="range-slider-periodicity" />
+            </div>
+            <div class="form-group">
+              <label for="" class="form-label">Certified</label>
+              <div class="form-buttons-radio">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn active">
+                <input type="radio" name="certified" id="certified_yes" autocomplete="off" checked> Yes
+              </label>
+                  <label class="btn">
+                <input type="radio" name="certified" id="certified_no" autocomplete="off"> No
+              </label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-block btn-primary">
+          Filters
+        </button>
+            <button type="submit" class="btn btn-block btn-outline-secondary">
+          Clear Filters
+        </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-sidebar>
+</ng-sidebar-container>
