@@ -17,7 +17,7 @@ export class TableComponent implements OnInit {
   ngOnInit() {
   }
 
-  rowDelete(id) {
+  rowDeleted(id) {
     // Remove row
     const list: any = this.table.content;
     list.forEach( (row, i) => {

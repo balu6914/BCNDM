@@ -28,7 +28,7 @@
           </thead>
           <tbody>
             <div *ngFor="let row of table.content">
-              <dpc-table-row [rowType]="table.tableType" [row]="row" (deleteEvt)="rowDelete($event)" (editEvt)="rowEdited($event)"></dpc-table-row>
+              <dpc-table-row [rowType]="table.tableType" [row]="row" (deleteEvt)="rowDeleted($event)" (editEvt)="rowEdited($event)"></dpc-table-row>
             </div>
           </tbody>
         </table>
