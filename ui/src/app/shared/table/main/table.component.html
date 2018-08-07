@@ -30,7 +30,7 @@
               </thead>
               <tbody>
                 <div *ngFor="let row of table.page.content">
-                  <dpc-table-row [rowType]="table.tableType" [row]="row" (rowSelected)="showRowDetails($event)"></dpc-table-row>
+                  <dpc-table-row [rowType]="table.tableType" [row]="row" (rowSelected)="showRowDetails($event)" (deleteEvt)="rowDeleted($event)" (editEvt)="rowEdited($event)"></dpc-table-row>
                 </div>
               </tbody>
             </table>

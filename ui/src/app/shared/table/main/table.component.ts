@@ -27,7 +27,8 @@ export class TableComponent {
   selectedRow = Stream;
 
   @Input() table: Table = new Table();
-
+  @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
+  @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() pageChanged = new EventEmitter<number>();
 
   constructor() { }
@@ -40,8 +41,33 @@ export class TableComponent {
     }
   }
 
+  rowDeleted(id) {
+    // Remove row
+    const list: any = this.table.page.content;
+    list.forEach( (row, i) => {
+      if (row.id == id) {
+        // Remove row from table
+        this.table.page.content.splice(i,1);
+        // Emit event to DashboardSellComponent
+        this.deleteEvt.emit(row.id);
+      }
+    });
+  }
+
+  rowEdited(stream) {
+    // Update row values
+    let rows: any = this.table.page.content;
+    rows.forEach( (row, i) => {
+      if (row.id == stream.id) {
+        // Update row table
+        this.table.page.content[i] = stream;
+        // Emit event to DashboardSellComponent
+        this.editEvt.emit(stream);
+      }
+    });
+  }
+
   onPageChange(page: number) {
     this.pageChanged.emit(page);
   }
-
 }

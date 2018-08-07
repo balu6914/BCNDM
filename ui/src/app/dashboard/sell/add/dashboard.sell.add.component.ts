@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
@@ -16,6 +16,7 @@ export class DashboardSellAddComponent {
     modalMsg: string;
     submitted: boolean = false;
 
+    @Output() streamCreated: EventEmitter<any> = new EventEmitter();
     constructor(
         private streamService: StreamService,
         private mitasPipe: MitasPipe,
@@ -52,8 +53,11 @@ export class DashboardSellAddComponent {
 
       // Send addStream request
       this.streamService.addStream(stream).subscribe(
-        response => {
+        res => {
           this.modalMsg = `Stream succesfully added!`;
+          // Add ID from http response to stream
+          stream.id = res.id;
+          this.streamCreated.emit(stream);
         },
         err => {
           this.modalMsg = `Status: ${err.status} - ${err.statusText}`;

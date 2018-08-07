@@ -14,7 +14,7 @@
       </div>
       <div class="action-buttons">
         <p class="action-buttons__item">
-          <button type="button" class="btn btn-primary btn-media" (click)="openModal()" data-toggle="modal">
+          <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()" data-toggle="modal">
             <span class="btn-media__icon btn-media__icon--add">
             </span>
             Add manually
@@ -39,12 +39,12 @@
             </p>
           </div>
           <!-- The element will contain our Map -->
-          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+          <dpc-map-leaflet #map [streamList]="streams"></dpc-map-leaflet>
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
-            <dpc-table [table]="table"></dpc-table>
-        </div>
+        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
       </div>
     </div>
   </div>
+</div>
