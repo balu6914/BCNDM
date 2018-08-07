@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -9,6 +9,7 @@ import { Table, TableType } from '../../shared/table/table';
 import { Query } from '../../common/interfaces/query.interface';
 import { Page } from '../../common/interfaces/page.interface';
 import { Stream } from '../../common/interfaces';
+import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
 
 @Component({
   selector: 'dashboard-sell',
@@ -20,6 +21,9 @@ export class DashboardSellComponent {
   temp = [];
   streams = [];
   table: Table = new Table();
+
+  @ViewChild('map')
+  private map: MapComponent;
 
   constructor(
     private streamService: StreamService,
@@ -85,13 +89,23 @@ export class DashboardSellComponent {
     // Show DashboardSellAddComponent as Modal
     this.modalService.show(DashboardSellAddComponent)
       .content.streamCreated.subscribe(
-        data => {
+        stream => {
           // Push new stream to table
-          this.streams.push(data);
+          this.streams.push(stream);
+          // Set MArker on the map
+          this.map.addMarker(stream);
         },
         err => {
           console.log(err)
         }
     );
+  }
+
+  editStream(stream) {
+    this.map.editMarker(stream);
+  }
+
+  deleteStream(id) {
+    this.map.removeMarker(id);
   }
 }

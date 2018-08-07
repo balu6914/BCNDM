@@ -39,13 +39,13 @@
             </p>
           </div>
           <!-- The element will contain our Map -->
-          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+          <dpc-map-leaflet #map [streamList]="streams"></dpc-map-leaflet>
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
         <div class="flip-card js-flip-card">
           <div class="front">
-            <dpc-table [table]="table"></dpc-table>
+            <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
           </div>
           <!-- /front -->
           <div class="back js-flip-card-back is-flip-card-hidden">
