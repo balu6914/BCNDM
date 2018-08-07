@@ -22,10 +22,10 @@
   </td>
 </tr>
 <tr *ngIf="rowType === types.Buy || rowType === types.Sell">
-  <td>
-    <a href="" class="table-link-arrow js-flip-card-trigger">
+  <td (click)="selectRow(row)">
+    <span class="table-link-arrow">
       {{row.name}}
-    </a>
+    </span>
   </td>
   <td>{{row.type}}</td>
   <td>{{row.price | tas}} TAS</td>

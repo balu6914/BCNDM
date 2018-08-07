@@ -5,6 +5,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
 import { Table, TableType } from '../../../shared/table/table';
 import { Contract } from '../../../common/interfaces'
+import { Page } from '../../../common/interfaces/page.interface';
 
 @Component({
   selector: 'dashboard-contracts-list',
@@ -46,7 +47,7 @@ export class DashboardContractsListComponent {
     this.table.title = "Contracts";
     this.table.tableType = TableType.Contract;
     this.table.headers = ["Stream Name", "Tokens per hour", "Share offered", "Expiration date", "Status"];
-    this.table.content = this.myContractsList;
+    this.table.page = new Page<Contract>(0, 20, 10, this.myContractsList);
 
     this.AuthService.getCurrentUser().subscribe(
       data => {

@@ -24,6 +24,8 @@ export class TableRowComponent implements OnInit {
   @Input() rowType: TableType;
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
+  @Output() rowSelected = new EventEmitter<Stream | Subscription>();
+
   constructor(
     private modalService: BsModalService,
     private tasPipe: TasPipe,
@@ -97,5 +99,11 @@ export class TableRowComponent implements OnInit {
     };
     // Open DashboardSellAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
+  }
+
+  // Select/Click on Row emits a selectedRow event and pass selected row data
+  // In order to show row details.
+  selectRow(row: any) {
+    this.rowSelected.emit(row);
   }
 }

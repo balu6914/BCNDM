@@ -49,6 +49,7 @@ export class DashboardSellComponent {
     this.table.title = 'Streams';
     this.table.tableType = TableType.Sell;
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.hasDetails = true;
 
     const query = new Query();
 
@@ -60,8 +61,9 @@ export class DashboardSellComponent {
             this.streams.push(stream);
           }
         });
+        result.content = this.streams;
         // Set table content
-        this.table.content = this.streams;
+        this.table.page = result;
       },
       err => {
         console.log(err);

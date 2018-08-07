@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <div class="page-wrapper">
+  <div class="page-wrapper animated fadeIn">
     <div class="page-header">
       <div class="page-header-xs--map">
         <h1 class="page-title">
@@ -43,95 +43,7 @@
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
-        <div class="flip-card js-flip-card">
-          <div class="front">
-            <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
-          </div>
-          <!-- /front -->
-          <div class="back js-flip-card-back is-flip-card-hidden">
-            <div class="box">
-              <div class="box__header">
-                <p class="box__title">
-                  <a href="#" class="box__title-link box__title--arrow-left js-flip-card-close">
-                  Luftdaten Hum 8806
-                  </a>
-                </p>
-                <div class="box__buttons">
-                  <a href="#" class="action action--color-1">
-                  <span class="action__icon action--edit"></span>
-                  </a>
-                  <a href="#" class="action action--color-2">
-                  <span class="action__icon action--delete"></span>
-                  </a>
-                </div>
-              </div>
-              <div class="box__content">
-                <div class="row">
-                  <div class="col-sm-4 col-md-12">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="stream__title">
-                          Stream Type
-                        </div>
-                        <div class="stream__text">
-                          Air Cuality
-                        </div>
-                      </div>
-                      <div class="col-sm-6">
-                        <div class="stream__title">
-                          Tokens per hour
-                        </div>
-                        <div class="stream__text">
-                          0.043256 TAS
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="stream__title">
-                          Description
-                        </div>
-                        <div class="stream__text">
-                          Leverage strategic supply-chains
-                        </div>
-                      </div>
-                      <div class="col-sm-6">
-                        <div class="stream__title">
-                          Latitude, Longitude
-                        </div>
-                        <div class="stream__text">
-                          50.0478165, 23.4271937
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-8 col-md-12">
-                    <div class="stream-data">
-                      <div class="stream-data__title">
-                        Example reading(s)
-                      </div>
-                      <div class="stream-data__text">
-                        <code class="stream-data__code">
-                          <pre class="stream-data__pre">
-                            "sensor_id": "8746",
-                            "sensor_type": "DHT22",
-                            "location": "4409",
-                            "lat": "50.873",
-                            "lon": "4.698",
-                            "timestamp": "2018-03-09T00:02:09",
-                            "temperature": "5.20"
-                          </pre>
-                        </code>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- /back -->
-        </div>
-        <!-- /js-card -->
+        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
       </div>
     </div>
   </div>

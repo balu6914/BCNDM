@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { NgProgressModule, NgProgressInterceptor } from 'ngx-progressbar';
 import { NgPipesModule } from 'ngx-pipes';
-
 
 import { AppRoutingModule } from './app.routes';
 import { AppBootstrapModule } from './app-bootstrap/app-bootstrap.module'
@@ -21,6 +21,7 @@ import { WalletModule } from './dashboard/wallet/wallet.module';
     imports: [
         NgProgressModule,
         BrowserModule,
+        BrowserAnimationsModule,
         NgPipesModule,
         // App modules
         AppBootstrapModule,
