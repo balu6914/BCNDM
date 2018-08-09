@@ -69,15 +69,15 @@ type StreamRepository interface {
 	// indicate operation failure.
 	SaveAll([]Stream) error
 
+	// Search for streams by specified query parameters.
+	Search(Query) (Page, error)
+
 	// Update performs an update of an existing stream. A non-nil error is
 	// returned to indicate operation failure.
 	Update(Stream) error
 
 	// One retrieves a stream by its unique identifier (i.e. id).
 	One(string) (Stream, error)
-
-	// Search for streams by specified query parameters.
-	Search(Query) (Page, error)
 
 	// Removes the stream having the provided identifier, that is owned
 	// by the specified user.

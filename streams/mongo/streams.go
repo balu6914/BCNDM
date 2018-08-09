@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	dbName     string = "monetasa-streams"
-	collection string = "streams"
+	dbName     = "monetasa-streams"
+	collection = "streams"
 )
 
 var _ streams.StreamRepository = (*streamRepository)(nil)
@@ -91,6 +91,42 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 	return nil
 }
 
+func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
+	s := sr.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collection)
+	limit := int(query.Limit)
+	page := int(query.Page)
+
+	ret := streams.Page{
+		Page:    query.Page,
+		Limit:   query.Limit,
+		Content: []streams.Stream{},
+	}
+
+	var results []streams.Stream
+	q := streams.GenQuery(&query)
+
+	total, err := c.Find(q).Count()
+	if err != nil {
+		return ret, err
+	}
+
+	ret.Total = uint64(total)
+	start := limit * page
+	if total < start {
+		return ret, nil
+	}
+
+	err = c.Find(q).Skip(start).Limit(limit).All(&results)
+	if results == nil || err != nil {
+		return ret, nil
+	}
+
+	ret.Content = results
+	return ret, nil
+}
+
 func (sr streamRepository) Update(stream streams.Stream) error {
 	s := sr.db.Copy()
 	defer s.Close()
@@ -125,42 +161,6 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 	}
 
 	return stream, nil
-}
-
-func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
-	s := sr.db.Copy()
-	defer s.Close()
-	c := s.DB(dbName).C(collection)
-	limit := int(query.Limit)
-	page := int(query.Page)
-
-	ret := streams.Page{
-		Page:    query.Page,
-		Limit:   query.Limit,
-		Content: []streams.Stream{},
-	}
-
-	var results []streams.Stream
-	q := streams.GenerateQuery(&query)
-
-	total, err := c.Find(q).Count()
-	if err != nil {
-		return ret, err
-	}
-
-	ret.Total = uint64(total)
-	start := limit * page
-	if total < start {
-		return ret, nil
-	}
-
-	err = c.Find(q).Skip(start).Limit(limit).All(&results)
-	if results == nil || err != nil {
-		return ret, nil
-	}
-
-	ret.Content = results
-	return ret, nil
 }
 
 func (sr streamRepository) Remove(owner, id string) error {

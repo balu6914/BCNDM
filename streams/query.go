@@ -2,77 +2,94 @@ package streams
 
 import (
 	"reflect"
-	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 )
 
 const (
-	min = "min"
-	max = "max"
+	id      = "id"
+	plain   = "plain"
+	min     = "min"
+	max     = "max"
+	kindTag = "kind"
+	dbTag   = "db"
+	gte     = "$gte"
+	lt      = "$lt"
 )
 
-// Query struct wraps query parameters and provides "query builder"
-//  as a convenient way to generate DB query.
+// Query struct wraps query parameters and provides
+// "query builder" as a convenient way to generate DB query.
+// ID fields are treated as EQUALS, not LIKE and they are of kind "id".
+// String values are treated as LIKE and they are of kind "plain".
+// Range fields ar treated as a RANGE, not EQUALS so they are of kind "min" or "max".
 type Query struct {
-	Name       string      `alias:"name"`
-	StreamType string      `alias:"type"`
-	Coords     [][]float64 `alias:"coords"`
-	Page       uint64      `alias:"page"`
-	Limit      uint64      `alias:"limit"`
-	MinPrice   *uint64     `alias:"minPrice"`
-	MaxPrice   *uint64     `alias:"maxPrice"`
+	Page       uint64
+	Limit      uint64
+	Coords     [][]float64
+	Owner      string  `kind:"id" db:"owner"`
+	Name       string  `kind:"plain" db:"name"`
+	StreamType string  `kind:"plain" db:"type"`
+	MinPrice   *uint64 `kind:"min" db:"price"`
+	MaxPrice   *uint64 `kind:"max" db:"price"`
 }
 
-func generateRange(query *bson.M, field string, val uint64) *bson.M {
-	prefix := field[:3]
-	q := *query
-	if prefix != min && prefix != max {
-		return query
-	}
-	name := strings.ToLower(field[3:])
-	kind := "$gte"
-	if prefix == max {
-		kind = "$lt"
-	}
-	if entry, ok := q[name]; ok {
-		entry := entry.(bson.M)
-		entry[kind] = val
-		return query
-	}
+func setRange(query *bson.M, kind, dbName string, value interface{}) {
+	if val, ok := value.(*uint64); ok && val != nil {
+		q := *query
+		v := *val
 
-	q[name] = bson.M{
-		kind: val,
+		if entry, ok := q[dbName].(bson.M); ok {
+			entry[kind] = v
+			return
+		}
+
+		q[dbName] = bson.M{
+			kind: v,
+		}
+	}
+}
+
+func setString(query *bson.M, dbName string, value interface{}, isID bool) {
+	if v, ok := value.(string); ok && v != "" {
+		q := *query
+
+		if isID {
+			q[dbName] = v
+			return
+		}
+
+		q[dbName] = bson.RegEx{v, ""}
+	}
+}
+
+func genQuery(qType reflect.Type, qVal reflect.Value) bson.M {
+	query := bson.M{}
+	for i := 0; i < qType.NumField(); i++ {
+		structField := qType.Field(i)
+		field := qVal.FieldByName(structField.Name)
+		kind := structField.Tag.Get(kindTag)
+		dbName := structField.Tag.Get(dbTag)
+		switch kind {
+		case id:
+			setString(&query, dbName, field.Interface(), true)
+		case plain:
+			setString(&query, dbName, field.Interface(), false)
+		case min:
+			setRange(&query, gte, dbName, field.Interface())
+		case max:
+			setRange(&query, lt, dbName, field.Interface())
+		}
 	}
 
 	return query
 }
 
-// GenerateQuery extracts a database query from
-// query  parameters.
-func GenerateQuery(q *Query) *bson.M {
-	val := reflect.ValueOf(q).Elem()
-	reqType := reflect.TypeOf(*q)
-	query := bson.M{}
-	for i := 0; i < reqType.NumField(); i++ {
-		structField := reqType.Field(i)
-		field := val.FieldByName(structField.Name)
-		name := structField.Tag.Get("alias")
-		fi := field.Interface()
-		switch fi.(type) {
-		case string:
-			// Create LIKE regex.
-			v := field.String()
-			if v != "" {
-				query[name] = bson.RegEx{v, ""}
-			}
-		case *uint64:
-			if fi.(*uint64) != nil {
-				generateRange(&query, name, *fi.(*uint64))
-			}
-		}
-	}
-
+// GenQuery extracts a database query
+// from query parameters.
+func GenQuery(q *Query) *bson.M {
+	v := reflect.ValueOf(q).Elem()
+	t := reflect.TypeOf(*q)
+	query := genQuery(t, v)
 	if q.Coords != nil {
 		query["location"] = bson.M{
 			"$within": bson.M{

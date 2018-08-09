@@ -24,7 +24,7 @@ var stream = streams.Stream{
 }
 
 func TestOne(t *testing.T) {
-	svc.AddStream(stream.Owner, stream)
+	svc.AddStream(stream)
 
 	conn := createConn(t)
 
