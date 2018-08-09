@@ -17,49 +17,65 @@ type apiRes interface {
 	empty() bool
 }
 
-type createStreamRes struct {
+type addStreamRes struct {
 	ID string `json:"id"`
 }
 
-func (res createStreamRes) headers() map[string]string {
+func (res addStreamRes) headers() map[string]string {
 	return map[string]string{
 		"location": res.ID,
 	}
 }
 
-func (res createStreamRes) code() int {
+func (res addStreamRes) code() int {
 	return http.StatusCreated
 }
 
-func (res createStreamRes) empty() bool {
+func (res addStreamRes) empty() bool {
 	return false
 }
 
-type createBulkStreamRes struct{}
+type addBulkStreamsRes struct{}
 
-func (res createBulkStreamRes) headers() map[string]string {
+func (res addBulkStreamsRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res createBulkStreamRes) code() int {
+func (res addBulkStreamsRes) code() int {
 	return http.StatusCreated
 }
 
-func (res createBulkStreamRes) empty() bool {
+func (res addBulkStreamsRes) empty() bool {
 	return true
 }
 
-type editStreamRes struct{}
+type searchStreamsRes struct {
+	streams.Page
+}
 
-func (res editStreamRes) headers() map[string]string {
+func (res searchStreamsRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res editStreamRes) code() int {
+func (res searchStreamsRes) code() int {
 	return http.StatusOK
 }
 
-func (res editStreamRes) empty() bool {
+func (res searchStreamsRes) empty() bool {
+	return false
+}
+
+type updateStreamRes struct{}
+
+func (res updateStreamRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res updateStreamRes) code() int {
+	return http.StatusOK
+}
+
+func (res updateStreamRes) empty() bool {
 	return true
 }
 
@@ -76,22 +92,6 @@ func (res viewStreamRes) code() int {
 }
 
 func (res viewStreamRes) empty() bool {
-	return false
-}
-
-type searchStreamRes struct {
-	streams.Page
-}
-
-func (res searchStreamRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res searchStreamRes) code() int {
-	return http.StatusOK
-}
-
-func (res searchStreamRes) empty() bool {
 	return false
 }
 

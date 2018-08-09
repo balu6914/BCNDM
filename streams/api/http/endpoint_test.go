@@ -96,8 +96,11 @@ func sendFile(fileName, targetURL string) (io.Reader, string) {
 	return bytes.NewReader(bodyBuff.Bytes()), ct
 }
 
-func makeQuery(page, limit uint, name, streamType string, minPrice, maxPrice *uint64) string {
+func makeQuery(page, limit uint, name, streamType, owner string, minPrice, maxPrice *uint64) string {
 	ret := fmt.Sprintf("?page=%d&limit=%d", page, limit)
+	if owner != "" {
+		ret = fmt.Sprintf("%s&owner=%s", ret, owner)
+	}
 	if name != "" {
 		ret = fmt.Sprintf("%s&name=%s", ret, name)
 	}
@@ -114,7 +117,7 @@ func makeQuery(page, limit uint, name, streamType string, minPrice, maxPrice *ui
 	return ret
 }
 
-func TestCreateStream(t *testing.T) {
+func TestAddStream(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
 	defer ts.Close()
@@ -168,7 +171,7 @@ func TestCreateStream(t *testing.T) {
 	}
 }
 
-func TestCreateBulkStream(t *testing.T) {
+func TestAddBulkStreams(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
 	defer ts.Close()
@@ -226,12 +229,169 @@ func TestCreateBulkStream(t *testing.T) {
 	}
 }
 
+func TestSearchStreams(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	total := uint64(200)
+	for i := uint64(0); i < total; i++ {
+		stream.ID = bson.NewObjectId()
+		svc.AddStream(stream)
+	}
+
+	// Specify two special Streams to match different
+	// types of query and different result sets.
+	price1 := uint64(40)
+	price2 := uint64(50)
+
+	s := stream
+	s.ID = bson.NewObjectId()
+	s.Price = price1
+	svc.AddStream(s)
+
+	owner := bson.NewObjectId().Hex()
+	s = stream
+	s.ID = bson.NewObjectId()
+	s.Price = price2
+	s.Name = "special_name"
+	s.Owner = owner
+	svc.AddStream(s)
+	// Add special streams to count.
+	total += 2
+
+	cases := []struct {
+		desc   string
+		auth   string
+		status int
+		query  string
+		size   int
+		res    streams.Page
+	}{
+		{
+			desc:   "search streams with no query provided",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  "",
+			size:   20,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: total,
+			},
+		},
+		{
+			desc:   "search streams unauthorized",
+			auth:   "invalid key",
+			status: http.StatusForbidden,
+			query:  "",
+		},
+		{
+			desc:   "search streams by page and limit only",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  makeQuery(3, 30, "", "", "", nil, nil),
+			size:   30,
+			res: streams.Page{
+				Page:  3,
+				Limit: 30,
+				Total: total,
+			},
+		},
+		{
+			desc:   "search streams by the owner",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  makeQuery(0, 20, "", "", owner, nil, nil),
+			size:   1,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+			},
+		},
+		{
+			desc:   "search streams by page, limit and price",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  makeQuery(3, 30, "", "", "", &price2, nil),
+			size:   30,
+			res: streams.Page{
+				Page:  3,
+				Limit: 30,
+				Total: total - 1,
+			},
+		},
+		{
+			desc:   "search streams by page, limit and price range",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  makeQuery(0, 30, "", "", "", &price1, &price2),
+			size:   1,
+			res: streams.Page{
+				Page:  0,
+				Limit: 30,
+				Total: 1,
+			},
+		},
+		{
+			desc:   "search streams by page, limit and price with too big page and limit",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  makeQuery(3, 30, "", "", "", &price1, &price2),
+			size:   0,
+			res: streams.Page{
+				Page:  3,
+				Limit: 30,
+				Total: 1,
+			},
+		},
+		{
+			desc:   "search streams by name",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?name=%s", s.Name[0:5]),
+			size:   1,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+			},
+		},
+	}
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/streams%s", ts.URL, tc.query),
+			token:  tc.auth,
+		}
+		r, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		defer r.Body.Close()
+		// Unauthorized requests should not be processed.
+		if tc.auth != validKey {
+			assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
+			continue
+		}
+		res := streams.Page{}
+		err = json.NewDecoder(r.Body).Decode(&res)
+
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.res.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.res.Limit, res.Limit))
+		assert.Equal(t, tc.res.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.res.Total, res.Total))
+		// Don't use actual content, only compare expected size.
+		assert.Equal(t, tc.size, len(res.Content), fmt.Sprintf("%s: expected size of batch %d got %d\n", tc.desc, tc.size, len(res.Content)))
+		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
+	}
+}
+
 func TestUpdateStream(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.AddStream(validKey, stream)
+	svc.AddStream(stream)
 	valid := toJSON(stream)
 	// Create an invalid stream.
 	s := stream
@@ -319,7 +479,7 @@ func TestViewStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.AddStream(validKey, stream)
+	svc.AddStream(stream)
 
 	cases := []struct {
 		desc   string
@@ -359,155 +519,12 @@ func TestViewStream(t *testing.T) {
 	}
 }
 
-func TestSearchStreams(t *testing.T) {
-	svc := newService()
-	ts := newServer(svc)
-	defer ts.Close()
-
-	total := uint64(200)
-	for i := uint64(0); i < total; i++ {
-		stream.ID = bson.NewObjectId()
-		svc.AddStream(validKey, stream)
-	}
-
-	// Specify two special Streams to match different
-	// types of query and different result sets.
-	price1 := uint64(40)
-	price2 := uint64(50)
-
-	s := stream
-	s.ID = bson.NewObjectId()
-	s.Price = price1
-	svc.AddStream(validKey, s)
-
-	s = stream
-	s.ID = bson.NewObjectId()
-	s.Price = price2
-	s.Name = "special_name"
-	svc.AddStream(validKey, s)
-	// Add special streams to count.
-	total += 2
-
-	cases := []struct {
-		desc   string
-		auth   string
-		status int
-		query  string
-		size   int
-		res    streams.Page
-	}{
-		{
-			desc:   "search streams with no query provided",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  "",
-			size:   20,
-			res: streams.Page{
-				Limit: 20,
-				Page:  0,
-				Total: total,
-			},
-		},
-		{
-			desc:   "search streams unauthorized",
-			auth:   "invalid key",
-			status: http.StatusForbidden,
-			query:  "",
-		},
-		{
-			desc:   "search streams by page and limit only",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  makeQuery(3, 30, "", "", nil, nil),
-			size:   30,
-			res: streams.Page{
-				Limit: 30,
-				Page:  3,
-				Total: total,
-			},
-		},
-		{
-			desc:   "search streams by page, limit and price",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  makeQuery(3, 30, "", "", &price2, nil),
-			size:   30,
-			res: streams.Page{
-				Limit: 30,
-				Page:  3,
-				Total: total - 1,
-			},
-		},
-		{
-			desc:   "search streams by page, limit and price range",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  makeQuery(0, 30, "", "", &price1, &price2),
-			size:   1,
-			res: streams.Page{
-				Limit: 30,
-				Page:  0,
-				Total: 1,
-			},
-		},
-		{
-			desc:   "search streams by page, limit and price with too big page and limit",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  makeQuery(3, 30, "", "", &price1, &price2),
-			size:   0,
-			res: streams.Page{
-				Limit: 30,
-				Page:  3,
-				Total: 1,
-			},
-		},
-		{
-			desc:   "search streams by name",
-			auth:   validKey,
-			status: http.StatusOK,
-			query:  fmt.Sprintf("?name=%s", s.Name[0:5]),
-			size:   1,
-			res: streams.Page{
-				Limit: 20,
-				Page:  0,
-				Total: 1,
-			},
-		},
-	}
-	for _, tc := range cases {
-		req := testRequest{
-			client: ts.Client(),
-			method: http.MethodGet,
-			url:    fmt.Sprintf("%s/streams%s", ts.URL, tc.query),
-			token:  tc.auth,
-		}
-		r, err := req.make()
-		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
-		defer r.Body.Close()
-		// Unauthorized requests should not be processed.
-		if tc.auth != validKey {
-			assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
-			continue
-		}
-		res := streams.Page{}
-		err = json.NewDecoder(r.Body).Decode(&res)
-
-		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
-		assert.Equal(t, tc.res.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.res.Limit, res.Limit))
-		assert.Equal(t, tc.res.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.res.Total, res.Total))
-		// Don't use actual content, only compare expected size.
-		assert.Equal(t, tc.size, len(res.Content), fmt.Sprintf("%s: expected size of batch %d got %d\n", tc.desc, tc.size, len(res.Content)))
-		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
-	}
-}
-
 func TestRemoveStream(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.AddStream(validKey, stream)
+	svc.AddStream(stream)
 
 	cases := []struct {
 		desc   string

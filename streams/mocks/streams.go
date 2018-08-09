@@ -1,10 +1,9 @@
 package mocks
 
 import (
+	"monetasa/streams"
 	"strings"
 	"sync"
-
-	"monetasa/streams"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -27,7 +26,7 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	dbKey := key(stream.Owner, stream.ID.Hex())
+	dbKey := stream.ID.Hex()
 
 	if _, ok := srm.streams[dbKey]; ok {
 		return "", streams.ErrConflict
@@ -53,9 +52,9 @@ func (srm *streamRepositoryMock) Update(stream streams.Stream) error {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	dbKey := key(stream.Owner, stream.ID.Hex())
+	dbKey := stream.ID.Hex()
 
-	if _, ok := srm.streams[dbKey]; !ok {
+	if v, ok := srm.streams[dbKey]; !ok || v.Owner != stream.Owner {
 		return streams.ErrNotFound
 	}
 
@@ -69,7 +68,7 @@ func (srm *streamRepositoryMock) One(id string) (streams.Stream, error) {
 	defer srm.mu.Unlock()
 
 	for k, v := range srm.streams {
-		if strings.HasSuffix(k, id) {
+		if k == id {
 			return v, nil
 		}
 	}
@@ -95,9 +94,16 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 	for _, stream := range srm.streams {
 		if strings.Contains(stream.Name, query.Name) && strings.Contains(stream.Type, query.StreamType) &&
 			inRange(stream.Price, query.MinPrice, query.MaxPrice) {
-			ret = append(ret, stream)
+			if query.Owner == "" {
+				ret = append(ret, stream)
+				continue
+			}
+			if query.Owner == stream.Owner {
+				ret = append(ret, stream)
+			}
 		}
 	}
+
 	start := query.Page * query.Limit
 	end := start + query.Limit
 	page := streams.Page{
@@ -106,6 +112,7 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 		Page:    query.Page,
 		Content: []streams.Stream{},
 	}
+
 	n := uint64(len(ret))
 	if start >= n {
 		return page, nil
@@ -124,8 +131,7 @@ func (srm *streamRepositoryMock) Remove(owner, id string) error {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	dbKey := key(owner, id)
-	delete(srm.streams, dbKey)
+	delete(srm.streams, id)
 
 	return nil
 }

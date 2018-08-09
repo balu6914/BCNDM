@@ -14,7 +14,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		stream, err := svc.ViewStream(req.id)
+		stream, err := svc.ViewStream(req.id, "")
 		if err != nil {
 			return nil, err
 		}

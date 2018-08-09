@@ -20,7 +20,7 @@ func LoggingMiddleware(svc streams.Service, logger log.Logger) streams.Service {
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) AddStream(key string, stream streams.Stream) (id string, err error) {
+func (lm *loggingMiddleware) AddStream(stream streams.Stream) (id string, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method add_stream for stream %s took %s to complete", stream.ID.Hex(), time.Since(begin))
 		if err != nil {
@@ -31,10 +31,10 @@ func (lm *loggingMiddleware) AddStream(key string, stream streams.Stream) (id st
 
 	}(time.Now())
 
-	return lm.svc.AddStream(key, stream)
+	return lm.svc.AddStream(stream)
 }
 
-func (lm *loggingMiddleware) AddBulkStream(key string, streams []streams.Stream) (err error) {
+func (lm *loggingMiddleware) AddBulkStreams(streams []streams.Stream) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method add_bulk_stream for streams of size %d took %s to complete", len(streams), time.Since(begin))
 		if err != nil {
@@ -45,10 +45,10 @@ func (lm *loggingMiddleware) AddBulkStream(key string, streams []streams.Stream)
 
 	}(time.Now())
 
-	return lm.svc.AddBulkStream(key, streams)
+	return lm.svc.AddBulkStreams(streams)
 }
 
-func (lm *loggingMiddleware) ViewStream(id string) (stream streams.Stream, err error) {
+func (lm *loggingMiddleware) ViewStream(id, owner string) (stream streams.Stream, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method view_stream for stream %s, took %s to complete", id, time.Since(begin))
 		if err != nil {
@@ -58,10 +58,10 @@ func (lm *loggingMiddleware) ViewStream(id string) (stream streams.Stream, err e
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.ViewStream(id)
+	return lm.svc.ViewStream(id, owner)
 }
 
-func (lm *loggingMiddleware) UpdateStream(key string, stream streams.Stream) (err error) {
+func (lm *loggingMiddleware) UpdateStream(stream streams.Stream) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method update_stream for stream %s took %s to complete", stream.ID, time.Since(begin))
 		if err != nil {
@@ -72,10 +72,10 @@ func (lm *loggingMiddleware) UpdateStream(key string, stream streams.Stream) (er
 
 	}(time.Now())
 
-	return lm.svc.UpdateStream(key, stream)
+	return lm.svc.UpdateStream(stream)
 }
 
-func (lm *loggingMiddleware) SearchStreams(query streams.Query) (page streams.Page, err error) {
+func (lm *loggingMiddleware) SearchStreams(owner string, query streams.Query) (page streams.Page, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method search_streams for took %s to complete", time.Since(begin))
 		if err != nil {
@@ -85,7 +85,7 @@ func (lm *loggingMiddleware) SearchStreams(query streams.Query) (page streams.Pa
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.SearchStreams(query)
+	return lm.svc.SearchStreams(owner, query)
 }
 
 func (lm *loggingMiddleware) RemoveStream(key string, id string) (err error) {
