@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
@@ -9,13 +9,13 @@ import * as L from 'leaflet';
   templateUrl: "./map.leaflet.component.html",
   styleUrls: ["./map.leaflet.component.scss"]
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   options = {
     layers: [
-      L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yrl8kaavm2smu4bx3okrh/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
+      L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
     ],
-    zoom: 5,
-    center: L.latLng({ lat: 48, lng: 2 })
+    center: L.latLng({ lat: 48, lng: 2 }),
+    zoom: 5
   };
   drawOptions = {
     position: 'topright',
@@ -44,6 +44,10 @@ export class MapComponent {
   ngOnInit() {
   }
 
+  ngOnChange() {
+    this.addMarkers();
+  }
+
   // Get stream type icon
   getIcon(type) {
     const icons = {
@@ -62,17 +66,21 @@ export class MapComponent {
     const that = this;
     map.on('move', function(e) {
       // TODO: Use another event that is only fired once
-      that.map.removeLayer(that.layerGroup);
-      that.layerGroup = new L.LayerGroup();
-      that.map.addLayer(that.layerGroup);
-      that.markers = [];
-      that.streamList.forEach( stream => {
-        that.addMarker(stream);
-      });
+      that.addMarkers();
     });
 
-    // TODO: Fix map.on('load') event (don't set view to force move event)
+    // Set the view of Paris
     map.setView([48.864716, 2.349014], 5);
+  }
+
+  addMarkers() {
+    this.map.removeLayer(this.layerGroup);
+    this.layerGroup = new L.LayerGroup();
+    this.map.addLayer(this.layerGroup);
+    this.markers = [];
+    this.streamList.forEach( stream => {
+      this.addMarker(stream);
+    });
   }
 
   addMarker(stream: any) {
@@ -82,7 +90,7 @@ export class MapComponent {
        stream.location.coordinates[0]], {
          icon: L.icon({
              iconUrl:  this.getIcon(stream.type),
-             iconSize: [50, 50]
+             iconSize: [45, 45]
          })
        }
     );
