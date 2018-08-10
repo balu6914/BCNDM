@@ -1,4 +1,4 @@
-import { Component, OnChanges, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
@@ -9,7 +9,7 @@ import * as L from 'leaflet';
   templateUrl: "./map.leaflet.component.html",
   styleUrls: ["./map.leaflet.component.scss"]
 })
-export class MapComponent implements OnChanges {
+export class MapComponent {
   options = {
     layers: [
       L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
@@ -39,10 +39,6 @@ export class MapComponent implements OnChanges {
   constructor(
     private tasPipe: TasPipe,
   ) {
-  }
-
-  ngOnChanges() {
-    this.addMarkers();
   }
 
   // Get stream type icon
