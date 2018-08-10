@@ -1,0 +1,17 @@
+<div class="alert-box-container"
+*ngIf="show"
+[@alertAnimation]
+(@alertAnimation.done)="destroy()">
+  <div class="row">
+    <div class="alert-box">
+      <a class="btn-close alert-box__close" (click)="close()"></a>
+      <div class="alert-box__content"
+      [ngClass]="{'alert-box__content__success': type === types.Success,
+      'alert-box__content__error': type === types.Error,
+      'alert-box__content__warning': type === types.Warning,
+      'alert-box__content__info': type === types.Info}">
+        {{message}}
+      </div>
+    </div>
+  </div>
+</div>
