@@ -4,6 +4,7 @@ import { TableModule } from './table/table.module';
 import { BalanceModule } from './balance/balance.module';
 import { MapModule } from './map/map.module';
 import { FiltersModule } from './filters/filters.module';
+import { AlertsModule } from './alerts/alerts.module';
 
 @NgModule({
   imports: [
@@ -11,13 +12,15 @@ import { FiltersModule } from './filters/filters.module';
     TableModule,
     BalanceModule,
     MapModule,
-    FiltersModule
+    FiltersModule,
+    AlertsModule
   ],
   exports: [
     TableModule,
     BalanceModule,
     MapModule,
-    FiltersModule
+    FiltersModule,
+    AlertsModule
   ]
 })
 export class SharedModule { }

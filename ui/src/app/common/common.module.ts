@@ -1,9 +1,9 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
-import { MitasPipe, TasPipe} from './pipes/converter.pipe';
+import { MitasPipe, TasPipe } from './pipes/converter.pipe';
 // services
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
