@@ -3,19 +3,14 @@ FROM node:9-slim
 MAINTAINER Datapace
 
 # install maintain tools
-#RUN npm install bower grunt-cli graceful-fs@4.1.5 minimatch@3.0.2 -g
 RUN apt-get update 
-#RUN mkdir -p /usr/share/man/man1 
-#RUN mkdir -p /usr/share/man/man7 
 RUN apt-get install -y git bash python build-essential
-#RUN apt-get install -y postgresql postgresql-contrib
 
 # clone latest code from github
 RUN git clone --single-branch -b release-3.4 --depth 1 https://github.com/hyperledger/blockchain-explorer.git
 
 WORKDIR /blockchain-explorer
 
-#RUN echo '{ "allow_root": true }' > .bowerrc
 RUN mkdir -p logs/app 
 RUN mkdir -p logs/db
 
