@@ -7,20 +7,24 @@ import (
 
 var (
 	// ErrConflict indicates usage of the existing stream id for the new stream.
-	ErrConflict error = errors.New("Subscription ID already taken")
+	ErrConflict = errors.New("Subscription ID already taken")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
 	// invalid username or password).
-	ErrMalformedEntity error = errors.New("malformed entity specification")
+	ErrMalformedEntity = errors.New("malformed entity specification")
 
 	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
 	// when accessing a protected resource.
-	ErrUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
+	ErrUnauthorizedAccess = errors.New("missing or invalid credentials provided")
 
 	// ErrNotFound indicates a non-existent entity request.
-	ErrNotFound error = errors.New("non-existent entity")
+	ErrNotFound = errors.New("non-existent entity")
 
-	ErrUnsupportedContentType error = errors.New("unsupported content type")
+	// ErrFailedTransfer indicates that token transfer failed.
+	ErrFailedTransfer = errors.New("failed to transfer tokens")
+
+	// ErrFailedCreateSub indicates that creation of subscription failed.
+	ErrFailedCreateSub = errors.New("failed to create subscription")
 )
 
 // Service specifies an API that must be fullfiled by the domain service
@@ -37,12 +41,16 @@ var _ Service = (*subscriptionsService)(nil)
 
 type subscriptionsService struct {
 	subscriptions SubscriptionsRepository
+	streams       StreamsService
+	transactions  TransactionsService
 }
 
 // New instantiates the domain service implementation.
-func New(subs SubscriptionsRepository) Service {
+func New(subs SubscriptionsRepository, streams StreamsService, transactions TransactionsService) Service {
 	return &subscriptionsService{
 		subscriptions: subs,
+		streams:       streams,
+		transactions:  transactions,
 	}
 }
 
@@ -51,9 +59,24 @@ func (ss *subscriptionsService) CreateSubscription(userID string, sub Subscripti
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
 
-	// TODO: Verify User Balance and transfer tokens
+	stream, err := ss.streams.One(sub.StreamID)
+	if err != nil {
+		return ErrNotFound
+	}
 
-	return ss.subscriptions.Create(sub)
+	if err := ss.subscriptions.Create(sub); err != nil {
+		if err == ErrConflict {
+			return ErrConflict
+		}
+
+		return ErrFailedCreateSub
+	}
+
+	if err := ss.transactions.Transfer(userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		return ErrFailedTransfer
+	}
+
+	return nil
 }
 
 func (ss *subscriptionsService) ReadSubscriptions(userID string) ([]Subscription, error) {

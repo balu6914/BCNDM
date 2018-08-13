@@ -13,8 +13,8 @@ import (
 
 const (
 	affiliation = "org1"
-	balanceFcn  = "balance"
-	transferFcn = "transferFrom"
+	balanceFcn  = "balanceOf"
+	transferFcn = "transfer"
 	chanID      = "myc"
 )
 
@@ -75,7 +75,7 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 	client, err := channel.New(ctx)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
-		return 0, transactions.ErrNotFound
+		return 0, err
 	}
 
 	req := balanceReq{Owner: userID}
@@ -83,7 +83,7 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to serialize balance request: %s", err))
-		return 0, transactions.ErrFailedBalanceFetch
+		return 0, err
 	}
 
 	balance, err := client.Query(channel.Request{
@@ -93,41 +93,52 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 	})
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to query blockchain for balance: %s", err))
-		return 0, transactions.ErrFailedBalanceFetch
+		return 0, err
 	}
 
 	var res balanceRes
 	if err := json.Unmarshal(balance.Payload, &res); err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to deserialize balance payload: %s", err))
-		return 0, transactions.ErrFailedBalanceFetch
+		return 0, err
 	}
 
 	return res.Value, nil
 }
 
 func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
+	return fn.transfer(from, to, value)
+}
+
+func (fn fabricNetwork) BuyTokens(account string, value uint64) error {
+	return fn.transfer(fn.admin, account, value)
+}
+
+func (fn fabricNetwork) WithdrawTokens(account string, value uint64) error {
+	return fn.transfer(account, fn.admin, value)
+}
+
+func (fn fabricNetwork) transfer(from, to string, value uint64) error {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(fn.admin),
+		fabsdk.WithUser(from),
 		fabsdk.WithOrg(fn.org),
 	)
 
 	client, err := channel.New(ctx)
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
-		return transactions.ErrNotFound
+		return err
 	}
 
-	req := transferFromReq{
-		From:  from,
+	req := transferReq{
 		To:    to,
 		Value: value,
 	}
 
 	data, err := json.Marshal(req)
 	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to serialize transfer_from request: %s", err))
-		return transactions.ErrFailedTransfer
+		fn.logger.Warn(fmt.Sprintf("failed to serialize transfer request: %s", err))
+		return err
 	}
 
 	_, err = client.Execute(channel.Request{
@@ -136,8 +147,8 @@ func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
 		Args:        [][]byte{data},
 	})
 	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to execute transfer_from chaincode: %s", err))
-		return transactions.ErrFailedTransfer
+		fn.logger.Warn(fmt.Sprintf("failed to execute transfer chaincode: %s", err))
+		return err
 	}
 
 	return nil

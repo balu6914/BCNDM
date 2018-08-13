@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -17,7 +18,10 @@ import (
 	"monetasa/subscriptions"
 )
 
-var auth monetasa.AuthServiceClient
+var (
+	errUnsupportedContentType = errors.New("unsupported content type")
+	auth                      monetasa.AuthServiceClient
+)
 
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc subscriptions.Service, ac monetasa.AuthServiceClient) http.Handler {
@@ -131,7 +135,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 	case subscriptions.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
-	case subscriptions.ErrUnsupportedContentType:
+	case errUnsupportedContentType:
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case io.ErrUnexpectedEOF:
 		w.WriteHeader(http.StatusBadRequest)

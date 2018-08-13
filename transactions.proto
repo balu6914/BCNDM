@@ -3,14 +3,11 @@ syntax = "proto3";
 package monetasa;
 
 import "google/protobuf/empty.proto";
+import "common.proto";
 
 service TransactionsService {
     rpc CreateUser(ID) returns (google.protobuf.Empty) {}
     rpc Transfer(TransferData) returns (google.protobuf.Empty) {}
-}
-
-message ID {
-    string value = 1;
 }
 
 message TransferData {

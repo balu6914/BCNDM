@@ -14,14 +14,15 @@ The service is configured using the environment variables presented in the
 following table. Note that any unset variables will be replaced with their
 default values.
 
-| Variable                 | Description                              | Default        |
-|--------------------------|------------------------------------------|----------------|
-| MONETASA_STREAMS_PORT    | Stream service port                      | localhost      |
-| MONETASA_STREAMS_DB_URL  | List of database cluster URLs            | 0.0.0.0        |
-| MONETASA_STREAMS_DB_NAME | Name of the database used by the service | streams        |
-| MONETASA_STREAMS_DB_USER | Database user                            |                |
-| MONETASA_STREAMS_DB_PASS | Database password                        |                |
-| MONETASA_AUTH_URL        | Auth service gRPC URL                    | localhost:8081 |
+| Variable                   | Description                              | Default        |
+|----------------------------|------------------------------------------|----------------|
+| MONETASA_STREAMS_HTTP_PORT | Stream service HTTP port                 | 8080           |
+| MONETASA_STREAMS_GRPC_PORT | Stream service gRPC port                 | 8081           |
+| MONETASA_STREAMS_DB_URL    | List of database cluster URLs            | 0.0.0.0        |
+| MONETASA_STREAMS_DB_NAME   | Name of the database used by the service | streams        |
+| MONETASA_STREAMS_DB_USER   | Database user                            |                |
+| MONETASA_STREAMS_DB_PASS   | Database password                        |                |
+| MONETASA_AUTH_URL          | Auth service gRPC URL                    | localhost:8081 |
 
 ## Deployment
 
@@ -40,7 +41,7 @@ make streams
 make install
 
 # set the environment variables and run the service
-MONETASA_STREAMS_PORT=[Service port] MONETASA_STREAMS_DB_URL=[List of database cluster URLs] MONETASA_STREAMS_DB_NAME=[Name of the database used by the service] MONETASA_STREAMS_DB_USER=[Database user] MONETASA_STREAMS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-streams
+MONETASA_STREAMS_HTTP_PORT=[Service HTTP port] MONETASA_STREAMS_GRPC_PORT=[Service gRPC port] MONETASA_STREAMS_DB_URL=[List of database cluster URLs] MONETASA_STREAMS_DB_NAME=[Name of the database used by the service] MONETASA_STREAMS_DB_USER=[Database user] MONETASA_STREAMS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-streams
 ```
 
 ## Usage
