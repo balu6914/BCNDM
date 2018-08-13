@@ -2,6 +2,7 @@ package subscriptions
 
 import "time"
 
+// Subscription represents users purchase of stream.
 type Subscription struct {
 	UserID    string    `bson:"user_id,omitempty" json:"user_id,omitempty"`
 	StreamID  string    `bson:"id,omitempty" json:"id,omitempty"`
@@ -13,7 +14,6 @@ type Subscription struct {
 
 // Validate returns an error if user representation is invalid.
 func (s *Subscription) Validate() error {
-
 	if s.Hours == 0 || s.StreamID == "" {
 		return ErrMalformedEntity
 	}

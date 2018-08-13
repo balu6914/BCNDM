@@ -61,6 +61,7 @@ services:
       - MONETASA_TRANSACTIONS_HTTP_PORT=8082
       - MONETASA_TRANSACTIONS_GRPC_PORT=8083
       - MONETASA_TRANSACTIONS_DB_URL=monetasa-transactions-db
+      - MONETASA_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.monetasa.com
       - MONETASA_AUTH_URL=monetasa-auth:8081
     volumes:
       - ../config:/go/src/monetasa/config/
@@ -89,8 +90,11 @@ services:
       - monetasa-streams-db
     ports:
       - 8084:8084
+    expose:
+      - 8085
     environment:
-      MONETASA_STREAMS_PORT: 8084
+      MONETASA_STREAMS_HTTP_PORT: 8084
+      MONETASA_STREAMS_GRPC_PORT: 8085
       MONETASA_STREAMS_DB_URL: monetasa-streams-db
       MONETASA_STREAMS_DB_NAME: streams
       MONETASA_AUTH_URL: monetasa-auth:8081
@@ -116,12 +120,14 @@ services:
     depends_on:
       - monetasa-subscriptions-db
     ports:
-      - 8085:8085
+      - 8086:8086
     environment:
-      MONETASA_SUBSCRIPTIONS_PORT: 8085
+      MONETASA_SUBSCRIPTIONS_PORT: 8086
       MONETASA_SUBSCRIPTIONS_DB_URL: monetasa-subscriptions-db
       MONETASA_SUBSCRIPTIONS_DB_NAME: subscriptions
       MONETASA_AUTH_URL: monetasa-auth:8081
+      MONETASA_STREAMS_URL: monetasa-streams:8085
+      MONETASA_TRANSACTIONS_URL: monetasa-transactions:8083
     networks:
       - monetasa-net
 

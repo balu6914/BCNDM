@@ -10,4 +10,10 @@ type BlockchainNetwork interface {
 
 	// Transfers tokens from one account to another.
 	Transfer(string, string, uint64) error
+
+	// BuyTokens transfers tokens to given account.
+	BuyTokens(string, uint64) error
+
+	// WithdrawTokens transfers tokens from account to coin base.
+	WithdrawTokens(string, uint64) error
 }

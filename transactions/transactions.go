@@ -29,7 +29,10 @@ func (ts transactionService) CreateUser(id string) error {
 		Secret: secret,
 	}
 	if err := ts.users.Save(user); err != nil {
-		return err
+		if err == ErrConflict || err == ErrMalformedEntity {
+			return err
+		}
+		return ErrFailedUserCreation
 	}
 
 	if err := ts.bn.CreateUser(id, secret); err != nil {
@@ -41,11 +44,36 @@ func (ts transactionService) CreateUser(id string) error {
 }
 
 func (ts transactionService) Balance(userID string) (uint64, error) {
-	return ts.bn.Balance(userID)
+	balance, err := ts.bn.Balance(userID)
+	if err != nil {
+		return 0, ErrFailedBalanceFetch
+	}
+
+	return balance, nil
 }
 
 func (ts transactionService) Transfer(from, to string, value uint64) error {
-	return ts.bn.Transfer(from, to, value)
+	if err := ts.bn.Transfer(from, to, value); err != nil {
+		return ErrFailedTransfer
+	}
+
+	return nil
+}
+
+func (ts transactionService) BuyTokens(account string, value uint64) error {
+	if err := ts.bn.BuyTokens(account, value); err != nil {
+		return ErrFailedTransfer
+	}
+
+	return nil
+}
+
+func (ts transactionService) WithdrawTokens(account string, value uint64) error {
+	if err := ts.bn.WithdrawTokens(account, value); err != nil {
+		return ErrFailedTransfer
+	}
+
+	return nil
 }
 
 func generate(n uint) string {

@@ -23,3 +23,31 @@ func (res balanceRes) code() int {
 func (res balanceRes) empty() bool {
 	return false
 }
+
+type buyRes struct{}
+
+func (res buyRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res buyRes) code() int {
+	return http.StatusOK
+}
+
+func (res buyRes) empty() bool {
+	return true
+}
+
+type withdrawRes struct{}
+
+func (res withdrawRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res withdrawRes) code() int {
+	return http.StatusOK
+}
+
+func (res withdrawRes) empty() bool {
+	return true
+}

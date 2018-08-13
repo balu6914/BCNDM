@@ -10,10 +10,10 @@ type mockUserRepository struct {
 
 // NewUserRepository returns mock implementation of user repository.
 func NewUserRepository(users map[string]string) transactions.UserRepository {
-	return mockUserRepository{users: users}
+	return &mockUserRepository{users: users}
 }
 
-func (repo mockUserRepository) Save(user transactions.User) error {
+func (repo *mockUserRepository) Save(user transactions.User) error {
 	if _, ok := repo.users[user.ID]; ok {
 		return transactions.ErrConflict
 	}
@@ -22,7 +22,7 @@ func (repo mockUserRepository) Save(user transactions.User) error {
 	return nil
 }
 
-func (repo mockUserRepository) Remove(id string) error {
+func (repo *mockUserRepository) Remove(id string) error {
 	if _, ok := repo.users[id]; !ok {
 		return transactions.ErrNotFound
 	}

@@ -51,3 +51,21 @@ func (mm *metricsMiddleware) Transfer(from, to string, value uint64) error {
 
 	return mm.svc.Transfer(from, to, value)
 }
+
+func (mm *metricsMiddleware) BuyTokens(account string, value uint64) error {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "buy_tokens").Add(1)
+		mm.latency.With("method", "buy_tokens").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.BuyTokens(account, value)
+}
+
+func (mm *metricsMiddleware) WithdrawTokens(account string, value uint64) error {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "withdraw_tokens").Add(1)
+		mm.latency.With("method", "withdraw_tokens").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.WithdrawTokens(account, value)
+}
