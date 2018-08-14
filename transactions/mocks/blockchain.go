@@ -73,8 +73,22 @@ func (mn *mockNetwork) BuyTokens(account string, value uint64) error {
 		return transactions.ErrFailedTransfer
 	}
 
-	mn.users[account] = mn.users[account] + value
-	mn.remaining = mn.remaining - value
+	mn.users[account] += value
+	mn.remaining -= value
+
+	return nil
+}
+
+func (mn *mockNetwork) WithdrawTokens(account string, value uint64) error {
+	mn.mutex.Lock()
+	defer mn.mutex.Unlock()
+
+	if value > mn.users[account] {
+		return transactions.ErrFailedTransfer
+	}
+
+	mn.users[account] -= value
+	mn.remaining += value
 
 	return nil
 }

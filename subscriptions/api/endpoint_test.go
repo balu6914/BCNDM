@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -24,6 +25,7 @@ const (
 	streamID    = "streamID"
 	streamURL   = "myUrl"
 	hours       = 24
+	balance     = 100000
 )
 
 var sub = subscriptions.Subscription{
@@ -35,7 +37,12 @@ var sub = subscriptions.Subscription{
 
 func newService() subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
-	return subscriptions.New(subs)
+	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
+		streamID: subscriptions.Stream{},
+	})
+	transactions := mocks.NewTransactionsService(balance)
+
+	return subscriptions.New(subs, streams, transactions)
 }
 
 func newServer(svc subscriptions.Service, ac monetasa.AuthServiceClient) *httptest.Server {
@@ -118,7 +125,9 @@ func TestViewSubscriptions(t *testing.T) {
 	})
 
 	svc := newService()
-	svc.CreateSubscription(userID, subscriptions.Subscription{})
+	err := svc.CreateSubscription(userID, sub)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
 	ss := newServer(svc, ac)
 	defer ss.Close()
 

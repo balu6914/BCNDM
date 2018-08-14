@@ -7,7 +7,10 @@ import (
 	log "monetasa/logger"
 	"monetasa/streams"
 	"monetasa/streams/api"
+	grpcapi "monetasa/streams/api/grpc"
+	httpapi "monetasa/streams/api/http"
 	"monetasa/streams/mongo"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,26 +24,29 @@ import (
 )
 
 const (
-	envPort    = "MONETASA_STREAMS_PORT"
-	envDBURL   = "MONETASA_STREAMS_DB_URL"
-	envDBName  = "MONETASA_STREAMS_DB_NAME"
-	envDBUser  = "MONETASA_STREAMS_DB_USER"
-	envDBPass  = "MONETASA_STREAMS_DB_PASS"
-	envAuthURL = "MONETASA_AUTH_URL"
+	envHTTPPort = "MONETASA_STREAMS_HTTP_PORT"
+	envGRPCPort = "MONETASA_STREAMS_GRPC_PORT"
+	envDBURL    = "MONETASA_STREAMS_DB_URL"
+	envDBName   = "MONETASA_STREAMS_DB_NAME"
+	envDBUser   = "MONETASA_STREAMS_DB_USER"
+	envDBPass   = "MONETASA_STREAMS_DB_PASS"
+	envAuthURL  = "MONETASA_AUTH_URL"
 
-	defPort    = "8080"
-	defDBURL   = "0.0.0.0"
-	defDBName  = "streams"
-	defDBUser  = ""
-	defDBPass  = ""
-	defAuthURL = "localhost:8081"
+	defHTTPPort = "8080"
+	defGRPCPort = "8081"
+	defDBURL    = "0.0.0.0"
+	defDBName   = "streams"
+	defDBUser   = ""
+	defDBPass   = ""
+	defAuthURL  = "localhost:8081"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
 )
 
 type config struct {
-	Port             string
+	HTTPPort         string
+	GRPCPort         string
 	DBURL            string
 	DBName           string
 	DBUser           string
@@ -60,7 +66,9 @@ func main() {
 	svc, auth := newServices(ms, conn, logger)
 
 	errs := make(chan error, 2)
-	go startHTTPServer(svc, auth, cfg.Port, logger, errs)
+	go startHTTPServer(svc, auth, cfg.HTTPPort, logger, errs)
+
+	go startGRPCServer(svc, cfg.GRPCPort, logger, errs)
 
 	go func() {
 		c := make(chan os.Signal)
@@ -74,7 +82,8 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		Port:             monetasa.Env(envPort, defPort),
+		HTTPPort:         monetasa.Env(envHTTPPort, defHTTPPort),
+		GRPCPort:         monetasa.Env(envGRPCPort, defGRPCPort),
 		DBURL:            monetasa.Env(envDBURL, defDBURL),
 		DBName:           monetasa.Env(envDBName, defDBName),
 		DBUser:           monetasa.Env(envDBUser, defDBUser),
@@ -143,5 +152,18 @@ func newServices(ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) (str
 func startHTTPServer(svc streams.Service, auth streams.Authorization, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Streams service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, api.MakeHandler(svc, auth))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, auth))
+}
+
+func startGRPCServer(svc streams.Service, port string, logger log.Logger, errs chan error) {
+	p := fmt.Sprintf(":%s", port)
+	listener, err := net.Listen("tcp", p)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to listen on port %s: %s", port, err))
+	}
+
+	server := grpc.NewServer()
+	monetasa.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
+	logger.Info(fmt.Sprintf("Streams gRPC service started, exposed port %s", port))
+	errs <- server.Serve(listener)
 }

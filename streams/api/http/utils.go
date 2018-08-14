@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"monetasa/streams"
@@ -35,7 +35,7 @@ func containsPoints(q url.Values) bool {
 	return false
 }
 
-func searchFields(req *searchStreamReq, q url.Values) error {
+func searchFields(req *searchStreamsReq, q url.Values) error {
 	val := reflect.ValueOf(req).Elem()
 	reqType := reflect.TypeOf(*req)
 	for i := 0; i < reqType.NumField(); i++ {
@@ -65,6 +65,7 @@ func searchFields(req *searchStreamReq, q url.Values) error {
 				field.SetUint(v)
 				break
 			}
+
 			field.Set(reflect.ValueOf(&v))
 		}
 	}
@@ -76,7 +77,7 @@ func searchFields(req *searchStreamReq, q url.Values) error {
 	return nil
 }
 
-func locationFields(req *searchStreamReq, q url.Values) error {
+func locationFields(req *searchStreamsReq, q url.Values) error {
 	if !containsPoints(q) {
 		return nil
 	}

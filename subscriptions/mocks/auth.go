@@ -16,12 +16,12 @@ type authClientMock struct {
 	tokens map[string]string
 }
 
-// NewUsersService creates mock of users service.
+// NewAuthClient creates mock of users service.
 func NewAuthClient(tokens map[string]string) monetasa.AuthServiceClient {
 	return &authClientMock{tokens}
 }
 
-func (svc authClientMock) Identify(ctx context.Context, in *monetasa.Token, opts ...grpc.CallOption) (*monetasa.UserID, error) {
+func (svc authClientMock) Identify(_ context.Context, in *monetasa.Token, opts ...grpc.CallOption) (*monetasa.UserID, error) {
 	if id, ok := svc.tokens[in.Value]; ok {
 		return &monetasa.UserID{Value: id}, nil
 	}

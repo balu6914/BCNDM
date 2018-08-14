@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"context"
@@ -8,39 +8,39 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createStreamEndpoint(svc streams.Service) endpoint.Endpoint {
+func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(createStreamReq)
+		req := request.(addStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		id, err := svc.AddStream(req.owner, req.stream)
+		id, err := svc.AddStream(req.stream)
 		if err != nil {
 			return nil, err
 		}
 
-		res := createStreamRes{
+		res := addStreamRes{
 			ID: id,
 		}
 		return res, nil
 	}
 }
 
-func createBulkStreamEndpoint(svc streams.Service) endpoint.Endpoint {
+func addBulkStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(createBulkStreamReq)
+		req := request.(addBulkStreamsReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		if err := svc.AddBulkStream(req.owner, req.Streams); err != nil {
+		if err := svc.AddBulkStreams(req.Streams); err != nil {
 			return nil, err
 		}
 
-		return createBulkStreamRes{}, nil
+		return addBulkStreamsRes{}, nil
 	}
 }
 
@@ -48,6 +48,12 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateStreamReq)
 
+		if req.stream.Owner == "" {
+			req.stream.Owner = req.owner
+		}
+
+		// Need to set owner before the validation because
+		// stream.Validate() won't pass otherwise.
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
@@ -56,27 +62,23 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			req.stream.ID = bson.ObjectIdHex(req.id)
 		}
 
-		if req.stream.Owner == "" {
-			req.stream.Owner = req.owner
-		}
-
-		if err := svc.UpdateStream(req.owner, req.stream); err != nil {
+		if err := svc.UpdateStream(req.stream); err != nil {
 			return nil, err
 		}
 
-		return editStreamRes{}, nil
+		return updateStreamRes{}, nil
 	}
 }
 
 func viewStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(readStreamReq)
+		req := request.(viewStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		s, err := svc.ViewStream(req.id)
+		s, err := svc.ViewStream(req.id, req.owner)
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +92,7 @@ func viewStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 
 func removeStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteStreamReq)
+		req := request.(removeStreamReq)
 
 		if err := req.validate(); err != nil {
 			return nil, err
@@ -104,15 +106,16 @@ func removeStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	}
 }
 
-func searchStreamEndpoint(svc streams.Service) endpoint.Endpoint {
+func searchStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(searchStreamReq)
+		req := request.(searchStreamsReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
 		q := streams.Query{
 			Name:       req.Name,
+			Owner:      req.Owner,
 			StreamType: req.StreamType,
 			Coords:     req.Coords,
 			Page:       req.Page,
@@ -121,12 +124,12 @@ func searchStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 			MaxPrice:   req.MaxPrice,
 		}
 
-		page, err := svc.SearchStreams(q)
+		page, err := svc.SearchStreams(req.user, q)
 		if err != nil {
 			return nil, err
 		}
 
-		res := searchStreamRes{page}
+		res := searchStreamsRes{page}
 		return res, nil
 	}
 }

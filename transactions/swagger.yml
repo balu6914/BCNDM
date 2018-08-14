@@ -51,6 +51,31 @@ paths:
           description: Missing or invalid content type.
         500:
           $ref: "#/responses/ServiceError"
+  /tokens/withdraw:
+    post:
+      summary: Sell tokens for real money.
+      tags:
+        - tokens
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: amount
+          description: |
+            JSON-formatted request specifying amount of tokens to be withdrawed.
+          in: body
+          schema:
+            $ref: "#/definitions/Amount"
+          required: true
+      responses:
+        200:
+          description: User withdrawed tokens successfully.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        415:
+          description: Missing or invalid content type.
+        500:
+          $ref: "#/responses/ServiceError"
 
 parameters:
   Authorization:

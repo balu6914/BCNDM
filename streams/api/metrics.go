@@ -25,49 +25,49 @@ func MetricsMiddleware(svc streams.Service, counter metrics.Counter, latency met
 	}
 }
 
-func (ms *metricsMiddleware) AddStream(key string, stream streams.Stream) (string, error) {
+func (ms *metricsMiddleware) AddStream(stream streams.Stream) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "add_stream").Add(1)
 		ms.latency.With("method", "add_stream").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.AddStream(key, stream)
+	return ms.svc.AddStream(stream)
 }
 
-func (ms *metricsMiddleware) AddBulkStream(key string, streams []streams.Stream) error {
+func (ms *metricsMiddleware) AddBulkStreams(streams []streams.Stream) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "add_bulk_stream").Add(1)
 		ms.latency.With("method", "add_bulk_stream").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.AddBulkStream(key, streams)
+	return ms.svc.AddBulkStreams(streams)
 }
 
-func (ms *metricsMiddleware) UpdateStream(key string, stream streams.Stream) error {
+func (ms *metricsMiddleware) UpdateStream(stream streams.Stream) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "update_stream").Add(1)
 		ms.latency.With("method", "update_stream").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.UpdateStream(key, stream)
+	return ms.svc.UpdateStream(stream)
 }
 
-func (ms *metricsMiddleware) ViewStream(id string) (streams.Stream, error) {
+func (ms *metricsMiddleware) ViewStream(id, owner string) (streams.Stream, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view_stream").Add(1)
 		ms.latency.With("method", "view_stream").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.ViewStream(id)
+	return ms.svc.ViewStream(id, owner)
 }
 
-func (ms *metricsMiddleware) SearchStreams(query streams.Query) (streams.Page, error) {
+func (ms *metricsMiddleware) SearchStreams(owner string, query streams.Query) (streams.Page, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "search_streams").Add(1)
 		ms.latency.With("method", "search_streams").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.SearchStreams(query)
+	return ms.svc.SearchStreams(owner, query)
 }
 
 func (ms *metricsMiddleware) RemoveStream(key, id string) error {

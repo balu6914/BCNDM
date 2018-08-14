@@ -12,11 +12,10 @@ import (
 )
 
 const (
-	affiliation     = "org1"
-	balanceFcn      = "balanceOf"
-	transferFromFcn = "transferFrom"
-	transferFcn     = "transfer"
-	chanID          = "myc"
+	affiliation = "org1"
+	balanceFcn  = "balanceOf"
+	transferFcn = "transfer"
+	chanID      = "myc"
 )
 
 var _ transactions.BlockchainNetwork = (*fabricNetwork)(nil)
@@ -107,47 +106,21 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 }
 
 func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
-	ctx := fn.sdk.ChannelContext(
-		chanID,
-		fabsdk.WithUser(fn.admin),
-		fabsdk.WithOrg(fn.org),
-	)
-
-	client, err := channel.New(ctx)
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
-		return err
-	}
-
-	req := transferFromReq{
-		From:  from,
-		To:    to,
-		Value: value,
-	}
-
-	data, err := json.Marshal(req)
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to serialize transfer_from request: %s", err))
-		return err
-	}
-
-	_, err = client.Execute(channel.Request{
-		ChaincodeID: fn.chaincodeID,
-		Fcn:         transferFromFcn,
-		Args:        [][]byte{data},
-	})
-	if err != nil {
-		fn.logger.Warn(fmt.Sprintf("failed to execute transfer_from chaincode: %s", err))
-		return err
-	}
-
-	return nil
+	return fn.transfer(from, to, value)
 }
 
-func (fn fabricNetwork) BuyTokens(to string, value uint64) error {
+func (fn fabricNetwork) BuyTokens(account string, value uint64) error {
+	return fn.transfer(fn.admin, account, value)
+}
+
+func (fn fabricNetwork) WithdrawTokens(account string, value uint64) error {
+	return fn.transfer(account, fn.admin, value)
+}
+
+func (fn fabricNetwork) transfer(from, to string, value uint64) error {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(fn.admin),
+		fabsdk.WithUser(from),
 		fabsdk.WithOrg(fn.org),
 	)
 

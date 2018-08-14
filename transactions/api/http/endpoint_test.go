@@ -87,6 +87,10 @@ type buyReq struct {
 	Amount uint64 `json:"amount"`
 }
 
+type withdrawReq struct {
+	Amount uint64 `json:"amount"`
+}
+
 func TestBalance(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
@@ -208,6 +212,89 @@ func TestBuyTokens(t *testing.T) {
 			client:      ts.Client(),
 			method:      http.MethodPost,
 			url:         fmt.Sprintf("%s/tokens/buy", ts.URL),
+			contentType: tc.contentType,
+			token:       tc.auth,
+			body:        strings.NewReader(tc.body),
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestWithdrawTokens(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	req := withdrawReq{Amount: balance}
+	byteReq, err := json.Marshal(req)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	data := string(byteReq)
+
+	cases := []struct {
+		desc        string
+		auth        string
+		contentType string
+		body        string
+		status      int
+	}{
+		{
+			desc:        "withdraw tokens for existing user",
+			auth:        token,
+			contentType: contentType,
+			body:        data,
+			status:      http.StatusOK,
+		},
+		{
+			desc:        "withdraw tokens for nonexistent user",
+			auth:        invalid,
+			contentType: contentType,
+			body:        data,
+			status:      http.StatusForbidden,
+		},
+		{
+			desc:        "withdraw zero tokens for user",
+			auth:        token,
+			contentType: contentType,
+			body:        `{"amount":0}`,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "withdraw tokens with empty auth token",
+			auth:        "",
+			contentType: contentType,
+			body:        data,
+			status:      http.StatusForbidden,
+		},
+		{
+			desc:        "withdraw tokens with invalid request",
+			auth:        token,
+			contentType: contentType,
+			body:        "}",
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "withdraw tokens with empty request",
+			auth:        token,
+			contentType: contentType,
+			body:        "",
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "withdraw tokens with invalid content type",
+			auth:        token,
+			contentType: invalid,
+			body:        data,
+			status:      http.StatusUnsupportedMediaType,
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client:      ts.Client(),
+			method:      http.MethodPost,
+			url:         fmt.Sprintf("%s/tokens/withdraw", ts.URL),
 			contentType: tc.contentType,
 			token:       tc.auth,
 			body:        strings.NewReader(tc.body),

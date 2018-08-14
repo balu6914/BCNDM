@@ -12,41 +12,74 @@ import (
 
 const (
 	userID    = "myUserID"
+	userID1   = "myUserID1"
 	streamID  = "myStreamID"
 	wrong     = "wrong"
 	streamURL = "myUrl"
 	token     = "token"
 	email     = "user@example.com"
+	balance   = 100
 )
 
 var subscription = subscriptions.Subscription{
 	UserID:    userID,
 	StreamID:  streamID,
 	StreamURL: streamURL,
+	Hours:     5,
 }
 
 func newService(tokens map[string]string) subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
-	return subscriptions.New(subs)
+	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
+		streamID: subscriptions.Stream{Price: 10},
+	})
+	transactions := mocks.NewTransactionsService(balance)
+
+	return subscriptions.New(subs, streams, transactions)
 }
 
 func TestCreateSubscription(t *testing.T) {
 	svc := newService(map[string]string{token: userID})
 
-	cases := map[string]struct {
-		sub subscriptions.Subscription
-		err error
+	cases := []struct {
+		desc string
+		sub  subscriptions.Subscription
+		err  error
 	}{
-		"create new subscription": {
-			subscription,
-			nil,
+		{
+			desc: "create new subscription",
+			sub:  subscription,
+			err:  nil,
+		},
+		{
+			desc: "create existing subscription",
+			sub:  subscription,
+			err:  subscriptions.ErrConflict,
+		},
+		{
+			desc: "create subscription with non-existent stream",
+			sub: subscriptions.Subscription{
+				UserID:    userID,
+				StreamID:  wrong,
+				StreamURL: streamURL,
+			},
+			err: subscriptions.ErrNotFound,
+		},
+		{
+			desc: "create subscription with too big price stream",
+			sub: subscriptions.Subscription{
+				UserID:    userID1,
+				StreamID:  streamID,
+				StreamURL: streamURL,
+				Hours:     100,
+			},
+			err: subscriptions.ErrFailedTransfer,
 		},
 	}
 
-	for desc, tc := range cases {
-		err := svc.CreateSubscription(userID, tc.sub)
-		assert.Equal(t, tc.err, err,
-			fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+	for _, tc := range cases {
+		err := svc.CreateSubscription(tc.sub.UserID, tc.sub)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 

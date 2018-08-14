@@ -47,6 +47,12 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 		encodeResponse,
 		opts...,
 	))
+	r.Post("/tokens/withdraw", kithttp.NewServer(
+		withdrawEndpoint(svc),
+		decodeWithdrawReq,
+		encodeResponse,
+		opts...,
+	))
 
 	r.GetFunc("/version", monetasa.Version())
 	r.Handle("/metrics", promhttp.Handler())
@@ -76,6 +82,26 @@ func decodeBuyReq(_ context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	var req buyReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.userID = id
+
+	return req, nil
+}
+
+func decodeWithdrawReq(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	id, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var req withdrawReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
