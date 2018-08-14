@@ -1,18 +1,17 @@
 import { Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { BsModalService } from 'ngx-bootstrap/modal';
 
-import { AuthService } from '../../../auth/services/auth.service';
-import { Router } from '@angular/router';
-import { Table, TableType } from '../../../shared/table/table';
-import { Contract } from '../../../common/interfaces'
-import { Page } from '../../../common/interfaces/page.interface';
+import { Table, TableType } from 'app/shared/table/table';
+import { Contract } from 'app/common/interfaces/contract.interface'
+import { Page } from 'app/common/interfaces/page.interface';
+import { DashboardContractsAddComponent } from './add/';
 
 @Component({
   selector: 'dashboard-contracts-list',
-  templateUrl: './dashboard.contracts.list.component.html',
-  styleUrls: [ './dashboard.contracts.list.component.scss' ]
+  templateUrl: './dashboard.contracts.component.html',
+  styleUrls: [ './dashboard.contracts.component.scss' ]
 })
-export class DashboardContractsListComponent {
+export class DashboardContractsComponent {
     tableColumns = [
         { prop: 'name' },
         { name: 'type' },
@@ -25,8 +24,6 @@ export class DashboardContractsListComponent {
       {'id' : "2", 'stream': {'name': 'WeIO temperature', 'price':'10000'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10','signed':true, 'expired': false },
       {'id' : "3", 'stream': {'name': 'WeIO humidity', 'price':'15'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':false, 'expired': false},
       {'id' : "4", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':true, 'expired': false},
-      {'id' : "5", 'stream': {'name': 'WeIO radiation', 'price':'50'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':false, 'expired': false},
-      {'id' : "5", 'stream': {'name': 'Spark', 'price':'30'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':false, 'expired': true}
     ];
     user: any;
     subscription: any;
@@ -39,8 +36,7 @@ export class DashboardContractsListComponent {
     table: Table = new Table();
 
     constructor(
-        private AuthService: AuthService,
-        private router: Router
+        private modalService: BsModalService,
     ) { }
 
   ngOnInit() {
@@ -49,15 +45,33 @@ export class DashboardContractsListComponent {
     this.table.headers = ["Stream Name", "Tokens per hour", "Share offered", "Expiration date", "Status"];
     this.table.page = new Page<Contract>(0, 20, 10, this.myContractsList);
 
-    this.AuthService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
-      },
-      err => {
-        console.log(err)
-      }
-    );
-
     this.temp = [...this.myContractsList];
   }
+
+  modalNewContract() {
+    // Show DashboardSellAddComponent as Modal
+    this.modalService.show(DashboardContractsAddComponent)
+      .content.contractCreated.subscribe(
+        res => {
+          // TODO: Use all values from response to create the contract
+          const contract = {
+            id: 'myID',
+            stream: {
+              name: res.streamName,
+              price: res.streamPrice
+            },
+            creationDate: "2018-02-15T12:14:56.806Z",
+            expirationDate: '2018-02-15T12:14:56.806Z',
+            share: res.shareOffered,
+            signed: false,
+            expired: true
+          }
+          this.myContractsList.push(contract);
+        },
+        err => {
+          console.log(err);
+        }
+    );
+  }
+
 }

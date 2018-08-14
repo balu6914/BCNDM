@@ -28,7 +28,7 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/wallet/wallet.module#WalletModule',
            },
            {
-               path: 'contract',
+               path: 'contracts',
                loadChildren: 'app/dashboard/contracts/dashboard.contracts.module#DashboardContractsModule',
            },
 
