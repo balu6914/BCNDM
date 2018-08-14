@@ -16,42 +16,28 @@
           <a (click)="_toggleSidebar()" class="btn-close filters__close"></a>
         </div>
         <div class="filters__content">
-          <form>
+          <form [formGroup]="form" novalidate>
             <div class="form-group">
-              <label for="exampleFormControlSelect1" class="form-label">City</label>
-              <select class="form-control selectpicker" id="exampleFormControlSelect1" data-live-search="true" title="Select City">
-            <option>Berlin</option>
-            <option>London</option>
-            <option>New York</option>
-            <option>Copenhagen</option>
-          </select>
+              <label for="stream_name" class="form-label">Name</label>
+              <input type="text" formControlName="name" id="stream_name" name="stream_name" value="" class="form-control"/>
             </div>
             <div class="form-group">
-              <label for="exampleFormControlSelect2" class="form-label">Type</label>
-              <select class="form-control selectpicker" id="exampleFormControlSelect2" data-live-search="true" title="Select Type">
-            <option>Air Quality</option>
-            <option>London</option>
-            <option>New York</option>
-            <option>Copenhagen</option>
-          </select>
+              <label for="stream_city" class="form-label">City</label>
+              <ngx-select [items]="mockCities" [formControl]="selectCityControl" [allowClear]="true" [optionValueField]="name" name="stream_city"></ngx-select>
             </div>
             <div class="form-group">
-              <label for="exampleFormControlSelect3" class="form-label">Company</label>
-              <select class="form-control selectpicker" id="exampleFormControlSelect3" data-live-search="true" title="Select Company">
-            <option>EthWorks</option>
-            <option>Google</option>
-            <option>Apple</option>
-          </select>
+              <label for="stream_type" class="form-label">Type</label>
+              <input type="text" formControlName="streamType" id="stream_type" name="stream_type" value="" class="form-control"/>
             </div>
             <div class="form-group">
-              <label for="" class="form-label">Price range</label>
-              <input type="text" id="price_range" name="price_range" value="" class="range-slider-price" />
+              <label for="price_range" class="form-label">Min price</label>
+              <input type="number" formControlName="minPrice" min="0" max="1000000" step="0.1" id="price_range" name="price_range" value="" class="range-slider-price" />
             </div>
             <div class="form-group">
-              <label for="" class="form-label">Periodicity</label>
-              <input type="text" id="periodicity" name="periodicity" value="" class="range-slider-periodicity" />
+              <label for="periodicity" class="form-label">Max price</label>
+              <input type="number" formControlName="maxPrice"  min="0" max="1000000" step="0.1"  id="periodicity" name="periodicity" value="" class="range-slider-periodicity" />
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
               <label for="" class="form-label">Certified</label>
               <div class="form-buttons-radio">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -63,11 +49,11 @@
               </label>
                 </div>
               </div>
-            </div>
-            <button type="submit" class="btn btn-block btn-primary">
-          Filters
+            </div> -->
+            <button type="button" (click)="onSubmit(form.value, form.valid)" class="btn btn-block btn-primary">
+          Apply Filters
         </button>
-            <button type="submit" class="btn btn-block btn-outline-secondary">
+            <button type="button" (click)="onClear()" class="btn btn-block btn-outline-secondary">
           Clear Filters
         </button>
           </form>
