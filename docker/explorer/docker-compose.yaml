@@ -12,7 +12,7 @@ services:
     networks:
       - monetasa-bc-net
 
-  explorer:
+  monetasa-explorer:
     image: datapace/hyperledger-explorer
     container_name: datapace_explorer
     hostname: explorer

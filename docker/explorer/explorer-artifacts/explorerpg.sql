@@ -48,8 +48,6 @@ Alter sequence chaincodes_id_seq restart with 10;
 -- ----------------------------
 DROP TABLE IF EXISTS channel;
 
---   state character(1) NOT NULL DEFAULT 'A' CHECK (state in ('A', 'D', 'S'))
-
 CREATE TABLE channel (
   id SERIAL PRIMARY KEY,
   name varchar(64) DEFAULT NULL,
@@ -64,8 +62,6 @@ Alter sequence channel_id_seq restart with 3;
 --  Table structure for `peer`
 -- ----------------------------
 DROP TABLE IF EXISTS peer;
-
---   state character(1) NOT NULL DEFAULT 'A' CHECK (state in ('A', 'D', 'S'))
 
 CREATE TABLE peer (
   id SERIAL PRIMARY KEY,
@@ -96,8 +92,6 @@ ALTER table peer_ref_channel owner to hppoc;
 --  Table structure for `orderer`
 -- ----------------------------
 DROP TABLE IF EXISTS orderer;
-
---   state character(1) NOT NULL DEFAULT 'A' CHECK (state in ('A', 'D', 'S'))
 
 CREATE TABLE orderer (
   id SERIAL PRIMARY KEY,

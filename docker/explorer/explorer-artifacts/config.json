@@ -1,34 +1,34 @@
 {
-	"network-config": {
-		"org1": {
-			"name": "peerOrg1",
-				"mspid": "Org1MSP",
-				"peer1": {
-					"requests": "grpcs://peer0.org1.monetasa.com:7051",
-					"events": "grpcs://peer0.org1.monetasa.com:7053",
-					"server-hostname": "peer0.org1.monetasa.com",
-					"tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls/ca.crt"
-				},
-				"admin": {
-					"key": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/keystore",
-					"cert": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/signcerts"
-				}
-		}
-	},
-	"channel": "myc",
-	"orderers":[
-		{
-			"mspid": "OrdererMSP",
-			"server-hostname":"orderer.monetasa.com",
-			"requests":"grpcs://orderer.monetasa.com:7050",
-			"tls_cacerts":"/blockchain-explorer/examples/net1/crypto-network/crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/tls/ca.crt"
-		}
-	],
-	"keyValueStore": "/tmp/fabric-client-kvs",
-	"configtxgenToolPath": "/home/ubuntu/monetasa/bin",
-	"SYNC_START_DATE_FORMAT":"YYYY/MM/DD",
-	"syncStartDate":"2018/01/01",
-	"eventWaitTime": "30000",
-	"license": "Apache-2.0",
-	"version": "1.1"
+  "network-config": {
+    "org1": {
+      "name": "peerOrg1",
+        "mspid": "Org1MSP",
+        "peer1": {
+          "requests": "grpcs://peer0.org1.monetasa.com:7051",
+          "events": "grpcs://peer0.org1.monetasa.com:7053",
+          "server-hostname": "peer0.org1.monetasa.com",
+          "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls/ca.crt"
+        },
+        "admin": {
+          "key": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/keystore",
+          "cert": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/signcerts"
+        }
+    }
+  },
+    "channel": "myc",
+    "orderers":[
+    {
+      "mspid": "OrdererMSP",
+      "server-hostname":"orderer.monetasa.com",
+      "requests":"grpcs://orderer.monetasa.com:7050",
+      "tls_cacerts":"/blockchain-explorer/examples/net1/crypto-network/crypto-config/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/tls/ca.crt"
+    }
+    ],
+    "keyValueStore": "/tmp/fabric-client-kvs",
+    "configtxgenToolPath": "/home/ubuntu/monetasa/bin",
+    "SYNC_START_DATE_FORMAT":"YYYY/MM/DD",
+    "syncStartDate":"2018/01/01",
+    "eventWaitTime": "30000",
+    "license": "Apache-2.0",
+    "version": "1.1"
 }
