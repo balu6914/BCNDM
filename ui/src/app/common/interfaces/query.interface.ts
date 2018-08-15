@@ -7,6 +7,7 @@ export class Query {
   public limit: number;
   public name?: string;
   public streamType?: string;
+  public owner?: string;
   public minPrice?: number;
   public maxPrice?: number;
   private _coords?: Map<string, number> | null;
@@ -50,6 +51,10 @@ export class Query {
 
     if (this.streamType) {
       params = params.set('type', this.streamType);
+    }
+
+    if (this.owner) {
+      params = params.set('owner', this.owner);
     }
 
     Array.from(this._coords.entries()).forEach(value => {

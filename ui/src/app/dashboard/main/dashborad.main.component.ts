@@ -62,7 +62,7 @@ export class DashboardMainComponent {
             result.Subscriptions.forEach(subscription => {
               this.streamService.getStream(subscription["id"]).subscribe(
                 (result: any) => {
-                  const stream = result.Stream;
+                  const stream = result;
 
                   // Create name and price field in susbcription
                   subscription["stream_name"] = stream["name"];

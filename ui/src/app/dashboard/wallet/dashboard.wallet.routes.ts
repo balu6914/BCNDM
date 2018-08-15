@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
-import { WalletBalanceComponent } from './balance';
-import { AuthGuardService as AuthGuard } from '../../auth/guardians/auth.guardian';
+import { DashboardWalletComponent } from './dashboard.wallet.component';
+import { AuthGuardService as AuthGuard } from 'app/auth/guardians/auth.guardian';
 
 // Define our Auth Routes
 const routes: Routes = [
        {
-           path: 'balance',
-           component: WalletBalanceComponent ,
+           path: '',
+           component: DashboardWalletComponent ,
            canActivate: [AuthGuard],
        },
 ];

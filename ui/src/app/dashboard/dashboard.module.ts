@@ -12,7 +12,6 @@ import { DashboardRoutingModule } from './dashboard.routes';
 // Dashboard components
 import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
-import { WalletModule } from './wallet/wallet.module';
 
 import { CommonAppModule } from '../common/common.module';
 
@@ -31,14 +30,13 @@ import { SharedModule } from '../shared/shared.module';
     CommonAppModule,
     SharedModule,
     LayoutModule,
-    WalletModule,
     DashboardRoutingModule,
     ClipboardModule,
     SharedModule,
   ],
   declarations: [
-      DashboardComponent,
-      DashboardMainComponent,
+    DashboardComponent,
+    DashboardMainComponent,
   ],
  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
