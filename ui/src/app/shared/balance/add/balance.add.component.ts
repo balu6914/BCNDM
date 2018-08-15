@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 
 import { BalanceService } from '../balance.service';
 import { Balance } from '../../../common/interfaces/balance.interface';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dpc-balance-add',
@@ -22,6 +23,7 @@ export class BalanceAddComponent implements OnInit {
     public  modalAddTokens: BsModalRef,
     private balanceService: BalanceService,
     private formBuilder: FormBuilder,
+    public  alertService: AlertService,
   ){}
 
   ngOnInit() {
@@ -36,15 +38,16 @@ export class BalanceAddComponent implements OnInit {
     if(isValid) {
       this.processing = true;
       this.balanceService.buy(model).subscribe(
-        response => {
-          this.balanceUpdate.emit('update');
+        (result: any) => {
           this.processing = false;
+          this.balanceUpdate.emit('update');
+          this.alertService.success(` You successfully transfer ${this.form.value.amount} TAS to your account`);
         },
         err => {
-          this.errorMsg = err;
           this.processing = false;
+          this.alertService.error(`Something went wrong. Please try again later.`);
         }
-      )
+      );
     }
   }
 }

@@ -3,6 +3,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { StreamService } from '../../../common/services/stream.service';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dashboard-sell-delete',
@@ -11,13 +12,12 @@ import { StreamService } from '../../../common/services/stream.service';
 })
 export class DashboardSellDeleteComponent implements OnInit {
   stream: any;
-  modalMsg: string;
-  submitted: boolean = false;
 
   @Output() streamDeleted: EventEmitter<any> = new EventEmitter();
   constructor(
     private streamService: StreamService,
     public  modalDeleteStream: BsModalRef,
+    public  alertService: AlertService,
   ) {}
 
 
@@ -25,15 +25,14 @@ export class DashboardSellDeleteComponent implements OnInit {
     // Send addStream request
     this.streamService.removeStream(this.stream.id).subscribe(
       res => {
-        this.modalMsg = `Stream succesfully removed!`;
         this.streamDeleted.emit(this.stream.id)
+        this.modalDeleteStream.hide();
+        this.alertService.success(`Stream succesfully removed!`);
       },
       err => {
-        this.modalMsg = `Status: ${err.status} - ${err.statusText}`;
+        this.modalDeleteStream.hide();
+        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
     });
-
-    // Hide modalDeleteStream and show modalResponse
-    this.submitted = true;
   }
 
   ngOnInit() {

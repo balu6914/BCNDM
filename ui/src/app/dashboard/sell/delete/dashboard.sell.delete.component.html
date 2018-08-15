@@ -1,69 +1,54 @@
-<!-- Add Stream Response -->
-<div *ngIf="submitted" class="modal-content">
+<!-- Add Stream -->
+<div class="modal-content">
   <div class="modal-header">
-    <h4 class="modal-title pull-left">{{ modalMsg }}</h4>
+    <h4 class="modal-title pull-left">Delete Stream</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalDeleteStream.hide()">
     <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    <button type="button" class="btn btn-primary btn-padding-lg btn-xs-full" (click)="modalDeleteStream.hide()">Close</button>
-  </div>
-</div>
-
-<!-- Add Stream -->
-<div *ngIf="!submitted" lass="modal-content">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h4 class="modal-title pull-left">Delete Stream</h4>
-      <button type="button" class="close pull-right" aria-label="Close" (click)="modalDeleteStream.hide()">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body text-center">
-      <div class="box__content">
-        <div class="row">
-          <div class="col-sm-4 col-md-12">
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="stream__title">
-                  Name
-                </div>
-                <div class="stream__text">
-                  {{ stream.name }}
-                </div>
+  <div class="modal-body text-center">
+    <div class="box__content">
+      <div class="row">
+        <div class="col-sm-4 col-md-12">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Name
               </div>
-              <div class="col-md-6">
-                <div class="stream__title">
-                  Stream Type
-                </div>
-                <div class="stream__text">
-                  {{ stream.type }}
-                </div>
+              <div class="stream__text">
+                {{ stream.name }}
               </div>
-              <div class="col-sm-6">
-                <div class="stream__title">
-                  Description
-                </div>
-                <div class="stream__text">
-                  {{ stream.description }}
-                </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stream__title">
+                Stream Type
               </div>
-              <div class="col-sm-6">
-                <div class="stream__title">
-                  Price
-                1</div>
-                <div class="stream__text">
-                  {{ stream.price }} TAS
-                </div>
+              <div class="stream__text">
+                {{ stream.type }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Description
+              </div>
+              <div class="stream__text">
+                {{ stream.description }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Price
+              1</div>
+              <div class="stream__text">
+                {{ stream.price }} TAS
               </div>
             </div>
           </div>
         </div>
       </div>
-      <p>Are you sure?</p>
-      <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
-      <button type="button" class="btn btn-danger" (click)="modalDeleteStream.hide()">No</button>
     </div>
+    <p>Are you sure?</p>
+    <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
+    <button type="button" class="btn btn-danger" (click)="modalDeleteStream.hide()">No</button>
   </div>
 </div>

@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { SubscriptionService } from '../../../common/services/subscription.service';
-import { AlertService } from '../../../shared/alerts/services/alert.service';
-
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dpc-dashboard-buy-add',
