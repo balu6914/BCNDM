@@ -1,1 +1,1 @@
-export * from './dashboard.buy.component'
+export * from './main/dashboard.buy.component';

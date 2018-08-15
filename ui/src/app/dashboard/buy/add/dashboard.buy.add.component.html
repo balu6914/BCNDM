@@ -1,21 +1,8 @@
-<!-- Add Subscription Response -->
-<div *ngIf="submitted" class="modal-content">
-  <div class="modal-header">
-    <h4 class="modal-title pull-left">{{ modalMsg }}</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalSubscription.hide()">
-    <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <button type="button" class="btn btn-primary btn-padding-lg btn-xs-full" (click)="modalSubscription.hide()">Close</button>
-  </div>
-</div>
-
-<div *ngIf="!submitted" lass="modal-content">
+<div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title" id="modalBuyStreamLabel">{{ stream.name }} - {{ stream.type }}</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalSubscription.hide()">
-    <span aria-hidden="true">&times;</span>
+      <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
@@ -34,7 +21,7 @@
             <form class="form-inline float-right buy-tas needs-validation" [formGroup]="form" novalidate>
               <div class="form-group">
                 <label for="hours" class="form-label mr-2">Subscription hours</label>
-                <input type="number" formControlName="hours" class="form-control buy-tas__input">
+                <input type="number" formControlName="hours" class="form-control buy-tas__input" min="1">
               </div>
             </form>
           </div>
