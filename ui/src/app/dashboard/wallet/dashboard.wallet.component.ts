@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
-import { AuthService } from '../../../auth/services/auth.service';
-import { User } from '../../../common/interfaces/user.interface';
-import { WalletAddComponent } from '../add'
+import { AuthService } from 'app/auth/services/auth.service';
+import { User } from 'app/common/interfaces/user.interface';
 import { Chart } from 'chart.js';
 
 @Component({
   selector: 'user-wallet-balance',
-  templateUrl: './wallet.balance.component.html',
-  styleUrls: ['./wallet.balance.component.scss']
+  templateUrl: './dashboard.wallet.component.html',
+  styleUrls: ['./dashboard.wallet.component.scss']
 })
-export class WalletBalanceComponent implements OnInit {
+export class DashboardWalletComponent implements OnInit {
   user: User;
   newBalance: number;
   subscription: any;
+  // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+  mockBalance: any;
 
   constructor(
     private authService: AuthService,
@@ -33,12 +34,6 @@ export class WalletBalanceComponent implements OnInit {
 
       // Create mocked statistics graph
       this.createMyChart();
-    }
-
-    // Open BUY tokens dialog
-    public onBuyTokensClick() {
-      // Open DashboardSellAddComponent Modal
-      this.modalService.show(WalletAddComponent);
     }
 
     createMyChart() {
