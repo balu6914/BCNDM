@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
@@ -10,6 +9,7 @@ import { Query } from '../../common/interfaces/query.interface';
 import { Page } from '../../common/interfaces/page.interface';
 import { Stream } from '../../common/interfaces';
 import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dashboard-sell',
@@ -28,8 +28,8 @@ export class DashboardSellComponent {
   constructor(
     private streamService: StreamService,
     private AuthService: AuthService,
-    private router: Router,
     private modalService: BsModalService,
+    public alertService: AlertService,
   ) {
   }
 
@@ -81,8 +81,12 @@ export class DashboardSellComponent {
       formData.append('csv', file, file.name);
 
       this.streamService.addStreamBulk(formData).subscribe(
-        data => this.router.navigate(['/dashboard/sell']),
-        error => console.log(error),
+        data => {
+          this.alertService.success(`CSV successfully uploaded`);
+        },
+        err => {
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+        }
       );
     }
   }

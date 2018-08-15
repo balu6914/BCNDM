@@ -1,76 +1,61 @@
-<!-- Create Contract Response -->
-<div *ngIf="submitted" class="modal-content">
+<!-- Create Contract -->
+<div class="modal-content">
   <div class="modal-header">
-    <h4 class="modal-title pull-left">{{ modalMsg }}</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalNewContract.hide()">
+    <h5 class="modal-title" id="newContractLabel">New contract</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalNewContract.hide()">
     <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    <button type="button" class="btn btn-primary btn-padding-lg btn-xs-full" (click)="modalNewContract.hide()">Close</button>
+    <div class="container-fluid">
+      <form class="needs-validation" [formGroup]="form" novalidate>
+        <div class="form-group row">
+          <label for="streamName" class="col-sm-4 col-form-label">Select stream</label>
+          <div class="col-sm-8">
+            <select formControlName="streamName" class="form-control selectpicker" data-live-search="true">
+              <option>WeIO humidity</option>
+              <option>WeIO temperature</option>
+              <option>WeIO humidity</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="parties" class="col-sm-4 col-form-label">Select users</label>
+          <div class="col-sm-8">
+            <select formControlName="parties" class="form-control selectpicker" data-live-search="true">
+              <option>Nikola Marcetic</option>
+              <option>Jason Born</option>
+              <option>Lina Reyes</option>
+              <option>Amelia Lynch</option>
+              <option>Dean Allen</option>
+              <option>Ellen Newton</option>
+              <option>Don McCoy</option>
+              <option>Don McCoy</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="expirationDate" class="col-sm-4 col-form-label">Select expiriation date</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="expirationDate" class="form-control datepicker">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamPrice" class="col-sm-4 col-form-label">Tokens per hour</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="streamPrice" class="form-control">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="shareOffered" class="col-sm-4 col-form-label">Share offered</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="shareOffered" class="form-control">
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
-
-<!-- Create Contract -->
-<div *ngIf="!submitted" class="modal-content">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title" id="newContractLabel">New contract</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalNewContract.hide()">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="container-fluid">
-        <form class="needs-validation" [formGroup]="form" novalidate>
-          <div class="form-group row">
-            <label for="streamName" class="col-sm-4 col-form-label">Select stream</label>
-            <div class="col-sm-8">
-              <select formControlName="streamName" class="form-control selectpicker" data-live-search="true">
-                <option>WeIO humidity</option>
-                <option>WeIO temperature</option>
-                <option>WeIO humidity</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label for="parties" class="col-sm-4 col-form-label">Select users</label>
-            <div class="col-sm-8">
-              <select formControlName="parties" class="form-control selectpicker" data-live-search="true">
-                <option>Nikola Marcetic</option>
-                <option>Jason Born</option>
-                <option>Lina Reyes</option>
-                <option>Amelia Lynch</option>
-                <option>Dean Allen</option>
-                <option>Ellen Newton</option>
-                <option>Don McCoy</option>
-                <option>Don McCoy</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label for="expirationDate" class="col-sm-4 col-form-label">Select expiriation date</label>
-            <div class="col-sm-8">
-              <input type="text" formControlName="expirationDate" class="form-control datepicker">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label for="streamPrice" class="col-sm-4 col-form-label">Tokens per hour</label>
-            <div class="col-sm-8">
-              <input type="text" formControlName="streamPrice" class="form-control">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label for="shareOffered" class="col-sm-4 col-form-label">Share offered</label>
-            <div class="col-sm-8">
-              <input type="text" formControlName="shareOffered" class="form-control">
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Create contact</button>
-    </div>
+  <div class="modal-footer">
+    <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Create contact</button>
   </div>
 </div>

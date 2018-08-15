@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dashboard-contracts-add',
@@ -11,14 +12,13 @@ import { MitasPipe } from 'app/common/pipes/converter.pipe';
 })
 export class DashboardContractsAddComponent {
   form: FormGroup;
-  modalMsg: string;
-  submitted: boolean = false;
 
   @Output() contractCreated: EventEmitter<any> = new EventEmitter();
   constructor(
     private mitasPipe: MitasPipe,
     private formBuilder: FormBuilder,
     public  modalNewContract: BsModalRef,
+    public  alertService: AlertService,
   ) {
     this.form = this.formBuilder.group({
       streamName:     ['', [<any>Validators.required]],
@@ -39,10 +39,8 @@ export class DashboardContractsAddComponent {
     }
 
     // TODO: Send request to transactions service to create th contract
-    this.modalMsg = `Contract succesfully created!`;
     this.contractCreated.emit(contract);
-
-    // Hide modalNewStream and show modalResponse
-    this.submitted = true;
+    this.modalNewContract.hide();
+    this.alertService.success(`Contract succesfully created!`);
   }
 }

@@ -5,6 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { StreamService } from '../../../common/services/stream.service';
 import { Stream } from '../../../common/interfaces/stream.interface';
 import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dashboard-sell-edit',
@@ -13,8 +14,6 @@ import { MitasPipe } from '../../../common/pipes/converter.pipe';
 })
 export class DashboardSellEditComponent {
   form: FormGroup;
-  modalMsg: string;
-  submitted: boolean = false;
   editData: any;
   streamID: any;
 
@@ -24,6 +23,7 @@ export class DashboardSellEditComponent {
       private mitasPipe: MitasPipe,
       private formBuilder: FormBuilder,
       public  modalNewStream: BsModalRef,
+      public  alertService: AlertService,
   ) {
     this.form = formBuilder.group({
       'name':        ['', [<any>Validators.required, <any>Validators.minLength(3)]],
@@ -57,16 +57,14 @@ export class DashboardSellEditComponent {
     // Send addStream request
     this.streamService.updateStream(this.streamID, stream).subscribe(
       res => {
-        this.modalMsg = `Stream succesfully updated!`;
         stream.id = this.streamID;
         this.streamEdited.emit(stream);
+        this.modalNewStream.hide();
+        this.alertService.success(`Stream succesfully updated!`);
       },
       err => {
-        console.log(err);
-        this.modalMsg = `Status: ${err.status} - ${err.statusText}`;
+        this.modalNewStream.hide();
+        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
     });
-
-    // Hide modalNewStream and show modalResponse
-    this.submitted = true;
   }
 }
