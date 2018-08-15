@@ -22,32 +22,32 @@ type streamRepository struct {
 // repository.
 func New(db *mgo.Session) streams.StreamRepository {
 	c := db.DB(dbName).C(collection)
-	ownersIdx := mgo.Index{
-		Name: "owners",
-		Key:  []string{"owner"},
+	indices := []mgo.Index{
+		mgo.Index{
+			Name: "owners",
+			Key:  []string{"owner"},
+		},
+		mgo.Index{
+			Name: "locations",
+			Key:  []string{"$2d:location.coordinates"},
+		},
+		mgo.Index{
+			Name: "names",
+			Key:  []string{"name"},
+		},
+		mgo.Index{
+			Name: "types",
+			Key:  []string{"type"},
+		},
+		mgo.Index{
+			Name: "prices",
+			Key:  []string{"price"},
+		},
 	}
-	locIdx := mgo.Index{
-		Name: "locations",
-		Key:  []string{"$2d:location.coordinates"},
-	}
-	namesIdx := mgo.Index{
-		Name: "names",
-		Key:  []string{"name"},
-	}
-	typeIdx := mgo.Index{
-		Name: "types",
-		Key:  []string{"type"},
-	}
-	priceIdx := mgo.Index{
-		Name: "prices",
-		Key:  []string{"price"},
+	for _, idx := range indices {
+		c.EnsureIndex(idx)
 	}
 
-	c.EnsureIndex(ownersIdx)
-	c.EnsureIndex(locIdx)
-	c.EnsureIndex(namesIdx)
-	c.EnsureIndex(typeIdx)
-	c.EnsureIndex(priceIdx)
 	return &streamRepository{db}
 }
 

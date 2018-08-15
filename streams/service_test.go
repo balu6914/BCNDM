@@ -126,40 +126,35 @@ func TestAddBulkStreams(t *testing.T) {
 func TestSearchStreams(t *testing.T) {
 	svc := newService()
 	size := 0
-	// all := []streams.Stream{}
 	for i := 0; i < 50; i++ {
 		size++
 		s := stream()
 		id, err := svc.AddStream(s)
 		s.ID = bson.ObjectIdHex(id)
-		// all = append(all, s)
 		require.Nil(t, err, "Repo should save streams.")
 	}
 	// Specify two special Streams to match different
 	// types of query and different result sets.
-	price1 := uint64(40)
-	price2 := uint64(50)
-	name := "different name"
+	s1Price := uint64(40)
+	s2Price := uint64(50)
 
 	s1 := stream()
-	s1.Price = price1
-	s1.Name = name
+	s1.Price = s1Price
+	s1.Name = "different name"
+	s1.Type = "different type"
 	id, _ := svc.AddStream(s1)
 	s1.ID = bson.ObjectIdHex(id)
-	// all = append(all, s1)
 	size++
 
 	s2 := stream()
-	owner := bson.NewObjectId().Hex()
-	s2.Price = price2
-	s2.Owner = owner
+	s2.Price = s2Price
+	s2.Owner = bson.NewObjectId().Hex()
 	id, _ = svc.AddStream(s2)
 	s2.ID = bson.ObjectIdHex(id)
-	// all = append(all, s2)
 	size++
 
 	total := uint64(size)
-	l := int(limit)
+	lmt := int(limit)
 
 	cases := []struct {
 		desc  string
@@ -170,7 +165,7 @@ func TestSearchStreams(t *testing.T) {
 	}{
 		{
 			desc: "search with query with only the limit specified",
-			size: l,
+			size: lmt,
 			query: streams.Query{
 				Limit: limit,
 			},
@@ -194,13 +189,13 @@ func TestSearchStreams(t *testing.T) {
 		},
 		{
 			desc: "search with min price specified",
-			size: l,
+			size: lmt,
 			// Get all except the one with the price1.
 			// Content is caluclated this way because MongoDB
-			// pages result from the last insertied entry.
+			// pages results from the last inserted entry.
 			query: streams.Query{
 				Limit:    limit,
-				MinPrice: pointer(price1 + 1),
+				MinPrice: pointer(s1Price + 1),
 			},
 			page: streams.Page{
 				Limit: limit,
@@ -209,11 +204,11 @@ func TestSearchStreams(t *testing.T) {
 		},
 		{
 			desc:  "search with max price specified",
-			owner: owner,
+			owner: s2.Owner,
 			size:  1,
 			query: streams.Query{
 				Limit:    limit,
-				MaxPrice: pointer(price2),
+				MaxPrice: pointer(s2Price),
 			},
 			page: streams.Page{
 				Limit: limit,
@@ -226,8 +221,8 @@ func TestSearchStreams(t *testing.T) {
 			// GTE price1 and LT price2 + 1 (to include price2)
 			query: streams.Query{
 				Limit:    limit,
-				MinPrice: pointer(price1),
-				MaxPrice: pointer(price2 + 1),
+				MinPrice: pointer(s1Price),
+				MaxPrice: pointer(s2Price + 1),
 			},
 			page: streams.Page{
 				Limit: limit,
@@ -239,24 +234,71 @@ func TestSearchStreams(t *testing.T) {
 			size: 1,
 			query: streams.Query{
 				Limit: limit,
-				Owner: owner,
+				Owner: s2.Owner,
 			},
 			page: streams.Page{
 				Limit: limit,
 				Total: 1,
 			},
 		},
-
 		{
 			desc: "search by name",
 			size: 1,
 			query: streams.Query{
 				Limit: limit,
-				Name:  name,
+				Name:  s1.Name,
 			},
 			page: streams.Page{
 				Limit: limit,
 				Total: 1,
+			},
+		},
+		{
+			desc: "search by type",
+			size: 1,
+			query: streams.Query{
+				Limit:      limit,
+				StreamType: s1.Type,
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 1,
+			},
+		},
+		{
+			desc: "search by owner other than provided",
+			size: lmt,
+			query: streams.Query{
+				Limit: limit,
+				Owner: fmt.Sprintf("-%s", s2.Owner),
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: total - 1,
+			},
+		},
+		{
+			desc: "search by name other than provided",
+			size: lmt,
+			query: streams.Query{
+				Limit: limit,
+				Name:  fmt.Sprintf("-%s", s1.Name),
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: total - 1,
+			},
+		},
+		{
+			desc: "search by type other than provided",
+			size: lmt,
+			query: streams.Query{
+				Limit:      limit,
+				StreamType: fmt.Sprintf("-%s", s1.Type),
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: total - 1,
 			},
 		},
 	}
