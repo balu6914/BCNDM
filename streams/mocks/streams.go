@@ -89,16 +89,34 @@ func inRange(price uint64, min, max *uint64) bool {
 	return true
 }
 
+func contains(value, search string) bool {
+	if strings.HasPrefix(search, "-") {
+		search = search[1:]
+		if !strings.HasPrefix(search, "-") {
+			return !strings.Contains(value, search)
+		}
+	}
+	return strings.Contains(value, search)
+}
+
 func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, error) {
 	ret := []streams.Stream{}
 	for _, stream := range srm.streams {
-		if strings.Contains(stream.Name, query.Name) && strings.Contains(stream.Type, query.StreamType) &&
+		if contains(stream.Name, query.Name) && contains(stream.Type, query.StreamType) &&
 			inRange(stream.Price, query.MinPrice, query.MaxPrice) {
 			if query.Owner == "" {
 				ret = append(ret, stream)
 				continue
 			}
-			if query.Owner == stream.Owner {
+			owner := query.Owner
+			if strings.HasPrefix(query.Owner, "-") {
+				owner := query.Owner[1:]
+				if !strings.HasPrefix(owner, "-") && stream.Owner != owner {
+					ret = append(ret, stream)
+					continue
+				}
+			}
+			if stream.Owner == owner {
 				ret = append(ret, stream)
 			}
 		}

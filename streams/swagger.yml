@@ -86,17 +86,27 @@ paths:
           name: owner
           type: string
           required: false
-          description: ID of the owner of the stream.
+          description: |
+            ID of the owner of the stream. You can search by the owner using logical NOT to match streams
+            with the owner other than the provided one. You can achieve this by adding "-" perfix to the value.
         - in: query
           name: name
           type: string
           required: false
-          description: Name of the stream to be found.
+          description: |
+            Name of the stream to be found. Name search is case sensitive and uses partial matching.
+            You can search by name using logical NOT to match all streams with the name other than the provided one.
+            You can achieve this by adding "-" character at the beginning of the value. If the name starts with the
+            "-" character, add one more "-" to the prefix to prevent "-" at the beginning being interpreted as logical NOT.
         - in: query
           name: type
           type: string
           required: false
-          description: Type of the stream to be found.
+          description: |
+            Type of the stream to be found. Type search is case sensitive and uses partial matching.
+            You can search by type using logical NOT to match all streams with the type other than the provided one.
+            You can achieve this by adding "-" character at the beginning of the value. If the type starts with the
+            "-" character, add one more "-" to the prefix to prevent "-" at the beginning being interpreted as logical NOT.
         - in: query
           name: minPrice
           type: number
