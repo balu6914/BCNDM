@@ -15,7 +15,6 @@ import { SharedModule } from './shared/shared.module';
 import { LayoutModule } from './layout'
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { WalletModule } from './dashboard/wallet/wallet.module';
 
 @NgModule({
     imports: [
@@ -30,7 +29,6 @@ import { WalletModule } from './dashboard/wallet/wallet.module';
         SharedModule,
         LayoutModule,
         DashboardModule,
-        WalletModule,
         AppRoutingModule,
     ],
     declarations: [

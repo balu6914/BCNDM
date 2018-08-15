@@ -25,7 +25,7 @@ const routes: Routes = [
            },
            {
                path: 'wallet',
-               loadChildren: 'app/dashboard/wallet/wallet.module#WalletModule',
+               loadChildren: 'app/dashboard/wallet/dashboard.wallet.module#DashboardWalletModule',
            },
            {
                path: 'contracts',
