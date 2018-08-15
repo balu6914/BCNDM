@@ -250,12 +250,12 @@ func TestSearchStreams(t *testing.T) {
 	s.Price = price1
 	svc.AddStream(s)
 
-	owner := bson.NewObjectId().Hex()
 	s = stream
 	s.ID = bson.NewObjectId()
 	s.Price = price2
+	s.Owner = bson.NewObjectId().Hex()
 	s.Name = "special_name"
-	s.Owner = owner
+	s.Type = "special_type"
 	svc.AddStream(s)
 	// Add special streams to count.
 	total += 2
@@ -302,7 +302,7 @@ func TestSearchStreams(t *testing.T) {
 			desc:   "search streams by the owner",
 			auth:   validKey,
 			status: http.StatusOK,
-			query:  makeQuery(0, 20, "", "", owner, nil, nil),
+			query:  makeQuery(0, 20, "", "", s.Owner, nil, nil),
 			size:   1,
 			res: streams.Page{
 				Page:  0,
@@ -347,6 +347,18 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
+			desc:   "search streams by owner",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?owner=%s", s.Owner),
+			size:   1,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+			},
+		},
+		{
 			desc:   "search streams by name",
 			auth:   validKey,
 			status: http.StatusOK,
@@ -356,6 +368,54 @@ func TestSearchStreams(t *testing.T) {
 				Page:  0,
 				Limit: 20,
 				Total: 1,
+			},
+		},
+		{
+			desc:   "search streams by type",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?type=%s", s.Type[0:5]),
+			size:   1,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+			},
+		},
+		{
+			desc:   "search streams by owner other than provided",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?owner=-%s", s.Owner),
+			size:   20,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: total - 1,
+			},
+		},
+		{
+			desc:   "search streams by name other than provided",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?name=-%s", s.Name[0:5]),
+			size:   20,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: total - 1,
+			},
+		},
+		{
+			desc:   "search streams by type other than provided",
+			auth:   validKey,
+			status: http.StatusOK,
+			query:  fmt.Sprintf("?type=-%s", s.Type[0:5]),
+			size:   20,
+			res: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: total - 1,
 			},
 		},
 	}
