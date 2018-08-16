@@ -2,14 +2,14 @@
   "network-config": {
     "org1": {
       "name": "peerOrg1",
-        "mspid": "Org1MSP",
-        "peer1": {
+      "mspid": "Org1MSP",
+      "peer1": {
           "requests": "grpcs://peer0.org1.monetasa.com:7051",
           "events": "grpcs://peer0.org1.monetasa.com:7053",
           "server-hostname": "peer0.org1.monetasa.com",
           "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls/ca.crt"
         },
-        "admin": {
+      "admin": {
           "key": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/keystore",
           "cert": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp/signcerts"
         }
