@@ -1,0 +1,29 @@
+version: '2'
+
+services: 
+
+  explorer-db:
+    image: postgres
+    ports:
+      - "5532:5432"
+    volumes:
+      - ../explorer/explorer-artifacts/explorerpg.sql:/docker-entrypoint-initdb.d/explorerpg.sql
+      - ../explorer/explorer-artifacts/updatepg.sql:/docker-entrypoint-initdb.d/updatepg.sql
+    networks:
+      - monetasa-bc-net
+
+  explorer:
+    image: datapace/hyperledger-explorer
+    container_name: monetasa-explorer
+    hostname: explorer
+    restart: always
+    volumes:
+      - ../explorer/explorer-artifacts/config.json:/blockchain-explorer/app/platform/fabric/config.json
+      - ../explorer/explorer-artifacts/pgconfig.json:/blockchain-explorer/app/persistence/postgreSQL/db/pgconfig.json
+      - ../../config/crypto-config:/blockchain-explorer/examples/net1/crypto-network/crypto-config
+    ports:
+      - "9090:8080"
+    networks:
+      - monetasa-bc-net
+    depends_on:
+      - "explorer-db"
