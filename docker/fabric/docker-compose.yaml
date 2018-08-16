@@ -91,3 +91,4 @@ services:
       - peer0.org1.monetasa.com
     networks:
       - monetasa-bc-net
+
