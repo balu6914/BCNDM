@@ -43,6 +43,7 @@ CREATE TABLE chaincodes (
 
 ALTER table chaincodes owner to hppoc;
 Alter sequence chaincodes_id_seq restart with 10;
+
 -- ----------------------------
 --  Table structure for `channel`
 -- ----------------------------
@@ -58,6 +59,7 @@ CREATE TABLE channel (
 
 ALTER table channel owner to hppoc;
 Alter sequence channel_id_seq restart with 3;
+
 -- ----------------------------
 --  Table structure for `peer`
 -- ----------------------------
@@ -74,6 +76,7 @@ CREATE TABLE peer (
   createdt timestamp DEFAULT NULL
 );
 ALTER table peer owner to hppoc;
+
 -- ---------------------------
 --  Table structure for `peer_ref_channel`
 -- ----------------------------
