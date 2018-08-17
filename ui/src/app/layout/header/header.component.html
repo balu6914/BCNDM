@@ -53,7 +53,6 @@
       </div>
 
 
-
       <div *ngIf="isLoggedin && user"  class="user">
         <div class="dropdown" dropdown>
           <a class="user__toggle" aria-haspopup="true" aria-expanded="false" dropdownToggle>
@@ -74,40 +73,3 @@
     </div>
   </div>
 </nav>
-
-
-
-
-
-
-
-
-
-<!--
-
-
-
-
-
-
-
-      <mdl-layout-header class="public-header">
-         <mdl-layout-header-row>
-             <mdl-layout-title class="title">
-                 <img src="assets/images/logo-monetasa-64.png" class="logo" alt="" width="50">
-             </mdl-layout-title>
-            <mdl-layout-spacer></mdl-layout-spacer>
-            <!-- Navigation. We hide it in small screens. -->
-            <!-- <nav class="mdl-navigation mdl-layout--large-screen-only">
-               <a *ngIf="!isLoggedin" href="" class="mdl-navigation__link" >ABOUT</a>
-               <a *ngIf="!isLoggedin" href="" class="mdl-navigation__link" >CONTACT</a>
-               <div  *ngIf="isLoggedin && user" class="header-user-menu">
-                  {{user.email}}<button mdl-button #btn1="mdlButton" (click)="m1.toggle($event, btn1)" mdl-button-type="icon" mdl-ripple><mdl-icon>more_vert</mdl-icon></button>
-                    <mdl-menu #m1="mdlMenu" mdl-menu-position="bottom-right">
-                       <mdl-menu-item mdl-menu-item-full-bleed-divider mdl-ripple [routerLink]="['dashboard/wallet/balance']">MY WALLET</mdl-menu-item>
-                       <mdl-menu-item  (click)="logout()">LOGOUT</mdl-menu-item>
-                    </mdl-menu>
-               </div>
-            </nav>
-         </mdl-layout-header-row>
-      </mdl-layout-header> -->

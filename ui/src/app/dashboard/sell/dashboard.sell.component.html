@@ -14,7 +14,7 @@
       </div>
       <div class="action-buttons">
         <p class="action-buttons__item">
-          <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()" data-toggle="modal">
+          <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()">
             <span class="btn-media__icon btn-media__icon--add">
             </span>
             Add manually
@@ -31,15 +31,14 @@
       </div>
     </div>
     <div class="row row-grow">
-      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block js-showMap-content">
+      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block">
         <div class="box box-grow">
           <div class="box__header">
             <p class="box__title">
               Your streams
             </p>
           </div>
-          <!-- The element will contain our Map -->
-          <dpc-map-leaflet #map [streamList]="streams"></dpc-map-leaflet>
+          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">

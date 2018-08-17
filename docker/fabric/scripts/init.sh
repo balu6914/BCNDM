@@ -12,7 +12,7 @@ CHANNEL_ID=myc
 CHAIN_ID=token
 CHAIN_PATH=github.com/chaincode/token
 CHAIN_VER=1.0
-CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 1000000}"]}'
+CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
 
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
 

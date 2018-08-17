@@ -1,7 +1,8 @@
 /* App style module imports
  You can add global styles to this file, and also import other style files
  */
-
+// Import font
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,500,500i,600,600i,700,700i');
 // Import Lib's
 
 @import '~bootstrap/scss/bootstrap.scss';
@@ -12,6 +13,7 @@
 
 @import "_global.scss";
 @import "_vars.scss";
+@import "_loader.scss";
 
 @import '~leaflet/dist/leaflet.css';
 @import '~leaflet-draw/dist/leaflet.draw.css';
@@ -68,7 +70,10 @@ Based on http://getbootstrap.com/docs/4.1/getting-started/theming/
 // Buttons
 
 .btn {
-font-weight: $font-weight-medium;
+  font-weight: $font-weight-medium;
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 .btn-padding-lg {
 padding-left: 3rem;
@@ -153,6 +158,7 @@ $btn-media-xy: 44px;
 .btn-media {
 position: relative;
 padding-left: $btn-media-xy + 15px;
+line-height: 33px;
 &__icon {
   position: absolute;
   top: 0;
@@ -271,7 +277,7 @@ margin-bottom: 1rem;
 .table tbody tr {
 transition: $transition-base;
 background-color: rgba(240, 244, 249, .5);
-border-bottom: 10px solid white;
+border-bottom: 10px solid white !important;
 &:last-child {
   border-bottom: none;
 }
@@ -590,8 +596,8 @@ font-size: 1rem;
 background-color: #fff;
 padding: 1rem;
 box-shadow: 0px 4px 32px 0px rgba(220,226,230,1);
-margin-bottom: 30px;
 position: relative;
+margin-bottom: 30px;
 &__header {
   display: flex;
   justify-content: space-between;
@@ -663,22 +669,6 @@ font-weight: $font-weight-medium;
     }
   }
 }
-}
-
-// Flip Card
-
-.flip-card {
-@include media-breakpoint-down(sm) {
-  margin-bottom: 1rem;
-}
-.box {
-  z-index: 1;
-}
-.back {
-}
-}
-.is-flip-card-hidden {
-display: none;
 }
 
 // Action Buttons
@@ -1169,45 +1159,6 @@ align-items: center;
 }
 }
 
-// Map
-
-.map-wrapper {
-margin-left: -1rem;
-margin-right: -1rem;
-margin-bottom: -1rem;
-}
-.map {
-width: 100%;
-height: 300px;
-@include media-breakpoint-up(sm) {
-  height: 400px;
-}
-}
-
-.map-tooltip {
-font-size: 12px;
-&__title {
-  font-weight: $font-weight-semi-bold;
-  margin-bottom: 3px;
-}
-&__content {
-
-}
-&__subtitle {
-  font-weight: $font-weight-medium;
-  color: $text-color-2;
-  margin-bottom: 7px;
-}
-&__stake {
-  color: #8392A8;
-  margin-bottom: 0;
-}
-&__stake-amount {
-  font-weight: $font-weight-semi-bold;
-  color: $primary;
-}
-}
-
 // Fill boxes to 100% in height of the remaining screen height
 
 @include media-breakpoint-up(md) {
@@ -1224,13 +1175,6 @@ body {
 }
 .row-grow {
   flex-grow: 1;
-  .flip-card {
-    height: calc(100%);
-    height: calc(100% - 2rem);
-    .box-grow {
-      height: 100%;
-    }
-  }
 }
 .box-grow {
   height: calc(100% - 2rem);

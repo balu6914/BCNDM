@@ -40,7 +40,6 @@ export class AuthService {
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
-    this.loggedIn.emit(false);
     this.user = null;
     this.router.navigate(['login'])
   }
