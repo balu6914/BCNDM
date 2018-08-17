@@ -14,16 +14,9 @@
   }
   .row-grow {
     flex-grow: 1;
-    .flip-card {
-      height: calc(100%);
-      height: calc(100% - 2rem);
-      .box-grow {
-        height: 100%;
-      }
-    }
   }
   .box-grow {
-    height: calc(100% - 2rem);
+    height: 100%;
     min-height: 300px;
     display: flex;
     flex-direction: column;
@@ -144,45 +137,50 @@
 }
 
 // Table flip animation
+
 .tp-wrapper {
+  width: 100%;
+  height: 100%;
+  perspective: 1600px;
   -webkit-perspective: 1600px;
-            perspective: 1600px;
-    }
+  position: relative;
+}
 
 .tp-box {
+  height: calc(100% - 2rem);
   width: 100%;
-  height: 1000%;
-  position: relative;
-  position: relative;
+  position: fixed;
   -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
   -webkit-transform         : transform 1s;
       -ms-transform         : transform 1s;
           transform         : transform 1s;
+
 }
 
 .tp-box__side {
-       width: 100%;
-      height: 100%;
-      position: absolute;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     }
 
     .tp-box__front {
-      background: green;
       -webkit-transform : rotateY(0deg);
       -ms-transform     : rotateY(0deg);
       transform         : rotateY(0deg);
     }
 
     .tp-box__back {
-      background: black;
      -webkit-transform : rotateY(-180deg);
      -ms-transform     : rotateY(-180deg);
      transform         : rotateY(-180deg);
+     .box {
+       height: 100% !important;
+     }
    }

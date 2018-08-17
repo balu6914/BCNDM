@@ -44,11 +44,9 @@ export class DashboardMainComponent {
       this.table.headers = ["Stream Name", "Price Paid","Start Date", "End Date", "URL"];
 
         // Fetch current User
-        this.user = {};
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
-              console.log(this.user)
             },
             err => {
                 console.log(err)

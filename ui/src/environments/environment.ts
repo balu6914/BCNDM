@@ -5,9 +5,9 @@
 
 export const environment = {
   production: false,
-  API_AUTH : '/users',
+  API_AUTH : '/auth/users',
   API_AUTH_TOKENS: '/auth/tokens',
-  API_SUBSCRIPTIONS: '/subscriptions',
-  API_STREAMS: '/streams',
-  API_TOKENS: '/tokens'
+  API_SUBSCRIPTIONS: '/subscriptions/subscriptions',
+  API_STREAMS: '/streams/streams',
+  API_TOKENS: '/transactions/tokens'
 };

@@ -5,6 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Balance } from './balance';
 import { BalanceService } from './balance.service';
 import { BalanceAddComponent } from './add/balance.add.component';
+import { MitasPipe } from '../../common/pipes/converter.pipe';
 
 @Component({
   selector: 'dpc-balance-widget',
@@ -18,6 +19,7 @@ export class BalanceComponent implements OnInit {
   constructor(
     private modalService: BsModalService,
     private balanceService: BalanceService,
+    private mitasPipe: MitasPipe,
   ) {}
 
     // Open BUY tokens dialog
