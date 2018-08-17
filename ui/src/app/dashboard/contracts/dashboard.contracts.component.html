@@ -1,0 +1,33 @@
+<div class="container-fluid">
+  <div class="page-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">
+        Smart contract
+      </h1>
+      <div class="action-buttons">
+        <p class="action-buttons__item">
+          <a href="#" class="btn btn-primary btn-media js-help-trigger">
+          <span class="btn-media__icon btn-media__icon--help"></span>
+          Help
+          </a>
+        </p>
+        <p class="action-buttons__item">
+          <button type="button" class="btn btn-primary btn-media" data-toggle="modal" (click)="modalNewContract()">
+          <span class="btn-media__icon btn-media__icon--add"></span>
+          Add contract
+          </button>
+        </p>
+      </div>
+    </div>
+    <!-- Left column -->
+    <div class="mdl-cell mdl-cell--6-col contracts-container-section">
+      <dpc-table [table]="table"></dpc-table>
+    </div>
+    <!-- Right column -->
+    <div class="dashboard-card card-welcome mdl-paper mdl-paper--1 mdl-cell mdl-cell--6-col mdl-cell--6-desktop mdl-shadow--2dp mdl-card">
+      <!-- <dashboard-contracts-empty-list *ngIf="myContractsList?.length < 1"></dashboard-contracts-empty-list> -->
+      <dashboard-contracts-empty-list *ngIf="selectedContract?.length < 1"></dashboard-contracts-empty-list>
+      <dashboard-contracts-details *ngIf="selectedContract?.length > 0" [selectedContract]="selectedContract[0]"></dashboard-contracts-details>
+    </div>
+  </div>
+</div>

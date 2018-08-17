@@ -1,1 +1,49 @@
-<!-- <router-outlet></router-outlet> -->
+<div class="container-fluid">
+  <div class="page-wrapper animated fadeIn">
+    <div class="page-header">
+      <div class="page-header-xs--map">
+        <h1 class="page-title">
+          Sell stream
+        </h1>
+        <div class="page-header-xs--right">
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
+            <label class="form-check-label" for="showMap">Show Map</label>
+          </div>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <p class="action-buttons__item">
+          <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()">
+            <span class="btn-media__icon btn-media__icon--add">
+            </span>
+            Add manually
+          </button>
+        </p>
+        <p class="action-buttons__item">
+          <label class="btn btn-primary btn-media">
+              <input type="file" (change)="onFileChange($event)" style="display:none">
+              <span class="btn-media__icon btn-media__icon--upload">
+              </span>
+              Upload CSV
+          </label>
+        </p>
+      </div>
+    </div>
+    <div class="row row-grow">
+      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block">
+        <div class="box box-grow">
+          <div class="box__header">
+            <p class="box__title">
+              Your streams
+            </p>
+          </div>
+          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-sm-2">
+        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
+      </div>
+    </div>
+  </div>
+</div>

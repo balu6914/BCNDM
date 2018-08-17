@@ -1,22 +1,38 @@
 {
-	"/users/*": {
+	"/auth/users/*": {
 		"target": "http://localhost:8080",
-		"secure": false
+		"secure": false,
+		"pathRewrite": {
+		 	"^/auth": ""
+	 	 }
 	},
-	"/tokens/*": {
+	"/auth/tokens/*": {
 		"target": "http://localhost:8080",
-		"secure": false
+		"secure": false,
+		"pathRewrite": {
+		 	"^/auth": ""
+	 	 }
 	},
-	"/transactions/*": {
+	"/transactions/tokens/*": {
 		"target": "http://localhost:8082",
-		"secure": false
+		"secure": false,
+		"pathRewrite": {
+		 	"^/transactions": ""
+	 	 }
 	},
 	"/streams/*": {
 		"target": "http://localhost:8084",
-		"secure": false
+		"secure": false,
+		"pathRewrite": {
+		 	"^/streams": ""
+	 	 }
 	},
 	"/subscriptions/*": {
 		"target": "http://localhost:8086",
-		"secure": false
+		"secure": false,
+		"pathRewrite": {
+		 	"^/subscriptions": ""
+	 	 }
+
 	}
 }

@@ -1,20 +1,20 @@
-import { Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { DatatableComponent } from '@swimlane/ngx-datatable';
-import { AuthService } from '../../auth/services/auth.service';
-import { User } from '../../common/interfaces/user.interface';
-import { StreamService } from './services/stream.service';
-import { SubscriptionService } from './services/subscription.service';
-import { SearchService } from './services/search.service';
+import { Component, ViewChild, Input } from '@angular/core';
 import { MdlDialogService } from '@angular-mdl/core';
 
-import * as L from 'leaflet';
-import { icon, latLng, Layer, marker } from 'leaflet';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
-import { TasPipe } from '../../common/pipes/converter.pipe';
+import { AuthService } from '../../auth/services/auth.service';
+import { StreamService } from '../../common/services/stream.service';
+import { SubscriptionService } from '../../common/services/subscription.service';
 
-import {Subscription} from '../../common/interfaces/subscription.interface';
+import { TasPipe } from '../../common/pipes/converter.pipe';
+import { User } from '../../common/interfaces/user.interface';
+import { Subscription } from '../../common/interfaces/subscription.interface';
+
+import { Chart } from 'chart.js';
+import { Table, TableType } from '../../shared/table/table';
+import { Query } from '../../common/interfaces/query.interface';
+import { Page } from '../../common/interfaces/page.interface';
+import { Stream } from '../../common/interfaces';
+
 
 @Component({
   selector: 'dashboard-main',
@@ -23,69 +23,27 @@ import {Subscription} from '../../common/interfaces/subscription.interface';
 })
 export class DashboardMainComponent {
     user:any;
-    mySubscriptions = [];
-    myStreamsList = [];
-    temp2 = [];
+    // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
+    mockBalance: any;
+    subscriptions = [];
+    streams = [];
     temp = [];
-    userEventFlag = 0;
-    markers: Layer[] = [];
-    markersSubs: Layer[] = [];
-    markerInd: any;
+    map: any;
+    table: Table = new Table();
 
-    // ngx-table custom messages
-    tableStreamsMessages =  {
-        emptyMessage: "You don't have any streams yet..."
-    }
-    // ngx-table custom messages
-    tableSubsMessages =  {
-        emptyMessage: "You don't have any subscription yet..."
-    }
-    // Leaflet options
-    options = {
-		layers: [
-            L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjdbxg3f6c6sq2smdj7cp4wwa/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 18,
-                id: 'mapbox.dark',
-                accessToken: 'pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ'
-            })
-		],
-		zoom: 5,
-		center: L.latLng({ lat: 48.864716, lng: 2.349014 })
-	};
-
-    drawOptions = {
-        position: 'topright',
-        draw: {
-            marker: false,
-            polygon: false,
-            polyline: false,
-            circle: false,
-            circlemarker: false,
-
-        },
-        edit: {
-            remove: false,
-            edit: false
-        }
-	};
-
-    drawnItems: any;
-    tabIndex = 0;
-
-    @ViewChild(DatatableComponent) table: DatatableComponent;
     constructor(
         private AuthService: AuthService,
-        private SubscriptionService: SubscriptionService,
+        private subscriptionService: SubscriptionService,
         private streamService: StreamService,
-        public searchService: SearchService,
-        public http: HttpClient,
-        private dialogService: MdlDialogService,
-        private tasPipe: TasPipe
+        private tasPipe: TasPipe,
     ) {}
 
     ngOnInit() {
-        this.user = {};
+      this.table.title = "Subscriptions";
+      this.table.tableType = TableType.Dashboard;
+      this.table.headers = ["Stream Name", "Price Paid","Start Date", "End Date", "URL"];
+
+        // Fetch current User
         this.AuthService.getCurrentUser().subscribe(
             data =>  {
                 this.user = data;
@@ -96,216 +54,153 @@ export class DashboardMainComponent {
         );
 
         // Fetch all subscriptions
-        this.SubscriptionService.get().subscribe(
+        this.subscriptionService.get().subscribe(
           (result: any) => {
-              this.temp2 = [...result.Subscriptions];
+            this.temp = [...result.Subscriptions];
+            result.Subscriptions.forEach(subscription => {
+              this.streamService.getStream(subscription["id"]).subscribe(
+                (result: any) => {
+                  const stream = result;
 
-              result.Subscriptions.forEach(subscription => {
-                  this.streamService.getStream(subscription["id"]).subscribe(
-                    (result: any) => {
-                        const stream = result.Stream
-                        subscription["stream_name"] = stream["name"]
-                        subscription["stream_price"] = stream["price"]
+                  // Create name and price field in susbcription
+                  subscription["stream_name"] = stream["name"];
+                  const mitasPrice = this.tasPipe.transform(stream["price"]);
+                  subscription["stream_price"] = mitasPrice;
 
-                        // Create marker with stream coordinate
-                        const newMarker = L.marker(
-                        [stream["location"]["coordinates"][1],
-                         stream["location"]["coordinates"][0]], {}
-                        );
-                        // Use yellow color for owner streams and blue for others
-                        var defIcon = L.icon({
-                            iconUrl:  '/assets/images/green-marker.png',
-                            iconSize: [45, 45]
-                        });
-                        newMarker.setIcon(defIcon);
-                        // Popup Msg
-                        const msg = "<b>" + stream["name"] + "</b>"
-                        // Push marker to the markers list
-                        this.mySubscriptions.push(subscription);
-                        this.markersSubs.push(newMarker);
+                  // Set markers on the map
+                  this.streams.push(stream);
+                },
+                err => {
+                  console.log(err);
+                }
+              );
 
-                        // Set markers on the map
-                        this.setTabMarkers();
-                    },
-                    err => {
-                        console.log(err)
-                    });
-                })
+              // Push marker to the markers list
+              this.subscriptions.push(subscription);
+            });
+            result.content = this.subscriptions;
+            // Set table content
+            this.table.page = result;
           },
           err => {
-              console.log(err)
+            console.log(err);
+          }
+        );
+
+          const query = new Query();
+
+          // Search streams on drawed region
+          this.streamService.searchStreams(query).subscribe(
+            (result: Page<Stream>) => {
+              this.temp = result.content;
+          },
+          err => {
+            console.log(err)
           });
-    }
 
-    onMapReady(map: L) {
-        const search = this.searchService;
-        const that = this;
+          // Create mocked statistics graph
+          this.createMyChart()
+      }
 
-        that.drawnItems = new L.FeatureGroup();
-        map.addLayer(that.drawnItems);
-
-        // Set Markers on initial charged map
-        const bounds = map.getBounds();
-        setMapMarkers(bounds["_southWest" ]["lng"], bounds["_southWest" ]["lat"],
-                      bounds["_southWest" ]["lng"], bounds["_northEast" ]["lat"],
-                      bounds["_northEast" ]["lng"], bounds["_northEast" ]["lat"],
-                      bounds["_northEast" ]["lng"], bounds["_southWest" ]["lat"]);
-
-        // Set original marker color if mouse is over the map and was over the list
-        map.on('mouseover', function (e){
-            if (that.userEventFlag) {
-                that.setMarkerColor(that.markerInd);
-            }
-        });
-
-        // Set markers on new view
-        map.on('moveend',function(e){
-            const bounds = map.getBounds();
-            setMapMarkers(bounds["_southWest" ]["lng"], bounds["_southWest" ]["lat"],
-                          bounds["_southWest" ]["lng"], bounds["_northEast" ]["lat"],
-                          bounds["_northEast" ]["lng"], bounds["_northEast" ]["lat"],
-                          bounds["_northEast" ]["lng"], bounds["_southWest" ]["lat"]);
-        });
-
-        // Set markers and polygon layer inside the created polygon
-        map.on('draw:created', function (e) {
-            var layer = e.layer;
-            var latLngs = layer.getLatLngs()[0];
-            setMapMarkers(latLngs[0]["lng"], latLngs[0]["lat"],
-                          latLngs[1]["lng"], latLngs[1]["lat"],
-                          latLngs[2]["lng"], latLngs[2]["lat"],
-                          latLngs[3]["lng"], latLngs[3]["lat"]);
-
-            this.drawnItems.addLayer(layer);
-        });
-
-        // Generic function to draw map markers from coordinates
-        function setMapMarkers(x1, y1, x2, y2, x3, y3, x4, y4) {
-            // Remove all layers and reset markers and color flag
-            var layers = that.drawnItems.getLayers();
-            that.drawnItems.clearLayers();
-            that.userEventFlag = 0;
-            that.markers = [];
-            that.myStreamsList = [];
-
-            // Search streams on drawed region
-            that.searchService.searchStreams("geo",x1, y1, x2, y2, x3, y3, x4, y4).subscribe(
-                (result: any) => {
-                    that.temp = [...result.Streams];
-                    // Add stream markers on the map (Name, Description and price)
-                    result.Streams.forEach(stream => {
-                    if (stream["owner"] == that.user["id"]) {
-                        // Create marker with stream coordinates
-                        const newMarker = L.marker(
-                        [stream["location"]["coordinates"][1],
-                         stream["location"]["coordinates"][0]], {}
-                        );
-                        // Use yellow color for owner streams and blue for others
-                        var defIcon = L.icon({
-                            iconUrl:  '/assets/images/yellow-marker.png',
-                            iconSize: [45, 45]
-                        });
-                        newMarker.setIcon(defIcon);
-
-                        // Popup Msg
-                        const name = stream["name"]
-                        const description = stream["description"]
-                        const price = that.tasPipe.transform(stream["price"])
-                        const msg = `<b>${name}</b> <br> ${description} <br> ${price} TAS`
-                        newMarker.bindPopup(msg);
-
-                        // Push marker to the markers list
-                        that.myStreamsList.push(stream);
-                        that.markers.push(newMarker);
-                    }
-                });
-
-                    // Set markers on the map
-                    that.setTabMarkers();
-                    // Refresh ngx-datatable list
-                    that.myStreamsList = [...that.myStreamsList];
-                    // Update temp list to use with search filter
-                    that.temp = that.myStreamsList;
+      createMyChart() {
+        let chartData = {
+          type: "line",
+          data: {
+            labels: [
+              "Jan 2017",
+              "Apr 2017",
+              "Sep 2017",
+              "Dec 2017",
+              "Mar 2018",
+              "Jul 2018",
+              "Oct 2018",
+              "Feb 2019"
+            ],
+            datasets: [{
+                type: "bar",
+                label: "Dataset 1",
+                data: [5, 10, 15, 7, 3, 10, 2, 45, 12, 3, 35, 2, 5],
+                backgroundColor: "rgba(6, 210, 216, 1)",
+                borderColor: "rgba(6, 210, 216, 1)",
+                borderWidth: 1,
+                barThickness: 1
+              },
+              {
+                label: "Dataset 2",
+                data: [25, 43, 38, 33, 52, 65, 62, 49],
+                backgroundColor: "rgba(0, 125, 255, .1)",
+                borderColor: "#007DFF",
+                borderWidth: 4,
+                pointBackgroundColor: "#ffffff",
+                pointRadius: 3,
+                pointBorderWidth: 1
+              }
+            ]
+          },
+          options: {
+            maintainAspectRatio: false,
+            scaleShowVerticalLines: false,
+            tooltips: {
+              backgroundColor: "#007DFF",
+              xPadding: 15,
+              yPadding: 5,
+              titleMarginBottom: 0,
+              bodySpacing: 2,
+              cornerRadius: 0,
+              displayColors: false,
+              caretSize: 0,
+              callbacks: {
+                label: function (tooltipItem, data) {
+                  return tooltipItem.yLabel + " TOK";
                 },
-                err => { console.log(err) }
-            );
-        }
-    }
-
-    setMarkerColor(i: number){
-        if (this.myStreamsList[i]["owner"] != this.user["email"]) {
-                var defIcon = L.icon({
-                    iconUrl:  '/assets/images/blue-marker.png',
-                    iconSize: [45, 45]
-                });
-                this.markers[i].setIcon(defIcon);
-        } else {
-            var defIcon = L.icon({
-                iconUrl:  '/assets/images/yellow-marker.png',
-                iconSize: [45, 45]
-            });
-            this.markers[i].setIcon(defIcon);
-        }
-    }
-
-    // Subscriptions table fileter
-    updateSubscriptions(event) {
-        const val = event.target.value.toLowerCase();
-        // filter our data
-        const temp = this.temp2.filter(function(d) {
-            const n  = d.streamUrl.toLowerCase().indexOf(val) !== -1 || !val;
-            return n;
-        });
-
-        // update the rows
-        this.mySubscriptions = temp;
-        // Whenever the filter changes, always go back to the first page
-        this.table.offset = 0;
-    }
-    // Mystreams table fileter
-    updateMyStreams(event) {
-        const val = event.target.value.toLowerCase();
-        // filter our data
-        const temp = this.temp.filter(function(d) {
-            const n =  d.name.toLowerCase().indexOf(val) !== -1 || !val;
-            const t =  d.type.toLowerCase().indexOf(val) !== -1 || !val;
-            return n || t;
-        });
-
-        // update the rows
-        this.myStreamsList = temp;
-        // Whenever the filter changes, always go back to the first page
-        this.table.offset = 0;
-    }
-
-    // Draw subscriptions or myStreams markers
-    setTabMarkers() {
-        if (this.tabIndex == 0) {
-            for (var i = 0; i < this.markersSubs.length; i++) {
-                this.drawnItems.addLayer(this.markersSubs[i]);
-            }
-        } else {
-            for (var i = 0; i < this.markers.length; i++) {
-                this.drawnItems.addLayer(this.markers[i]);
-            }
-        }
-    }
-
-    tabChanged(event) {
-        this.tabIndex = event.index;
-        this.drawnItems.clearLayers();
-        this.setTabMarkers();
-    }
-
-    // Open BUY tokens dialog
-    onUrlClick(url) {
-        const urlMsg = '<a href="' + url + '"> LINK </a>'
-        let resultCopy = this.dialogService.confirm(urlMsg, "OK", "Copy");
-        resultCopy.subscribe(
-            copy => {
-                console.log("Copy");
+                title: function (tooltipItem, data) {
+                  return;
+                }
+              }
             },
-            err => {}
-         );
-    }
+            legend: {
+              display: false
+            },
+            scales: {
+              yAxes: [{
+                afterTickToLabelConversion: function (q) {
+                  for (var tick in q.ticks) {
+                    let newLabel = q.ticks[tick] + " TOK ";
+                    q.ticks[tick] = newLabel;
+                  }
+                },
+                gridLines: {
+                  color: "rgba(223,233,247,1)",
+                  zeroLineColor: "rgba(223,233,247,1)",
+                  borderDash: [15, 15],
+                  drawBorder: false
+                },
+                ticks: {
+                  fontColor: "rgba(158,175,200, 1)",
+                  fontSize: 11,
+                  stepSize: 25
+                }
+              }],
+              xAxes: [{
+                barPercentage: 10,
+                categoryPercentage: 0.1,
+                barThickness: 5,
+                gridLines: {
+                  lineWidth: 0,
+                  color: "rgba(255,255,255,0)",
+                  zeroLineColor: "rgba(255,255,255,0)"
+                },
+                ticks: {
+                  fontColor: "rgba(158,175,200, 1)",
+                  fontSize: 11
+                }
+              }]
+            }
+          }
+        };
+
+        let c: any = document.getElementById("myChart");
+        let ctx = c.getContext("2d");
+        let chart = new Chart(ctx, chartData);
+      }
 }

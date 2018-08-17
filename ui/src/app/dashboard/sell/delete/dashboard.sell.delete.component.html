@@ -1,24 +1,54 @@
-<div class="mdl-grid animated fadeIn">
-    <div class="dashboard-sell-map-container" mdl-shadow="4">
-        <h4 class="mdl-cell mdl-cell--12-col"> DELETE STREAM
-          <a routerLink="/dashboard/sell/map" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
-              <i class="material-icons md-dark">close</i>
-          </a>
-        </h4>
-        <div> Name: {{name}} </div>
-        <div> Type: {{type}} </div>
-        <div> Description: {{description}} </div>
-        <div> Price: {{price}} </div>
-
-        <div class="mdl-cell mdl-cell--12-col">
-            <p>
-                <a routerLink="/dashboard/sell/map" mdl-button mdl-button-type="raised" mdl-ripple> CANCEL </a>
-            <button mdl-button (click)="onSubmit(form.valid)"  [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>DELETE STREAM</button>
-            </p>
-            <br>
-                <p class="text-center">
-                    <strong>DISCLAIMER: </strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
+<!-- Add Stream -->
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Delete Stream</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalDeleteStream.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <div class="box__content">
+      <div class="row">
+        <div class="col-sm-4 col-md-12">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Name
+              </div>
+              <div class="stream__text">
+                {{ stream.name }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stream__title">
+                Stream Type
+              </div>
+              <div class="stream__text">
+                {{ stream.type }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Description
+              </div>
+              <div class="stream__text">
+                {{ stream.description }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Price
+              1</div>
+              <div class="stream__text">
+                {{ stream.price }} TAS
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+    <p>Are you sure?</p>
+    <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
+    <button type="button" class="btn btn-danger" (click)="modalDeleteStream.hide()">No</button>
+  </div>
 </div>

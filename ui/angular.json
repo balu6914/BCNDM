@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "blocksense-ui": {
+    "datapace-ui": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -54,18 +54,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "blocksense-ui:build"
+            "browserTarget": "datapace-ui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "blocksense-ui:build:production"
+              "browserTarget": "datapace-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "blocksense-ui:build"
+            "browserTarget": "datapace-ui:build"
           }
         },
         "test": {
@@ -98,8 +98,8 @@
         }
       }
     },
-    "blocksense-ui-e2e": {
-      "root": "",
+    "datapace-ui-e2e": {
+      "root": "e2e/",
       "sourceRoot": "e2e",
       "projectType": "application",
       "architect": {
@@ -107,7 +107,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "blocksense-ui:serve"
+            "devServerTarget": "datapace-ui:serve"
           }
         },
         "lint": {
@@ -122,15 +122,14 @@
       }
     }
   },
-  "defaultProject": "blocksense-ui",
+  "defaultProject": "datapace-ui",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "app",
-      "styleext": "scss"
+      "prefix": "dpc",
+      "styleExt": "scss"
     },
     "@schematics/angular:directive": {
-      "prefix": "app"
+      "prefix": "dpc"
     }
-  },
-
+  }
 }

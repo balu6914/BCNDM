@@ -1,0 +1,39 @@
+$success : #00ff65;
+$error: #ff2a00;
+$warning: #ffc700;
+$info: #007DFF;
+$white: #DCE2E6;
+
+.alert-box-container {
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.alert-box {
+  width: 350px;
+  max-width: 100%;
+  z-index: 5;
+  background-color: white;
+  &__content {
+    border-left: 6px solid;
+    padding: 30px 40px 30px 10px;
+    &__success {
+      border-left-color: $success
+    }
+    &__error {
+      border-left-color: $error
+    }
+    &__warning {
+      border-left-color: $warning
+    }
+    &__info {
+      border-left-color: $info
+    }
+  }
+  &__close {
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+}

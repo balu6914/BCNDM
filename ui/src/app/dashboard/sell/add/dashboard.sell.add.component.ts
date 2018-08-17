@@ -1,10 +1,11 @@
-import { Component, ViewContainerRef } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  } from '@angular/forms';
-import { MdlDialogService, MdlDialogOutletService } from '@angular-mdl/core';
-import { Router } from '@angular/router';
+import { Component, Output, EventEmitter } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { StreamService } from '../services/stream.service';
+import { StreamService } from '../../../common/services/stream.service';
 import { Stream } from '../../../common/interfaces/stream.interface';
+import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
   selector: 'dashboard-sell-add',
@@ -12,65 +13,56 @@ import { Stream } from '../../../common/interfaces/stream.interface';
   styleUrls: [ './dashboard.sell.add.component.scss' ]
 })
 export class DashboardSellAddComponent {
-    user:any;
+    form: FormGroup;
 
-    public form: FormGroup;
+    @Output() streamCreated: EventEmitter<any> = new EventEmitter();
     constructor(
-        private router: Router,
-        private fb: FormBuilder,
-        private dialogService: MdlDialogService,
-        private StreamService: StreamService,
-        private mdlDialogService: MdlDialogOutletService,
-        private vcRef: ViewContainerRef
+        private streamService: StreamService,
+        private mitasPipe: MitasPipe,
+        private formBuilder: FormBuilder,
+        public  modalNewStream: BsModalRef,
+        public  alertService: AlertService,
     ) {
-        this.mdlDialogService.setDefaultViewContainerRef(this.vcRef);
+      this.form = formBuilder.group({
+        'name':        ['', [<any>Validators.required, <any>Validators.minLength(3)]],
+        'type':        ['', Validators.required],
+        'description': ['', [<any>Validators.required, <any>Validators.minLength(5)]],
+        'url':         ['', Validators.required],
+        'price':       ['', Validators.required],
+        'lat':         ['', Validators.required],
+        'long':        ['', Validators.required]
+      })
     }
+
     ngOnInit() {
-        this.form = this.fb.group({
-                name       : ['', [<any>Validators.required, <any>Validators.minLength(3)]],
-                type       : ['', [<any>Validators.required]],
-                description: ['', [<any>Validators.required, <any>Validators.minLength(5)]],
-                url        : ['', [<any>Validators.required]],
-                price      : ['', [<any>Validators.required]],
-                long       : ['', [<any>Validators.required]],
-                lat        : ['', [<any>Validators.required]]
-        });
     }
 
-    onSubmit(model: Stream, isValid: boolean) {
-        if(isValid) {
-            // Confirm dialog
-            let confirmMsg = 'Your Stream will be published automatically on the market, affter creation. Do you Agree ?'
-            let result = this.dialogService.confirm(confirmMsg, 'Cancel', 'Yes, publish it!');
-             result.subscribe( () => {
-                 console.log('confirmed');
-                 // Convert to miTAS
-                 var mitas = model["price"] * Math.pow(10, 6);
-                 model["price"] = mitas;
-                 model["location"] = {
-                     "type": "Point",
-                     "coordinates": [parseFloat(model["long"]),
-                                     parseFloat(model["lat"])]
-                                 }
-                delete model["long"];
-                delete model["lat"];
-
-                 this.StreamService.addStream(model).subscribe(
-                     response => {
-                         this.router.navigate(['/dashboard/sell/map'])
-                     },
-                     err => {
-                         console.log(err);
-                     });
-               },
-               (err: any) => {
-                 console.log('declined');
-               }
-             );
-             // if you only need the confirm answer
-             result.onErrorResumeNext().subscribe( () => {
-               console.log('confirmed 2');
-             });
+    onSubmit() {
+      const stream: Stream = {
+        name: this.form.value.name,
+        type: this.form.value.type,
+        description: this.form.value.description,
+        url: this.form.value.url,
+        price: this.mitasPipe.transform(this.form.value.price),
+        location: {
+          "type": "Point",
+          "coordinates": [parseFloat(this.form.value.long),
+                          parseFloat(this.form.value.lat)]
         }
+      };
+
+      // Send addStream request
+      this.streamService.addStream(stream).subscribe(
+        res => {
+          // Add ID from http response to stream
+          stream.id = res.id;
+          this.streamCreated.emit(stream);
+          this.modalNewStream.hide();
+          this.alertService.success(`Stream succesfully added!`);
+        },
+        err => {
+          this.modalNewStream.hide();
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+      });
     }
 }

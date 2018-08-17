@@ -40,7 +40,6 @@ export class AuthService {
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
-    this.loggedIn.emit(false);
     this.user = null;
     this.router.navigate(['login'])
   }
@@ -59,10 +58,11 @@ export class AuthService {
 
     getCurrentUser() {
         if(this.user) {
-            console.log("Yes we have user , here it is", this.user)
             return Observable.of(this.user)
         } else {
-            return this.fetchCurrentUser()
+            if(this.isLoggedin()) {
+              return this.fetchCurrentUser()
+            }
         }
     }
 

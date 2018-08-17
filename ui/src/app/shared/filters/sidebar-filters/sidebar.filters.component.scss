@@ -1,0 +1,111 @@
+@import '_vars';
+@import "~bootstrap/scss/bootstrap";
+
+.filters-sidebar {
+  top: 72px;
+  box-shadow: 0px 4px 20px 0px rgba(220,226,230,.4);
+  position: absolute;
+  position: fixed;
+  background: #fff;
+  min-height: 100%;
+  max-height: none;
+  top: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 19em !important;
+}
+
+.offcanvas-trigger {
+  position: fixed;
+  z-index: 999999;
+  cursor: pointer;
+  top: 50%;
+  left: 0;
+  margin-top: -45px;
+  height: 90px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $primary;
+  transform: translate3d(0, 0, 0);
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.6, 1),
+  -webkit-transform 300ms cubic-bezier(0.4, 0, 0.6, 1);
+  box-shadow: 0px 4px 20px 0px rgba(220,226,230,.4);
+  transition: $transition-base;
+  &:hover {
+    text-decoration: none;
+    background-color: darken($primary, 10%);
+  }
+  &:focus {
+    outline: none;
+  }
+  .c-button__text {
+    display: block;
+    transform: rotate(90deg);
+    font-weight: $font-weight-medium;
+    color: white;
+    position: relative;
+    padding-right: 28px;
+    &:before {
+      transform: rotate(-90deg);
+      display: block;
+      content: '';
+      position: absolute;
+      top: 50%;
+      margin-top: -7px;
+      right: 0;
+      background: url(#{$asset-path}/img/icons/filter.svg) 0 0 no-repeat;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &.is-filter-active {
+    background-color: darken($primary, 10%);
+    .c-button__text {
+      &:before {
+        // background-position: 0 100%;
+      }
+    }
+  }
+
+  &.is-active {
+    transform: translate3d(20em, 0, 0);
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .filters-sidebar {
+    width: 100%;
+  }
+  .offcanvas-trigger.is-active {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+// Filters box
+
+.filters {
+  padding: 1rem;
+  &__content {
+    padding-bottom: 6rem;
+  &__close {
+    cursor: pointer;
+  }
+  }
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  &__title {
+    font-weight: $font-weight-medium;
+    margin-bottom: 0;
+  }
+  &__close {
+    cursor: pointer;
+  }
+}

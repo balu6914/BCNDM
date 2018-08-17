@@ -1,60 +1,61 @@
-<div class="mdl-grid animated fadeIn contracts-add-container">
-  <div class="dashboard-sell-add-container" mdl-shadow="2">
-
-    <h4 class="mdl-cell mdl-cell--12-col">NEW CONTRACT
-    <a [routerLink]="['/dashboard/contract/list']" class="mdl-button mdl-js-button  mdl-button--colored pull-right">
-        <i class="material-icons md-dark">close</i>
-    </a>
-</h4>
-
-    <div class="mdl-cell mdl-cell--12-col">
-      <form class="form-full-width-filds" [formGroup]="form">
-          <!-- Left side -->
-          <div class="mdl-col mdl-cell--6-col">
-              <p>
-                  <mdl-select label="Select Stream" floating-label>
-                      <mdl-option *ngFor="let u of streamList" [value]="u">{{u.stream.name}}</mdl-option>
-                  </mdl-select>
-              </p>
-              <p>
-                  Select Parties by picking a uses from a list
-              </p>
-              <p>
-                  <mdl-select label="Select Users" floating-label [multiple]="true" formControlName="parties">
-                      <mdl-option *ngFor="let u of usersList" [value]="u">{{u.name}}</mdl-option>
-                  </mdl-select>
-              </p>
-
-              <p>
-                  <button (click)="pickADate($event)"
-                  mdl-button
-                  mdl-button-type="icon"
-                  mdl-ripple>
-                  <mdl-icon>event</mdl-icon>
-              </button>
-              <label (click)="pickADate($event)" for="">Select Contract Exparation Date</label>
-              <span> <strong>{{ selectedEndDate | date: 'MMM d, y' }}</strong></span>
-          </p>
+<!-- Create Contract -->
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="newContractLabel">New contract</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalNewContract.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid">
+      <form class="needs-validation" [formGroup]="form" novalidate>
+        <div class="form-group row">
+          <label for="streamName" class="col-sm-4 col-form-label">Select stream</label>
+          <div class="col-sm-8">
+            <select formControlName="streamName" class="form-control selectpicker" data-live-search="true">
+              <option>WeIO humidity</option>
+              <option>WeIO temperature</option>
+              <option>WeIO humidity</option>
+            </select>
           </div>
-          <!-- Right side -->
-          <div class="mdl-col mdl-cell--6-col">
-              <p *ngFor="let p of form.parties">
-                  {{p.name}}
-              </p>
+        </div>
+        <div class="form-group row">
+          <label for="parties" class="col-sm-4 col-form-label">Select users</label>
+          <div class="col-sm-8">
+            <select formControlName="parties" class="form-control selectpicker" data-live-search="true">
+              <option>Nikola Marcetic</option>
+              <option>Jason Born</option>
+              <option>Lina Reyes</option>
+              <option>Amelia Lynch</option>
+              <option>Dean Allen</option>
+              <option>Ellen Newton</option>
+              <option>Don McCoy</option>
+              <option>Don McCoy</option>
+            </select>
           </div>
-          <hr>
-          <p>
-            <a [routerLink]="['/dashboard/contract/list']" mdl-button mdl-button-type="raised" mdl-ripple>
-                          CANCEL
-                      </a>
-            <button mdl-button (click)="onSubmit(form.value, form.valid)" [disabled]="!form.valid" mdl-button mdl-button-type="raised" mdl-colored="primary" mdl-ripple>CREATE CONTRACT</button>
-          </p>
-          <br>
-          <p class="text-center">
-            <strong>DISCLAIMER: </strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+        </div>
+        <div class="form-group row">
+          <label for="expirationDate" class="col-sm-4 col-form-label">Select expiriation date</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="expirationDate" class="form-control datepicker">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="streamPrice" class="col-sm-4 col-form-label">Tokens per hour</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="streamPrice" class="form-control">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="shareOffered" class="col-sm-4 col-form-label">Share offered</label>
+          <div class="col-sm-8">
+            <input type="text" formControlName="shareOffered" class="form-control">
+          </div>
+        </div>
       </form>
     </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Create contact</button>
   </div>
 </div>

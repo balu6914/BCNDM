@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { NgProgressModule, NgProgressInterceptor } from 'ngx-progressbar';
 import {
@@ -24,7 +23,6 @@ import { LoginComponent } from './login';
 @NgModule({
   imports: [
     CommonModule,
-    MdlModule,
     FormsModule,
     HttpClientModule,
     AuthRoutingModule,

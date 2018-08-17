@@ -12,7 +12,7 @@ const routes: Routes = [
        canActivate: [AuthGuard],
        children: [
            {
-               path: 'me',
+               path: '',
                component: DashboardMainComponent,
            },
            {
@@ -24,15 +24,11 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/buy/dashboard.buy.module#DashboardBuyModule',
            },
            {
-               path: 'subscription',
-               loadChildren: 'app/dashboard/subscription/subscription.module#SubscriptionModule',
-           },
-           {
                path: 'wallet',
-               loadChildren: 'app/dashboard/wallet/wallet.module#WalletModule',
+               loadChildren: 'app/dashboard/wallet/dashboard.wallet.module#DashboardWalletModule',
            },
            {
-               path: 'contract',
+               path: 'contracts',
                loadChildren: 'app/dashboard/contracts/dashboard.contracts.module#DashboardContractsModule',
            },
 

@@ -1,79 +1,22 @@
 /* App style module imports
  You can add global styles to this file, and also import other style files
  */
+// Import font
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,500,500i,600,600i,700,700i');
+// Import Lib's
 
-// Import MDL design theme
-@import "~@angular-mdl/core/scss/_color-definitions";
-$color-primary: $palette-blue-500;
-$color-primary-dark: $palette-blue-700;
-$color-accent: $palette-amber-A200;
-$color-primary-contrast: $color-dark-contrast;
-$color-accent-contrast: $color-dark-contrast;
-
-@import '~@angular-mdl/core/scss/material-design-lite';
 @import '~bootstrap/scss/bootstrap.scss';
 // Import MDL additinal extensions
 @import '~@angular2-mdl-ext/popover/popover.css';
 @import '~@angular2-mdl-ext/select/select.css';
 @import '~@angular-mdl/datepicker/datepicker';
 
-// Import ngx-tables style
-@import '~@swimlane/ngx-datatable/release/index.css';
-@import '~@swimlane/ngx-datatable/release/themes/material.css';
-@import '~@swimlane/ngx-datatable/release/assets/icons.css';
 @import "_global.scss";
 @import "_vars.scss";
+@import "_loader.scss";
 
-
-.mdl-layout__drawer {
-  overflow: hidden;
-  // width: 55px;
-  transform: translateX(0);
-  transition: 250ms width ease-in-out;
-  background: #fff;
-
-.mdl-navigation__link {
-    transition: 250ms width ease-in-out;
-
-}
-  .mdl-navigation__link i {
-      color: #2196f3;
-  }
-
-  .mdl-navigation__link span {
-    opacity: 1;
-    transition: 250ms opacity ease-in-out;
-  }
-
-  .mdl-navigation__link:hover {
-  transition: 250ms width ease-in-out;
-      background-color: #2196f3 !important;
-      color: #fff !important;
-      i {
-  transition: 250ms width ease-in-out;
-          color: #fff;
-      }
-  }
-
-  + .mdl-layout__header,
-  ~ .mdl-layout__content {
-    transition: 250ms margin-left ease-in-out;
-  }
-
-}
-
-// .mdl-layout__header,
-// .mdl-layout__content {
-//   margin-left: 55px!important;
-// }
-
-.mdl-navigation {
-  width: 240px;
-}
-
-.mdl-layout__header-row {
-  padding: 0 16px 0 22px;
-}
+@import '~leaflet/dist/leaflet.css';
+@import '~leaflet-draw/dist/leaflet.draw.css';
 
 .error-message {
     color: rgb(213,0,0);
@@ -82,8 +25,6 @@ $color-accent-contrast: $color-dark-contrast;
     margin-top: 3px;
     display: block;
 }
-
-
 
 /**
  *
@@ -129,7 +70,10 @@ Based on http://getbootstrap.com/docs/4.1/getting-started/theming/
 // Buttons
 
 .btn {
-font-weight: $font-weight-medium;
+  font-weight: $font-weight-medium;
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 .btn-padding-lg {
 padding-left: 3rem;
@@ -214,6 +158,7 @@ $btn-media-xy: 44px;
 .btn-media {
 position: relative;
 padding-left: $btn-media-xy + 15px;
+line-height: 33px;
 &__icon {
   position: absolute;
   top: 0;
@@ -332,7 +277,7 @@ margin-bottom: 1rem;
 .table tbody tr {
 transition: $transition-base;
 background-color: rgba(240, 244, 249, .5);
-border-bottom: 10px solid white;
+border-bottom: 10px solid white !important;
 &:last-child {
   border-bottom: none;
 }
@@ -374,6 +319,7 @@ color: $body-color;
 color: $body-color;
 padding-right: .825rem;
 position: relative;
+cursor: pointer;
 &:before {
   display: block;
   content: '';
@@ -590,6 +536,7 @@ color: $text-color-2;
   padding-top: .25rem;
   padding-bottom: .25rem;
   padding-left: 0;
+  border-radius: 0 !important;
   &:focus {
     outline: none;
     border-color: $border-color;
@@ -649,8 +596,8 @@ font-size: 1rem;
 background-color: #fff;
 padding: 1rem;
 box-shadow: 0px 4px 32px 0px rgba(220,226,230,1);
-margin-bottom: 30px;
 position: relative;
+margin-bottom: 30px;
 &__header {
   display: flex;
   justify-content: space-between;
@@ -722,22 +669,6 @@ font-weight: $font-weight-medium;
     }
   }
 }
-}
-
-// Flip Card
-
-.flip-card {
-@include media-breakpoint-down(sm) {
-  margin-bottom: 1rem;
-}
-.box {
-  z-index: 1;
-}
-.back {
-}
-}
-.is-flip-card-hidden {
-display: none;
 }
 
 // Action Buttons
@@ -1228,45 +1159,6 @@ align-items: center;
 }
 }
 
-// Map
-
-.map-wrapper {
-margin-left: -1rem;
-margin-right: -1rem;
-margin-bottom: -1rem;
-}
-.map {
-width: 100%;
-height: 300px;
-@include media-breakpoint-up(sm) {
-  height: 400px;
-}
-}
-
-.map-tooltip {
-font-size: 12px;
-&__title {
-  font-weight: $font-weight-semi-bold;
-  margin-bottom: 3px;
-}
-&__content {
-
-}
-&__subtitle {
-  font-weight: $font-weight-medium;
-  color: $text-color-2;
-  margin-bottom: 7px;
-}
-&__stake {
-  color: #8392A8;
-  margin-bottom: 0;
-}
-&__stake-amount {
-  font-weight: $font-weight-semi-bold;
-  color: $primary;
-}
-}
-
 // Fill boxes to 100% in height of the remaining screen height
 
 @include media-breakpoint-up(md) {
@@ -1283,13 +1175,6 @@ body {
 }
 .row-grow {
   flex-grow: 1;
-  .flip-card {
-    height: calc(100%);
-    height: calc(100% - 2rem);
-    .box-grow {
-      height: 100%;
-    }
-  }
 }
 .box-grow {
   height: calc(100% - 2rem);
@@ -1323,4 +1208,39 @@ body {
   }
 }
 
+}
+
+/** Sidebar global style **/
+.ng-sidebar {
+
+  position: absolute !important;
+  position: fixed !important;
+  top: 72px !important;
+}
+
+.filters-sidebar {
+  box-shadow: 0px 4px 20px 0px rgba(220,226,230,.4);
+  background: #fff;
+  min-height: 100%;
+  max-height: none;
+  top: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 20em;
+}
+
+/** Oveeride ngx-select-ex **/
+.ngx-select__toggle {
+  border-radius: 0;
+}
+
+
+@include media-breakpoint-down(sm) {
+  .filters-sidebar {
+    width: 100%;
+  }
+  .offcanvas-trigger.is-active {
+    transform: translate3d(100%, 0, 0);
+  }
 }

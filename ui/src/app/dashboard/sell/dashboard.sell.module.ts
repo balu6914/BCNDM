@@ -3,45 +3,40 @@ import { CommonModule } from '@angular/common';
 import { MdlModule } from '@angular-mdl/core';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // Sell routes
 import { DashboardSellRoutingModule } from './dashboard.sell.routes';
-// // Add services
-import { SearchService } from './services/search.service';
-import { StreamService } from './services/stream.service';
-import { TokenInterceptor } from '../../auth/services/token.http.interceptor.service';
 // Sell components
 import { DashboardSellComponent } from './index';
 import { DashboardSellAddComponent } from './add';
 import { DashboardSellEditComponent } from './edit';
-import { DashboardSellMapComponent } from './map';
+import { DashboardSellDeleteComponent } from './delete';
 
 import { CommonAppModule } from '../../common/common.module';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LeafletDrawModule } from '@asymmetrik/ngx-leaflet-draw';
+import { SharedModule } from '../../shared/shared.module';
+import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    AppBootstrapModule,
     MdlModule,
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,
-    NgxDatatableModule,
     CommonAppModule,
     DashboardSellRoutingModule,
-    LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot()
+    SharedModule,
   ],
   declarations: [
-      DashboardSellComponent,
-      DashboardSellAddComponent,
-      DashboardSellEditComponent,
-      DashboardSellMapComponent,
+    DashboardSellComponent,
+    DashboardSellAddComponent,
+    DashboardSellEditComponent,
+    DashboardSellDeleteComponent,
   ],
-  providers: [
-      StreamService,
-      SearchService,
+  entryComponents: [
+    DashboardSellAddComponent,
+    DashboardSellEditComponent,
+    DashboardSellDeleteComponent,
   ]
 })
 export class DashboardSellModule { }

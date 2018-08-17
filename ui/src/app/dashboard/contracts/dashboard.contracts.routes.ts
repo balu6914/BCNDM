@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
-import { DashboardContractsListComponent } from './list/dashboard.contracts.list.component';
+import { DashboardContractsComponent } from './dashboard.contracts.component';
 import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
 import { AuthGuardService as AuthGuard } from '../../auth/guardians/auth.guardian';
 
 // Define our Auth Routes
 const routes: Routes = [
     {
-        path: 'list',
-        component: DashboardContractsListComponent ,
+        path: '',
+        component: DashboardContractsComponent ,
         canActivate: [AuthGuard],
     },
     {

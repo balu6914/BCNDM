@@ -1,0 +1,52 @@
+<!-- Modal -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBuyTasLabel">Buy TAS</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalAddTokens.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="modal-section-border">
+            <div class="row">
+              <div class="col-3">
+                <div class="modal__subtitle">
+                  Ratio
+                </div>
+              </div>
+              <div class="col-9">
+                <div class="modal__ratio">
+                  1$ = 1 TAS
+                </div>
+                <!--
+                  Validation
+                  http://getbootstrap.com/docs/4.1/components/forms/#validation
+                -->
+                <form [formGroup]="form" class="form-inline float-right buy-tas needs-validation" novalidate>
+                  <div class="form-group">
+                    <label for="tokenAmount" class="form-label mr-2">Token amount</label>
+                    <input type="number"  formControlName="amount" class="form-control buy-tas__input" id="tokenAmount" min="0">
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="modal__subtitle">
+                Summary
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="modal__summary">
+                25$
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="onSubmit(form.value, form.valid)" [disabled]="!form.valid || processing" class="btn btn-primary btn-padding-lg">Buy TAS</button>
+      </div>
+    </div>

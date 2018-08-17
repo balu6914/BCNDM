@@ -46,11 +46,10 @@ export class SignupComponent {
         if(isValid) {
             this.UserService.addUser(model).subscribe(
                 response => {
-                    console.log("here is a response", response)
                     this.AuthService.login(model.email, model.password)
                       .subscribe(
-                        (token: any) => this.router.navigate(['/dashboard/me']),
-                        err => { console.log(err) }
+                        (token: any) => this.router.navigate(['/dashboard']),
+                        err => { console.log("Response error: ", err) }
                       );
                 },
                 err => {
