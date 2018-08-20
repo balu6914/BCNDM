@@ -165,6 +165,66 @@ func (tc tokenChaincode) Allowance(stub shim.ChaincodeStubInterface, owner, spen
 	return binary.LittleEndian.Uint64(data), nil
 }
 
+func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfers ...Transfer) error {
+	from, err := callerCN(stub)
+	if err != nil {
+		return err
+	}
+
+	fromBalance, err := tc.BalanceOf(stub, from)
+	if err != nil {
+		return err
+	}
+
+	events := []transfer{}
+
+	for _, tr := range transfers {
+		if from == tr.To {
+			continue
+		}
+
+		toBalance, err := tc.BalanceOf(stub, tr.To)
+		if err != nil {
+			return err
+		}
+
+		if fromBalance < tr.Value {
+			return ErrNotEnoughTokens
+		}
+
+		if toBalance+tr.Value < toBalance {
+			return ErrOverflow
+		}
+
+		fromBalance -= tr.Value
+		if err := setBalance(stub, from, fromBalance); err != nil {
+			return err
+		}
+
+		toBalance += tr.Value
+		if err := setBalance(stub, tr.To, toBalance); err != nil {
+			return err
+		}
+
+		events = append(events, transfer{
+			From:  from,
+			To:    tr.To,
+			Value: tr.Value,
+		})
+	}
+
+	payload, err := json.Marshal(events)
+	if err != nil {
+		return ErrFailedSerialization
+	}
+
+	if err := stub.SetEvent("Transfers", payload); err != nil {
+		return ErrSettingState
+	}
+
+	return nil
+}
+
 func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to string, value uint64) bool {
 	if from == to {
 		return true

@@ -3,8 +3,8 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
+	"monetasa/chaincode/mocks"
 	token "monetasa/chaincode/token"
-	"monetasa/chaincode/token/mocks"
 	"testing"
 
 	"github.com/hyperledger/fabric/common/util"
@@ -81,7 +81,7 @@ func TestInit(t *testing.T) {
 	cc := token.NewChaincode(svc)
 	stub := mocks.NewFullMockStub(ccName, cc)
 
-	reqPayload, err := json.Marshal(td)
+	payload, err := json.Marshal(td)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	cases := []struct {
@@ -93,13 +93,13 @@ func TestInit(t *testing.T) {
 		{
 			desc:   "create token with valid user",
 			cert:   user1Cert,
-			args:   util.ToChaincodeArgs("init", string(reqPayload)),
+			args:   util.ToChaincodeArgs("init", string(payload)),
 			status: int32(shim.OK),
 		},
 		{
 			desc:   "create token with invalid user",
 			cert:   invalid,
-			args:   util.ToChaincodeArgs("init", string(reqPayload)),
+			args:   util.ToChaincodeArgs("init", string(payload)),
 			status: int32(shim.ERROR),
 		},
 		{
@@ -111,13 +111,13 @@ func TestInit(t *testing.T) {
 		{
 			desc:   "create token with invalid num of arguments",
 			cert:   user1Cert,
-			args:   util.ToChaincodeArgs("init", string(reqPayload), "other_arg"),
+			args:   util.ToChaincodeArgs("init", string(payload), "other_arg"),
 			status: int32(shim.ERROR),
 		},
 		{
 			desc:   "create token with invalid function name",
 			cert:   user1Cert,
-			args:   util.ToChaincodeArgs(invalid, string(reqPayload), "other_arg"),
+			args:   util.ToChaincodeArgs(invalid, string(payload), "other_arg"),
 			status: int32(shim.ERROR),
 		},
 	}
@@ -405,6 +405,68 @@ func TestAllowance(t *testing.T) {
 	for desc, tc := range cases {
 		res := stub.MockInvoke(ccID, tc.args)
 		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", desc, tc.status, res.Status))
+	}
+}
+
+func TestGroupTransfer(t *testing.T) {
+	svc := token.NewService()
+	cc := token.NewChaincode(svc)
+	stub := mocks.NewFullMockStub(ccName, cc)
+
+	createToken(t, stub)
+
+	tr := []transferReq{
+		transferReq{
+			To:    user1CN,
+			Value: 100,
+		},
+		transferReq{
+			To:    user3CN,
+			Value: 100,
+		},
+	}
+	transferData, err := json.Marshal(tr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	bigTr := []transferReq{
+		transferReq{
+			To:    user3CN,
+			Value: 10000,
+		},
+	}
+	bigTransferData, err := json.Marshal(bigTr)
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+
+	cases := []struct {
+		desc   string
+		args   [][]byte
+		status int32
+	}{
+		{
+			desc:   "group transfer tokens to valid account",
+			args:   util.ToChaincodeArgs("groupTransfer", string(transferData)),
+			status: int32(shim.OK),
+		},
+		{
+			desc:   "group transfer too many tokens",
+			args:   util.ToChaincodeArgs("groupTransfer", string(bigTransferData)),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "group transfer tokens with invalid request",
+			args:   util.ToChaincodeArgs("groupTransfer", "}"),
+			status: int32(shim.ERROR),
+		},
+		{
+			desc:   "group transfer tokens with too many arguments",
+			args:   util.ToChaincodeArgs("groupTransfer", string(transferData), ""),
+			status: int32(shim.ERROR),
+		},
+	}
+
+	for _, tc := range cases {
+		res := stub.MockInvoke(ccID, tc.args)
+		assert.Equal(t, tc.status, res.Status, fmt.Sprintf("%s: expected %d got %d", tc.desc, tc.status, res.Status))
 	}
 }
 

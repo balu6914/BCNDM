@@ -33,9 +33,19 @@ var (
 
 	// ErrFailedKeyCreation indicates that creating composite key failed.
 	ErrFailedKeyCreation = errors.New("failed to create key")
+
+	// ErrNotEnoughTokens indicates that spender doesn't have enough tokens.
+	ErrNotEnoughTokens = errors.New("not enough tokens")
+
+	// ErrOverflow indicates that overflow error happened while calculating new
+	// balance.
+	ErrOverflow = errors.New("overflow error")
+
+	// ErrFailedSerialization indicates that object serialization failed.
+	ErrFailedSerialization = errors.New("failed to serialize response data")
 )
 
-// Service defined ERC20 compliant interface.
+// Service defines ERC20 compliant interface.
 type Service interface {
 	// Init set initial token supply.
 	Init(shim.ChaincodeStubInterface) error
@@ -61,4 +71,13 @@ type Service interface {
 	// Allowance returns the amount which specified spender is still allowed to
 	// withdraw from specified owner.
 	Allowance(shim.ChaincodeStubInterface, string, string) (uint64, error)
+
+	// GroupTransfer given amount of tokens from callers account to
+	GroupTransfer(shim.ChaincodeStubInterface, ...Transfer) error
+}
+
+// Transfer contrains data necessary to transfer tokens.
+type Transfer struct {
+	To    string
+	Value uint64
 }

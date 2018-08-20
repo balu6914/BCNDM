@@ -3,11 +3,17 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "uuLcVQXUw0CNt8Y5tsmzLWGlixI=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "89a0c16f4dc2a70c0ed864d8ef64878f24fdaa51",
+			"revisionTime": "2018-08-04T22:03:15Z"
+		},
+		{
 			"checksumSHA1": "7jUK9OzL1arQsSuop5KmgKxM2Pc=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
 			"revision": "8186e9ce3f500e79166c7af56c39f2ea46e79c0f",
 			"revisionTime": "2018-08-18T19:30:08Z"
 		}
 	],
-	"rootPath": "github.com/chaincode/token"
+	"rootPath": "github.com/chaincode/system-fee"
 }

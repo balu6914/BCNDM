@@ -21,21 +21,23 @@ const (
 var _ transactions.BlockchainNetwork = (*fabricNetwork)(nil)
 
 type fabricNetwork struct {
-	sdk         *fabsdk.FabricSDK
-	admin       string
-	org         string
-	chaincodeID string
-	logger      log.Logger
+	sdk            *fabsdk.FabricSDK
+	admin          string
+	org            string
+	tokenChaincode string
+	feeChaincode   string
+	logger         log.Logger
 }
 
 // NewNetwork returns Fabric instance of blockchain network.
-func NewNetwork(sdk *fabsdk.FabricSDK, admin, org, chaincodeID string, logger log.Logger) transactions.BlockchainNetwork {
+func NewNetwork(sdk *fabsdk.FabricSDK, admin, org, tokenChaincode, feeChaincode string, logger log.Logger) transactions.BlockchainNetwork {
 	return fabricNetwork{
-		sdk:         sdk,
-		admin:       admin,
-		org:         org,
-		chaincodeID: chaincodeID,
-		logger:      logger,
+		sdk:            sdk,
+		admin:          admin,
+		org:            org,
+		tokenChaincode: tokenChaincode,
+		feeChaincode:   feeChaincode,
+		logger:         logger,
 	}
 }
 
@@ -87,7 +89,7 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 	}
 
 	balance, err := client.Query(channel.Request{
-		ChaincodeID: fn.chaincodeID,
+		ChaincodeID: fn.tokenChaincode,
 		Fcn:         balanceFcn,
 		Args:        [][]byte{data},
 	})
@@ -106,18 +108,18 @@ func (fn fabricNetwork) Balance(userID string) (uint64, error) {
 }
 
 func (fn fabricNetwork) Transfer(from, to string, value uint64) error {
-	return fn.transfer(from, to, value)
+	return fn.transfer(fn.feeChaincode, from, to, value)
 }
 
 func (fn fabricNetwork) BuyTokens(account string, value uint64) error {
-	return fn.transfer(fn.admin, account, value)
+	return fn.transfer(fn.tokenChaincode, fn.admin, account, value)
 }
 
 func (fn fabricNetwork) WithdrawTokens(account string, value uint64) error {
-	return fn.transfer(account, fn.admin, value)
+	return fn.transfer(fn.tokenChaincode, account, fn.admin, value)
 }
 
-func (fn fabricNetwork) transfer(from, to string, value uint64) error {
+func (fn fabricNetwork) transfer(chaincode, from, to string, value uint64) error {
 	ctx := fn.sdk.ChannelContext(
 		chanID,
 		fabsdk.WithUser(from),
@@ -142,7 +144,7 @@ func (fn fabricNetwork) transfer(from, to string, value uint64) error {
 	}
 
 	_, err = client.Execute(channel.Request{
-		ChaincodeID: fn.chaincodeID,
+		ChaincodeID: chaincode,
 		Fcn:         transferFcn,
 		Args:        [][]byte{data},
 	})
