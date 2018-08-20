@@ -54,6 +54,13 @@ For the installation of Go `protobuf` tools and `gRPC` take a look [here](https:
 If all crypto-material is generated (as described in aforementioned `docker` README), then blockchain network can be started with:
 
 ```
+make runbc
+```
+
+This is a shorthand for:
+
+```
+./docker/fabric/generate.sh
 ./docker/fabric/run.sh
 ```
 
@@ -63,5 +70,12 @@ In another terminal run:
 ```
 docker-compose -f docker/docker-compose.yml up
 ```
+
+To run locally compiled binaries (during dev process) instead of Docker containers execute:
+```
+make rundapp
+```
+
+UI will be available at [http://localhost:4200](http://localhost:4200)
 
 Happy hackin'!
