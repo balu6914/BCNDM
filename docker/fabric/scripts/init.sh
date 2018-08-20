@@ -9,10 +9,16 @@ CHANNEL_BLOCK=myc.block
 ORDERER_URL=orderer.monetasa.com:7050
 
 CHANNEL_ID=myc
-CHAIN_ID=token
-CHAIN_PATH=github.com/chaincode/token
-CHAIN_VER=1.0
-CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+
+TOKEN_CHAIN_ID=token
+TOKEN_CHAIN_PATH=github.com/chaincode/token
+TOKEN_CHAIN_VER=1.0
+TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+
+FEE_CHAIN_ID=fee
+FEE_CHAIN_PATH=github.com/chaincode/system-fee
+FEE_CHAIN_VER=1.0
+FEE_CHAIN_INIT_FN='{"Args":["init","{\"value\": 10000}"]}'
 
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
 
@@ -50,12 +56,29 @@ govendor fetch github.com/hyperledger/fabric/protos/msp
 cd $LOCATION
 
 # Install chaincode
-peer chaincode install -n $CHAIN_ID -v $CHAIN_VER -p $CHAIN_PATH
+peer chaincode install -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -p $TOKEN_CHAIN_PATH
+
+cd $GOPATH/src/github.com/chaincode/system-fee
+# Install govendor tool
+go get -u github.com/kardianos/govendor
+
+govendor init
+
+# Fetch deps
+govendor fetch github.com/hyperledger/fabric/protos/msp
+
+cd $LOCATION
+
+# Install chaincode
+peer chaincode install -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -p $FEE_CHAIN_PATH
 
 sleep 5
 
 # Init/provision system with TAS
-peer chaincode instantiate -o $ORDERER_URL -n $CHAIN_ID -v $CHAIN_VER -c "$CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+
+# Init/provision system with system fee
+peer chaincode instantiate -o $ORDERER_URL -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -c "$FEE_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
 sleep 5
 

@@ -9,10 +9,9 @@ import (
 )
 
 var (
-	errFailedSerialization = errors.New("failed to serialize response data")
-	errFailedTransfer      = errors.New("failed to transfer tokens")
-	errFailedApprove       = errors.New("failed to approve allowance")
-	errIncorrectFunc       = errors.New("incorrect function name")
+	errFailedTransfer = errors.New("failed to transfer tokens")
+	errFailedApprove  = errors.New("failed to approve allowance")
+	errIncorrectFunc  = errors.New("incorrect function name")
 )
 
 var _ shim.Chaincode = (*chaincodeRouter)(nil)
@@ -62,6 +61,8 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	// Transfers _value amount of tokens from address _from to address _to
 	case "transferFrom":
 		return cr.transferFrom(stub, args)
+	case "groupTransfer":
+		return cr.groupTransfer(stub, args)
 	}
 	return shim.Error(errIncorrectFunc.Error())
 }
@@ -75,7 +76,7 @@ func (cr chaincodeRouter) totalSupply(stub shim.ChaincodeStubInterface) pb.Respo
 	balance := balanceRes{Value: total}
 	payload, err := json.Marshal(balance)
 	if err != nil {
-		return shim.Error("Failed to serialize total supply payload")
+		return shim.Error(ErrFailedSerialization.Error())
 	}
 
 	return shim.Success(payload)
@@ -117,7 +118,7 @@ func (cr chaincodeRouter) balance(stub shim.ChaincodeStubInterface, args []strin
 
 	payload, err := json.Marshal(res)
 	if err != nil {
-		return shim.Error(errFailedSerialization.Error())
+		return shim.Error(ErrFailedSerialization.Error())
 	}
 
 	return shim.Success(payload)
@@ -158,7 +159,7 @@ func (cr chaincodeRouter) allowance(stub shim.ChaincodeStubInterface, args []str
 	res := allowanceRes{Value: allowance}
 	payload, err := json.Marshal(res)
 	if err != nil {
-		return shim.Error(errFailedSerialization.Error())
+		return shim.Error(ErrFailedSerialization.Error())
 	}
 
 	return shim.Success(payload)
@@ -176,6 +177,31 @@ func (cr chaincodeRouter) transferFrom(stub shim.ChaincodeStubInterface, args []
 
 	if ok := cr.svc.TransferFrom(stub, req.From, req.To, req.Value); !ok {
 		return shim.Error(errFailedTransfer.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (cr chaincodeRouter) groupTransfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error(ErrInvalidNumOfArgs.Error())
+	}
+
+	var req []transferReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
+		return shim.Error(ErrInvalidArgument.Error())
+	}
+
+	transfers := []Transfer{}
+	for _, tr := range req {
+		transfers = append(transfers, Transfer{
+			To:    tr.To,
+			Value: tr.Value,
+		})
+	}
+
+	if err := cr.svc.GroupTransfer(stub, transfers...); err != nil {
+		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)

@@ -26,48 +26,51 @@ import (
 )
 
 const (
-	envHTTPPort          = "MONETASA_TRANSACTIONS_HTTP_PORT"
-	envGRPCPort          = "MONETASA_TRANSACTIONS_GRPC_PORT"
-	envDBURL             = "MONETASA_TRANSACTIONS_DB_URL"
-	envDBUser            = "MONETASA_TRANSACTIONS_DB_USER"
-	envDBPass            = "MONETASA_TRANSACTIONS_DB_PASS"
-	envDBName            = "MONETASA_TRANSACTIONS_DB_NAME"
-	envFabricOrgAdmin    = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
-	envFabricOrgName     = "MONETASA_TRANSACTIONS_FABRIC_NAME"
-	envFabricConfFile    = "MONETASA_TRANSACTIONS_FABRIC_CONF"
-	envFabricChaincodeID = "MONETASA_TRANSACTIONS_FABRIC_CHAINCODE"
-	envAuthURL           = "MONETASA_AUTH_URL"
+	envHTTPPort         = "MONETASA_TRANSACTIONS_HTTP_PORT"
+	envGRPCPort         = "MONETASA_TRANSACTIONS_GRPC_PORT"
+	envDBURL            = "MONETASA_TRANSACTIONS_DB_URL"
+	envDBUser           = "MONETASA_TRANSACTIONS_DB_USER"
+	envDBPass           = "MONETASA_TRANSACTIONS_DB_PASS"
+	envDBName           = "MONETASA_TRANSACTIONS_DB_NAME"
+	envFabricOrgAdmin   = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
+	envFabricOrgName    = "MONETASA_TRANSACTIONS_FABRIC_NAME"
+	envFabricConfFile   = "MONETASA_TRANSACTIONS_FABRIC_CONF"
+	envTokenChaincodeID = "MONETASA_TRANSACTIONS_TOKEN_CHAINCODE"
+	envFeeChaincodeID   = "MONETASA_TRANSACTIONS_FEE_CHAINCODE"
+	envAuthURL          = "MONETASA_AUTH_URL"
 
-	defHTTPPort          = "8080"
-	defGRPCPort          = "8081"
-	defDBURL             = "0.0.0.0"
-	defDBUser            = ""
-	defDBPass            = ""
-	defDBName            = "transactions"
-	defFabricOrgAdmin    = "admin"
-	defFabricOrgName     = "org1"
-	defFabricConfFile    = "/src/monetasa/config/fabric/config.yaml"
-	defFabricChaincodeID = "token"
-	defAuthURL           = "localhost:8081"
+	defHTTPPort         = "8080"
+	defGRPCPort         = "8081"
+	defDBURL            = "0.0.0.0"
+	defDBUser           = ""
+	defDBPass           = ""
+	defDBName           = "transactions"
+	defFabricOrgAdmin   = "admin"
+	defFabricOrgName    = "org1"
+	defFabricConfFile   = "/src/monetasa/config/fabric/config.yaml"
+	defTokenChaincodeID = "token"
+	defFeeChaincodeID   = "fee"
+	defAuthURL          = "localhost:8081"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
 )
 
 type conf struct {
-	httpPort          string
-	grpcPort          string
-	dbURL             string
-	dbUser            string
-	dbPass            string
-	dbName            string
-	dbConnectTimeout  int
-	dbSocketTimeout   int
-	fabricOrgAdmin    string
-	fabricOrgName     string
-	fabricConfFile    string
-	fabricChaincodeID string
-	authURL           string
+	httpPort         string
+	grpcPort         string
+	dbURL            string
+	dbUser           string
+	dbPass           string
+	dbName           string
+	dbConnectTimeout int
+	dbSocketTimeout  int
+	fabricOrgAdmin   string
+	fabricOrgName    string
+	fabricConfFile   string
+	tokenChaincodeID string
+	feeChaincodeID   string
+	authURL          string
 }
 
 func main() {
@@ -108,19 +111,20 @@ func loadConfig() conf {
 	confPath := monetasa.Env(envFabricConfFile, defFabricConfFile)
 	fullConfPath := fmt.Sprintf("%s%s", os.Getenv("GOPATH"), confPath)
 	return conf{
-		httpPort:          monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:          monetasa.Env(envGRPCPort, defGRPCPort),
-		dbURL:             monetasa.Env(envDBURL, defDBURL),
-		dbUser:            monetasa.Env(envDBUser, defDBUser),
-		dbPass:            monetasa.Env(envDBPass, defDBPass),
-		dbName:            monetasa.Env(envDBName, defDBName),
-		dbConnectTimeout:  dbConnectTimeout,
-		dbSocketTimeout:   dbSocketTimeout,
-		fabricOrgAdmin:    monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
-		fabricOrgName:     monetasa.Env(envFabricOrgName, defFabricOrgName),
-		fabricConfFile:    fullConfPath,
-		fabricChaincodeID: monetasa.Env(envFabricChaincodeID, defFabricChaincodeID),
-		authURL:           monetasa.Env(envAuthURL, defAuthURL),
+		httpPort:         monetasa.Env(envHTTPPort, defHTTPPort),
+		grpcPort:         monetasa.Env(envGRPCPort, defGRPCPort),
+		dbURL:            monetasa.Env(envDBURL, defDBURL),
+		dbUser:           monetasa.Env(envDBUser, defDBUser),
+		dbPass:           monetasa.Env(envDBPass, defDBPass),
+		dbName:           monetasa.Env(envDBName, defDBName),
+		dbConnectTimeout: dbConnectTimeout,
+		dbSocketTimeout:  dbSocketTimeout,
+		fabricOrgAdmin:   monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
+		fabricOrgName:    monetasa.Env(envFabricOrgName, defFabricOrgName),
+		fabricConfFile:   fullConfPath,
+		tokenChaincodeID: monetasa.Env(envTokenChaincodeID, defTokenChaincodeID),
+		feeChaincodeID:   monetasa.Env(envFeeChaincodeID, defFeeChaincodeID),
+		authURL:          monetasa.Env(envAuthURL, defAuthURL),
 	}
 }
 
@@ -152,7 +156,14 @@ func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
 }
 
 func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, logger log.Logger) transactions.Service {
-	bn := fabric.NewNetwork(sdk, cfg.fabricOrgAdmin, cfg.fabricOrgName, cfg.fabricChaincodeID, logger)
+	bn := fabric.NewNetwork(
+		sdk,
+		cfg.fabricOrgAdmin,
+		cfg.fabricOrgName,
+		cfg.tokenChaincodeID,
+		cfg.feeChaincodeID,
+		logger,
+	)
 	users := mongo.NewUserRepository(ms)
 
 	svc := transactions.New(users, bn)

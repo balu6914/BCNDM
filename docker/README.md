@@ -62,7 +62,7 @@ docker exec -it cli bash
 Query chaincode:
 
 ```
-peer chaincode query -C myc -n token -c '{"Args":["balance","{\"user\": \"testUser\"}"]}'
+peer chaincode query -C myc -n token -c '{"Args":["balanceOf","{\"user\": \"testUser\"}"]}'
 ```
 
 You should get response:
