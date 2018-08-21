@@ -10,8 +10,9 @@
 #
 ###
 
-BUILD=../build
-UI=../ui
+ROOT=$GOPATH/src/monetasa
+BUILD=$ROOT/build
+UI=$ROOT/ui
 
 # Kill all monetasa-* stuff
 function cleanup {
