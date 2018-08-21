@@ -5,6 +5,9 @@ import (
 	"monetasa"
 	"monetasa/subscriptions"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var _ subscriptions.TransactionsService = (*transactionsService)(nil)
@@ -27,7 +30,14 @@ func (ts transactionsService) Transfer(from, to string, value uint64) error {
 		To:    to,
 		Value: value,
 	}
-	_, err := ts.client.Transfer(ctx, td)
+	if _, err := ts.client.Transfer(ctx, td); err != nil {
+		e, ok := status.FromError(err)
+		if ok && e.Code() == codes.FailedPrecondition {
+			return subscriptions.ErrNotEnoughTokens
+		}
 
-	return err
+		return err
+	}
+
+	return nil
 }

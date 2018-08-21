@@ -97,9 +97,5 @@ func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, val
 	}
 
 	// Transfer tokens.
-	if err := fc.ts.Transfer(stub, transfers...); err != nil {
-		return err
-	}
-
-	return nil
+	return fc.ts.Transfer(stub, transfers...)
 }
