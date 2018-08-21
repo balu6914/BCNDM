@@ -5,9 +5,11 @@ import (
 	"fmt"
 	log "monetasa/logger"
 	"monetasa/transactions"
+	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
@@ -150,6 +152,10 @@ func (fn fabricNetwork) transfer(chaincode, from, to string, value uint64) error
 	})
 	if err != nil {
 		fn.logger.Warn(fmt.Sprintf("failed to execute transfer chaincode: %s", err))
+		e, ok := status.FromError(err)
+		if ok && strings.Contains(e.Message, transactions.ErrNotEnoughTokens.Error()) {
+			return transactions.ErrNotEnoughTokens
+		}
 		return err
 	}
 

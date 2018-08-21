@@ -89,6 +89,8 @@ func encodeError(err error) error {
 		return nil
 	case errMalformedEntity:
 		return status.Error(codes.InvalidArgument, "received invalid user request")
+	case transactions.ErrNotEnoughTokens:
+		return status.Error(codes.FailedPrecondition, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal server error")
 	}

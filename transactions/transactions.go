@@ -54,6 +54,9 @@ func (ts transactionService) Balance(userID string) (uint64, error) {
 
 func (ts transactionService) Transfer(from, to string, value uint64) error {
 	if err := ts.bn.Transfer(from, to, value); err != nil {
+		if err == ErrNotEnoughTokens {
+			return ErrNotEnoughTokens
+		}
 		return ErrFailedTransfer
 	}
 

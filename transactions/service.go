@@ -23,6 +23,9 @@ var (
 
 	// ErrFailedTransfer indicates that token transfer failed.
 	ErrFailedTransfer = errors.New("failed to transfer tokens")
+
+	// ErrNotEnoughTokens indicates that spender doesn't have enough tokens.
+	ErrNotEnoughTokens = errors.New("not enough tokens")
 )
 
 // Service specifies an API that must be fulfilled by the domain service

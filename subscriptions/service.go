@@ -25,6 +25,9 @@ var (
 
 	// ErrFailedCreateSub indicates that creation of subscription failed.
 	ErrFailedCreateSub = errors.New("failed to create subscription")
+
+	// ErrNotEnoughTokens indicates that spender doesn't have enough tokens.
+	ErrNotEnoughTokens = errors.New("not enough tokens")
 )
 
 // Service specifies an API that must be fullfiled by the domain service
@@ -73,6 +76,9 @@ func (ss *subscriptionsService) CreateSubscription(userID string, sub Subscripti
 	}
 
 	if err := ss.transactions.Transfer(userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		if err == ErrNotEnoughTokens {
+			return err
+		}
 		return ErrFailedTransfer
 	}
 

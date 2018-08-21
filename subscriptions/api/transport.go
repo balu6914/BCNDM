@@ -135,6 +135,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 	case subscriptions.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
+	case subscriptions.ErrNotEnoughTokens:
+		w.WriteHeader(http.StatusPaymentRequired)
 	case errUnsupportedContentType:
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case io.ErrUnexpectedEOF:
