@@ -66,14 +66,18 @@ This is a shorthand for:
 
 ### Datapace dApp
 In another terminal run:
+```
+make rundapp
+```
 
+which is a shorthand for:
 ```
 docker-compose -f docker/docker-compose.yml up
 ```
 
 To run locally compiled binaries (during dev process) instead of Docker containers execute:
 ```
-make rundapp
+make rundev
 ```
 
 UI will be available at [http://localhost:4200](http://localhost:4200)
