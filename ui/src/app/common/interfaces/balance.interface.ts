@@ -1,5 +1,8 @@
 export class Balance {
   constructor(
-    public balance: number,
+    public amount: number = 0,
+    public symbol: string = 'TAS',
+    public fiatAmount: number = 0,
+    public fiatSymbol: string = 'EUR'
   ) { }
 }

@@ -11,6 +11,7 @@ import { DashboardContractsComponent } from './dashboard.contracts.component';
 import { DashboardContractsEmptyListComponent } from './empty-list/dashboard.contracts.empty.list.component';
 import { DashboardContractsDetailsComponent } from './contract-details/dashboard.contracts.details.component'
 import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
+import { DashboardContractsHelpComponent } from './help/dashboard.contracts.help.component';
 import { CommonAppModule } from '../../common/common.module';
 import { SharedModule } from '../../shared/shared.module';
 import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
@@ -32,6 +33,7 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
     DashboardContractsAddComponent,
     DashboardContractsEmptyListComponent,
     DashboardContractsDetailsComponent,
+    DashboardContractsHelpComponent,
   ],
   entryComponents: [
     DashboardContractsAddComponent,

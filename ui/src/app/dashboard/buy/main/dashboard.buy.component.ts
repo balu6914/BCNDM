@@ -3,6 +3,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { Query } from '../../../common/interfaces/query.interface';
 import { StreamService } from '../../../common/services/stream.service';
 import { Table, TableType } from '../../../shared/table/table';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class DashboardBuyComponent implements OnInit {
   constructor(
     private AuthService: AuthService,
     public streamService: StreamService,
+    public alertService: AlertService,
   ) { }
 
   ngOnInit() {
@@ -44,6 +46,11 @@ export class DashboardBuyComponent implements OnInit {
     this.fetchStreams();
   }
 
+  onFiltersChange(filters: any) {
+    Object.assign(this.query, filters);
+    this.fetchStreams();
+  }
+
   private fetchStreams() {
     this.streamService.searchStreams(this.query).subscribe(
       (result: any) => {
@@ -54,6 +61,7 @@ export class DashboardBuyComponent implements OnInit {
       },
       err => {
         console.log(err);
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
       });
   }
 

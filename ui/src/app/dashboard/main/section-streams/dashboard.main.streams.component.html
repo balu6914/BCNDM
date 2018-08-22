@@ -1,0 +1,16 @@
+<div class="box box-grow">
+  <div class="box__header">
+    <p class="box__title">
+      Streams
+    </p>
+    <ul class="nav box-nav">
+      <li (click)="onTabSwitch(types.Bought)" class="box-nav__item">
+        <a  [routerLink]="" class="box-nav__link" [ngClass]="{'active': section.name === types.Bought}" data-toggle="pill" role="tab" aria-controls="sold-stream" aria-selected="true">Bought streams</a>
+      </li>
+      <li (click)="onTabSwitch(types.Sold)" class="box-nav__item">
+        <a [routerLink]="" class="box-nav__link" [ngClass]="{'active': section.name === types.Sold}" data-toggle="pill" role="tab" aria-controls="bought-stream" aria-selected="false">Sold streams</a>
+      </li>
+    </ul>
+  </div>
+  <dpc-table [table]="table"></dpc-table>
+</div>

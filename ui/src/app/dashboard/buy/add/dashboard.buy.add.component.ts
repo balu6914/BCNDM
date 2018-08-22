@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { SubscriptionService } from '../../../common/services/subscription.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { BalanceService } from '../../../shared/balance/balance.service';
+import { Balance } from '../../../common/interfaces/balance.interface';
 
 @Component({
   selector: 'dpc-dashboard-buy-add',
@@ -14,12 +16,14 @@ export class DashboardBuyAddComponent {
   form: FormGroup;
   stream: any;
   modalMsg: string;
+  balance = new Balance();
 
   constructor(
     private subscriptionService: SubscriptionService,
     private formBuilder: FormBuilder,
     public modalSubscription: BsModalRef,
     private alertService: AlertService,
+    private balanceService: BalanceService,
   ) {
     this.form = this.formBuilder.group({
       hours: ['', [Validators.required, Validators.min(1)]]
@@ -41,8 +45,20 @@ export class DashboardBuyAddComponent {
     // Send subscription request
     this.subscriptionService.add(subsReq).subscribe(
       response => {
-        this.modalSubscription.hide();
-        this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours`);
+        // Fetch new user balance and publish new balance value to message buss
+        this.balanceService.get().subscribe(
+        (result: any) => {
+          this.balance.amount = result.balance;
+          this.balance.fiatAmount = this.balance.amount;
+          this.balanceService.changed(this.balance);
+          // Close modal and show success message
+          this.modalSubscription.hide();
+          this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours`);
+        },
+        err => {
+          console.error("Error fetching user balance ", err)
+        });
+
       },
       err => {
         this.modalSubscription.hide();

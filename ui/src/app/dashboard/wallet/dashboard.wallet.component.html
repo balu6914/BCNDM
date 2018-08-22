@@ -9,57 +9,8 @@
     <dpc-balance-widget [balance]="mockBalance"></dpc-balance-widget>
   </div>
   <div class="col-md-8 col-lg-9">
-    <div class="box">
-      <div class="box__header">
-        <p class="box__title">
-          Statistics
-        </p>
-        <!-- Mobile version of the chart caption -->
-        <div class="chart-caption d-sm-none">
-          <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
-        </div>
-        <!-- Desktop version of the navigation -->
-        <ul class="box-nav d-none d-sm-block">
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last week</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last month</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last year</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link active">All</a>
-          </li>
-        </ul>
-      </div>
-      <div class="box__content">
-        <!-- Chart goes here -->
-        <div class="chart-container" style="position: relative; max-height: 148px;">
-          <canvas id="myChart"></canvas>
-        </div>
-        <!-- Desktop version of the chart caption -->
-        <div class="chart-caption d-none d-sm-block">
-          <span class="chart-caption__color chart-caption--color-1">Wallet balance</span>
-        </div>
-        <!-- Mobile version of the nav -->
-        <ul class="box-nav box-nav--xs d-sm-none">
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last week</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last month</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link">Last year</a>
-          </li>
-          <li class="box-nav__item">
-            <a href="#" class="box-nav__link active">All</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <!-- Statistics -->
+    <dpc-statistic-graph></dpc-statistic-graph>
   </div>
 </div>
 <div class="row row-grow">

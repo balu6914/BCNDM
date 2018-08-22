@@ -21,6 +21,7 @@ export class DashboardSellComponent {
   temp = [];
   streams = [];
   table: Table = new Table();
+  query = new Query();
 
   @ViewChild('map')
   private map: MapComponent;
@@ -50,26 +51,8 @@ export class DashboardSellComponent {
     this.table.tableType = TableType.Sell;
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
     this.table.hasDetails = true;
-
-    const query = new Query();
-
-    this.streamService.searchStreams(query).subscribe(
-      (result: Page<Stream>) => {
-        this.temp = result.content;
-        result.content.forEach(stream => {
-          if (stream.owner === this.user.id) {
-            this.streams.push(stream);
-          }
-        });
-        result.content = this.streams;
-        // Set table content
-        this.table.page = result;
-      },
-      err => {
-        console.log(err);
-      }
-    );
-  }
+    this.fetchStreams();
+    }
 
   // Add Bulk event
   onFileChange(event): void {
@@ -97,7 +80,7 @@ export class DashboardSellComponent {
       .content.streamCreated.subscribe(
         stream => {
           // Push new stream to table
-          this.streams.push(stream);
+          this.table.page.content.push(stream);
           // Set MArker on the map
           this.map.addMarker(stream);
         },
@@ -114,4 +97,32 @@ export class DashboardSellComponent {
   deleteStream(id) {
     this.map.removeMarker(id);
   }
+
+  onFiltersChange(filters: any) {
+    Object.assign(this.query, filters);
+    this.fetchStreams();
+  }
+
+  private fetchStreams() {
+    this.streamService.searchStreams(this.query).subscribe(
+      (result: any) => {
+        result.content.forEach(stream => {
+          if (stream.owner === this.user.id) {
+            this.streams.push(stream);
+          }
+        });
+        result.content = this.streams;
+        const temp = Object.assign({}, this.table);
+        temp.page = result;
+        // Set table content
+        this.table = temp;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+    console.log(this.table)
+  }
+
+
 }

@@ -29,7 +29,6 @@ export class SidebarFiltersComponent {
        );
 
        this.form = formBuilder.group({
-         city: ['', String],
          name: ['', String],
          streamType: ['', String],
          minPrice: [0, Number],
@@ -47,7 +46,6 @@ export class SidebarFiltersComponent {
 
     onSubmit(isValid: boolean) {
     if(isValid) {
-        console.log("Here it is", this.form.value);
         this.filtersUpdate.emit(this.form.value)
       }
     }

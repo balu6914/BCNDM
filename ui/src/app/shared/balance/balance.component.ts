@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { Balance } from './balance';
+import { Balance } from '../../common/interfaces/balance.interface';
 import { BalanceService } from './balance.service';
 import { BalanceAddComponent } from './add/balance.add.component';
 import { MitasPipe } from '../../common/pipes/converter.pipe';
@@ -13,7 +13,7 @@ import { MitasPipe } from '../../common/pipes/converter.pipe';
   styleUrls: ['./balance.component.scss']
 })
 export class BalanceComponent implements OnInit {
-  balance: Balance;
+  balance = new Balance();
   modalRef: BsModalRef;
 
   constructor(
@@ -30,21 +30,13 @@ export class BalanceComponent implements OnInit {
           // Fetch updated user balance
           this.getBalance().then(
           (response) => {
-              this.modalRef.hide()
+              this.modalRef.hide();
           },
         )
         });
     }
 
   ngOnInit() {
-    // TODO: Remove this Mock of user balance its tmp hack until we add this on API side.
-    let mockBalance = {
-      amount: 0,
-      symbol: 'TAS',
-      fiatAmount: 1200,
-      fiatSymbol: 'USD'
-    }
-    this.balance = mockBalance;
     this.getBalance();
   }
 
@@ -53,6 +45,10 @@ export class BalanceComponent implements OnInit {
       this.balanceService.get().subscribe(
         (result: any) => {
           this.balance.amount = result.balance;
+          //TODO remove this Mock of fiatAmount when we add this info on API side
+          this.balance.fiatAmount = this.balance.amount;
+          // Publish new balance data to balance message buss
+          this.balanceService.changed(this.balance);
           resolve();
         },
         err => {

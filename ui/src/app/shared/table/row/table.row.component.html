@@ -16,9 +16,18 @@
   <td nowrap>{{ row.share }} %</td>
   <td nowrap> {{row.expirationDate | date: 'MMM d, y'}}</td>
   <td nowrap>
-    <i *ngIf="row.signed && !row.expired" class="material-icons" title="Signed">lock</i>
-    <i *ngIf="!row.signed && !row.expired" class="material-icons" title="Waiting for a signature">lock_open</i>
-    <i *ngIf="row.expired" class="material-icons" title="Contract Expired">error_outline</i>
+    <div *ngIf="row.signed && !row.expired" class="status-wrapper">
+      <span class="status-icon status-icon--signed"></span>
+      <span class="status-icon__text">Signed</span>
+    </div>
+    <div *ngIf="!row.signed && !row.expired" class="status-wrapper">
+      <span  class="status-icon status-icon--waiting"></span>
+      <span  class="status-icon__text">Waiting for a signature</span>
+    </div>
+    <div *ngIf="row.expired" class="status-wrapper">
+      <span class="status-icon status-icon--expired"></span>
+      <span class="status-icon__text">Contract expired</span>
+    </div>
   </td>
 </tr>
 <tr *ngIf="rowType === types.Buy || rowType === types.Sell">
