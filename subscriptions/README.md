@@ -13,16 +13,17 @@ The service is configured using the environment variables presented in the
 following table. Note that any unset variables will be replaced with their
 default values.
 
-| Variable                       | Description                              | Default        |
-|--------------------------------|------------------------------------------|----------------|
-| MONETASA_SUBSCRIPTIONS_PORT    | Stream service port                      | localhost      |
-| MONETASA_SUBSCRIPTIONS_DB_URL  | List of database cluster URLs            | 0.0.0.0        |
-| MONETASA_SUBSCRIPTIONS_DB_NAME | Name of the database used by the service | subscriptions  |
-| MONETASA_SUBSCRIPTIONS_DB_USER | Database user                            |                |
-| MONETASA_SUBSCRIPTIONS_DB_PASS | Database password                        |                |
-| MONETASA_AUTH_URL              | Auth service gRPC URL                    | localhost:8081 |
-| MONETASA_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081 |
-| MONETASA_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081 |
+| Variable                       | Description                              | Default               |
+|--------------------------------|------------------------------------------|-----------------------|
+| MONETASA_SUBSCRIPTIONS_PORT    | Stream service port                      | localhost             |
+| MONETASA_SUBSCRIPTIONS_DB_URL  | List of database cluster URLs            | 0.0.0.0               |
+| MONETASA_SUBSCRIPTIONS_DB_NAME | Name of the database used by the service | subscriptions         |
+| MONETASA_SUBSCRIPTIONS_DB_USER | Database user                            |                       |
+| MONETASA_SUBSCRIPTIONS_DB_PASS | Database password                        |                       |
+| MONETASA_AUTH_URL              | Auth service gRPC URL                    | localhost:8081        |
+| MONETASA_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081        |
+| MONETASA_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081        |
+| MONETASA_PROXY_URL             | Proxy service URL                        | http://localhost:8080 |
 
 ## Deployment
 
@@ -41,7 +42,7 @@ make subscriptions
 make install
 
 # set the environment variables and run the service
-MONETASA_SUBSCRIPTIONS_PORT=[Service port] MONETASA_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] MONETASA_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] MONETASA_SUBSCRIPTIONS_DB_USER=[Database user] MONETASA_SUBSCRIPTIONS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-subscriptions
+MONETASA_SUBSCRIPTIONS_PORT=[Service port] MONETASA_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] MONETASA_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] MONETASA_SUBSCRIPTIONS_DB_USER=[Database user] MONETASA_SUBSCRIPTIONS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] MONETASA_PROXY_URL=[Proxy service URL] $GOBIN/monetasa-subscriptions
 ```
 
 ## Usage

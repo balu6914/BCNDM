@@ -42,6 +42,9 @@ type Service interface {
 	// Updates the Stream identified by the provided id.
 	UpdateStream(Stream) error
 
+	// ViewFullStream retrieves Stream data including URL by id.
+	ViewFullStream(string) (Stream, error)
+
 	// Retrieves data about the Stream identified by the id.
 	// Provides check if the user is actual owner of the
 	// Stream to prevent access to the real Stream URL.
@@ -89,6 +92,10 @@ func (ss streamService) SearchStreams(owner string, query Query) (Page, error) {
 
 func (ss streamService) UpdateStream(stream Stream) error {
 	return ss.streams.Update(stream)
+}
+
+func (ss streamService) ViewFullStream(id string) (Stream, error) {
+	return ss.streams.One(id)
 }
 
 func (ss streamService) ViewStream(id, owner string) (Stream, error) {

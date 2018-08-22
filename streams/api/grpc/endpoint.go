@@ -14,7 +14,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		stream, err := svc.ViewStream(req.id, "")
+		stream, err := svc.ViewFullStream(req.id)
 		if err != nil {
 			return nil, err
 		}
@@ -22,6 +22,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 		res := oneRes{
 			id:    stream.ID.Hex(),
 			owner: stream.Owner,
+			url:   stream.URL,
 			price: stream.Price,
 		}
 

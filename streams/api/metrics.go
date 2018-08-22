@@ -52,6 +52,15 @@ func (ms *metricsMiddleware) UpdateStream(stream streams.Stream) error {
 	return ms.svc.UpdateStream(stream)
 }
 
+func (ms *metricsMiddleware) ViewFullStream(id string) (streams.Stream, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_full_stream").Add(1)
+		ms.latency.With("method", "view_full_stream").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ViewFullStream(id)
+}
+
 func (ms *metricsMiddleware) ViewStream(id, owner string) (streams.Stream, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view_stream").Add(1)

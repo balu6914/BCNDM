@@ -355,6 +355,34 @@ func TestUpdateStream(t *testing.T) {
 	}
 }
 
+func TestFullViewStream(t *testing.T) {
+	s := stream()
+	svc := newService()
+	svc.AddStream(s)
+
+	cases := []struct {
+		desc string
+		id   string
+		err  error
+	}{
+		{
+			desc: "view an existing stream",
+			id:   s.ID.Hex(),
+			err:  nil,
+		},
+		{
+			desc: "view a non-existing stream",
+			id:   bson.NewObjectId().String(),
+			err:  streams.ErrNotFound,
+		},
+	}
+
+	for _, tc := range cases {
+		_, err := svc.ViewFullStream(tc.id)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+	}
+}
+
 func TestViewStream(t *testing.T) {
 	s := stream()
 	svc := newService()

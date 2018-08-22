@@ -14,6 +14,7 @@ import (
 	"monetasa/subscriptions"
 	"monetasa/subscriptions/api"
 	"monetasa/subscriptions/mongo"
+	"monetasa/subscriptions/proxy"
 	"monetasa/subscriptions/streams"
 	"monetasa/subscriptions/transactions"
 	transactionsapi "monetasa/transactions/api/grpc"
@@ -30,15 +31,19 @@ const (
 	envAuthURL         = "MONETASA_AUTH_URL"
 	envTransactionsURL = "MONETASA_TRANSACTIONS_URL"
 	envStreamsURL      = "MONETASA_STREAMS_URL"
-	envMongoURL        = "MONETASA_SUBSCRIPTIONS_DB_URL"
-	envMongoUser       = "MONETASA_SUBSCRIPTIONS_DB_USER"
-	envMongoPass       = "MONETASA_SUBSCRIPTIONS_DB_PASS"
-	envMongoDatabase   = "MONETASA_SUBSCRIPTIONS_DB_NAME"
+
+	// HTTP prefixed, because all others are gRPC.
+	envProxyURL      = "MONETASA_PROXY_URL"
+	envMongoURL      = "MONETASA_SUBSCRIPTIONS_DB_URL"
+	envMongoUser     = "MONETASA_SUBSCRIPTIONS_DB_USER"
+	envMongoPass     = "MONETASA_SUBSCRIPTIONS_DB_PASS"
+	envMongoDatabase = "MONETASA_SUBSCRIPTIONS_DB_NAME"
 
 	defSubsPort        = "8080"
 	defAuthURL         = "localhost:8081"
 	defTransactionsURL = "localhost:8081"
 	defStreamsURL      = "localhost:8081"
+	defProxyURL        = "http://localhost:8080"
 	defSubsURL         = "0.0.0.0"
 	defMongoURL        = "0.0.0.0"
 	defMongoUser       = ""
@@ -54,6 +59,7 @@ type config struct {
 	AuthURL             string
 	TransactionsURL     string
 	StreamsURL          string
+	ProxyURL            string
 	MongoURL            string
 	MongoUser           string
 	MongoPass           string
@@ -82,7 +88,7 @@ func main() {
 	defer streamsConn.Close()
 	sc := streamsapi.NewClient(streamsConn)
 
-	svc := newService(ms, sc, tc, logger)
+	svc := newService(ms, sc, tc, cfg.ProxyURL, logger)
 
 	errs := make(chan error, 2)
 
@@ -103,6 +109,7 @@ func loadConfig() config {
 		SubsPort:            monetasa.Env(envSubsPort, defSubsPort),
 		StreamsURL:          monetasa.Env(envStreamsURL, defStreamsURL),
 		TransactionsURL:     monetasa.Env(envTransactionsURL, defTransactionsURL),
+		ProxyURL:            monetasa.Env(envProxyURL, defProxyURL),
 		MongoURL:            monetasa.Env(envMongoURL, defMongoURL),
 		MongoUser:           monetasa.Env(envMongoUser, defMongoUser),
 		MongoPass:           monetasa.Env(envMongoPass, defMongoPass),
@@ -140,12 +147,13 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.TransactionsServiceClient, logger log.Logger) subscriptions.Service {
+func newService(ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
+	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewRepository(ms)
-	svc := subscriptions.New(repo, ss, ts)
+	svc := subscriptions.New(repo, ss, ps, ts)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(

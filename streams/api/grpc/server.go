@@ -46,6 +46,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 	stream := monetasa.Stream{
 		Id:    res.id,
 		Owner: res.owner,
+		Url:   res.url,
 		Price: res.price,
 	}
 

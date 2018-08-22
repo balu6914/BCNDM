@@ -45,14 +45,16 @@ var _ Service = (*subscriptionsService)(nil)
 type subscriptionsService struct {
 	subscriptions SubscriptionsRepository
 	streams       StreamsService
+	proxy         Proxy
 	transactions  TransactionsService
 }
 
 // New instantiates the domain service implementation.
-func New(subs SubscriptionsRepository, streams StreamsService, transactions TransactionsService) Service {
+func New(subs SubscriptionsRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
 	return &subscriptionsService{
 		subscriptions: subs,
 		streams:       streams,
+		proxy:         proxy,
 		transactions:  transactions,
 	}
 }
@@ -66,6 +68,13 @@ func (ss *subscriptionsService) CreateSubscription(userID string, sub Subscripti
 	if err != nil {
 		return ErrNotFound
 	}
+
+	hash, err := ss.proxy.Register(sub.Hours, stream.URL)
+	if err != nil {
+		return err
+	}
+
+	sub.StreamURL = hash
 
 	if err := ss.subscriptions.Create(sub); err != nil {
 		if err == ErrConflict {

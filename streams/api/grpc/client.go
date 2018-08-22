@@ -39,6 +39,7 @@ func (client grpcClient) One(ctx context.Context, id *monetasa.ID, _ ...grpc.Cal
 	stream := monetasa.Stream{
 		Id:    sr.id,
 		Owner: sr.owner,
+		Url:   sr.url,
 		Price: sr.price,
 	}
 
@@ -55,6 +56,7 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 	stream := oneRes{
 		id:    res.GetId(),
 		owner: res.GetOwner(),
+		url:   res.GetUrl(),
 		price: res.GetPrice(),
 	}
 

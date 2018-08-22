@@ -20,6 +20,7 @@ import (
 var stream = streams.Stream{
 	Owner: owner,
 	ID:    bson.NewObjectId(),
+	URL:   "http://test.com",
 	Price: 100,
 }
 
@@ -42,6 +43,7 @@ func TestOne(t *testing.T) {
 			stream: &monetasa.Stream{
 				Owner: stream.Owner,
 				Id:    stream.ID.Hex(),
+				Url:   stream.URL,
 				Price: stream.Price,
 			},
 			err: nil,

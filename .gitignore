@@ -6,6 +6,7 @@ docker/fabric/artifacts/**/**
 fabric-ca-db
 /*.pb.go
 build
+data/
 
 # System Files
 .DS_Store
