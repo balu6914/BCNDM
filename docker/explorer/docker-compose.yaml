@@ -27,3 +27,4 @@ services:
       - monetasa-bc-net
     depends_on:
       - "explorer-db"
+      - "cli"
