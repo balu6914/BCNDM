@@ -20,7 +20,7 @@ export class TableRowComponent implements OnInit {
   types = TableType;
   bsModalRef: BsModalRef;
 
-  @Input() row: Stream | Subscription;
+  @Input() row: any;
   @Input() rowType: TableType;
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
@@ -39,8 +39,11 @@ export class TableRowComponent implements OnInit {
   }
 
   public copyToClipboard() {
-    if (this.isStream(this.row)) {
-      ngCopy(this.row.url, null);
+    if (this.row.url) {
+      return ngCopy(this.row.url, null);
+    }
+    if (this.row.stream_url) {
+      return ngCopy(this.row.stream_url, null);
     }
   }
 

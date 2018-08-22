@@ -5,7 +5,7 @@
   <td nowrap>{{ row.end_date | date }}</td>
   <td nowrap>
     <div class="action-wrapper">
-      <a href="{{row.url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
+      <a href="{{row.url || row.stream_url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
       <a (click)="copyToClipboard()" class="btn btn-primary-alt btn-sm">Copy</a>
     </div>
   </td>
