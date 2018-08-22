@@ -62,7 +62,11 @@ export class DashboardBuyAddComponent {
       },
       err => {
         this.modalSubscription.hide();
-        this.alertService.error(`Something went wrong. Please try again later.`);
+        if (err.status === 402) {
+          this.alertService.error(`No enough funds.`);
+        } else {
+          this.alertService.error(`Something went wrong. Please try again later.`);
+        }
       });
   }
 }
