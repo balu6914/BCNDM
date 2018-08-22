@@ -40,9 +40,10 @@ func newService() subscriptions.Service {
 	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
 		streamID: subscriptions.Stream{},
 	})
+	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
 
-	return subscriptions.New(subs, streams, transactions)
+	return subscriptions.New(subs, streams, proxy, transactions)
 }
 
 func newServer(svc subscriptions.Service, ac monetasa.AuthServiceClient) *httptest.Server {

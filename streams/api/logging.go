@@ -48,6 +48,19 @@ func (lm *loggingMiddleware) AddBulkStreams(streams []streams.Stream) (err error
 	return lm.svc.AddBulkStreams(streams)
 }
 
+func (lm *loggingMiddleware) ViewFullStream(id string) (stream streams.Stream, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method view_full_stream for stream %s, took %s to complete", id, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.ViewFullStream(id)
+}
+
 func (lm *loggingMiddleware) ViewStream(id, owner string) (stream streams.Stream, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method view_stream for stream %s, took %s to complete", id, time.Since(begin))

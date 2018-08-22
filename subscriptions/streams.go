@@ -10,5 +10,6 @@ type StreamsService interface {
 type Stream struct {
 	ID    string
 	Owner string
+	URL   string
 	Price uint64
 }
