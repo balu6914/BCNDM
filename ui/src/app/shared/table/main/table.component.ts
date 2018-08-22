@@ -24,7 +24,7 @@ import { Stream } from '../../../common/interfaces/stream.interface';
 export class TableComponent {
   types = TableType;
   flip = 'inactive';
-  selectedRow = Stream;
+  selectedRow: any;
 
   @Input() table: Table = new Table();
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
@@ -34,7 +34,7 @@ export class TableComponent {
   constructor() { }
 
 
-  showRowDetails(row) {
+  showRowDetails(row: any) {
     this.selectedRow = row;
     if (this.table.hasDetails && this.selectedRow) {
       this.flip = (this.flip === 'inactive') ? 'active' : 'inactive';
@@ -49,6 +49,10 @@ export class TableComponent {
         // Remove row from table
         this.table.page.content.splice(i,1);
         // Emit event to DashboardSellComponent
+        // If its delted from details page, go back to list
+        if(this.selectedRow && row.id === this.selectedRow.id) {
+          this.flip = 'inactive';
+        }
         this.deleteEvt.emit(row.id);
       }
     });
@@ -63,6 +67,7 @@ export class TableComponent {
         this.table.page.content[i] = stream;
         // Emit event to DashboardSellComponent
         this.editEvt.emit(stream);
+        this.selectedRow = stream;
       }
     });
   }

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {RouterModule} from '@angular/router';
 import { CommonAppModule } from '../../common/common.module';
 import { TableRowComponent } from './row/table.row.component';
 import { TableRowDetailsComponent } from './details/table.row.details.component';
@@ -9,6 +10,7 @@ import { TablePaginationComponent } from './pagination/table.pagination.componen
 @NgModule({
   imports: [
     CommonModule,
+    RouterModule,
     CommonAppModule
   ],
   declarations: [

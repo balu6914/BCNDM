@@ -103,7 +103,7 @@ export class TableRowComponent implements OnInit {
 
   // Select/Click on Row emits a selectedRow event and pass selected row data
   // In order to show row details.
-  selectRow(row: any) {
+  selectRow(row: Stream) {
     this.rowSelected.emit(row);
   }
 }
