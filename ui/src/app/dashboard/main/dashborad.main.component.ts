@@ -16,7 +16,6 @@ export class DashboardMainComponent implements OnInit {
   user: any;
   streams = [];
   map: any;
-  // table: Table = new Table();
   pageData: Page<Subscription>;
   streamTypes: StreamsType;
   activeStreamsSection: StreamSection = new StreamSection();
