@@ -12,6 +12,7 @@ import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
+  providers:[MapComponent],
   selector: 'dashboard-sell',
   templateUrl: './dashboard.sell.component.html',
   styleUrls: ['./dashboard.sell.component.scss']
@@ -23,10 +24,8 @@ export class DashboardSellComponent {
   table: Table = new Table();
   query = new Query();
 
-  @ViewChild('map')
-  private map: MapComponent;
-
   constructor(
+    private map: MapComponent,
     private streamService: StreamService,
     private AuthService: AuthService,
     private modalService: BsModalService,
@@ -65,6 +64,7 @@ export class DashboardSellComponent {
 
       this.streamService.addStreamBulk(formData).subscribe(
         data => {
+          this.fetchStreams();
           this.alertService.success(`CSV successfully uploaded`);
         },
         err => {
