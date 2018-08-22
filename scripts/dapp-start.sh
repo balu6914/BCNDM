@@ -10,7 +10,9 @@
 #
 ###
 
-BUILD=../build
+ROOT=$GOPATH/src/monetasa
+BUILD=$ROOT/build
+UI=$ROOT/ui
 
 # Kill all monetasa-* stuff
 function cleanup {
@@ -55,6 +57,13 @@ MONETASA_SUBSCRIPTIONS_DB_URL=localhost                 \
 MONETASA_SUBSCRIPTIONS_DB_NAME=monetasa-subscriptions   \
 MONETASA_AUTH_URL=localhost:8081                        \
 $BUILD/monetasa-subscriptions &
+
+###
+# UI
+###
+cd $UI
+npm start &
+cd -
 
 trap cleanup EXIT
 
