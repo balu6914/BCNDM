@@ -38,7 +38,7 @@ export class DashboardBuyAddComponent {
     }
     const subsReq = {
       hours: this.form.value.hours,
-      id: this.stream.id,
+      stream_id: this.stream.id,
     };
     const streamName = this.stream.name;
 
