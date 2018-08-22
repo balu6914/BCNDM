@@ -33,16 +33,30 @@ func MakeHandler(svc subscriptions.Service, ac monetasa.AuthServiceClient) http.
 
 	r := bone.New()
 
-	r.Get("/subscriptions", kithttp.NewServer(
-		readSubsEndpoint(svc),
-		decodeReadSubsRequest,
+	r.Get("/subscriptions/owned", kithttp.NewServer(
+		searchSubsEndpoint(svc),
+		decodeOwnedSubsRequest,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/subscriptions/bought", kithttp.NewServer(
+		searchSubsEndpoint(svc),
+		decodeBoughtSubsRequest,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/subscriptions/:id", kithttp.NewServer(
+		viewSubEndpoint(svc),
+		decodeViewSubRequest,
 		encodeResponse,
 		opts...,
 	))
 
 	r.Post("/subscriptions", kithttp.NewServer(
-		createSubsEndpoint(svc),
-		decodeCreateSubsRequest,
+		addSubEndpoint(svc),
+		decodeAddSubRequest,
 		encodeResponse,
 		opts...,
 	))
@@ -75,7 +89,21 @@ func authorize(r *http.Request) (string, error) {
 	return id.GetValue(), nil
 }
 
-func decodeCreateSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeSearch(r *http.Request) (searchSubsReq, error) {
+	q := r.URL.Query()
+
+	req := searchSubsReq{
+		Limit: 20,
+	}
+
+	if err := searchFields(&req, q); err != nil {
+		return searchSubsReq{}, err
+	}
+
+	return req, nil
+}
+
+func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	userID, err := authorize(r)
 	if err != nil {
 		return nil, err
@@ -86,21 +114,57 @@ func decodeCreateSubsRequest(_ context.Context, r *http.Request) (interface{}, e
 		return nil, err
 	}
 
-	req := subscriptionReq{
+	sub.UserID = userID
+
+	req := addSubReq{
 		UserID:       userID,
 		Subscription: sub,
 	}
+
 	return req, nil
 }
 
-func decodeReadSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	userID, err := authorize(r)
 	if err != nil {
 		return nil, err
 	}
 
-	req := listSubsReq{
-		UserID: userID,
+	req, err := decodeSearch(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req.UserID = userID
+
+	return req, nil
+}
+
+func decodeOwnedSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := decodeSearch(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req.StreamOwner = userID
+
+	return req, nil
+}
+
+func decodeViewSubRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req := viewSubReq{
+		userID:         userID,
+		subscriptionID: bone.GetValue(r, "id"),
 	}
 	return req, nil
 }

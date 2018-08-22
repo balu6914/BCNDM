@@ -26,20 +26,29 @@ func MetricsMiddleware(svc subscriptions.Service, counter metrics.Counter, laten
 	}
 }
 
-func (ms *metricsMiddleware) CreateSubscription(token string, subs subscriptions.Subscription) error {
+func (ms *metricsMiddleware) AddSubscription(token string, subs subscriptions.Subscription) (string, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "create_subscription").Add(1)
-		ms.latency.With("method", "create_subscription").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "add_subscription").Add(1)
+		ms.latency.With("method", "add_subscription").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.CreateSubscription(token, subs)
+	return ms.svc.AddSubscription(token, subs)
 }
 
-func (ms *metricsMiddleware) ReadSubscriptions(token string) ([]subscriptions.Subscription, error) {
+func (ms *metricsMiddleware) ViewSubscription(userID, subID string) (subscriptions.Subscription, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "read_subscriptions").Add(1)
-		ms.latency.With("method", "read_subscriptions").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "view_subscription").Add(1)
+		ms.latency.With("method", "view_subscription").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.ReadSubscriptions(token)
+	return ms.svc.ViewSubscription(userID, subID)
+}
+
+func (ms *metricsMiddleware) SearchSubscriptions(query subscriptions.Query) (subscriptions.Page, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "search_subscriptions").Add(1)
+		ms.latency.With("method", "search_subscriptions").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.SearchSubscriptions(query)
 }

@@ -4,16 +4,21 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/mgo.v2/bson"
 
 	"monetasa/subscriptions"
 	"monetasa/subscriptions/mocks"
 )
 
 const (
-	userID    = "myUserID"
-	userID1   = "myUserID1"
-	streamID  = "myStreamID"
+	user1ID   = "user1ID"
+	user2ID   = "user2ID"
+	noUser    = "noUser"
+	stream1ID = "myStream1ID"
+	stream2ID = "myStream2ID"
 	wrong     = "wrong"
 	streamURL = "myUrl"
 	token     = "token"
@@ -22,16 +27,18 @@ const (
 )
 
 var subscription = subscriptions.Subscription{
-	UserID:    userID,
-	StreamID:  streamID,
-	StreamURL: streamURL,
-	Hours:     5,
+	UserID:      user1ID,
+	StreamOwner: user2ID,
+	StreamID:    stream1ID,
+	StreamURL:   streamURL,
+	Hours:       5,
 }
 
 func newService(tokens map[string]string) subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
 	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
-		streamID: subscriptions.Stream{Price: 10},
+		stream1ID: subscriptions.Stream{Price: 10, Owner: user2ID},
+		stream2ID: subscriptions.Stream{Price: 100, Owner: user1ID},
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
@@ -39,8 +46,8 @@ func newService(tokens map[string]string) subscriptions.Service {
 	return subscriptions.New(subs, streams, proxy, transactions)
 }
 
-func TestCreateSubscription(t *testing.T) {
-	svc := newService(map[string]string{token: userID})
+func TestAddSubscription(t *testing.T) {
+	svc := newService(map[string]string{token: user1ID})
 
 	cases := []struct {
 		desc string
@@ -48,29 +55,31 @@ func TestCreateSubscription(t *testing.T) {
 		err  error
 	}{
 		{
-			desc: "create new subscription",
+			desc: "create a new subscription",
 			sub:  subscription,
 			err:  nil,
 		},
 		{
-			desc: "create existing subscription",
+			desc: "create an existing subscription",
 			sub:  subscription,
 			err:  subscriptions.ErrConflict,
 		},
 		{
-			desc: "create subscription with non-existent stream",
+			desc: "create a subscription with non-existent stream",
 			sub: subscriptions.Subscription{
-				UserID:    userID,
+				ID:        bson.NewObjectId(),
+				UserID:    user1ID,
 				StreamID:  wrong,
 				StreamURL: streamURL,
 			},
 			err: subscriptions.ErrNotFound,
 		},
 		{
-			desc: "create subscription with too big price stream",
+			desc: "create a subscription with too big price stream",
 			sub: subscriptions.Subscription{
-				UserID:    userID1,
-				StreamID:  streamID,
+				ID:        bson.NewObjectId(),
+				UserID:    user2ID,
+				StreamID:  stream1ID,
 				StreamURL: streamURL,
 				Hours:     100,
 			},
@@ -79,33 +88,143 @@ func TestCreateSubscription(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := svc.CreateSubscription(tc.sub.UserID, tc.sub)
+		_, err := svc.AddSubscription(tc.sub.UserID, tc.sub)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 
-func TestGetSubscriptions(t *testing.T) {
-	svc := newService(map[string]string{token: userID})
+func TestSearchSubscriptions(t *testing.T) {
+	svc := newService(map[string]string{token: user1ID})
 
-	svc.CreateSubscription(userID, subscription)
+	s := subscription
+	defLimit := uint64(3)
+	total := uint64(20)
+	for i := 0; i < 20; i++ {
+		s.ID = bson.NewObjectId()
+		svc.AddSubscription(user1ID, s)
+	}
 
-	cases := map[string]struct {
-		userID string
-		err    error
+	s.ID = bson.NewObjectId()
+	s.StreamID = stream2ID
+	svc.AddSubscription(user2ID, s)
+
+	cases := []struct {
+		desc  string
+		query subscriptions.Query
+		page  subscriptions.Page
+		size  int
 	}{
-		"get subscription with valid token": {
-			userID,
-			nil,
+		{
+			desc: "get subscription for the specific user",
+			query: subscriptions.Query{
+				UserID: user1ID,
+				Limit:  defLimit,
+			},
+			page: subscriptions.Page{
+				Total: total,
+				Page:  0,
+				Limit: defLimit,
+			},
+			size: 3,
 		},
-		"read subscriptions with non-existent entity": {
-			wrong,
-			subscriptions.ErrNotFound,
+		{
+			desc: "get subscription with user and page specified",
+			query: subscriptions.Query{
+				UserID: user1ID,
+				Page:   3,
+				Limit:  defLimit,
+			},
+			page: subscriptions.Page{
+				Total: total,
+				Page:  3,
+				Limit: defLimit,
+			},
+			size: 3,
+		},
+		{
+			desc: "get subscription for the user with no subscriptions",
+			query: subscriptions.Query{
+				StreamOwner: noUser,
+				Limit:       3,
+			},
+			page: subscriptions.Page{
+				Total: 0,
+				Page:  0,
+				Limit: defLimit,
+			},
+			size: 0,
+		},
+		{
+			desc: "get subscription for the specific owner",
+			query: subscriptions.Query{
+				StreamOwner: user1ID,
+				Limit:       defLimit,
+			},
+			page: subscriptions.Page{
+				Total: 1,
+				Page:  0,
+				Limit: defLimit,
+			},
+			size: 1,
+		},
+		{
+			desc: "get subscription for the owner with no subscriptions on his streams",
+			query: subscriptions.Query{
+				StreamOwner: noUser,
+				Limit:       3,
+			},
+			page: subscriptions.Page{
+				Total: 0,
+				Page:  0,
+				Limit: defLimit,
+			},
+			size: 0,
 		},
 	}
 
-	for desc, tc := range cases {
-		_, err := svc.ReadSubscriptions(tc.userID)
-		assert.Equal(t, tc.err, err,
-			fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
+	for _, tc := range cases {
+		ret, _ := svc.SearchSubscriptions(tc.query)
+		assert.Equal(t, tc.page.Limit, ret.Limit, fmt.Sprintf("%s: expected %d got %d\n", tc.desc, tc.page.Limit, ret.Limit))
+		assert.Equal(t, tc.page.Total, ret.Total, fmt.Sprintf("%s: expected %d got %d\n", tc.desc, tc.page.Total, ret.Total))
+		assert.Equal(t, tc.page.Page, ret.Page, fmt.Sprintf("%s: expected %d got %d\n", tc.desc, tc.page.Page, ret.Page))
+		assert.Equal(t, tc.size, len(ret.Content), fmt.Sprintf("%s: expected %d got %d\n", tc.desc, tc.size, len(ret.Content)))
+	}
+}
+
+func TestViewSubscription(t *testing.T) {
+	svc := newService(map[string]string{token: user1ID})
+
+	_, err := svc.AddSubscription(subscription.UserID, subscription)
+	require.Nil(t, err, "Saving Subscription expected to succeed.")
+
+	cases := []struct {
+		desc           string
+		subscriptionID string
+		userID         string
+		err            error
+	}{
+		{
+			desc:           "get a subscription by the user",
+			subscriptionID: subscription.ID.Hex(),
+			userID:         subscription.UserID,
+			err:            nil,
+		},
+		{
+			desc:           "get a subscription by the owner",
+			subscriptionID: subscription.ID.Hex(),
+			userID:         user2ID,
+			err:            nil,
+		},
+		{
+			desc:           "get a wrong subscription",
+			subscriptionID: subscription.ID.Hex(),
+			userID:         noUser,
+			err:            subscriptions.ErrNotFound,
+		},
+	}
+
+	for _, tc := range cases {
+		_, err := svc.ViewSubscription(tc.userID, tc.subscriptionID)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
