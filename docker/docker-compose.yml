@@ -9,6 +9,8 @@ services:
     image: mongo:latest
     container_name: monetasa-auth-db
     command: --smallfiles --nojournal
+    volumes:
+      - ./auth-data:/data/db
     networks:
       # Our network is called "monetasa-net"
       - monetasa-net
@@ -40,6 +42,8 @@ services:
     image: mongo:latest
     container_name: monetasa-transactions-db
     command: --smallfiles --nojournal
+    volumes:
+      - ./transactions-data:/data/db
     networks:
       - monetasa-net
 
@@ -77,6 +81,8 @@ services:
     image: mongo:latest
     container_name: monetasa-streams-db
     command: --smallfiles --nojournal
+    volumes:
+      - ./streams-data:/data/db
     networks:
       - monetasa-net
 
@@ -108,6 +114,8 @@ services:
     image: mongo:latest
     container_name: monetasa-subscriptions-db
     command: --smallfiles --nojournal
+    volumes:
+      - ./subscriptions-data:/data/db
     networks:
       - monetasa-net
 
@@ -119,6 +127,8 @@ services:
     container_name: monetasa-subscriptions
     depends_on:
       - monetasa-subscriptions-db
+      - monetasa-streams
+      - monetasa-proxy
     ports:
       - 8086:8086
     environment:
@@ -154,7 +164,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./data:/data
+      - ./proxy-data:/data
     networks:
       - monetasa-net
 
