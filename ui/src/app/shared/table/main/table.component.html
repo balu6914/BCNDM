@@ -2,7 +2,7 @@
     <div class="tp-box" [@flipState]="flip">
       <!-- Front side -->
       <div class="front tp-box__side tp-box__front">
-        <div class="box box-grow" *ngIf="table.page.content.length">
+        <div class="box-grow" [ngClass]="{box: table.tableType !== types.Dashboard}" *ngIf="table.page.content.length">
           <div class="box__header">
             <p class="box__title">
               {{table.title}}
@@ -43,21 +43,22 @@
         <!-- No content -->
         <div class="tp-box">
           <div class="front tp-box__side tp-box__front">
-            <div class="box box-grow" *ngIf="table.page.content && !table.page.content.length">
-              <div class="box__header">
-                <p class="box__title">No Content</p>
+            <div class="box-grow" *ngIf="table.page.content && !table.page.content.length" [ngClass]="{box: table.tableType !== types.Dashboard}">
+              <div class="text-center">
                 <div *ngIf="table.tableType === types.Sell">
                   <!-- No my streams -->
-                  <p class="lead">
-                    You haven't added any streams yet. Use
-                    <span class="badge badge-primary">Add button</span> to add a new stream.
+                  <p class="lead no-content">
+                    You haven't added any streams yet.
                   </p>
                 </div>
                 <div *ngIf="table.tableType === types.Buy">
-                  <p class="lead">There are currently no streams for you.</p>
+                  <p class="lead no-content">There are currently no streams for you.</p>
                 </div>
                 <div *ngIf="table.tableType === types.Contract">
-                  <p class="lead">You have no contracts yet. Start buying and selling streams today!</p>
+                  <p class="lead no content">You have no contracts yet. Start buying and selling streams today!</p>
+                </div>
+                <div *ngIf="table.tableType === types.Dashboard">
+                  <p class="lead no-content">There are currently no streams for you.</p>
                 </div>
               </div>
             </div>

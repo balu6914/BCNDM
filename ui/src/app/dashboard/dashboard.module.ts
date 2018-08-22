@@ -12,6 +12,7 @@ import { DashboardRoutingModule } from './dashboard.routes';
 // Dashboard components
 import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
+import { DashboardMainStreamsComponent } from './main/section-streams/dashboard.main.streams.component';
 
 import { CommonAppModule } from '../common/common.module';
 
@@ -32,11 +33,11 @@ import { SharedModule } from '../shared/shared.module';
     LayoutModule,
     DashboardRoutingModule,
     ClipboardModule,
-    SharedModule,
   ],
   declarations: [
     DashboardComponent,
     DashboardMainComponent,
+    DashboardMainStreamsComponent
   ],
  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

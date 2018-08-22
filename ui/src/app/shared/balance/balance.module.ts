@@ -30,4 +30,4 @@ import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component'
   providers: [BalanceService]
 
 })
-export class BalanceModule { }
+export class BalanceModule {}

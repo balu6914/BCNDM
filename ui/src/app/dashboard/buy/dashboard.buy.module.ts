@@ -19,8 +19,8 @@ import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
     FormsModule,
     ReactiveFormsModule,
     CommonAppModule,
-    DashboardBuyRoutingModule,
     SharedModule,
+    DashboardBuyRoutingModule,
   ],
   declarations: [
     DashboardBuyComponent,

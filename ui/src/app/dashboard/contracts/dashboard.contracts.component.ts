@@ -20,10 +20,22 @@ export class DashboardContractsComponent {
     ];
     // TODO: Remove this Mock contracts list for demo purpose
     myContractsList = [
-      {'id' : "1", 'stream': {'name': 'WeIO pressure', 'price':'100'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10','signed':false, 'expired': false},
-      {'id' : "2", 'stream': {'name': 'WeIO temperature', 'price':'10000'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10','signed':true, 'expired': false },
-      {'id' : "3", 'stream': {'name': 'WeIO humidity', 'price':'15'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':false, 'expired': false},
-      {'id' : "4", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-02-15T12:14:56.806Z', 'share':'10', 'signed':true, 'expired': false},
+      {'id' : "1", 'stream': {'name': 'WeIO board pressure', 'price':'100'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-12-15T12:14:56.806Z', 'share':'10','signed':false, 'expired': false},
+      {'id' : "2", 'stream': {'name': 'WeIO board temperature', 'price':'10000'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-11-15T12:14:56.806Z', 'share':'15','signed':true, 'expired': false },
+      {'id' : "3", 'stream': {'name': 'WeIO board humidity', 'price':'15'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-12-15T12:14:56.806Z', 'share':'50', 'signed':false, 'expired': false},
+      {'id' : "4", 'stream': {'name': 'aqi', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+
+      {'id' : "5", 'stream': {'name': 'vibration', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "6", 'stream': {'name': 'temperature', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "7", 'stream': {'name': 'humidity', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "8", 'stream': {'name': 'humidity_20', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "9", 'stream': {'name': 'radiation', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "10", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "11", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "12", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "13", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "14", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
+      {'id' : "15", 'stream': {'name': 'WeIO water', 'price':'5'}, 'creationDate':"2018-02-15T12:14:56.806Z", 'expirationDate': '2018-07-15T12:14:56.806Z', 'share':'5', 'signed':true, 'expired': true},
     ];
     user: any;
     subscription: any;
@@ -34,6 +46,7 @@ export class DashboardContractsComponent {
         emptyMessage: "You don't have any smart contracts yet..."
     }
     table: Table = new Table();
+    openedHelp: boolean = false;
 
     constructor(
         private modalService: BsModalService,
@@ -48,7 +61,14 @@ export class DashboardContractsComponent {
     this.temp = [...this.myContractsList];
   }
 
+  toggleHelp() {
+    this.openedHelp = !this.openedHelp;
+    console.log("toggle trigger, opened: ", this.openedHelp);
+  }
+
   modalNewContract() {
+    // Make sure  help container is closed
+    this.openedHelp = false;
     // Show DashboardSellAddComponent as Modal
     this.modalService.show(DashboardContractsAddComponent)
       .content.contractCreated.subscribe(

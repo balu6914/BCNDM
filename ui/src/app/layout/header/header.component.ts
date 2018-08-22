@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../auth/services/auth.service';
+import { BalanceService } from '../../shared/balance/balance.service';
+import { Balance } from '../../common/interfaces/balance.interface';
 
 @Component({
   selector: 'header-component',
@@ -9,13 +11,22 @@ import { AuthService } from '../../auth/services/auth.service';
   ],
 })
 
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   isLoggedin: Boolean;
   user: any;
+  balance = new Balance();
 
   constructor(
-    private AuthService: AuthService
-  ) { }
+    private AuthService: AuthService,
+    private balanceService: BalanceService,
+  ) {
+    // Listen to balance changed events
+    this.balanceService.balance.subscribe(result => {
+      this.balance = result;
+    },
+  );
+
+   }
 
   ngOnInit() {
     this.AuthService.loggedIn
@@ -25,9 +36,34 @@ export class HeaderComponent {
         this.AuthService.getCurrentUser()
           .subscribe(data => {
             this.user = data;
+            // Get user balance
+            this.getBalance();
           });
       });
+    }
+
+  getBalance() {
+    let promise = new Promise((resolve, reject) => {
+      this.balanceService.get().subscribe(
+        (result: any) => {
+          this.balance.amount = result.balance;
+          //TODO remove this Mock of fiatAmount when we add this info on API side
+          this.balance.fiatAmount = this.balance.amount;
+          // Publish new balance data to balance message buss
+          this.balanceService.changed(this.balance);
+          resolve();
+        },
+        err => {
+          console.error("Error fetching user balance ", err)
+          reject();
+        });
+    });
+    return promise;
   }
+
+
+
+
 
   logout() {
     this.AuthService.logout();

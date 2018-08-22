@@ -28,7 +28,9 @@
         <dpc-table [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
       </div>
     </div>
-    <!-- Sidebar filters -->
   </div>
 </div>
-<dpc-sidebar-filters></dpc-sidebar-filters>
+<!-- Sidebar filters -->
+<dpc-sidebar-filters
+  (filtersUpdate)="onFiltersChange($event)">
+</dpc-sidebar-filters>

@@ -17,7 +17,7 @@
               </div>
               <div class="col-9">
                 <div class="modal__ratio">
-                  1$ = 1 TAS
+                  1EUR = 1 TAS
                 </div>
                 <!--
                   Validation
@@ -40,7 +40,8 @@
             </div>
             <div class="col-9">
               <div class="modal__summary">
-                25$
+                <span *ngIf="!this.form.value.amount">0</span>
+                <span *ngIf="this.form.value.amount">{{this.form.value.amount | currency:'EUR'}}</span>
               </div>
             </div>
           </div>
