@@ -5,6 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Balance } from '../../common/interfaces/balance.interface';
 import { BalanceService } from './balance.service';
 import { BalanceAddComponent } from './add/balance.add.component';
+import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component';
 import { MitasPipe } from '../../common/pipes/converter.pipe';
 
 @Component({
@@ -25,6 +26,19 @@ export class BalanceComponent implements OnInit {
     // Open BUY tokens dialog
     onBuyTokensClick() {
         this.modalRef = this.modalService.show(BalanceAddComponent);
+        // Listen to balance update event
+        this.modalRef.content.balanceUpdate.subscribe(e => {
+          // Fetch updated user balance
+          this.getBalance().then(
+          (response) => {
+              this.modalRef.hide();
+          },
+        )
+        });
+    }
+    // Open Withdraw tokens dialog
+    onWithdrawTokensClick() {
+        this.modalRef = this.modalService.show(BalanceWithdrawComponent);
         // Listen to balance update event
         this.modalRef.content.balanceUpdate.subscribe(e => {
           // Fetch updated user balance

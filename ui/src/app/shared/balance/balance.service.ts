@@ -29,6 +29,11 @@ export class BalanceService {
                         .map((res:Response) => res)
                         .catch((error:any) => Observable.throw(error || 'Server error'));
     }
+    withdraw(data: any) {
+        return this.http.post(`${environment.API_TOKENS}/withdraw`, data)
+                        .map((res:Response) => res)
+                        .catch((error:any) => Observable.throw(error || 'Server error'));
+    }
     // Balance Message Buss will brodcast notification about balance value changes
     changed(value: Balance) {
       this._balance.next(value);
