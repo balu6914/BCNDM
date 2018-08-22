@@ -66,6 +66,6 @@
         </div>
       </div>
       <!-- Back side -->
-      <dpc-table-row-details class="back tp-box__side tp-box__back" [stream]="selectedRow" (backClicked)="flip = 'inactive'"></dpc-table-row-details>
+      <dpc-table-row-details class="back tp-box__side tp-box__back" [stream]="selectedRow" [rowType]="table.tableType" (backClicked)="flip = 'inactive'" (deleteEvt)="rowDeleted($event)" (editEvt)="rowEdited($event)"></dpc-table-row-details>
     </div>
   </div>
