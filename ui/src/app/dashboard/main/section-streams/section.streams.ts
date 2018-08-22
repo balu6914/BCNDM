@@ -1,6 +1,6 @@
 export enum StreamsType {
-  Bought = "Bought",
-  Sold = "Sold"
+  Bought = 'Bought',
+  Sold = 'Sold'
 }
 
 export class StreamSection {

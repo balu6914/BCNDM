@@ -12,5 +12,5 @@
       </li>
     </ul>
   </div>
-  <dpc-table [table]="table"></dpc-table>
+  <dpc-table [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
 </div>
