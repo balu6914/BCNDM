@@ -13,32 +13,50 @@ type apiRes interface {
 	empty() bool
 }
 
-type subscriptionRes struct{}
+type addSubRes struct {
+	ID string `json:"id"`
+}
 
-func (res subscriptionRes) headers() map[string]string {
+func (res addSubRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res subscriptionRes) code() int {
+func (res addSubRes) code() int {
 	return http.StatusCreated
 }
 
-func (res subscriptionRes) empty() bool {
+func (res addSubRes) empty() bool {
 	return false
 }
 
-type listSubsRes struct {
-	Subscriptions []subscriptions.Subscription
+type viewSubRes struct {
+	subscriptions.Subscription
 }
 
-func (res listSubsRes) headers() map[string]string {
+func (res viewSubRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res listSubsRes) code() int {
+func (res viewSubRes) code() int {
 	return http.StatusOK
 }
 
-func (res listSubsRes) empty() bool {
+func (res viewSubRes) empty() bool {
+	return false
+}
+
+type searchSubsRes struct {
+	subscriptions.Page
+}
+
+func (res searchSubsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res searchSubsRes) code() int {
+	return http.StatusOK
+}
+
+func (res searchSubsRes) empty() bool {
 	return false
 }

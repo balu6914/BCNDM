@@ -152,7 +152,7 @@ func newService(ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.T
 	ts := transactions.NewService(tc)
 	ps := proxy.New(proxyURL)
 
-	repo := mongo.NewRepository(ms)
+	repo := mongo.NewSubscriptionRepository(ms)
 	svc := subscriptions.New(repo, ss, ps, ts)
 
 	svc = api.LoggingMiddleware(svc, logger)

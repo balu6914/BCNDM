@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"monetasa"
 	"monetasa/subscriptions"
 	httpapi "monetasa/subscriptions/api"
 	"monetasa/subscriptions/mocks"
+	"strings"
 
 	"net/http"
 	"net/http/httptest"
@@ -15,25 +17,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
-	token       = "token"
 	wrong       = "wrong"
-	userID      = "userID"
 	contentType = "application/json"
-	streamID    = "streamID"
 	streamURL   = "myUrl"
 	hours       = 24
 	balance     = 100000
 )
 
-var sub = subscriptions.Subscription{
-	UserID:    userID,
-	StreamID:  streamID,
-	StreamURL: streamURL,
-	Hours:     hours,
-}
+var (
+	token    = bson.NewObjectId().Hex()
+	userID   = bson.NewObjectId().Hex()
+	streamID = bson.NewObjectId().Hex()
+
+	sub = subscriptions.Subscription{
+		ID:        bson.NewObjectId(),
+		UserID:    userID,
+		StreamID:  streamID,
+		StreamURL: streamURL,
+		Hours:     hours,
+	}
+)
 
 func newService() subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
@@ -52,10 +59,12 @@ func newServer(svc subscriptions.Service, ac monetasa.AuthServiceClient) *httpte
 }
 
 type testRequest struct {
-	client *http.Client
-	method string
-	url    string
-	token  string
+	client      *http.Client
+	method      string
+	url         string
+	token       string
+	contentType string
+	body        io.Reader
 }
 
 func (tr testRequest) make() (*http.Response, error) {
@@ -74,7 +83,12 @@ func (tr testRequest) make() (*http.Response, error) {
 	return tr.client.Do(req)
 }
 
-func TestCreateSubscriptions(t *testing.T) {
+func toJSON(data interface{}) string {
+	jsonData, _ := json.Marshal(data)
+	return string(jsonData)
+}
+
+func TestCreateSubscription(t *testing.T) {
 	ac := mocks.NewAuthClient(map[string]string{
 		token: userID,
 	})
@@ -82,25 +96,27 @@ func TestCreateSubscriptions(t *testing.T) {
 	ss := newServer(svc, ac)
 	defer ss.Close()
 
+	body := toJSON(sub)
+
 	cases := []struct {
 		desc        string
 		auth        string
 		contentType string
-		method      string
+		body        string
 		status      int
 	}{
 		{
 			desc:        "create subscriptions with valid credentials",
 			auth:        token,
 			contentType: contentType,
-			method:      http.MethodPost,
+			body:        body,
 			status:      http.StatusCreated,
 		},
 		{
 			desc:        "create subscriptions with invalid credentials",
 			auth:        wrong,
 			contentType: contentType,
-			method:      http.MethodPost,
+			body:        body,
 			status:      http.StatusForbidden,
 		},
 	}
@@ -108,10 +124,12 @@ func TestCreateSubscriptions(t *testing.T) {
 	for _, tc := range cases {
 		req := testRequest{
 			client: ss.Client(),
-			method: tc.method,
+			method: http.MethodPost,
 			url:    fmt.Sprintf("%s/subscriptions", ss.URL),
 			token:  tc.auth,
+			body:   strings.NewReader(tc.body),
 		}
+
 		res, err := req.make()
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
@@ -120,13 +138,13 @@ func TestCreateSubscriptions(t *testing.T) {
 	}
 }
 
-func TestViewSubscriptions(t *testing.T) {
+func TestViewSubscription(t *testing.T) {
 	ac := mocks.NewAuthClient(map[string]string{
 		token: userID,
 	})
 
 	svc := newService()
-	err := svc.CreateSubscription(userID, sub)
+	_, err := svc.AddSubscription(userID, sub)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	ss := newServer(svc, ac)
@@ -136,21 +154,21 @@ func TestViewSubscriptions(t *testing.T) {
 		desc        string
 		auth        string
 		contentType string
-		method      string
+		id          string
 		status      int
 	}{
 		{
 			desc:        "get subscriptions with valid credentials",
 			auth:        token,
 			contentType: contentType,
-			method:      http.MethodGet,
+			id:          sub.ID.Hex(),
 			status:      http.StatusOK,
 		},
 		{
 			desc:        "get subscriptions with invalid credentials",
 			auth:        wrong,
 			contentType: contentType,
-			method:      http.MethodGet,
+			id:          sub.ID.Hex(),
 			status:      http.StatusForbidden,
 		},
 	}
@@ -158,8 +176,8 @@ func TestViewSubscriptions(t *testing.T) {
 	for _, tc := range cases {
 		req := testRequest{
 			client: ss.Client(),
-			method: tc.method,
-			url:    fmt.Sprintf("%s/subscriptions", ss.URL),
+			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/subscriptions/%s", ss.URL, tc.id),
 			token:  tc.auth,
 		}
 		res, err := req.make()

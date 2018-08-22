@@ -9,7 +9,7 @@ import (
 // DBName - DB name
 // CollectionName - Collection name
 const (
-	dbName         = "monetasa"
+	dbName         = "monetasa-subscriptions"
 	collentionName = "subscriptions"
 )
 
@@ -32,6 +32,42 @@ func Connect(addr string, tout int, socketTout int, db string,
 
 	ms.SetSocketTimeout(time.Duration(socketTout) * time.Millisecond)
 	ms.SetMode(mgo.Monotonic, true)
+
+	session := ms.Copy()
+	defer session.Close()
+	collection := session.DB(dbName).C(collentionName)
+
+	indices := []mgo.Index{
+
+		mgo.Index{
+			Name: "users",
+			Key:  []string{"user_id"},
+		},
+		mgo.Index{
+			Name: "owners",
+			Key:  []string{"owner_id"},
+		},
+		mgo.Index{
+			Name: "streams",
+			Key:  []string{"stream_id"},
+		},
+		mgo.Index{
+			Name: "hours",
+			Key:  []string{"hours"},
+		},
+		mgo.Index{
+			Name: "start",
+			Key:  []string{"start_date"},
+		},
+		mgo.Index{
+			Name: "end",
+			Key:  []string{"end_date"},
+		},
+	}
+
+	for _, idx := range indices {
+		collection.EnsureIndex(idx)
+	}
 
 	return ms, nil
 }
