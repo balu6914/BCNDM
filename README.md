@@ -65,6 +65,8 @@ This is a shorthand for:
 ```
 
 ### Datapace dApp
+
+#### Docker
 In another terminal run:
 ```
 make rundapp
@@ -75,11 +77,26 @@ which is a shorthand for:
 docker-compose -f docker/docker-compose.yml up
 ```
 
-To run locally compiled binaries (during dev process) instead of Docker containers execute:
+UI will be available at [http://localhost:4200](http://localhost:4200)
+
+#### Natively
+To run locally compiled binaries (during dev process) instead of Docker containers
+first assure that all `localhost` mappings are present in `/etc/hosts`:
+```
+drasko@Marx:~$ cat /etc/hosts
+127.0.0.1	localhost
+127.0.1.1	Marx
+127.0.1.1	orderer.monetasa.com
+127.0.1.1	peer0.org1.monetasa.com
+127.0.1.1	ca.org1.monetasa.com
+...
+```
+This is needed because FabricSDK reads information from `config.yaml` and to avoid changing it drastically
+it is easier just to create these mappings in `/etc/hosts`
+
+To run previously compiled binaries execute:
 ```
 make rundev
 ```
-
-UI will be available at [http://localhost:4200](http://localhost:4200)
 
 Happy hackin'!
