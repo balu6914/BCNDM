@@ -66,14 +66,20 @@ export class MapComponent {
     map.setView([48.864716, 2.349014], 5);
   }
 
+  ngOnChanges() {
+      this.addMarkers();
+  }
+
   addMarkers() {
-    this.map.removeLayer(this.layerGroup);
-    this.layerGroup = new L.LayerGroup();
-    this.map.addLayer(this.layerGroup);
-    this.markers = [];
-    this.streamList.forEach( stream => {
-      this.addMarker(stream);
-    });
+    if(this.map) {
+      this.map.removeLayer(this.layerGroup);
+      this.layerGroup = new L.LayerGroup();
+      this.map.addLayer(this.layerGroup);
+      this.markers = [];
+      this.streamList.forEach( stream => {
+        this.addMarker(stream);
+      });
+    }
   }
 
   addMarker(stream: any) {
