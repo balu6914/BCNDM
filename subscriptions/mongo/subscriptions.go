@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"monetasa/subscriptions"
+	"time"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,7 +17,7 @@ type subscriptionRepository struct {
 
 // NewSubscriptionRepository returns new Subscription repository.
 func NewSubscriptionRepository(db *mgo.Session) subscriptions.SubscriptionRepository {
-	return &subscriptionRepository{db}
+	return &subscriptionRepository{db: db}
 }
 
 func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, error) {
@@ -25,8 +26,10 @@ func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, e
 	c := s.DB(dbName).C(collentionName)
 
 	sub.ID = bson.NewObjectId()
+	dbSub := toDBSub(sub)
+	dbSub.Active = false
 
-	if err := c.Insert(sub); err != nil {
+	if err := c.Insert(dbSub); err != nil {
 		if mgo.IsDup(err) {
 			return "", subscriptions.ErrConflict
 		}
@@ -34,7 +37,7 @@ func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, e
 		return "", err
 	}
 
-	return sub.ID.Hex(), nil
+	return dbSub.ID.Hex(), nil
 }
 
 func (sr subscriptionRepository) Search(query subscriptions.Query) (subscriptions.Page, error) {
@@ -51,7 +54,7 @@ func (sr subscriptionRepository) Search(query subscriptions.Query) (subscription
 		Content: []subscriptions.Subscription{},
 	}
 
-	results := []subscriptions.Subscription{}
+	results := []subscription{}
 	q := subscriptions.GenQuery(&query)
 
 	total, err := c.Find(q).Count()
@@ -69,7 +72,11 @@ func (sr subscriptionRepository) Search(query subscriptions.Query) (subscription
 		return ret, err
 	}
 
-	ret.Content = results
+	for _, dbSub := range results {
+		sub := toSub(dbSub)
+		ret.Content = append(ret.Content, sub)
+	}
+
 	return ret, nil
 }
 
@@ -78,17 +85,90 @@ func (sr subscriptionRepository) One(id string) (subscriptions.Subscription, err
 	defer s.Close()
 	c := s.DB(dbName).C(collentionName)
 
-	sub := subscriptions.Subscription{}
-
-	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	_id := bson.ObjectIdHex(id)
-	if err := c.Find(bson.M{"_id": _id}).One(&sub); err != nil {
+	var dbSub subscription
+	query := bson.M{
+		"_id":    bson.ObjectIdHex(id),
+		"active": true,
+	}
+	if err := c.Find(query).One(&dbSub); err != nil {
 		if err == mgo.ErrNotFound {
-			return sub, subscriptions.ErrNotFound
+			return subscriptions.Subscription{}, subscriptions.ErrNotFound
 		}
 
-		return sub, err
+		return subscriptions.Subscription{}, err
 	}
 
+	sub := toSub(dbSub)
+
 	return sub, nil
+}
+
+func (sr subscriptionRepository) Activate(id string) error {
+	return sr.setActive(id, true)
+}
+
+func (sr subscriptionRepository) Remove(id string) error {
+	return sr.setActive(id, false)
+}
+
+func (sr subscriptionRepository) setActive(id string, active bool) error {
+	s := sr.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collentionName)
+
+	update := bson.M{
+		"$set": subscription{Active: active},
+	}
+	if err := c.UpdateId(bson.ObjectIdHex(id), update); err != nil {
+		if err == mgo.ErrNotFound {
+			return subscriptions.ErrNotFound
+		}
+		if mgo.IsDup(err) {
+			return subscriptions.ErrConflict
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+// Subscription is subscription representation in DB.
+type subscription struct {
+	ID          bson.ObjectId `bson:"_id,omitempty"`
+	UserID      string        `bson:"user_id"`
+	StreamID    string        `bson:"stream_id"`
+	StreamOwner string        `bson:"stream_owner"`
+	Hours       uint64        `bson:"hours"`
+	StartDate   time.Time     `bson:"start_date"`
+	EndDate     time.Time     `bson:"end_date,omitempty"`
+	StreamURL   string        `bson:"stream_url,omitempty"`
+	Active      bool          `bson:"active"`
+}
+
+func toDBSub(sub subscriptions.Subscription) subscription {
+	return subscription{
+		ID:          sub.ID,
+		UserID:      sub.UserID,
+		StreamID:    sub.StreamID,
+		StreamOwner: sub.StreamOwner,
+		Hours:       sub.Hours,
+		StartDate:   sub.StartDate,
+		EndDate:     sub.EndDate,
+		StreamURL:   sub.StreamURL,
+		Active:      false,
+	}
+}
+
+func toSub(dbSub subscription) subscriptions.Subscription {
+	return subscriptions.Subscription{
+		ID:          dbSub.ID,
+		UserID:      dbSub.UserID,
+		StreamID:    dbSub.StreamID,
+		StreamOwner: dbSub.StreamOwner,
+		Hours:       dbSub.Hours,
+		StartDate:   dbSub.StartDate,
+		EndDate:     dbSub.EndDate,
+		StreamURL:   dbSub.StreamURL,
+	}
 }

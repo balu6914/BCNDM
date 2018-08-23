@@ -116,6 +116,8 @@ services:
     command: --smallfiles --nojournal
     volumes:
       - ./subscriptions-data:/data/db
+    ports:
+      - 27017:27017
     networks:
       - monetasa-net
 
