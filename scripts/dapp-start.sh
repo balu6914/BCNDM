@@ -33,10 +33,11 @@ $BUILD/monetasa-auth &
 ###
 # Transactions
 ###
-MONETASA_TRANSACTIONS_HTTP_PORT=8082                \
-MONETASA_TRANSACTIONS_GRPC_PORT=8083                \
-MONETASA_TRANSACTIONS_DB_NAME=monetasa-transactions \
-MONETASA_TRANSACTIONS_DB_URL=localhost              \
+MONETASA_TRANSACTIONS_HTTP_PORT=8082                		\
+MONETASA_TRANSACTIONS_GRPC_PORT=8083                		\
+MONETASA_TRANSACTIONS_DB_NAME=monetasa-transactions 		\
+MONETASA_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.monetasa.com 	\
+MONETASA_TRANSACTIONS_DB_URL=localhost              		\
 $BUILD/monetasa-transactions &
 
 ###
