@@ -121,7 +121,6 @@ export class DashboardSellComponent {
         console.log(err);
       }
     );
-    console.log(this.table)
   }
 
 
