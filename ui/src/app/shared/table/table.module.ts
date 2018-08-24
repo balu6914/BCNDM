@@ -6,6 +6,7 @@ import { TableRowComponent } from './row/table.row.component';
 import { TableRowDetailsComponent } from './details/table.row.details.component';
 import { TableComponent } from './main/table.component';
 import { TablePaginationComponent } from './pagination/table.pagination.component';
+import { TableTabbedComponent } from './table-tabbed/table-tabbed.component';
 
 @NgModule({
   imports: [
@@ -15,12 +16,14 @@ import { TablePaginationComponent } from './pagination/table.pagination.componen
   ],
   declarations: [
     TableComponent,
+    TableTabbedComponent,
     TableRowComponent,
     TableRowDetailsComponent,
     TablePaginationComponent
   ],
   exports: [
-    TableComponent
+    TableComponent,
+    TableTabbedComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

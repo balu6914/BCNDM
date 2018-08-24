@@ -7,6 +7,7 @@ export class Subscription {
     public price: number,
     public start_date: number,
     public end_date: number,
-    public url: string
+    public url: string,
+    public type?: string
   ) { }
 }
