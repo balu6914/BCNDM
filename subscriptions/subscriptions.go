@@ -8,14 +8,14 @@ import (
 
 // Subscription represents users purchase of stream.
 type Subscription struct {
-	ID          bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
-	UserID      string        `bson:"user_id,omitempty" json:"user_id,omitempty"`
-	StreamID    string        `bson:"stream_id,omitempty" json:"stream_id,omitempty"`
-	StreamOwner string        `bson:"stream_owner,omitempty" json:"stream_owner,omitempty"`
-	Hours       uint64        `bson:"hours,omitempty" json:"hours,omitempty"`
-	StartDate   time.Time     `bson:"start_date,omitempty" json:"start_date,omitempty"`
-	EndDate     time.Time     `bson:"end_date,omitempty" json:"end_date,omitempty"`
-	StreamURL   string        `bson:"stream_url,omitempty" json:"stream_url,omitempty"`
+	ID          bson.ObjectId `json:"id,omitempty"`
+	UserID      string        `json:"user_id,omitempty"`
+	StreamID    string        `json:"stream_id,omitempty"`
+	StreamOwner string        `json:"stream_owner,omitempty"`
+	Hours       uint64        `json:"hours,omitempty"`
+	StartDate   time.Time     `json:"start_date,omitempty"`
+	EndDate     time.Time     `json:"end_date,omitempty"`
+	StreamURL   string        `json:"stream_url,omitempty"`
 }
 
 // Validate returns an error if user representation is invalid.
@@ -45,4 +45,10 @@ type SubscriptionRepository interface {
 
 	// One retrieves a subscription by its ID.
 	One(string) (Subscription, error)
+
+	// Activate subscription by ID.
+	Activate(string) error
+
+	// Removes subscription by ID.
+	Remove(string) error
 }

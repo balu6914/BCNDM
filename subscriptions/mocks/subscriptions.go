@@ -84,3 +84,11 @@ func (srm *subscriptionRepositoryMock) Search(query subscriptions.Query) (subscr
 
 	return page, nil
 }
+
+func (*subscriptionRepositoryMock) Activate(_ string) error {
+	return nil
+}
+
+func (*subscriptionRepositoryMock) Remove(_ string) error {
+	return nil
+}

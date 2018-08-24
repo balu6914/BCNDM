@@ -47,8 +47,7 @@ func setString(query *bson.M, dbName string, value interface{}) {
 	}
 }
 
-// GenQuery extracts a database query
-// from query parameters.
+// GenQuery extracts a database query from query parameters.
 func GenQuery(q *Query) *bson.M {
 	qVal := reflect.ValueOf(q).Elem()
 	qType := reflect.TypeOf(*q)
@@ -62,6 +61,7 @@ func GenQuery(q *Query) *bson.M {
 			setString(&query, dbName, field.Interface())
 		}
 	}
+	setString(&query, "active", true)
 
 	return &query
 }

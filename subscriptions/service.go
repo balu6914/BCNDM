@@ -62,7 +62,7 @@ func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, trans
 	}
 }
 
-func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (string, error) {
+func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (_ string, err error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
@@ -95,6 +95,8 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		}
 		return "", ErrFailedTransfer
 	}
+
+	ss.subscriptions.Activate(id)
 
 	return id, nil
 }
