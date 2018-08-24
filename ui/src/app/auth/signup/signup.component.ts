@@ -53,7 +53,13 @@ export class SignupComponent {
                       );
                 },
                 err => {
+                  // Handle tmp case when user already exists and we don't have error msg on API side yet.
+                  if(err.status === 409) {
+                  this.errorMsg = "User with this email already exists."
+
+                  } else {
                     this.errorMsg = err;
+                  }
                 });
         }
     }

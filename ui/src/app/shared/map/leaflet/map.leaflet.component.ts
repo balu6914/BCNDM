@@ -34,6 +34,7 @@ export class MapComponent {
   map: L.Map;
   layerGroup = new L.LayerGroup();
   markers = [];
+  activeMarkers = [];
 
   @Input() streamList: any;
   constructor(
@@ -55,19 +56,32 @@ export class MapComponent {
   onMapReady(map: L.Map) {
     this.map = map;
     this.map.addLayer(this.layerGroup);
-
-    const that = this;
-    map.on('move', function(e) {
-      // TODO: Use another event that is only fired once
-      that.addMarkers();
-    });
-
-    // Set the view of Paris
-    map.setView([48.864716, 2.349014], 5);
+    this.addMarkers();
   }
 
   ngOnChanges() {
-      this.addMarkers();
+    this.addMarkers();
+  }
+
+  focusMap() {
+    // Get Markers range Bounts and set map to this view in order to always
+    // see all markers in focus on map Init.
+    const that = this;
+    this.activeMarkers = this.markers.map(m => {
+      const a = [];
+      const lat = m.location.coordinates[1];
+      const long = m.location.coordinates[0];
+      if(lat && long) {
+        a.push(L.latLng(lat, long));
+      }
+      return a;
+    });
+    Promise.all(this.activeMarkers).then(result => {
+      if(this.activeMarkers.length && this.map) {
+        var b = new L.LatLngBounds(this.activeMarkers);
+        this.map.fitBounds(b);
+      }
+    });
   }
 
   addMarkers() {
@@ -79,6 +93,7 @@ export class MapComponent {
       this.streamList.forEach( stream => {
         this.addMarker(stream);
       });
+      this.focusMap();
     }
   }
 
@@ -93,7 +108,6 @@ export class MapComponent {
          })
        }
     );
-
     // Create popup message and add it to marker
     const msg = `
       <div class="map-tooltip">
@@ -117,7 +131,7 @@ export class MapComponent {
     stream.mapId = this.layerGroup.getLayerId(newMarker);
 
     // Add stream to markers list
-    this.markers.push(stream)
+    this.markers.push(stream);
   }
 
   // Callback of editEvt from TableComponent

@@ -18,22 +18,22 @@ export class UserService {
      getUser() : Observable<User[]> {
          return this.http.get(`${environment.API_AUTH}`)
                          .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+                         .catch((error:any) => Observable.throw(error || 'Server error'));
      }
      addUser (data): Observable<User[]> {
         return this.http.post(`${environment.API_AUTH}`, data)
                          .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+                         .catch((error:any) => Observable.throw(error || 'Server error'));
     }
      removeUser (id:string): Observable<User[]> {
         return this.http.delete(`${environment.API_AUTH}`)
                          .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+                         .catch((error:any) => Observable.throw(error || 'Server error'));
     }
      updateUser (id:string, data): Observable<User[]> {
         return this.http.put(`${environment.API_AUTH}`, data)
                          .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+                         .catch((error:any) => Observable.throw(error || 'Server error'));
     }
 
 }
