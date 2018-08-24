@@ -1,23 +1,20 @@
-import { Component, ViewChild } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap/modal';
-
-import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
-import { StreamService } from '../../common/services/stream.service';
-import { AuthService } from '../../auth/services/auth.service';
-import { Table, TableType } from '../../shared/table/table';
-import { Query } from '../../common/interfaces/query.interface';
-import { Page } from '../../common/interfaces/page.interface';
-import { Stream } from '../../common/interfaces';
-import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
+import { Component, OnInit } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { AuthService } from '../../auth/services/auth.service';
+import { Query } from '../../common/interfaces/query.interface';
+import { StreamService } from '../../common/services/stream.service';
+import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
+import { Table, TableType } from '../../shared/table/table';
+import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 
 @Component({
-  providers:[MapComponent],
-  selector: 'dashboard-sell',
+  providers: [MapComponent],
+  selector: 'dpc-dashboard-sell',
   templateUrl: './dashboard.sell.component.html',
   styleUrls: ['./dashboard.sell.component.scss']
 })
-export class DashboardSellComponent {
+export class DashboardSellComponent implements OnInit {
   user: any;
   temp = [];
   streams = [];
@@ -39,9 +36,10 @@ export class DashboardSellComponent {
     this.AuthService.getCurrentUser().subscribe(
       data => {
         this.user = data;
+        this.query.owner = this.user.id;
       },
       err => {
-        console.log(err)
+        console.log(err);
       }
     );
 
@@ -51,7 +49,7 @@ export class DashboardSellComponent {
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
     this.table.hasDetails = true;
     this.fetchStreams();
-    }
+  }
 
   // Add Bulk event
   onFileChange(event): void {
@@ -87,7 +85,7 @@ export class DashboardSellComponent {
         err => {
           console.log(err)
         }
-    );
+      );
   }
 
   editStream(stream) {
@@ -106,12 +104,6 @@ export class DashboardSellComponent {
   private fetchStreams() {
     this.streamService.searchStreams(this.query).subscribe(
       (result: any) => {
-        result.content.forEach(stream => {
-          if (stream.owner === this.user.id) {
-            this.streams.push(stream);
-          }
-        });
-        result.content = this.streams;
         const temp = Object.assign({}, this.table);
         temp.page = result;
         // Set table content
@@ -119,9 +111,13 @@ export class DashboardSellComponent {
       },
       err => {
         console.log(err);
-      }
-    );
+        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+      });
   }
 
+  onPageChange(page: number) {
+    this.query.page = page;
+    this.fetchStreams();
+  }
 
 }

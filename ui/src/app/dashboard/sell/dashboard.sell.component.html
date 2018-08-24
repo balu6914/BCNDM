@@ -43,7 +43,7 @@
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
-        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table"></dpc-table>
+        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
       </div>
     </div>
   </div>
