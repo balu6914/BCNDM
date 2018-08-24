@@ -11,8 +11,8 @@
 		{
 			"checksumSHA1": "7jUK9OzL1arQsSuop5KmgKxM2Pc=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "65f1c74bfde51ae71e3e01c464bfcd74544bd385",
-			"revisionTime": "2018-08-23T05:19:29Z"
+			"revision": "080f1affbd7c16ef3eb52410b0eec8f533a0bc0b",
+			"revisionTime": "2018-08-01T07:11:44Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/system-fee"

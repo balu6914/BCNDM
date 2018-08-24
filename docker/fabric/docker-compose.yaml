@@ -53,7 +53,7 @@ services:
       - monetasa-bc-net
     # Persistent data
     volumes:
-      - ./fabric-ca-db:/var/lib/postgresql
+      - ./fabric-ca-db:/var/lib/postgresql/data
 
   # Fabric tools
   cli:
@@ -91,4 +91,3 @@ services:
       - peer0.org1.monetasa.com
     networks:
       - monetasa-bc-net
-
