@@ -18,6 +18,18 @@ export class TasPipe implements PipeTransform {
       // Convert miTAS to TAS
       const tas = parseInt(value) / tasToMitasCoef;
       return tas.toString();
+  }
+}
 
+@Pipe({name: 'subscriptionType'})
+export class SubscriptionTypePipe implements PipeTransform {
+  transform(value: number, type: string): any {
+    if (type === 'Income') {
+      return '+' + value;
+    }
+    if (type === 'Outcome') {
+      return '-' + value;
+    }
+    return value.toString();
   }
 }

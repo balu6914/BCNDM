@@ -10,6 +10,14 @@
     </div>
   </td>
 </tr>
+<tr *ngIf="rowType === types.Wallet">
+  <td>{{ row.stream_name }}</td>
+  <td>{{ row.type }}</td>
+  <td nowrap>{{ row.start_date| date }}</td>
+  <div class="value" [ngClass]="row.type === 'Income' ? 'value--plus' : 'value--minus'">
+    <td nowrap>{{row.stream_price | subscriptionType:row.type}}</td>
+  </div>
+</tr>
 <tr *ngIf="rowType === types.Contract">
   <td>{{ row.stream.name }}</td>
   <td nowrap>{{ row.stream.price | tas }}</td>
@@ -21,8 +29,8 @@
       <span class="status-icon__text">Signed</span>
     </div>
     <div *ngIf="!row.signed && !row.expired" class="status-wrapper">
-      <span  class="status-icon status-icon--waiting"></span>
-      <span  class="status-icon__text">Waiting for a signature</span>
+      <span class="status-icon status-icon--waiting"></span>
+      <span class="status-icon__text">Waiting for a signature</span>
     </div>
     <div *ngIf="row.expired" class="status-wrapper">
       <span class="status-icon status-icon--expired"></span>

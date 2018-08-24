@@ -5,7 +5,8 @@ export enum TableType {
   Buy,
   Sell,
   Contract,
-  Dashboard
+  Dashboard,
+  Wallet
 }
 
 export class Table {

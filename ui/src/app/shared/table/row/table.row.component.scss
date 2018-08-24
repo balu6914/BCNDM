@@ -1,3 +1,15 @@
+$font-weight-medium: 500;
+
 .action {
   cursor: pointer;
+}
+
+.value {
+  font-weight: $font-weight-medium;
+  &--plus {
+    color: #0BBF79;
+  }
+  &--minus {
+    color: #E30C5C;
+  }
 }
