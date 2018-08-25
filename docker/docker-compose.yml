@@ -114,10 +114,10 @@ services:
     image: mongo:latest
     container_name: monetasa-subscriptions-db
     command: --smallfiles --nojournal
-    volumes:
-      - ./subscriptions-data:/data/db
     ports:
       - 27017:27017
+    volumes:
+      - ./subscriptions-data:/data/db
     networks:
       - monetasa-net
 

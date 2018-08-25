@@ -44,7 +44,7 @@ export class DashboardWalletComponent implements OnInit {
         (stream: any) => {
           // Create name and price field in the Subscription
           sub['stream_name'] = stream['name'];
-          const mitasPrice = this.tasPipe.transform(stream['price']);
+          const mitasPrice = this.tasPipe.transform(stream['price'] * (+sub.hours));
           sub['stream_price'] = mitasPrice;
         },
         err => {
@@ -60,7 +60,7 @@ export class DashboardWalletComponent implements OnInit {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
         (page: Page<Subscription>) => {
           this.fetchStreams(page);
-          page.content.forEach(sub => {
+          page.content = page.content.map(sub => {
             sub.type = 'Outcome';
             return sub;
           });
