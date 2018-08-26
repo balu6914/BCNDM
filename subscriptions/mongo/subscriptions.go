@@ -27,7 +27,6 @@ func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, e
 
 	sub.ID = bson.NewObjectId()
 	dbSub := toDBSub(sub)
-	dbSub.Active = false
 
 	if err := c.Insert(dbSub); err != nil {
 		if mgo.IsDup(err) {
@@ -136,11 +135,11 @@ func (sr subscriptionRepository) setActive(id string, active bool) error {
 // Subscription is subscription representation in DB.
 type subscription struct {
 	ID          bson.ObjectId `bson:"_id,omitempty"`
-	UserID      string        `bson:"user_id"`
-	StreamID    string        `bson:"stream_id"`
-	StreamOwner string        `bson:"stream_owner"`
-	Hours       uint64        `bson:"hours"`
-	StartDate   time.Time     `bson:"start_date"`
+	UserID      string        `bson:"user_id,omitempty"`
+	StreamID    string        `bson:"stream_id,omitempty"`
+	StreamOwner string        `bson:"stream_owner,omitempty"`
+	Hours       uint64        `bson:"hours,omitempty"`
+	StartDate   time.Time     `bson:"start_date,omitempty"`
 	EndDate     time.Time     `bson:"end_date,omitempty"`
 	StreamURL   string        `bson:"stream_url,omitempty"`
 	Active      bool          `bson:"active"`

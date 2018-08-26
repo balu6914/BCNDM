@@ -12,6 +12,7 @@ const (
 	kindTag   = "kind"
 	dbTag     = "db"
 	ne        = "$ne"
+	eq        = "$eq"
 	prefixNot = "-"
 )
 
@@ -51,7 +52,7 @@ func setString(query *bson.M, dbName string, value interface{}) {
 func GenQuery(q *Query) *bson.M {
 	qVal := reflect.ValueOf(q).Elem()
 	qType := reflect.TypeOf(*q)
-	query := bson.M{}
+	query := bson.M{"active": true}
 	for i := 0; i < qType.NumField(); i++ {
 		structField := qType.Field(i)
 		field := qVal.FieldByName(structField.Name)
@@ -61,7 +62,6 @@ func GenQuery(q *Query) *bson.M {
 			setString(&query, dbName, field.Interface())
 		}
 	}
-	setString(&query, "active", true)
 
 	return &query
 }
