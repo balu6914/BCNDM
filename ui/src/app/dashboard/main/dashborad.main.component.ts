@@ -38,8 +38,8 @@ export class DashboardMainComponent implements OnInit {
           sub['stream_name'] = stream['name'];
           const mitasPrice = this.tasPipe.transform(stream['price']);
           sub['stream_price'] = mitasPrice;
-          // Set markers on the map
-          this.streams.push(stream);
+          // Update map markers.
+          this.streams = this.streams.concat(stream);
         },
         err => {
           console.log(err);
