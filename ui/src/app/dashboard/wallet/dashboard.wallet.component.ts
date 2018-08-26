@@ -89,7 +89,7 @@ export class DashboardWalletComponent implements OnInit {
         const result = results[0];
         const content = results[0].content.concat(results[1].content);
         content.forEach(sub => {
-          sub.type = sub.stream_owner === this.user.id ? 'Outcome' : 'Income';
+          sub.type = sub.stream_owner !== this.user.id ? 'Outcome' : 'Income';
           return sub;
         });
         result.content = content;
