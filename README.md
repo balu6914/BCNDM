@@ -1,17 +1,27 @@
-# Monetasa
+# Datapace
 IoT data marketplace based on blockchain.
 
 ## Install
 ```
 cd $GOPATH/src
-git clone https://gitlab.com/drasko/monetasa
+git@github.com:Datapace/datapace.git
 ```
+
+For read-only access (non-developer) you can use `https` and avoid setting necessary GitHub SSH keys:
+```
+cd $GOPATH/src
+git clone https://github.com/Datapace/datapace.git
+```
+
+
 ## Set Dev Env
 
 ### Add SSH Key
-Add your `ssh` key to GitLab, then use ssh git remote:
+Add your `ssh` key to GitHub.
+
+If you used `https` to clone the repo, you must change the git remote to SSH in order to be able to send PRs:
 ```
-git remote set-url origin git@gitlab.com:drasko/monetasa.git
+git remote set-url origin git@github.com:datapace/datapace.git
 ```
 
 ### Configure git To Use SSH
@@ -20,19 +30,15 @@ Configure `git` to use `ssh` for GitLab, in order to enable
 otherwise it will break because it can not handle username/password prompt.
 
 ```
-git config --global url."git@gitlab.com:".insteadOf "https://gitlab.com/"
+git config --global url."git@github.com:".insteadOf "https://github.com/"
 ```
 
-## Deploy
-Hyperledger Fabric network and Datapace dApp are deployed in the form of docker composition.
-
-More information can be found in [README](docker/README.md) in `docker` dir.
-
-In order to build backend microservices (i.e. Datapace dApp) you will need to make dockers:
+### Protobuf
+Datapace comes with already generated all necesary `*.pb.go` files,
+but in case you need to (re)gernerate them, command is:
 
 ```
 make proto
-make dockers
 ```
 
 Note that suggested version of `protobuf` is `3.6`. Outdated `protobuf` versions will
@@ -49,6 +55,17 @@ export PATH=$PATH:/usr/local/bin/protoc
 ```
 
 For the installation of Go `protobuf` tools and `gRPC` take a look [here](https://github.com/grpc/grpc-go#faq)
+
+## Deploy
+Hyperledger Fabric network and Datapace dApp are deployed in the form of docker composition.
+
+More information can be found in [README](docker/README.md) in `docker` dir.
+
+In order to build backend microservices (i.e. Datapace dApp) you will need to make dockers:
+
+```
+make dockers
+```
 
 ### Blockchain
 If all crypto-material is generated (as described in aforementioned `docker` README), then blockchain network can be started with:
