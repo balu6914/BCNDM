@@ -4,7 +4,6 @@ chaincode/token/vendor/*/**
 docker/fabric/artifacts/**/**
 !docker/fabric/artifacts/.gitkeep
 fabric-ca-db
-/*.pb.go
 build
 auth-data/
 streams-data/
