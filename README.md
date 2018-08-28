@@ -6,13 +6,13 @@ IoT data marketplace based on blockchain.
 ## Install
 ```
 cd $GOPATH/src
-git@github.com:Datapace/datapace.git
+git@github.com:Datapace/datapace.git monetasa
 ```
 
 For read-only access (non-developer) you can use `https` and avoid setting necessary GitHub SSH keys:
 ```
 cd $GOPATH/src
-git clone https://github.com/Datapace/datapace.git
+git clone https://github.com/Datapace/datapace.git monetasa
 ```
 
 
