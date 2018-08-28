@@ -1,4 +1,6 @@
 # Datapace
+[![Build Status](https://semaphoreci.com/api/v1/projects/f0520a21-dfcd-45ec-85bb-c14fda410c37/2174671/badge.svg)](https://semaphoreci.com/datapace/datapace)
+
 IoT data marketplace based on blockchain.
 
 ## Install
