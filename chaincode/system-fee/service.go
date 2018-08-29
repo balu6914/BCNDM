@@ -29,16 +29,22 @@ var (
 // Service defines API for taking, fetching and setting system fee.
 type Service interface {
 	// Init sets initial system fee.
-	Init(shim.ChaincodeStubInterface) error
+	Init(shim.ChaincodeStubInterface, Fee) error
 
 	// Fee returns current system fee.
-	Fee(shim.ChaincodeStubInterface) uint64
+	Fee(shim.ChaincodeStubInterface) Fee
 
 	// SetFee sets system fee value.
-	SetFee(shim.ChaincodeStubInterface, uint64) error
+	SetFee(shim.ChaincodeStubInterface, Fee) error
 
 	// Transfer given amount from callers account to specified account and
 	// fee to platform owner account. Returns error only if transaction can't be
 	// executed.
 	Transfer(shim.ChaincodeStubInterface, string, uint64) error
+}
+
+// Fee contains system owner CN and fee value that will go to owner.
+type Fee struct {
+	Owner string `json:"owner"`
+	Value uint64 `json:"value"`
 }

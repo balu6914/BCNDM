@@ -73,6 +73,18 @@ Query Result: {"user":"testUser","value":0}
 
 This confirms that Datapace network is fully operational with running token chaincode.
 
+# Platform Fee
+
+If you want to set system owner and fee, you should first sign up owner using UI.
+
+After that set system owner and fee on blockchain:
+```
+docker exec -it cli bash
+peer chaincode invoke --tls --cafile $ORDERER_CA -C myc -n fee -c '{"Args":["setFee","{\"owner\":\"<owner_id>\", \"value\": <fee_value>}"]}'
+```
+
+From this point on, fee will be transfered to platform owner account.
+
 ---
 # Datapace dApp
 In order to run Datapace docker composition  you must first build docker images locally (they are not available online yet).

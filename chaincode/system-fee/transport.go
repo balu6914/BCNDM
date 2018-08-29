@@ -29,7 +29,27 @@ func NewChaincode(svc Service) shim.Chaincode {
 // Note that chaincode upgrade also calls this function to reset or to
 // migrate data, so be careful when initializing fee.
 func (cr chaincodeRouter) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	if err := cr.svc.Init(stub); err != nil {
+	function, args := stub.GetFunctionAndParameters()
+
+	if function != "init" {
+		return shim.Error(ErrInvalidFuncCall.Error())
+	}
+
+	if len(args) != 1 {
+		return shim.Error(ErrInvalidNumOfArgs.Error())
+	}
+
+	var req feeReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
+		return shim.Error(ErrInvalidArgument.Error())
+	}
+
+	fee := Fee{
+		Owner: req.Owner,
+		Value: req.Value,
+	}
+
+	if err := cr.svc.Init(stub, fee); err != nil {
 		return shim.Error(err.Error())
 	}
 
@@ -53,10 +73,13 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 func (cr chaincodeRouter) fee(stub shim.ChaincodeStubInterface) pb.Response {
-	value := cr.svc.Fee(stub)
+	fee := cr.svc.Fee(stub)
 
-	fee := feeRes{Value: value}
-	payload, err := json.Marshal(fee)
+	res := feeRes{
+		Owner: fee.Owner,
+		Value: fee.Value,
+	}
+	payload, err := json.Marshal(res)
 	if err != nil {
 		return shim.Error(errFailedSerialization.Error())
 	}
@@ -74,7 +97,12 @@ func (cr chaincodeRouter) setFee(stub shim.ChaincodeStubInterface, args []string
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if err := cr.svc.SetFee(stub, req.Value); err != nil {
+	fee := Fee{
+		Owner: req.Owner,
+		Value: req.Value,
+	}
+
+	if err := cr.svc.SetFee(stub, fee); err != nil {
 		return shim.Error(err.Error())
 	}
 

@@ -1,5 +1,12 @@
 package main
 
+type tokenInfo struct {
+	Name        string `json:"name"`
+	Symbol      string `json:"symbol"`
+	Decimals    uint8  `json:"decimals"`
+	TotalSupply uint64 `json:"totalSupply"`
+}
+
 type balanceReq struct {
 	Owner string `json:"owner"`
 }

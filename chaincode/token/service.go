@@ -48,7 +48,7 @@ var (
 // Service defines ERC20 compliant interface.
 type Service interface {
 	// Init set initial token supply.
-	Init(shim.ChaincodeStubInterface) error
+	Init(shim.ChaincodeStubInterface, TokenInfo) error
 
 	// TotalSupply returns total token supply.
 	TotalSupply(shim.ChaincodeStubInterface) (uint64, error)
@@ -74,6 +74,29 @@ type Service interface {
 
 	// GroupTransfer given amount of tokens from callers account to
 	GroupTransfer(shim.ChaincodeStubInterface, ...Transfer) error
+}
+
+type TokenInfo struct {
+	Name        string `json:"name"`
+	Symbol      string `json:"symbol"`
+	Decimals    uint8  `json:"decimals"`
+	TotalSupply uint64 `json:"totalSupply"`
+}
+
+type Balance struct {
+	User  string `json:"user"`
+	Value uint64 `json:"value"`
+}
+
+type TransferFrom struct {
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Value uint64 `json:"value"`
+}
+
+type Approve struct {
+	Spender string `json:"spender"`
+	Value   uint64 `json:"value"`
 }
 
 // Transfer contrains data necessary to transfer tokens.
