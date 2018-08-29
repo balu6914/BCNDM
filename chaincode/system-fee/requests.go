@@ -1,6 +1,7 @@
 package main
 
 type feeReq struct {
+	Owner string `json:"owner"`
 	Value uint64 `json:"value"`
 }
 

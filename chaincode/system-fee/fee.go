@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"math"
 
@@ -10,7 +9,7 @@ import (
 
 const (
 	feeKey  = "__fee"
-	ownerCN = "Admin@org1.monetasa.com"
+	adminCN = "Admin@org1.monetasa.com"
 
 	// Decimals represent number of zeros in 100% value, in this case it's 5, so
 	// 100% == 100000.
@@ -28,50 +27,45 @@ func NewService(ts TransferService) Service {
 	return feeChaincode{ts: ts}
 }
 
-func (fc feeChaincode) Init(stub shim.ChaincodeStubInterface) error {
-	function, args := stub.GetFunctionAndParameters()
-
-	if function != "init" {
-		return ErrInvalidFuncCall
-	}
-
-	if len(args) != 1 {
-		return ErrInvalidNumOfArgs
-	}
-
-	var req feeReq
-	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
-		return ErrInvalidArgument
-	}
-
-	if err := fc.SetFee(stub, req.Value); err != nil {
-		return err
-	}
-
-	return nil
+func (fc feeChaincode) Init(stub shim.ChaincodeStubInterface, fee Fee) error {
+	return fc.SetFee(stub, fee)
 }
 
-func (fc feeChaincode) Fee(stub shim.ChaincodeStubInterface) uint64 {
+func (fc feeChaincode) Fee(stub shim.ChaincodeStubInterface) Fee {
 	data, err := stub.GetState(feeKey)
 	if err != nil || data == nil {
-		return 0
+		return Fee{
+			Owner: adminCN,
+			Value: 0,
+		}
 	}
 
-	return binary.LittleEndian.Uint64(data)
+	var fee Fee
+	if err := json.Unmarshal(data, &fee); err != nil {
+		return Fee{
+			Owner: adminCN,
+			Value: 0,
+		}
+	}
+
+	return fee
 }
 
-func (fc feeChaincode) SetFee(stub shim.ChaincodeStubInterface, value uint64) error {
-	if value > uint64(math.Pow(10, decimals)) {
+func (fc feeChaincode) SetFee(stub shim.ChaincodeStubInterface, fee Fee) error {
+	if fee.Value > uint64(math.Pow(10, decimals)) {
 		return ErrInvalidArgument
 	}
 
 	cn, err := callerCN(stub)
-	if err != nil || cn != ownerCN {
+	if err != nil || cn != adminCN {
 		return ErrUnauthorized
 	}
 
-	data := make([]byte, 8)
-	binary.LittleEndian.PutUint64(data, value)
+	data, err := json.Marshal(fee)
+	if err != nil {
+		return ErrInvalidArgument
+	}
+
 	if err := stub.PutState(feeKey, data); err != nil {
 		return ErrSettingState
 	}
@@ -83,7 +77,7 @@ func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, val
 	fee := fc.Fee(stub)
 	wholeValue := uint64(math.Pow(10, decimals))
 
-	feeValue := fee * value / wholeValue
+	feeValue := fee.Value * value / wholeValue
 
 	transfers := []Transfer{
 		Transfer{
@@ -91,7 +85,7 @@ func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, val
 			Value: value - feeValue,
 		},
 		Transfer{
-			To:    ownerCN,
+			To:    fee.Owner,
 			Value: feeValue,
 		},
 	}

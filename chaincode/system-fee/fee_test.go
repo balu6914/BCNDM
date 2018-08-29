@@ -78,7 +78,10 @@ func TestInit(t *testing.T) {
 	cc := fee.NewChaincode(svc)
 	stub := mocks.NewFullMockStub(ccName, cc)
 
-	payload, err := json.Marshal(feeReq{Value: feeValue})
+	payload, err := json.Marshal(feeReq{
+		Owner: user2CN,
+		Value: feeValue,
+	})
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	cases := []struct {
@@ -133,6 +136,7 @@ func TestFee(t *testing.T) {
 	stub := mocks.NewFullMockStub(ccName, cc)
 
 	payload, err := json.Marshal(feeReq{
+		Owner: user2CN,
 		Value: 100,
 	})
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
@@ -168,11 +172,13 @@ func TestSetFee(t *testing.T) {
 	stub := mocks.NewFullMockStub(ccName, cc)
 
 	payload, err := json.Marshal(feeReq{
+		Owner: user2CN,
 		Value: 100,
 	})
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	tooBigFeePayload, err := json.Marshal(feeReq{
+		Owner: user2CN,
 		Value: 100001,
 	})
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
@@ -235,6 +241,7 @@ func TestTransfer(t *testing.T) {
 	stub := mocks.NewFullMockStub(ccName, cc)
 
 	initPayload, err := json.Marshal(feeReq{
+		Owner: user2CN,
 		Value: 10000,
 	})
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
@@ -283,6 +290,7 @@ func TestTransfer(t *testing.T) {
 }
 
 type feeReq struct {
+	Owner string `json:"owner"`
 	Value uint64 `json:"value"`
 }
 

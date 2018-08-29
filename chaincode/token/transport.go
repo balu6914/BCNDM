@@ -29,7 +29,30 @@ func NewChaincode(svc Service) shim.Chaincode {
 // Note that chaincode upgrade also calls this function to reset or to
 // migrate data, so be careful when initializing token.
 func (cr chaincodeRouter) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	if err := cr.svc.Init(stub); err != nil {
+	function, args := stub.GetFunctionAndParameters()
+
+	if function != "init" {
+		return shim.Error(ErrInvalidFuncCall.Error())
+	}
+
+	if len(args) != 1 {
+		return shim.Error(ErrInvalidNumOfArgs.Error())
+	}
+
+	// get token data from JSON
+	var ti tokenInfo
+	if err := json.Unmarshal([]byte(args[0]), &ti); err != nil {
+		return shim.Error(ErrInvalidArgument.Error())
+	}
+
+	info := TokenInfo{
+		Name:        ti.Name,
+		Symbol:      ti.Symbol,
+		Decimals:    ti.Decimals,
+		TotalSupply: ti.TotalSupply,
+	}
+
+	if err := cr.svc.Init(stub, info); err != nil {
 		return shim.Error(err.Error())
 	}
 

@@ -22,24 +22,13 @@ func NewService() Service {
 	return tokenChaincode{}
 }
 
-func (tc tokenChaincode) Init(stub shim.ChaincodeStubInterface) error {
-	function, args := stub.GetFunctionAndParameters()
-
-	if function != "init" {
-		return ErrInvalidFuncCall
-	}
-
-	if len(args) != 1 {
-		return ErrInvalidNumOfArgs
-	}
-
-	// get token data from JSON
-	var ti tokenInfo
-	if err := json.Unmarshal([]byte(args[0]), &ti); err != nil {
+func (tc tokenChaincode) Init(stub shim.ChaincodeStubInterface, ti TokenInfo) error {
+	data, err := json.Marshal(ti)
+	if err != nil {
 		return ErrInvalidArgument
 	}
 
-	if err := stub.PutState(keyToken, []byte(args[0])); err != nil {
+	if err := stub.PutState(keyToken, data); err != nil {
 		return ErrSettingState
 	}
 
@@ -63,7 +52,7 @@ func (tc tokenChaincode) TotalSupply(stub shim.ChaincodeStubInterface) (uint64, 
 		return 0, ErrGettingState
 	}
 
-	var ti tokenInfo
+	var ti TokenInfo
 	if err := json.Unmarshal(data, &ti); err != nil {
 		return 0, ErrInvalidStateData
 	}
@@ -133,7 +122,7 @@ func (tc tokenChaincode) Approve(stub shim.ChaincodeStubInterface, spender strin
 		return false
 	}
 
-	a := approve{
+	a := Approve{
 		Spender: spender,
 		Value:   value,
 	}
@@ -176,7 +165,7 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 		return err
 	}
 
-	events := []transfer{}
+	events := []TransferFrom{}
 
 	for _, tr := range transfers {
 		if from == tr.To {
@@ -206,7 +195,7 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 			return err
 		}
 
-		events = append(events, transfer{
+		events = append(events, TransferFrom{
 			From:  from,
 			To:    tr.To,
 			Value: tr.Value,
@@ -261,7 +250,7 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to str
 		return false
 	}
 
-	t := transfer{
+	t := TransferFrom{
 		From:  from,
 		To:    to,
 		Value: value,

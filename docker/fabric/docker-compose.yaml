@@ -77,6 +77,8 @@ services:
       - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.monetasa.com/peers/peer0.org1.monetasa.com/tls/ca.crt
       # Reflect peer0 name, org1 name and our company's domain
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp
+      # This cert is needed for invoking chaincode methods
+      - ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/users/Admin@monetasa.com/tls/ca.crt
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     # On start we are provisioning the network
     command: /bin/bash -c 'scripts/init.sh'
