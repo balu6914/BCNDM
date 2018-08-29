@@ -44,8 +44,17 @@ func stream() streams.Stream {
 		Name:        randomString(nameLen),
 		Type:        randomString(typeLen),
 		Description: randomString(descLen),
-		URL:         fmt.Sprintf("http://%s.com", randomString(urlLen)),
-		Price:       rand.Uint64(),
+		Snippet: `{
+				"sensor_id": "8746",
+				"sensor_type": "DHT22",
+				"location": "4409",
+				"lat": "50.873",
+				"lon": "4.698",
+				"timestamp": "2018-03-09T00:02:09",
+				"temperature": "5.20"
+			}`,
+		Price: rand.Uint64(),
+		URL:   fmt.Sprintf("http://%s.com", randomString(urlLen)),
 		Location: streams.Location{
 			Type: "Point",
 			Coordinates: [2]float64{

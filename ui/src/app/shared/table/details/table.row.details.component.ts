@@ -45,10 +45,11 @@ export class TableRowDetailsComponent implements OnInit {
         name:        this.stream.name,
         type:        this.stream.type,
         description: this.stream.description,
-        url:         "fakeurl.com", //TODO: use stream URL
+        url:         'fakeurl.com', // TODO: use stream URL
         price:       this.tasPipe.transform(this.stream.price),
         long:        this.stream.location.coordinates[0],
         lat:         this.stream.location.coordinates[1],
+        snippet:     this.stream.snippet,
       },
       streamID: this.stream.id,
     };
@@ -87,9 +88,9 @@ export class TableRowDetailsComponent implements OnInit {
     // Parameter stream is set on modal component
     const initialState = {
       stream: {
-        id:         this.stream.id,
-        name:       this.stream.name,
-        price:      this.stream.price,
+        id:    this.stream.id,
+        name:  this.stream.name,
+        price: this.stream.price,
       },
     };
     // Open DashboardSellAddComponent Modal

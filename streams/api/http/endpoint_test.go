@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	validFilePath   = "../../../assets/test/validBulkTest.csv"
-	invalidFilePath = "../../../assets/test/invalidBulkTest.csv"
+	validFilePath   = "../../../assets/test/validBulk.csv"
+	invalidFilePath = "../../../assets/test/invalidBulk.csv"
 )
 
 var (
@@ -31,9 +31,18 @@ var (
 		Name:        "name",
 		Type:        "type",
 		Description: "description",
-		Price:       123,
-		URL:         "https://myUrl/myStream.com",
-		Owner:       validKey,
+		Snippet: `{
+			"sensor_id": "8746",
+			"sensor_type": "DHT22",
+			"location": "4409",
+			"lat": "50.873",
+			"lon": "4.698",
+			"timestamp": "2018-03-09T00:02:09",
+			"temperature": "5.20"
+		}`,
+		Price: 123,
+		URL:   "https://myUrl/myStream.com",
+		Owner: validKey,
 		Location: streams.Location{
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
@@ -145,7 +154,7 @@ func TestAddStream(t *testing.T) {
 			status: http.StatusBadRequest,
 		},
 		{
-			desc:   "add an empty stram",
+			desc:   "add an empty stream",
 			req:    "{}",
 			auth:   validKey,
 			status: http.StatusBadRequest,

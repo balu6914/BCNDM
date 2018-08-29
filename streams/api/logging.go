@@ -22,7 +22,7 @@ func LoggingMiddleware(svc streams.Service, logger log.Logger) streams.Service {
 
 func (lm *loggingMiddleware) AddStream(stream streams.Stream) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method add_stream for stream %s took %s to complete", stream.ID.Hex(), time.Since(begin))
+		message := fmt.Sprintf("Method add_stream for stream %s took %s to complete", id, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return

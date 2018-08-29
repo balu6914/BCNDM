@@ -1,25 +1,24 @@
 <div class="box" *ngIf="stream">
   <div class="box__header">
     <p class="box__title">
-      <span  (click)="close()" class="box__title-link box__title--arrow-left js-flip-card-close">
-          {{stream.name}}
-        </span>
+      <span (click)="close()" class="box__title-link box__title--arrow-left js-flip-card-close">
+        {{stream.name}}
+      </span>
     </p>
     <!-- Action buttons -->
     <div *ngIf="rowType === types.Sell" class="box__buttons">
       <a [routerLink]="" (click)="openModalEdit()" class="action action--color-1">
-          <span class="action__icon action--edit"></span>
-        </a>
+        <span class="action__icon action--edit"></span>
+      </a>
       <a [routerLink]="" (click)="openModalDelete()" class="action action--color-2">
-          <span class="action__icon action--delete"></span>
-        </a>
+        <span class="action__icon action--delete"></span>
+      </a>
     </div>
     <!-- Buy button -->
     <div *ngIf="rowType === types.Buy" class="box__buttons">
       <a [routerLink]="" class="action action--color-1" (click)="openModalSubscription()">
         <span class="action__icon action--buy"></span>
       </a>
-
     </div>
   </div>
   <div class="box__content">
@@ -68,20 +67,7 @@
             Example reading(s)
           </div>
           <div class="stream-data__text">
-            <pre class="stream-data__pre">
-              <code class="stream-data__code">
-                Exmaple response goes here
-                <!-- {
-                "sensor_id": "8746",
-                "sensor_type": "DHT22",
-                "location": "4409",
-                "lat": "50.873",
-                "lon": "4.698",
-                "timestamp": "2018-03-09T00:02:09",
-                "temperature": "5.20"
-              } -->
-            </code>
-          </pre>
+            <pre class="stream-data__pre">{{stream.snippet}}</pre>
           </div>
         </div>
       </div>

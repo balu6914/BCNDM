@@ -24,6 +24,7 @@ type Stream struct {
 	Name        string        `bson:"name,omitempty" json:"name,omitempty"`
 	Type        string        `bson:"type,omitempty" json:"type,omitempty"`
 	Description string        `bson:"description,omitempty" json:"description,omitempty"`
+	Snippet     string        `bson:"snippet,omitempty" json:"snippet,omitempty"`
 	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
 	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`

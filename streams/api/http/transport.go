@@ -21,7 +21,7 @@ const defLocType = "Point"
 var (
 	authService    streams.Authorization
 	locationPoints = [4][2]string{{"x0", "y0"}, {"x1", "y1"}, {"x2", "y2"}, {"x3", "y3"}}
-	fields         = []string{"name", "type", "description", "price", "longitude", "latitude", "url"}
+	fields         = []string{"name", "type", "description", "snippet", "price", "longitude", "latitude", "url"}
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
@@ -160,12 +160,13 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 		Name:        record[keys["name"]],
 		Type:        record[keys["type"]],
 		Description: record[keys["description"]],
+		Snippet:     record[keys["snippet"]],
 		Price:       price,
 		Location: streams.Location{
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL: record[6],
+		URL: record[keys["url"]],
 	}
 	return ret, nil
 }
@@ -204,7 +205,6 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 		if stream.Location.Type == "" {
 			stream.Location.Type = defLocType
 		}
-
 		s = append(s, *stream)
 	}
 
