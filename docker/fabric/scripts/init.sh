@@ -18,7 +18,7 @@ TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\":
 FEE_CHAIN_ID=fee
 FEE_CHAIN_PATH=github.com/chaincode/system-fee
 FEE_CHAIN_VER=1.0
-FEE_CHAIN_INIT_FN='{"Args":["init","{\"value\": 10000}"]}'
+FEE_CHAIN_INIT_FN='{"Args":["init","{\"owner\": \"Admin@org1.monetasa.com\", \"value\": 10000}"]}'
 
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
 
