@@ -1,56 +1,41 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Stream } from '../interfaces/stream.interface';
-import { Query } from '../interfaces/query.interface';
-import { Observable } from 'rxjs/Observable';
-
-// Import RxJs required methods
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
 import { Page } from '../interfaces/page.interface';
-
+import { Query } from '../interfaces/query.interface';
+import { Stream } from '../interfaces/stream.interface';
 
 @Injectable()
 export class StreamService {
-  // Resolve HTTP using the constructor
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient
+  ) { }
 
-  getStream(id: string): Observable<Stream[]> {
-    return this.http.get(`${environment.API_STREAMS}/${id}`)
-      .map((res: Response) => res)
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+  getStream(id: string): Observable<Stream> {
+    return this.http.get<Stream>(`${environment.API_STREAMS}/${id}`);
   }
 
   addStream(data) {
-    return this.http.post(`${environment.API_STREAMS}`, data)
-      .map((res: Response) => res)
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+    return this.http.post(`${environment.API_STREAMS}`, data);
   }
 
   addStreamBulk(csv) {
-    return this.http.post(`${environment.API_STREAMS}/bulk`, csv)
-      .map((res: Response) => { })
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+    return this.http.post(`${environment.API_STREAMS}/bulk`, csv);
   }
 
   removeStream(id: string) {
-    return this.http.delete(`${environment.API_STREAMS}/${id}`)
-      .map((res: Response) => res)
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+    return this.http.delete(`${environment.API_STREAMS}/${id}`);
   }
 
   updateStream(id: string, data) {
-    return this.http.put(`${environment.API_STREAMS}/${id}`, data)
-      .map((res: Response) => res)
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+    return this.http.put(`${environment.API_STREAMS}/${id}`, data);
   }
 
   searchStreams(q: Query): Observable<Page<Stream>> {
-    return this.http.get(`${environment.API_STREAMS}`, {
+    return this.http.get<Page<Stream>>(`${environment.API_STREAMS}`, {
       params: q.generateQuery()
-    })
-      .map((res: Response) => res)
-      .catch((error: any) => Observable.throw(error || 'Server error'));
+    });
   }
+
 }

@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { NgPipesModule } from 'ngx-pipes';
-import { MdlDatePickerModule } from '@angular-mdl/datepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // Sell routes
 import { DashboardContractsRoutingModule } from './dashboard.contracts.routes';
@@ -20,7 +18,6 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
   imports: [
     CommonModule,
     AppBootstrapModule,
-    MdlModule,
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // Sell routes
@@ -19,7 +18,6 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
   imports: [
     CommonModule,
     AppBootstrapModule,
-    MdlModule,
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,

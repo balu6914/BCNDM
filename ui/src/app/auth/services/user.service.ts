@@ -1,39 +1,31 @@
 // Imports
-import { Injectable }     from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { environment } from '../../../environments/environment';
-import { User } from '../../common/interfaces/user.interface'
-import {Observable} from 'rxjs/Rx';
-
-// Import RxJs required methods
-import 'rxjs/add/operator/map';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+import { environment } from '../../../environments/environment';
+import { User } from '../../common/interfaces/user.interface';
 
 @Injectable()
 export class UserService {
-     // Resolve HTTP using the constructor
-     constructor (private http: Http) {}
+  constructor(
+    private http: HttpClient
+  ) { }
 
-     // Fetch  user
-     getUser() : Observable<User[]> {
-         return this.http.get(`${environment.API_AUTH}`)
-                         .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
-     }
-     addUser (data): Observable<User[]> {
-        return this.http.post(`${environment.API_AUTH}`, data)
-                         .map((res:Response) => res)
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
-    }
-     removeUser (id:string): Observable<User[]> {
-        return this.http.delete(`${environment.API_AUTH}`)
-                         .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
-    }
-     updateUser (id:string, data): Observable<User[]> {
-        return this.http.put(`${environment.API_AUTH}`, data)
-                         .map((res:Response) => res.json())
-                         .catch((error:any) => Observable.throw(error || 'Server error'));
-    }
+  getUser(): Observable<User> {
+    return this.http.get<User>(`${environment.API_AUTH}`);
+  }
+
+  addUser(data): Observable<User> {
+    return this.http.post<User>(`${environment.API_AUTH}`, data);
+  }
+
+  removeUser(id: string) {
+    return this.http.delete(`${environment.API_AUTH}`);
+  }
+  updateUser(id: string, data): Observable<User> {
+    return this.http.put<User>(`${environment.API_AUTH}`, data);
+  }
 
 }

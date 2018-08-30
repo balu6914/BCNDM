@@ -56,7 +56,7 @@ export class DashboardSellAddComponent {
     this.streamService.addStream(stream).subscribe(
       res => {
         // Add ID from http response to stream
-        stream.id = res.id;
+        stream.id = res['id'];
         this.streamCreated.emit(stream);
         this.modalNewStream.hide();
         this.alertService.success(`Stream successfully added!`);

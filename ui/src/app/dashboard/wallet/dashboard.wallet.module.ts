@@ -1,6 +1,5 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdlModule } from '@angular-mdl/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 // Add wallet routes
@@ -13,7 +12,6 @@ import { SharedModule } from 'app/shared/shared.module';
 @NgModule({
   imports: [
     CommonModule,
-    MdlModule,
     FormsModule,
     ReactiveFormsModule,
     AppBootstrapModule,
