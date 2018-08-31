@@ -14,7 +14,7 @@ services:
       - monetasa-bc-net
 
   explorer:
-    image: datapace/hyperledger-explorer
+    image: monetasa/hyperledger-explorer
     container_name: fabric-explorer
     hostname: explorer
     restart: always
