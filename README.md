@@ -70,7 +70,15 @@ make dockers
 ```
 
 ### Blockchain
-If all crypto-material is generated (as described in aforementioned `docker` README), then blockchain network can be started with:
+Be sure that you generated all necessary crypto-material (as described in aforementioned `docker` [README](docker/README.md)):
+```
+make crypto
+```
+
+> N.B. Do not regenerate crypto material during the product life-cycle, otherwise you will loose access to all users
+> (because Fabric CA will have new crypto keys and will not be in sync with MongoDB which holds the user metadata).
+
+If all crypto-material is generated, then blockchain network can be started with:
 
 ```
 make runbc
@@ -82,6 +90,16 @@ This is a shorthand for:
 ./docker/fabric/generate.sh
 ./docker/fabric/run.sh
 ```
+
+### Blockchain Explorer
+Once blockchain network is up and running, you can start Hyperledger Explorer with:
+
+```
+make runexplorer
+```
+
+> Hyperledger Explorer docker image will be built previously when `make` (or `make dockers`) is called.
+
 
 ### Datapace dApp
 
