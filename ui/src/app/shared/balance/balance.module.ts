@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { CommonAppModule } from '../../common/common.module';
 import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
-import { BalanceService } from './balance.service';
-import { BalanceComponent } from './balance.component';
+import { CommonAppModule } from '../../common/common.module';
 import { BalanceAddComponent } from './add/balance.add.component';
+import { BalanceComponent } from './balance.component';
 import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component';
+
 
 
 @NgModule({
@@ -26,11 +25,10 @@ import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component'
   exports: [
     BalanceComponent,
   ],
-  entryComponents:[
+  entryComponents: [
     BalanceAddComponent,
     BalanceWithdrawComponent,
-  ],
-  providers: [BalanceService]
+  ]
 
 })
-export class BalanceModule {}
+export class BalanceModule { }

@@ -5,9 +5,10 @@ import { Subject } from 'rxjs/Subject';
 import { environment } from '../../../environments/environment';
 import { Balance } from '../../common/interfaces/balance.interface';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class BalanceService {
-  // Resolve HTTP using the constructor
   private _balance = new Subject<Balance>();
   balance = this._balance.asObservable();
 
@@ -25,7 +26,7 @@ export class BalanceService {
   withdraw(data: any) {
     return this.http.post(`${environment.API_TOKENS}/withdraw`, data);
   }
-  // Balance Message Buss will bro[adcast notification about balance value changes
+  // Balance Message Buss will broadcast notification about balance value changes
   changed(value: Balance) {
     this._balance.next(value);
   }
