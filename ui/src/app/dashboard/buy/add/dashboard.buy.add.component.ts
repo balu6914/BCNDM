@@ -5,6 +5,7 @@ import { SubscriptionService } from '../../../common/services/subscription.servi
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BalanceService } from '../../../shared/balance/balance.service';
 import { Balance } from '../../../common/interfaces/balance.interface';
+import 'rxjs/add/observable/throw';
 
 @Component({
   selector: 'dpc-dashboard-buy-add',
@@ -56,7 +57,7 @@ export class DashboardBuyAddComponent {
           this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours`);
         },
         err => {
-          console.error("Error fetching user balance ", err)
+          console.error(`Error fetching user balance ${err}`);
         });
 
       },
