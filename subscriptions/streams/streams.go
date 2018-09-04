@@ -29,6 +29,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 
 	stream := subscriptions.Stream{
 		ID:    s.GetId(),
+		Name:  s.GetName(),
 		Owner: s.GetOwner(),
 		URL:   s.GetUrl(),
 		Price: s.GetPrice(),

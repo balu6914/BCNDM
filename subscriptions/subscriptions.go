@@ -16,6 +16,8 @@ type Subscription struct {
 	StartDate   time.Time     `json:"start_date,omitempty"`
 	EndDate     time.Time     `json:"end_date,omitempty"`
 	StreamURL   string        `json:"stream_url,omitempty"`
+	StreamPrice uint64        `json:"stream_price,omitempty"`
+	StreamName  string        `json:"stream_name,omitempty"`
 }
 
 // Validate returns an error if user representation is invalid.
