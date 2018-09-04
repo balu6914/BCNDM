@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
 import { MitasPipe, SubscriptionTypePipe, TasPipe } from './pipes/converter.pipe';
+import { WalletBalanceStatisticPipe } from './pipes/balance.income.pipe';
 // services
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
@@ -20,18 +21,21 @@ import { SubscriptionService } from './services/subscription.service';
     TasPipe,
     MitasPipe,
     SubscriptionTypePipe,
+    WalletBalanceStatisticPipe,
   ],
   providers: [
     TasPipe,
     MitasPipe,
     SubscriptionTypePipe,
+    WalletBalanceStatisticPipe,
     StreamService,
     SubscriptionService
   ],
   exports: [
     TasPipe,
     MitasPipe,
-    SubscriptionTypePipe
+    SubscriptionTypePipe,
+    WalletBalanceStatisticPipe,
   ]
 })
 export class CommonAppModule { }

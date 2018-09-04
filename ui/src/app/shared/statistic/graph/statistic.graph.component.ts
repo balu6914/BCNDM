@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Chart } from 'chart.js';
 
 @Component({
@@ -7,12 +7,15 @@ import { Chart } from 'chart.js';
   styleUrls: ['./statistic.graph.component.scss']
 })
 export class StatisticGraphComponent {
+  @Input() dataIncome: number[];
+  @Input() dataBalance: number[];
 
   constructor(
   ) { }
 
   ngOnInit() {
     this.createMyChart();
+    console.log("what we have ? ", this.dataIncome)
 
   }
 
@@ -32,16 +35,16 @@ export class StatisticGraphComponent {
         ],
         datasets: [{
           type: "bar",
-          label: "Dataset 1",
-          data: [5, 10, 15, 7, 3, 10, 2, 45, 12, 3, 35, 2, 5],
+          label: "Income",
+          data: this.dataIncome,
           backgroundColor: "rgba(6, 210, 216, 1)",
           borderColor: "rgba(6, 210, 216, 1)",
           borderWidth: 1,
           barThickness: 1
         },
         {
-          label: "Dataset 2",
-          data: [25, 43, 38, 33, 52, 65, 62, 49],
+          label: "Wallet balance",
+          data: this.dataBalance,
           backgroundColor: "rgba(0, 125, 255, .1)",
           borderColor: "#007DFF",
           borderWidth: 4,
@@ -96,9 +99,18 @@ export class StatisticGraphComponent {
             }
           }],
           xAxes: [{
+            type: 'time',
             barPercentage: 10,
             categoryPercentage: 0.1,
             barThickness: 5,
+            distribution: 'linear',
+             time: {
+             unit: 'month',
+             unitStepSize: 1,
+             displayFormats: {
+                'month': 'MMM'
+               }
+             },
             gridLines: {
               lineWidth: 0,
               color: "rgba(255,255,255,0)",
