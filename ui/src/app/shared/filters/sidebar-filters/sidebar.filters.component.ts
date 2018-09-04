@@ -22,7 +22,6 @@ export class SidebarFiltersComponent {
     ) {
 
        this.mockCities = ['Belgrade', 'Paris', 'Tel Aviv'];
-       console.log(this.selectCityControl)
        // Update form control city value on selected value change
        this.selectCityControl.valueChanges.subscribe(value =>
          this.form.patchValue({city: value})
