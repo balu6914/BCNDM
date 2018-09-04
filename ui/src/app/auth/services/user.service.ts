@@ -2,8 +2,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/interfaces/user.interface';
 

@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  } from '@angular/forms';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 import { User } from '../../common/interfaces/user.interface';
 import { UserService } from '../services/user.service';
@@ -34,11 +36,26 @@ export class SignupComponent {
     ngOnInit() {
         this.errorMsg = null;
         this.form = this.fb.group({
-                email: ['', [<any>Validators.required, emailValidator]],
-                password: ['', [<any>Validators.required, <any>Validators.minLength(5)]],
-                first_name: ['', []],
-                last_name: ['', []]
+                email:            ['', emailValidator],
+                password:         ['', [Validators.required, Validators.minLength(5)]],
+                passwordConfirm:  [''],
+                first_name:       ['', [Validators.required, Validators.minLength(2)]],
+                last_name:        ['', [Validators.required, Validators.minLength(2)]]
+        },
+        {
+                validator: this.passwordMatchValidator
         });
+    }
+
+    passwordMatchValidator(fg: FormGroup) {
+      // Compare passwords only if minLength is valid
+      if (fg.get('passwordConfirm').value.length >= 5) {
+        if (fg.get('password').value === fg.get('passwordConfirm').value) {
+          return null;
+        }
+        fg.controls.passwordConfirm.setErrors({'invalid': true});
+      }
+      return {'mismatch': true };
     }
 
     onSubmit(model: User, isValid: boolean) {
@@ -54,9 +71,8 @@ export class SignupComponent {
                 },
                 err => {
                   // Handle tmp case when user already exists and we don't have error msg on API side yet.
-                  if(err.status === 409) {
-                  this.errorMsg = "User with this email already exists."
-
+                  if (err.status === 409) {
+                    this.errorMsg = "User with this email already exists."
                   } else {
                     this.errorMsg = err;
                   }
