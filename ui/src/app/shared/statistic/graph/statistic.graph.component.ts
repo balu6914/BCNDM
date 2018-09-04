@@ -20,8 +20,6 @@ export class StatisticGraphComponent {
   ngOnInit() {
     this.income = this.walletBalanceStatisticPipe.transform(this.dataIncome);
     this.createMyChart();
-    console.log("what we have ? ", this.income);
-
 
   }
 
@@ -29,34 +27,10 @@ export class StatisticGraphComponent {
     let chartData = {
       type: "line",
       data: {
-        // labels: [
-        //   "Jan 2017",
-        //   "Apr 2017",
-        //   "Sep 2017",
-        //   "Dec 2017",
-        //   "Mar 2018",
-        //   "Jul 2018",
-        //   "Oct 2018",
-        //   "Feb 2019"
-        // ],
         datasets: [{
           type: "bar",
           label: "Income",
           data: this.income,
-          // data: [
-          //   {
-          //     x: this.newDate(12),
-          //     y: 2.44
-          //   },
-          //   {
-          //     x: this.newDate(13),
-          //     y: 31
-          //   },
-          //   {
-          //     x: this.newDate(2),
-          //     y: 13.33
-          //   }
-          // ],
           backgroundColor: "rgba(6, 210, 216, 1)",
           borderColor: "rgba(6, 210, 216, 1)",
           borderWidth: 1,
@@ -64,20 +38,7 @@ export class StatisticGraphComponent {
         },
         {
           label: "Wallet balance",
-          data: [
-            {
-              x: this.newDate(0),
-              y: 34.11
-            },
-            {
-              x: this.newDate(1),
-              y: 34
-            },
-            {
-              x: this.newDate(228),
-              y: 100
-            }
-          ],
+          data: this.balance,
           backgroundColor: "rgba(0, 125, 255, .1)",
           borderColor: "#007DFF",
           borderWidth: 4,
@@ -101,7 +62,6 @@ export class StatisticGraphComponent {
           caretSize: 0,
           callbacks: {
             label: function(tooltipItem, data) {
-              console.log("tooltipItem", tooltipItem)
               return `${tooltipItem.yLabel} TAS on ${moment(tooltipItem.xLabel).format('MMM, D')}`
             },
             title: function(tooltipItem, data) {
@@ -146,7 +106,7 @@ export class StatisticGraphComponent {
             ticks: {
               fontColor: "rgba(158,175,200, 1)",
               fontSize: 11,
-              stepSize: 25
+              stepSize: 2500
             }
           }]
         }
@@ -155,10 +115,5 @@ export class StatisticGraphComponent {
     let c: any = document.getElementById("myChart");
     let ctx = c.getContext("2d");
     let chart = new Chart(ctx, chartData);
-  }
-
-  newDate(days) {
-    console.log("here is how it looks like", moment().add(days, 'd').toDate())
-    return moment().add(days, 'd').toDate();
   }
 }

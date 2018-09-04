@@ -29,35 +29,15 @@ export class DashboardMainComponent implements OnInit {
     private tasPipe: TasPipe,
   ) { }
 
-  fetchStreams(page: Page<Subscription>) {
-    this.streams = [];
-    page.content.forEach(sub => {
-      this.streamService.getStream(sub.stream_id).subscribe(
-        (stream: any) => {
-          // Create name and price field in the Subscription
-          sub['stream_name'] = stream['name'];
-          const mitasPrice = this.tasPipe.transform(stream['price']);
-          sub['stream_price'] = mitasPrice;
-          // Update map markers.
-          this.streams = this.streams.concat(stream);
-        },
-        err => {
-          console.log(err);
-        }
-      );
-    });
-    this.pageData = page;
-  }
-
   fetchSubscriptions() {
     if (this.activeStreamsSection.name === StreamsType.Bought) {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.fetchStreams(page),
+        (page: Page<Subscription>) => this.pageData = page,
         err => console.log(err)
       );
     } else {
       this.subscriptionService.owned(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.fetchStreams(page),
+        (page: Page<Subscription>) => this.pageData = page,
         err => console.log(err)
       );
     }
