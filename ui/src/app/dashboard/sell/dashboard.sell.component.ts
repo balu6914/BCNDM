@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { AuthService } from '../../auth/services/auth.service';
@@ -21,6 +21,9 @@ export class DashboardSellComponent implements OnInit {
   streams = [];
   table: Table = new Table();
   query = new Query();
+
+  @ViewChild('map')
+  private map: MapComponent;
 
   constructor(
     private streamService: StreamService,
