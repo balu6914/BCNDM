@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { AuthService } from '../../auth/services/auth.service';
@@ -7,6 +7,7 @@ import { StreamService } from '../../common/services/stream.service';
 import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
 import { Table, TableType } from '../../shared/table/table';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
+import { User } from '../../common/interfaces/user.interface';
 
 @Component({
   providers: [MapComponent],
@@ -15,14 +16,16 @@ import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
   styleUrls: ['./dashboard.sell.component.scss']
 })
 export class DashboardSellComponent implements OnInit {
-  user: any;
+  user: User;
   temp = [];
   streams = [];
   table: Table = new Table();
   query = new Query();
 
+  @ViewChild('map')
+  private map: MapComponent;
+
   constructor(
-    private map: MapComponent,
     private streamService: StreamService,
     private AuthService: AuthService,
     private modalService: BsModalService,
@@ -32,11 +35,11 @@ export class DashboardSellComponent implements OnInit {
 
   ngOnInit() {
     // Fetch current User
-    this.user = {};
     this.AuthService.getCurrentUser().subscribe(
       data => {
         this.user = data;
         this.query.owner = this.user.id;
+        this.fetchStreams();
       },
       err => {
         console.log(err);
@@ -48,7 +51,6 @@ export class DashboardSellComponent implements OnInit {
     this.table.tableType = TableType.Sell;
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
     this.table.hasDetails = true;
-    this.fetchStreams();
   }
 
   // Add Bulk event
@@ -110,7 +112,6 @@ export class DashboardSellComponent implements OnInit {
         this.table = temp;
       },
       err => {
-        console.log(err);
         this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
       });
   }

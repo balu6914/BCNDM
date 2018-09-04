@@ -72,6 +72,8 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		return "", ErrNotFound
 	}
 	sub.StreamOwner = stream.Owner
+	sub.StreamName = stream.Name
+	sub.StreamPrice = stream.Price
 
 	hash, err := ss.proxy.Register(sub.Hours, stream.URL)
 	if err != nil {

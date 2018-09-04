@@ -142,6 +142,8 @@ type subscription struct {
 	StartDate   time.Time     `bson:"start_date,omitempty"`
 	EndDate     time.Time     `bson:"end_date,omitempty"`
 	StreamURL   string        `bson:"stream_url,omitempty"`
+	StreamPrice uint64        `bson:"stream_price,omitempty"`
+	StreamName  string        `bson:"stream_name,omitempty"`
 	Active      bool          `bson:"active"`
 }
 
@@ -155,6 +157,8 @@ func toDBSub(sub subscriptions.Subscription) subscription {
 		StartDate:   sub.StartDate,
 		EndDate:     sub.EndDate,
 		StreamURL:   sub.StreamURL,
+		StreamPrice: sub.StreamPrice,
+		StreamName:  sub.StreamName,
 		Active:      false,
 	}
 }
@@ -169,5 +173,7 @@ func toSub(dbSub subscription) subscriptions.Subscription {
 		StartDate:   dbSub.StartDate,
 		EndDate:     dbSub.EndDate,
 		StreamURL:   dbSub.StreamURL,
+		StreamPrice: dbSub.StreamPrice,
+		StreamName:  dbSub.StreamName,
 	}
 }

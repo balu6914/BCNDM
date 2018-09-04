@@ -7,7 +7,7 @@
       Sign Up
       <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
     </p>
-    <form [formGroup]="form" class="needs-validation" novalidate>
+    <form [formGroup]="form" class="needs-validation">
       <div class="form-group row">
         <label for="staticEmail" class="col-sm-3 col-form-label">Email*</label>
         <div class="col-sm-9">
@@ -30,17 +30,17 @@
             disableNativeValidityChecking
             error-msg="'Please provide a correct password (min length is 5 chars)!'"
             class="form-control"
-            id="inputPassword"
-            placeholder="**********" required>
+            id="inputPassword">
         </div>
       </div>
       <div class="form-group row">
         <label for="inputRepeatPassword" class="col-sm-3 col-form-label col-form-label-2-rows">Repeat Password*</label>
         <div class="col-sm-9">
-          <input
-            type="password"
+          <input type="password"
+            formControlName="passwordConfirm"
             class="form-control"
-            id="inputRepeatPassword" required>
+            id="inputRepeatPassword">
+            <span *ngIf="form.get('passwordConfirm').invalid" class="error-message text-center"> Password mismatch </span>
         </div>
       </div>
       <div class="form-group row">
