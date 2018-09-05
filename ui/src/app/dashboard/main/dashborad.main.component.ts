@@ -29,15 +29,36 @@ export class DashboardMainComponent implements OnInit {
     private tasPipe: TasPipe,
   ) { }
 
+fetchStreams(page: Page<Subscription>) {
+    this.streams = [];
+    page.content.forEach(sub => {
+      this.streamService.getStream(sub.stream_id).subscribe(
+        (stream: any) => {
+          // Update map markers.
+          this.streams = this.streams.concat(stream);
+        },
+        err => {
+          console.log(err);
+        }
+      );
+    });
+  }
+
   fetchSubscriptions() {
     if (this.activeStreamsSection.name === StreamsType.Bought) {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.pageData = page,
+        (page: Page<Subscription>) => {
+          this.pageData = page;
+          this.fetchStreams(page);
+        },
         err => console.log(err)
       );
     } else {
       this.subscriptionService.owned(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.pageData = page,
+        (page: Page<Subscription>) => {
+          this.pageData = page;
+          this.fetchStreams(page);
+        },
         err => console.log(err)
       );
     }
