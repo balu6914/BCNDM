@@ -64,24 +64,15 @@ export class MapComponent {
   }
 
   focusMap() {
-    // Get Markers range Bounts and set map to this view in order to always
-    // see all markers in focus on map Init.
-    const that = this;
-    this.activeMarkers = this.markers.map(m => {
-      const a = [];
-      const lat = m.location.coordinates[1];
-      const long = m.location.coordinates[0];
-      if(lat && long) {
-        a.push(L.latLng(lat, long));
-      }
-      return a;
-    });
-    Promise.all(this.activeMarkers).then(result => {
-      if(this.activeMarkers.length && this.map) {
-        var b = new L.LatLngBounds(this.activeMarkers);
-        this.map.fitBounds(b);
-      }
-    });
+    // Get markers bounds and set the new map view with flyToBounds effect
+    const markers = this.layerGroup.getLayers();
+    const featureGroup = new L.FeatureGroup(markers);
+    const bounds = featureGroup.getBounds();
+    const options = {
+      maxZoom: 8
+    };
+
+    this.map.flyToBounds(bounds, options);
   }
 
   addMarkers() {
@@ -93,7 +84,6 @@ export class MapComponent {
       this.streamList.forEach( stream => {
         this.addMarker(stream);
       });
-      this.focusMap();
     }
   }
 
@@ -132,6 +122,9 @@ export class MapComponent {
 
     // Add stream to markers list
     this.markers.push(stream);
+
+    // Fit map bounds
+    this.focusMap();
   }
 
   // Callback of editEvt from TableComponent
