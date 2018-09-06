@@ -12,7 +12,7 @@ const (
 	dbName     = "monetasa-streams"
 	collection = "streams"
 	unknown    = "unknown conflict"
-	errMsg     = "Some of the URLs you've provided already exist in the database."
+	errMsg     = "Some of the URLs already exist in the database."
 	msgMark    = "\""
 )
 
