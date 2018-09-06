@@ -32,17 +32,37 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 		return "", streams.ErrConflict
 	}
 
+	for _, s := range srm.streams {
+		if s.URL == stream.URL {
+			return "", streams.ErrConflict
+		}
+	}
+
 	srm.streams[dbKey] = stream
 
 	return stream.ID.Hex(), nil
 }
 
 func (srm *streamRepositoryMock) SaveAll(bulk []streams.Stream) error {
+
+	bulkErr := streams.ErrBulkConflict{
+		Message:   "Mock error: unique URL violation.",
+		Conflicts: []string{},
+	}
+
 	for _, stream := range bulk {
 		stream.ID = bson.NewObjectId()
 		if _, err := srm.Save(stream); err != nil {
+			if _, ok := err.(streams.ErrBulkConflict); ok {
+				bulkErr.Conflicts = append(bulkErr.Conflicts, stream.URL)
+				continue
+			}
 			return err
 		}
+	}
+
+	if len(bulkErr.Conflicts) > 0 {
+		return bulkErr
 	}
 
 	return nil

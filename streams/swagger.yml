@@ -166,7 +166,12 @@ paths:
         403:
           description: Missing or invalid access token provided.
         409:
-          description: Stream already exists.
+          description: |
+            Some of the Streams already exist in the database. This status is most
+            likely a result of Stream URL uniquness violation. All valid streams are
+            successfully added.
+          schema:
+            $ref: "#/definitions/BulkConflictErr"
         500:
           $ref: "#/responses/ServiceError"
   /streams/{streamId}:
@@ -339,3 +344,16 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/StreamRes'
+
+  BulkConflictErr:
+    type: object
+    description: Stream conflict error.
+    properties:
+      message:
+        type: string
+        description: Error message.
+      conflicts:
+        description: List of conflicted values.
+        type: array
+        items:
+          type: string

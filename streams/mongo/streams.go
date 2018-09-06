@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"monetasa/streams"
+	"strings"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -10,12 +11,30 @@ import (
 const (
 	dbName     = "monetasa-streams"
 	collection = "streams"
+	unknown    = "unknown conflict"
+	errMsg     = "Some of the URLs you've provided already exist in the database."
+	msgMark    = "\""
 )
 
 var _ streams.StreamRepository = (*streamRepository)(nil)
 
 type streamRepository struct {
 	db *mgo.Session
+}
+
+// This obscure way of parsing error is forced by the
+// way `mgo` handles Bulk error.
+func parseError(err error) string {
+	e := err.Error()
+	start := strings.Index(e, msgMark)
+	if start != -1 && start < len(e)-1 {
+		e = e[start+1:]
+		if end := strings.Index(e, msgMark); end != -1 {
+			return e[:end]
+		}
+	}
+
+	return unknown
 }
 
 // New instantiates a Mongo implementation of streams
@@ -30,6 +49,11 @@ func New(db *mgo.Session) streams.StreamRepository {
 		mgo.Index{
 			Name: "locations",
 			Key:  []string{"$2d:location.coordinates"},
+		},
+		mgo.Index{
+			Name:   "urls",
+			Unique: true,
+			Key:    []string{"url"},
 		},
 		mgo.Index{
 			Name: "names",
@@ -77,6 +101,7 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 	defer s.Close()
 	c := s.DB(dbName).C(collection)
 	bulk := c.Bulk()
+	bulk.Unordered()
 
 	arr := make([]interface{}, len(blk))
 	for i := range blk {
@@ -85,6 +110,18 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 
 	bulk.Insert(arr...)
 	if _, err := bulk.Run(); err != nil {
+		if mgo.IsDup(err) {
+			ret := streams.ErrBulkConflict{
+				Message:   errMsg,
+				Conflicts: []string{},
+			}
+			if bulkErr, ok := err.(*mgo.BulkError); ok {
+				for _, errCase := range bulkErr.Cases() {
+					ret.Conflicts = append(ret.Conflicts, parseError(errCase.Err))
+				}
+			}
+			return ret
+		}
 		return err
 	}
 
