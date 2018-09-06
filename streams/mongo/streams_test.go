@@ -23,6 +23,8 @@ const (
 	maxPage    = uint64(100)
 	long       = float64(50)
 	lat        = float64(50)
+	bulkSize   = 10
+	searchSize = 50
 )
 
 var (
@@ -64,7 +66,7 @@ func TestSearch(t *testing.T) {
 	repo := mongo.New(db)
 
 	all := []streams.Stream{}
-	for i := 0; i < 50; i++ {
+	for i := 0; i < searchSize; i++ {
 		s := stream()
 		id, err := repo.Save(s)
 		require.Nil(t, err, "Repo should save streams.")
@@ -304,16 +306,13 @@ func TestSaveAll(t *testing.T) {
 	repo := mongo.New(db)
 
 	validBulk := []streams.Stream{}
-	for i := 0; i < 100; i++ {
-		validBulk = append(validBulk, stream())
-	}
-
 	conflictBulk := []streams.Stream{}
 	conflicts := []string{}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < bulkSize; i++ {
+		s := stream()
+		validBulk = append(validBulk, s)
 		// Add some new Streams and some Streams with
-		// an existing URL, but non-xisting ID.
-		s := validBulk[i]
+		// an existing URL, but non-existent ID.
 		s.ID = bson.NewObjectId()
 		conflicts = append(conflicts, s.URL)
 		conflictBulk = append(conflictBulk, stream(), s)
