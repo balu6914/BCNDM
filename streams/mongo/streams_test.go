@@ -264,6 +264,7 @@ func TestSave(t *testing.T) {
 	db.DB(testDB).DropDatabase()
 	db.ResetIndexCache()
 	db.Refresh()
+
 	repo := mongo.New(db)
 
 	s := stream()
@@ -297,17 +298,53 @@ func TestSave(t *testing.T) {
 
 func TestSaveAll(t *testing.T) {
 	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
-	s := stream()
-	s.ID = ""
+	db.ResetIndexCache()
+	db.Refresh()
 
-	bulk := []streams.Stream{}
+	repo := mongo.New(db)
+
+	validBulk := []streams.Stream{}
 	for i := 0; i < 100; i++ {
-		bulk = append(bulk, s)
+		validBulk = append(validBulk, stream())
 	}
 
-	err := repo.SaveAll(bulk)
-	assert.Nil(t, err, fmt.Sprintf("expected to save all successfully got: %s", err))
+	conflictBulk := []streams.Stream{}
+	conflicts := []string{}
+	for i := 0; i < 10; i++ {
+		// Add some new Streams and some Streams with
+		// an existing URL, but non-xisting ID.
+		s := validBulk[i]
+		s.ID = bson.NewObjectId()
+		conflicts = append(conflicts, s.URL)
+		conflictBulk = append(conflictBulk, stream(), s)
+	}
+
+	cases := []struct {
+		desc    string
+		streams []streams.Stream
+		err     error
+	}{
+		{
+			desc:    "save a valid bulk",
+			streams: validBulk,
+			err:     nil,
+		},
+		{
+			desc:    "save bulk with non-unique URLs",
+			streams: conflictBulk,
+			err: streams.ErrBulkConflict{
+				// Since we don't care about message, this is exact
+				// copy of the same message from the repo.
+				Message:   "Some of the URLs already exist in the database.",
+				Conflicts: conflicts,
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		err := repo.SaveAll(tc.streams)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected error %s got %s", tc.desc, tc.err, err))
+	}
 }
 
 func TestUpdate(t *testing.T) {
