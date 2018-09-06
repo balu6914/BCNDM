@@ -49,6 +49,22 @@ func (res addBulkStreamsRes) empty() bool {
 	return true
 }
 
+type conflictBulkStreamsRes struct {
+	streams.ErrBulkConflict
+}
+
+func (res conflictBulkStreamsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res conflictBulkStreamsRes) code() int {
+	return http.StatusConflict
+}
+
+func (res conflictBulkStreamsRes) empty() bool {
+	return false
+}
+
 type searchStreamsRes struct {
 	streams.Page
 }

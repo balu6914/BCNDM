@@ -5,7 +5,7 @@ import "errors"
 var (
 	// ErrConflict indicates usage of the existing stream id
 	// for the new stream.
-	ErrConflict = errors.New("stream id already taken")
+	ErrConflict = errors.New("stream id or url already taken")
 
 	// ErrUnauthorizedAccess indicates missing or invalid
 	// credentials provided when accessing a protected resource.
@@ -20,6 +20,18 @@ var (
 	// ErrMalformedData indicates a malformed request.
 	ErrMalformedData = errors.New("malformed data")
 )
+
+// ErrBulkConflict represents an error when saving bulk
+// of Streams. It's different from other errors because
+// it contains data about conflicted fields values.
+type ErrBulkConflict struct {
+	Message   string   `json:"message,omitempty"`
+	Conflicts []string `json:"conflicts,omitempty"`
+}
+
+func (e ErrBulkConflict) Error() string {
+	return e.Message
+}
 
 var _ Service = (*streamService)(nil)
 
