@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { Chart } from 'chart.js';
 import { WalletBalanceStatisticPipe } from '../../../common/pipes/balance.income.pipe';
 import * as moment from 'moment';
@@ -7,38 +7,45 @@ import * as moment from 'moment';
   templateUrl: './statistic.graph.component.html',
   styleUrls: ['./statistic.graph.component.scss']
 })
-export class StatisticGraphComponent {
+export class StatisticGraphComponent implements OnInit, OnChanges {
   income: any[] = [];
-  balance: any[] = [];
-  @Input() dataIncome: number[];
-  @Input() dataBalance: number[];
+  outcome: any[] = [];
+  public chart: Chart;
+  @Input() dataOutcome: any[];
+  @Input() dataIncome: any[];
 
   constructor(
     private walletBalanceStatisticPipe: WalletBalanceStatisticPipe,
   ) { }
 
-  ngOnInit() {
-    this.income = this.walletBalanceStatisticPipe.transform(this.dataIncome);
-    this.createMyChart();
-
+  ngOnChanges() {
+    if (this.chart) {
+      this.parseInputs();
+      this.chart.destroy();
+      this.createChart();
+    }
   }
 
-  createMyChart() {
+  ngOnInit() {
+    this.parseInputs();
+    this.createChart();
+  }
+
+  createChart() {
     let chartData = {
       type: "line",
       data: {
         datasets: [{
-          type: "bar",
-          label: "Income",
-          data: this.income,
-          backgroundColor: "rgba(6, 210, 216, 1)",
+          label: "Outcome",
+          data: this.outcome,
+          backgroundColor: "rgba(6, 210, 216, .1)",
           borderColor: "rgba(6, 210, 216, 1)",
           borderWidth: 1,
           barThickness: 1
         },
         {
-          label: "Wallet balance",
-          data: this.balance,
+          label: "Income",
+          data: this.income,
           backgroundColor: "rgba(0, 125, 255, .1)",
           borderColor: "#007DFF",
           borderWidth: 4,
@@ -93,7 +100,7 @@ export class StatisticGraphComponent {
             display: true,
             afterTickToLabelConversion: function(q) {
               for (var tick in q.ticks) {
-                let newLabel = q.ticks[tick] + " TOK ";
+                let newLabel = q.ticks[tick] + " TAS ";
                 q.ticks[tick] = newLabel;
               }
             },
@@ -106,14 +113,22 @@ export class StatisticGraphComponent {
             ticks: {
               fontColor: "rgba(158,175,200, 1)",
               fontSize: 11,
-              stepSize: 2500
+              stepSize: this.calculteStepSize()
             }
           }]
         }
       }
     };
-    let c: any = document.getElementById("myChart");
-    let ctx = c.getContext("2d");
-    let chart = new Chart(ctx, chartData);
+    this.chart = new Chart("statisticChart", chartData);
+  }
+  // Method parse inputed subscriptions array to chart.js data friendly objects array
+  parseInputs() {
+    this.outcome = this.walletBalanceStatisticPipe.transform(this.dataOutcome);
+    this.income = this.walletBalanceStatisticPipe.transform(this.dataIncome);
+  }
+  // Method takes largest ammount and do the math to build a step size
+  calculteStepSize() {
+    const d = this.income.concat(this.outcome);
+    return Math.max(...d.map(o => o.y)) / 5
   }
 }

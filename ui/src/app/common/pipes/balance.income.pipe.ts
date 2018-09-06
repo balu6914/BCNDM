@@ -8,11 +8,10 @@ export class WalletBalanceStatisticPipe implements PipeTransform {
   constructor(private tasPipe: TasPipe) {}
   transform(subscriptions: any[]): any[] {
     const data: any[] = [];
-    subscriptions.forEach((s: any) => {
-      const a = this.tasPipe.transform(s.stream_price)
+    subscriptions.forEach((s: any, index) => {
         data.push({
-          x:  moment(s.start_date).toDate(),
-          y: s.stream_price,
+          x: moment(s.start_date).toDate(),
+          y: parseFloat(this.tasPipe.transform(s.stream_price)) * s.hours,
         });
     });
     return data;

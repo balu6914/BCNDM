@@ -15,6 +15,8 @@ import { StreamSection, StreamsType } from './section-streams/section.streams';
 export class DashboardMainComponent implements OnInit {
   user: any;
   streams = [];
+  sIncome: any[] = [];
+  sOutcome: any[] = [];
   map: any;
   pageData: Page<Subscription>;
   streamTypes: StreamsType;
@@ -49,6 +51,7 @@ fetchStreams(page: Page<Subscription>) {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
         (page: Page<Subscription>) => {
           this.pageData = page;
+          this.sOutcome = this.pageData.content;
           this.fetchStreams(page);
         },
         err => console.log(err)
@@ -57,6 +60,7 @@ fetchStreams(page: Page<Subscription>) {
       this.subscriptionService.owned(this.page, this.limit).subscribe(
         (page: Page<Subscription>) => {
           this.pageData = page;
+          this.sIncome = this.pageData.content;
           this.fetchStreams(page);
         },
         err => console.log(err)
