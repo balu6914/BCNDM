@@ -66,7 +66,7 @@ export class MapComponent {
     // Get markers bounds and set the new map view with flyToBounds effect
     const markers = this.layerGroup.getLayers();
 
-    if (markers.length > 0) {
+    if (markers && markers.length) {
       const featureGroup = new L.FeatureGroup(markers);
       const bounds = featureGroup.getBounds();
       const options = {
