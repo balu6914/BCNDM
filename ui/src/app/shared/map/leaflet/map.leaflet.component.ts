@@ -34,7 +34,6 @@ export class MapComponent {
   map: L.Map;
   layerGroup = new L.LayerGroup();
   markers = [];
-  activeMarkers = [];
 
   @Input() streamList: any;
   constructor(
@@ -66,13 +65,16 @@ export class MapComponent {
   focusMap() {
     // Get markers bounds and set the new map view with flyToBounds effect
     const markers = this.layerGroup.getLayers();
-    const featureGroup = new L.FeatureGroup(markers);
-    const bounds = featureGroup.getBounds();
-    const options = {
-      maxZoom: 8
-    };
 
-    this.map.flyToBounds(bounds, options);
+    if (markers.length > 0) {
+      const featureGroup = new L.FeatureGroup(markers);
+      const bounds = featureGroup.getBounds();
+      const options = {
+        maxZoom: 8
+      };
+
+      this.map.flyToBounds(bounds, options);
+    }
   }
 
   addMarkers() {
@@ -81,6 +83,7 @@ export class MapComponent {
       this.layerGroup = new L.LayerGroup();
       this.map.addLayer(this.layerGroup);
       this.markers = [];
+
       this.streamList.forEach( stream => {
         this.addMarker(stream);
       });
@@ -142,5 +145,8 @@ export class MapComponent {
         this.markers.splice(i,1);
       }
     });
+
+    // Fit map bounds
+    this.focusMap();
   }
 }
