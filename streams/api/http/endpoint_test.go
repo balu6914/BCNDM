@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"mime/multipart"
 	"monetasa/streams"
 	httpapi "monetasa/streams/api/http"
@@ -20,13 +21,29 @@ import (
 )
 
 const (
-	validFilePath   = "../../../assets/test/validBulk.csv"
-	invalidFilePath = "../../../assets/test/invalidBulk.csv"
+	validFilePath    = "../../../assets/test/validBulk.csv"
+	invalidFilePath  = "../../../assets/test/invalidBulk.csv"
+	conflictFilePath = "../../../assets/test/conflictBulk.csv"
+	urlLen           = 20
 )
 
 var (
-	validKey = bson.NewObjectId().Hex()
-	stream   = streams.Stream{
+	validKey    = bson.NewObjectId().Hex()
+	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	counter     = rand.Intn(100)
+)
+
+func randomString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func genStream() streams.Stream {
+	counter++
+	return streams.Stream{
 		ID:          bson.NewObjectId(),
 		Name:        "name",
 		Type:        "type",
@@ -41,14 +58,14 @@ var (
 			"temperature": "5.20"
 		}`,
 		Price: 123,
-		URL:   "https://myUrl/myStream.com",
+		URL:   fmt.Sprintf("https://myStream%d.com", counter),
 		Owner: validKey,
 		Location: streams.Location{
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
 	}
-)
+}
 
 type testRequest struct {
 	client      *http.Client
@@ -130,8 +147,11 @@ func TestAddStream(t *testing.T) {
 	svc := newService()
 	ts := newServer(svc)
 	defer ts.Close()
+
+	stream := genStream()
 	valid := toJSON(stream)
-	s := stream
+
+	s := genStream()
 	s.Name = ""
 	invalid := toJSON(s)
 
@@ -186,6 +206,7 @@ func TestAddBulkStreams(t *testing.T) {
 	defer ts.Close()
 	valid, ct := sendFile(validFilePath, ts.URL)
 	invalid, ct1 := sendFile(invalidFilePath, ts.URL)
+	conflict, ct2 := sendFile(conflictFilePath, ts.URL)
 
 	cases := []struct {
 		desc        string
@@ -222,6 +243,13 @@ func TestAddBulkStreams(t *testing.T) {
 			auth:        validKey,
 			status:      http.StatusBadRequest,
 		},
+		{
+			desc:        "add a bulk of streams with conflicts",
+			req:         conflict,
+			contentType: ct2,
+			auth:        validKey,
+			status:      http.StatusConflict,
+		},
 	}
 	for _, tc := range cases {
 		req := testRequest{
@@ -245,8 +273,7 @@ func TestSearchStreams(t *testing.T) {
 
 	total := uint64(200)
 	for i := uint64(0); i < total; i++ {
-		stream.ID = bson.NewObjectId()
-		svc.AddStream(stream)
+		svc.AddStream(genStream())
 	}
 
 	// Specify two special Streams to match different
@@ -254,12 +281,12 @@ func TestSearchStreams(t *testing.T) {
 	price1 := uint64(40)
 	price2 := uint64(50)
 
-	s := stream
+	s := genStream()
 	s.ID = bson.NewObjectId()
 	s.Price = price1
 	svc.AddStream(s)
 
-	s = stream
+	s = genStream()
 	s.ID = bson.NewObjectId()
 	s.Price = price2
 	s.Owner = bson.NewObjectId().Hex()
@@ -460,10 +487,11 @@ func TestUpdateStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
+	stream := genStream()
 	svc.AddStream(stream)
 	valid := toJSON(stream)
 	// Create an invalid stream.
-	s := stream
+	s := genStream()
 	s.Name = ""
 	invalid := toJSON(s)
 	// Create stream that does not exist in database.
@@ -548,6 +576,7 @@ func TestViewStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
+	stream := genStream()
 	svc.AddStream(stream)
 
 	cases := []struct {
@@ -593,6 +622,7 @@ func TestRemoveStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
+	stream := genStream()
 	svc.AddStream(stream)
 
 	cases := []struct {

@@ -37,7 +37,12 @@ func addBulkStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 
 		if err := svc.AddBulkStreams(req.Streams); err != nil {
-			return nil, err
+			switch err.(type) {
+			case streams.ErrBulkConflict:
+				return conflictBulkStreamsRes{err.(streams.ErrBulkConflict)}, nil
+			default:
+				return nil, err
+			}
 		}
 
 		return addBulkStreamsRes{}, nil

@@ -2,6 +2,7 @@ package mongo_test
 
 import (
 	"fmt"
+	"math/rand"
 	log "monetasa/logger"
 	"monetasa/streams"
 	"monetasa/streams/mongo"
@@ -22,12 +23,23 @@ const (
 	maxPage    = uint64(100)
 	long       = float64(50)
 	lat        = float64(50)
+	bulkSize   = 10
+	searchSize = 50
 )
 
 var (
-	db      *mgo.Session
-	testLog = log.New(os.Stdout)
+	db          *mgo.Session
+	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	testLog     = log.New(os.Stdout)
 )
+
+func randomString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
 
 func stream() streams.Stream {
 	return streams.Stream{
@@ -36,7 +48,7 @@ func stream() streams.Stream {
 		Name:        "stream",
 		Type:        "stream type",
 		Description: "stream description",
-		URL:         "http://www.mystream.com",
+		URL:         fmt.Sprintf("http://www.%s.com", randomString(10)),
 		Price:       123,
 		Location: streams.Location{
 			Type:        "Point",
@@ -54,12 +66,12 @@ func TestSearch(t *testing.T) {
 	repo := mongo.New(db)
 
 	all := []streams.Stream{}
-	for i := 0; i < 50; i++ {
+	for i := 0; i < searchSize; i++ {
 		s := stream()
 		id, err := repo.Save(s)
+		require.Nil(t, err, "Repo should save streams.")
 		s.ID = bson.ObjectIdHex(id)
 		all = append(all, s)
-		require.Nil(t, err, "Repo should save streams.")
 	}
 	// Specify two special Streams to match different
 	// types of query and different result sets.
@@ -252,26 +264,86 @@ func TestSearch(t *testing.T) {
 
 func TestSave(t *testing.T) {
 	db.DB(testDB).DropDatabase()
+	db.ResetIndexCache()
+	db.Refresh()
+
 	repo := mongo.New(db)
 
-	id, err := repo.Save(stream())
-	assert.Nil(t, err, fmt.Sprintf("expected to save successfully got: %s", err))
-	assert.True(t, bson.IsObjectIdHex(id), fmt.Sprintf("create new stream expected to return a valid ID"))
+	s := stream()
+	s1 := stream()
+	s1.URL = s.URL
+	cases := []struct {
+		desc   string
+		stream streams.Stream
+		err    error
+	}{
+		{
+			desc:   "save stream successfully",
+			stream: s,
+			err:    nil,
+		},
+		{
+			desc:   "save duplicate stream URL",
+			stream: s1,
+			err:    streams.ErrConflict,
+		},
+	}
+
+	for _, tc := range cases {
+		id, err := repo.Save(tc.stream)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s expected: %s", tc.desc, err))
+		if err == nil {
+			assert.True(t, bson.IsObjectIdHex(id), "stream id is expected to be valid")
+		}
+	}
 }
 
 func TestSaveAll(t *testing.T) {
 	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
-	s := stream()
-	s.ID = ""
+	db.ResetIndexCache()
+	db.Refresh()
 
-	bulk := []streams.Stream{}
-	for i := 0; i < 100; i++ {
-		bulk = append(bulk, s)
+	repo := mongo.New(db)
+
+	validBulk := []streams.Stream{}
+	conflictBulk := []streams.Stream{}
+	conflicts := []string{}
+	for i := 0; i < bulkSize; i++ {
+		s := stream()
+		validBulk = append(validBulk, s)
+		// Add some new Streams and some Streams with
+		// an existing URL, but non-existent ID.
+		s.ID = bson.NewObjectId()
+		conflicts = append(conflicts, s.URL)
+		conflictBulk = append(conflictBulk, stream(), s)
 	}
 
-	err := repo.SaveAll(bulk)
-	assert.Nil(t, err, fmt.Sprintf("expected to save all successfully got: %s", err))
+	cases := []struct {
+		desc    string
+		streams []streams.Stream
+		err     error
+	}{
+		{
+			desc:    "save a valid bulk",
+			streams: validBulk,
+			err:     nil,
+		},
+		{
+			desc:    "save bulk with non-unique URLs",
+			streams: conflictBulk,
+			err: streams.ErrBulkConflict{
+				// Since we don't care about message, this is exact
+				// copy of the same message from the repo.
+				Message:   "Some of the URLs already exist in the database.",
+				Conflicts: conflicts,
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		err := repo.SaveAll(tc.streams)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected error %s got %s", tc.desc, tc.err, err))
+	}
 }
 
 func TestUpdate(t *testing.T) {
