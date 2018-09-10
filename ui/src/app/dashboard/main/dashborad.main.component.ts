@@ -15,6 +15,8 @@ import { StreamSection, StreamsType } from './section-streams/section.streams';
 export class DashboardMainComponent implements OnInit {
   user: any;
   streams = [];
+  sIncome: any[] = [];
+  sOutcome: any[] = [];
   map: any;
   pageData: Page<Subscription>;
   streamTypes: StreamsType;
@@ -29,15 +31,11 @@ export class DashboardMainComponent implements OnInit {
     private tasPipe: TasPipe,
   ) { }
 
-  fetchStreams(page: Page<Subscription>) {
+fetchStreams(page: Page<Subscription>) {
     this.streams = [];
     page.content.forEach(sub => {
       this.streamService.getStream(sub.stream_id).subscribe(
         (stream: any) => {
-          // Create name and price field in the Subscription
-          sub['stream_name'] = stream['name'];
-          const mitasPrice = this.tasPipe.transform(stream['price']);
-          sub['stream_price'] = mitasPrice;
           // Update map markers.
           this.streams = this.streams.concat(stream);
         },
@@ -46,18 +44,25 @@ export class DashboardMainComponent implements OnInit {
         }
       );
     });
-    this.pageData = page;
   }
 
   fetchSubscriptions() {
     if (this.activeStreamsSection.name === StreamsType.Bought) {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.fetchStreams(page),
+        (page: Page<Subscription>) => {
+          this.pageData = page;
+          this.sOutcome = this.pageData.content;
+          this.fetchStreams(page);
+        },
         err => console.log(err)
       );
     } else {
       this.subscriptionService.owned(this.page, this.limit).subscribe(
-        (page: Page<Subscription>) => this.fetchStreams(page),
+        (page: Page<Subscription>) => {
+          this.pageData = page;
+          this.sIncome = this.pageData.content;
+          this.fetchStreams(page);
+        },
         err => console.log(err)
       );
     }

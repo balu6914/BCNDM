@@ -22,7 +22,8 @@ export class DashboardWalletComponent implements OnInit {
   subscription: any;
   // TODO: Remove this Mock of user balance its tmp hack for balance wallet widget
   mockBalance: any;
-  streams = [];
+  sIncome: any[] = [];
+  sOutcome: any[] = [];
   pageData: Page<Subscription>;
   activeStreamsSection: StreamSection = new StreamSection();
   page = 0;
@@ -38,45 +39,28 @@ export class DashboardWalletComponent implements OnInit {
 
   ) { }
 
-  fetchStreams(page: Page<Subscription>) {
-    page.content.forEach(sub => {
-      this.streamService.getStream(sub.stream_id).subscribe(
-        (stream: any) => {
-          // Create name and price field in the Subscription
-          sub['stream_name'] = stream['name'];
-          const mitasPrice = this.tasPipe.transform(stream['price'] * (+sub.hours));
-          sub['stream_price'] = mitasPrice;
-        },
-        err => {
-          console.log(err);
-        }
-      );
-    });
-    this.pageData = page;
-  }
-
   fetchSubscriptions() {
     if (this.activeStreamsSection.name === StreamsType.Bought) {
       this.subscriptionService.bought(this.page, this.limit).subscribe(
         (page: Page<Subscription>) => {
-          this.fetchStreams(page);
           page.content = page.content.map(sub => {
             sub.type = 'Outcome';
             return sub;
           });
           this.pageData = page;
+          this.sOutcome = this.pageData.content;
         },
         err => console.log(err)
       );
     } else if (this.activeStreamsSection.name === StreamsType.Sold) {
       this.subscriptionService.owned(this.page, this.limit).subscribe(
         (page: Page<Subscription>) => {
-          this.fetchStreams(page);
           page.content.forEach(sub => {
             sub.type = 'Income';
             return sub;
           });
           this.pageData = page;
+          this.sIncome = this.pageData.content;
         },
         err => console.log(err)
       );
@@ -84,8 +68,6 @@ export class DashboardWalletComponent implements OnInit {
       const owned = this.subscriptionService.owned(this.page, this.limit / 2);
       const bought = this.subscriptionService.bought(this.page, this.limit / 2);
       forkJoin([owned, bought]).subscribe(results => {
-        this.fetchStreams(results[0]);
-        this.fetchStreams(results[1]);
         const result = results[0];
         const content = results[0].content.concat(results[1].content);
         content.forEach(sub => {

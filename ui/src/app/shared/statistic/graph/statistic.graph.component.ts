@@ -1,47 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { Chart } from 'chart.js';
-
+import { WalletBalanceStatisticPipe } from '../../../common/pipes/balance.income.pipe';
+import * as moment from 'moment';
 @Component({
   selector: 'dpc-statistic-graph',
   templateUrl: './statistic.graph.component.html',
   styleUrls: ['./statistic.graph.component.scss']
 })
-export class StatisticGraphComponent {
+export class StatisticGraphComponent implements OnInit, OnChanges {
+  income: any[] = [];
+  outcome: any[] = [];
+  public chart: Chart;
+  @Input() dataOutcome: any[];
+  @Input() dataIncome: any[];
 
   constructor(
+    private walletBalanceStatisticPipe: WalletBalanceStatisticPipe,
   ) { }
 
-  ngOnInit() {
-    this.createMyChart();
-
+  ngOnChanges() {
+    if (this.chart) {
+      this.parseInputs();
+      this.chart.destroy();
+      this.createChart();
+    }
   }
 
-  createMyChart() {
+  ngOnInit() {
+    this.parseInputs();
+    this.createChart();
+  }
+
+  createChart() {
     let chartData = {
       type: "line",
       data: {
-        labels: [
-          "Jan 2017",
-          "Apr 2017",
-          "Sep 2017",
-          "Dec 2017",
-          "Mar 2018",
-          "Jul 2018",
-          "Oct 2018",
-          "Feb 2019"
-        ],
         datasets: [{
-          type: "bar",
-          label: "Dataset 1",
-          data: [5, 10, 15, 7, 3, 10, 2, 45, 12, 3, 35, 2, 5],
-          backgroundColor: "rgba(6, 210, 216, 1)",
+          label: "Outcome",
+          data: this.outcome,
+          backgroundColor: "rgba(6, 210, 216, .1)",
           borderColor: "rgba(6, 210, 216, 1)",
           borderWidth: 1,
           barThickness: 1
         },
         {
-          label: "Dataset 2",
-          data: [25, 43, 38, 33, 52, 65, 62, 49],
+          label: "Income",
+          data: this.income,
           backgroundColor: "rgba(0, 125, 255, .1)",
           borderColor: "#007DFF",
           borderWidth: 4,
@@ -65,7 +69,7 @@ export class StatisticGraphComponent {
           caretSize: 0,
           callbacks: {
             label: function(tooltipItem, data) {
-              return tooltipItem.yLabel + " TOK";
+              return `${tooltipItem.yLabel} TAS on ${moment(tooltipItem.xLabel).format('MMM, D')}`
             },
             title: function(tooltipItem, data) {
               return;
@@ -76,10 +80,27 @@ export class StatisticGraphComponent {
           display: false
         },
         scales: {
+          xAxes: [{
+            type: 'time',
+            barPercentage: 10,
+            categoryPercentage: 0.1,
+            barThickness: 5,
+            distribution: 'linear',
+            gridLines: {
+              lineWidth: 0,
+              color: "rgba(255,255,255,0)",
+              zeroLineColor: "rgba(255,255,255,0)"
+            },
+            ticks: {
+              fontColor: "rgba(158,175,200, 1)",
+              fontSize: 11
+            }
+          }],
           yAxes: [{
+            display: true,
             afterTickToLabelConversion: function(q) {
               for (var tick in q.ticks) {
-                let newLabel = q.ticks[tick] + " TOK ";
+                let newLabel = q.ticks[tick] + " TAS ";
                 q.ticks[tick] = newLabel;
               }
             },
@@ -92,31 +113,22 @@ export class StatisticGraphComponent {
             ticks: {
               fontColor: "rgba(158,175,200, 1)",
               fontSize: 11,
-              stepSize: 25
-            }
-          }],
-          xAxes: [{
-            barPercentage: 10,
-            categoryPercentage: 0.1,
-            barThickness: 5,
-            gridLines: {
-              lineWidth: 0,
-              color: "rgba(255,255,255,0)",
-              zeroLineColor: "rgba(255,255,255,0)"
-            },
-            ticks: {
-              fontColor: "rgba(158,175,200, 1)",
-              fontSize: 11
+              stepSize: this.calculteStepSize()
             }
           }]
         }
       }
     };
-
-    let c: any = document.getElementById("myChart");
-    let ctx = c.getContext("2d");
-    let chart = new Chart(ctx, chartData);
+    this.chart = new Chart("statisticChart", chartData);
   }
-
-
+  // Method parse inputed subscriptions array to chart.js data friendly objects array
+  parseInputs() {
+    this.outcome = this.walletBalanceStatisticPipe.transform(this.dataOutcome);
+    this.income = this.walletBalanceStatisticPipe.transform(this.dataIncome);
+  }
+  // Method takes largest ammount and do the math to build a step size
+  calculteStepSize() {
+    const d = this.income.concat(this.outcome);
+    return Math.max(...d.map(o => o.y)) / 5
+  }
 }
