@@ -1,36 +1,33 @@
-<div class="container-fluid">
-  <div class="page-wrapper animated fadeIn">
-    <div class="page-header">
-      <div class="page-header-xs--map">
-        <h1 class="page-title">
+<div class="animated fadeIn">
+  <div class="page-header">
+    <div class="page-header-xs--map">
+      <h1 class="page-title">
           Buy stream
         </h1>
-        <div class="page-header-xs--right">
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
-            <label class="form-check-label" for="showMap">Show Map</label>
-          </div>
+      <div class="page-header-xs--right">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
+          <label class="form-check-label" for="showMap">Show Map</label>
         </div>
       </div>
     </div>
-    <div class="row row-grow">
-      <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block">
-        <div class="box box-grow">
-          <div class="box__header">
-            <p class="box__title">
-              Map
-            </p>
-          </div>
-          <dpc-map-leaflet [streamList]="table.page.content"></dpc-map-leaflet>
+  </div>
+  <div class="row row-grow">
+    <div class="col-lg-6 order-2 order-sm-1 d-none d-sm-block">
+      <div class="box box-grow">
+        <div class="box__header">
+          <p class="box__title">
+            Map
+          </p>
         </div>
+        <dpc-map-leaflet [streamList]="table.page.content"></dpc-map-leaflet>
       </div>
-      <div class="col-lg-6 order-1 order-sm-2">
-        <dpc-table [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
-      </div>
+    </div>
+    <div class="col-lg-6 order-1 order-sm-2">
+      <dpc-table [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
     </div>
   </div>
 </div>
 <!-- Sidebar filters -->
-<dpc-sidebar-filters
-  (filtersUpdate)="onFiltersChange($event)">
+<dpc-sidebar-filters (filtersUpdate)="onFiltersChange($event)">
 </dpc-sidebar-filters>
