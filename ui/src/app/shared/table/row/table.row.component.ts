@@ -54,7 +54,7 @@ export class TableRowComponent implements OnInit {
         name:        row.name,
         type:        row.type,
         description: row.description,
-        url:         'fakeurl.com', // TODO: use stream URL
+        url:         row.url,
         price:       this.tasPipe.transform(row.price),
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
