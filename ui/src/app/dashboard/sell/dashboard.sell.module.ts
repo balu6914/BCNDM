@@ -35,6 +35,6 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
     DashboardSellAddComponent,
     DashboardSellEditComponent,
     DashboardSellDeleteComponent,
-  ]
+  ],
 })
 export class DashboardSellModule { }
