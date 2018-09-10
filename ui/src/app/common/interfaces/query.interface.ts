@@ -15,7 +15,7 @@ export class Query {
   ) {
     // Set default values.
     this.page = 0;
-    this.limit = 20;
+    this.limit = 50;
     this._coords = new Map<string, number>();
   }
 
