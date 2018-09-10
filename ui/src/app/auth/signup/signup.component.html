@@ -1,67 +1,65 @@
 <div class="wrapper animated fadeIn">
-
   <div class="logo"></div>
-
   <div class="box">
     <p class="box__title">
       Sign Up
       <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
     </p>
-    <form [formGroup]="form" class="needs-validation">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group row">
-        <label for="staticEmail" class="col-sm-3 col-form-label">Email*</label>
+        <label class="col-sm-3 col-form-label">Email*</label>
         <div class="col-sm-9">
-          <input type="email"
-            formControlName="email"
-            pattern="^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$"
-            error-msg="Please provide a valid email!"
-            (focus)="errorMsg=null"
-            class="form-control"
-            id="staticEmail"
-            placeholder="Enter email"
-            required>
+          <input type="email" formControlName="email" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.email.errors }" />
+          <div *ngIf="submitted && form.controls.email.errors" class="invalid-feedback">
+            Email must be a valid email address.
+          </div>
         </div>
       </div>
       <div class="form-group row">
-        <label for="inputPassword" class="col-sm-3 col-form-label">Password*</label>
+        <label class="col-sm-3 col-form-label">Password*</label>
         <div class="col-sm-9">
-          <input type="password"
-            formControlName="password"
-            disableNativeValidityChecking
-            error-msg="'Please provide a correct password (min length is 5 chars)!'"
-            class="form-control"
-            id="inputPassword">
+          <input type="password" formControlName="password" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.password.errors }"/>
+          <div *ngIf="submitted && form.controls.password.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.password.errors.required">Password must be provided.</div>
+            <div *ngIf="form.controls.password.errors.minlength || form.controls.password.errors.maxlength">
+              Password must be 8-16 characters.
+            </div>
+          </div>
         </div>
       </div>
       <div class="form-group row">
-        <label for="inputRepeatPassword" class="col-sm-3 col-form-label col-form-label-2-rows">Repeat Password*</label>
+        <label class="col-sm-3 col-form-label col-form-label-2-rows">Repeat Password*</label>
         <div class="col-sm-9">
-          <input type="password"
-            formControlName="passwordConfirm"
-            class="form-control"
-            id="inputRepeatPassword">
-            <span *ngIf="form.get('passwordConfirm').invalid" class="error-message text-center"> Password mismatch </span>
+          <input type="password" formControlName="confirm" class="form-control"
+                 [ngClass]="{ 'is-invalid': form.controls.confirm.errors }" />
+          <div *ngIf="form.controls.confirm.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.confirm.errors.invalid">Password mismatch.</div>
+          </div>
         </div>
       </div>
       <div class="form-group row">
-        <label for="firstName" class="col-sm-3 col-form-label">First name</label>
+        <label class="col-sm-3 col-form-label">First name</label>
         <div class="col-sm-9">
-          <input type="text"
-            formControlName="first_name"
-            class="form-control"
-            id="firstName">
+          <input type="text" formControlName="name" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.name.errors }"/>
+          <div *ngIf="submitted && form.controls.name.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.name.errors.maxlength">The maximum length is 16 characters.</div>
+          </div>
         </div>
       </div>
       <div class="form-group row">
-        <label for="firstName" class="col-sm-3 col-form-label">Second name</label>
+        <label class="col-sm-3 col-form-label">Second name</label>
         <div class="col-sm-9">
-          <input type="text"
-            formControlName="last_name"
-            class="form-control"
-            id="secondName">
+          <input type="text" formControlName="surname" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.surname.errors }"/>
+          <div *ngIf="submitted && form.controls.surname.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.surname.errors.maxlength">The maximum length is 16 characters.</div>
+          </div>
         </div>
       </div>
-      <button (click)="onSubmit(form.value, form.valid)" [disabled]="!form.valid" class="btn btn-block btn-primary">Sign Up</button>
+      <button class="btn btn-block btn-primary">Sign Up</button>
     </form>
     <p class="box__action">
       Don you have an account? <a routerLink="/login" class="box__action-link">Login</a>

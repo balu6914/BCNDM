@@ -8,8 +8,6 @@ import { User } from '../../common/interfaces/user.interface';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 
-const emailValidator = Validators.pattern('^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$');
-
 @Component({
   selector: 'signup-form',
   templateUrl: './signup.component.html',
@@ -17,67 +15,72 @@ const emailValidator = Validators.pattern('^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5
   providers: [
   ],
 })
-
 export class SignupComponent {
-    public form: FormGroup;
-    public errorMsg: String;
-    @Output()
-    userCreated: EventEmitter<any> = new EventEmitter();
-    constructor(
-        private fb: FormBuilder,
-        private router: Router,
-        private UserService: UserService,
-        private AuthService: AuthService
+  public form: FormGroup;
+  public errorMsg: String;
+  submitted = false;
 
+  @Output() userCreated: EventEmitter<any> = new EventEmitter();
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private UserService: UserService,
+    private AuthService: AuthService
     ) {
-
     }
 
     ngOnInit() {
-        this.errorMsg = null;
-        this.form = this.fb.group({
-                email:            ['', emailValidator],
-                password:         ['', [Validators.required, Validators.minLength(5)]],
-                passwordConfirm:  [''],
-                first_name:       ['', [Validators.required, Validators.minLength(2)]],
-                last_name:        ['', [Validators.required, Validators.minLength(2)]]
-        },
-        {
-                validator: this.passwordMatchValidator
-        });
+      this.errorMsg = null;
+      this.form = this.fb.group({
+        email:    ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
+        confirm:  [''],
+        name:     ['', [Validators.maxLength(16)]],
+        surname:  ['', [Validators.maxLength(16)]]
+      },
+      {
+        validator: this.passwordMatchValidator
+      });
     }
 
     passwordMatchValidator(fg: FormGroup) {
       // Compare passwords only if minLength is valid
-      if (fg.get('passwordConfirm').value.length >= 5) {
-        if (fg.get('password').value === fg.get('passwordConfirm').value) {
+      if (fg.get('confirm').value.length > 0) {
+        if (fg.get('password').value == fg.get('confirm').value) {
           return null;
         }
-        fg.controls.passwordConfirm.setErrors({'invalid': true});
+        fg.controls.confirm.setErrors({'invalid': true});
       }
-      return {'mismatch': true };
+
+      // Set form confirm password missmatch
+      return {'missmatch': true };
     }
 
-    onSubmit(model: User, isValid: boolean) {
-        this.errorMsg = null;
-        if(isValid) {
-            this.UserService.addUser(model).subscribe(
-                response => {
-                    this.AuthService.login(model.email, model.password)
-                      .subscribe(
-                        (token: any) => this.router.navigate(['/dashboard']),
-                        err => { console.log("Response error: ", err) }
-                      );
-                },
-                err => {
-                  // Handle tmp case when user already exists and we don't have error msg on API side yet.
-                  if (err.status === 409) {
-                    this.errorMsg = "User with this email already exists."
-                  } else {
-                    this.errorMsg = err;
-                  }
-                });
-        }
-    }
+  onSubmit() {
+    this.submitted = true;
 
+    if (this.form.valid) {
+      const user = {
+        email: this.form.value.email,
+        password: this.form.value.password,
+        name: `${this.form.value.name} ${this.form.value.surname}`,
+      }
+      this.UserService.addUser(user).subscribe(
+        response => {
+          this.AuthService.login(user.email, user.password)
+          .subscribe(
+            token => this.router.navigate(['/dashboard']),
+            err => this.errorMsg = err.status
+          );
+        },
+        err => {
+          // Handle tmp case when user already exists and we don't have error msg on API side yet.
+          if (err.status === 409) {
+            this.errorMsg = "User with this email already exists."
+          } else {
+            this.errorMsg = err.status;
+          }
+      });
+    }
+  }
 }

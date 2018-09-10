@@ -45,7 +45,7 @@ export class TableRowDetailsComponent implements OnInit {
         name:        this.stream.name,
         type:        this.stream.type,
         description: this.stream.description,
-        url:         'fakeurl.com', // TODO: use stream URL
+        url:         this.stream.url,
         price:       this.tasPipe.transform(this.stream.price),
         long:        this.stream.location.coordinates[0],
         lat:         this.stream.location.coordinates[1],

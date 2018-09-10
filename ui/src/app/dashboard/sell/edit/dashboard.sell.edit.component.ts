@@ -16,6 +16,7 @@ export class DashboardSellEditComponent implements OnInit {
   form: FormGroup;
   editData: any;
   streamID: any;
+  submitted: boolean = false
 
   @Output() streamEdited: EventEmitter<any> = new EventEmitter();
   constructor(
@@ -25,15 +26,18 @@ export class DashboardSellEditComponent implements OnInit {
     public modalNewStream: BsModalRef,
     public alertService: AlertService,
   ) {
+    const floatValidator = Validators.pattern('[-+]?([0-9]\.[0-9]+|[0-9]+)');
+    const urlValidator = Validators.pattern('(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})');
+
     this.form = this.formBuilder.group({
-      'name': ['', [<any>Validators.required, <any>Validators.minLength(3)]],
-      'type': ['', Validators.required],
-      'description': ['', [<any>Validators.required, <any>Validators.minLength(5)]],
-      'snippet': ['', Validators.required],
-      'url': ['', Validators.required],
-      'price': ['', Validators.required],
-      'lat': ['', Validators.required],
-      'long': ['', Validators.required]
+      'name':        ['', [Validators.required, Validators.maxLength(16)]],
+      'type':        ['', [Validators.required, Validators.maxLength(32)]],
+      'description': ['', [Validators.required, Validators.maxLength(256)]],
+      'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],
+      'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
+      'lat':         ['', [Validators.required, Validators.maxLength(9), floatValidator, Validators.min(-90), Validators.max(90)]],
+      'long':        ['', [Validators.required, Validators.maxLength(9), floatValidator, Validators.min(-180), Validators.max(180)]],
+      'snippet':     ['', [Validators.maxLength(256)]]
     });
   }
 
@@ -42,33 +46,38 @@ export class DashboardSellEditComponent implements OnInit {
   }
 
   onSubmit() {
-    const stream: Stream = {
-      name: this.form.value.name,
-      type: this.form.value.type,
-      description: this.form.value.description,
-      snippet: this.form.value.snippet,
-      url: this.form.value.url,
-      price: this.mitasPipe.transform(this.form.value.price),
-      location: {
-        'type': 'Point',
-        'coordinates': [
-          parseFloat(this.form.value.long),
-          parseFloat(this.form.value.lat)
-        ]
-      }
-    };
+    this.submitted = true;
 
-    // Send addStream request
-    this.streamService.updateStream(this.streamID, stream).subscribe(
-      res => {
-        stream.id = this.streamID;
-        this.streamEdited.emit(stream);
-        this.modalNewStream.hide();
-        this.alertService.success(`Stream successfully updated!`);
-      },
-      err => {
-        this.modalNewStream.hide();
-        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
-      });
+    if (this.form.valid) {
+      const stream: Stream = {
+        name: this.form.value.name,
+        type: this.form.value.type,
+        description: this.form.value.description,
+        snippet: this.form.value.snippet || "",
+        url: this.form.value.url,
+        price: this.mitasPipe.transform(this.form.value.price),
+        location: {
+          'type': 'Point',
+          'coordinates': [
+            parseFloat(this.form.value.long),
+            parseFloat(this.form.value.lat)
+          ]
+        }
+      };
+
+      // Send addStream request
+      this.streamService.updateStream(this.streamID, stream).subscribe(
+        res => {
+          stream.id = this.streamID;
+          this.streamEdited.emit(stream);
+          this.modalNewStream.hide();
+          this.alertService.success(`Stream successfully updated!`);
+        },
+        err => {
+          this.modalNewStream.hide();
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+        }
+      );
+    }
   }
 }
