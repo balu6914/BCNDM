@@ -15,9 +15,10 @@ func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Email:    req.Email,
-			Password: req.Password,
-			Name:     req.Name,
+			Email:        req.Email,
+			ContactEmail: req.Email,
+			Password:     req.Password,
+			Name:         req.Name,
 		}
 		err := svc.Register(user)
 		return createRes{}, err
@@ -52,9 +53,8 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Email:    req.Email,
-			Password: req.Password,
-			Name:     req.Name,
+			ContactEmail: req.ContactEmail,
+			Name:         req.Name,
 		}
 		if err := svc.Update(req.key, user); err != nil {
 			return nil, err
@@ -77,8 +77,9 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		res := viewRes{
-			ID:    user.ID,
-			Email: user.Email,
+			ID:           user.ID,
+			Email:        user.Email,
+			ContactEmail: user.ContactEmail,
 		}
 
 		return res, nil
