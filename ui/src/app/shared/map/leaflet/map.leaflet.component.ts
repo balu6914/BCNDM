@@ -57,13 +57,12 @@ export class MapComponent {
   onMapReady(map: L.Map) {
     this.map = map;
     this.map.addLayer(this.layerGroup);
+  }
 
-    // Set markers on new view
-    const that = this;
-    map.on('moveend',function(e){
-      const bounds = map.getBounds();
-      that.viewChanged.emit(bounds);
-    });
+  // This event is triggered when move or zoom is detected
+  onMapMoveEnd() {
+    const bounds = this.map.getBounds();
+    this.viewChanged.emit(bounds);
   }
 
   ngOnChanges() {
