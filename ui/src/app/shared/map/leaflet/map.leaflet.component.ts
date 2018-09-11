@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, Output, EventEmitter } from "@angular/core";
 
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
@@ -34,8 +34,10 @@ export class MapComponent {
   map: L.Map;
   layerGroup = new L.LayerGroup();
   markers = [];
+  firstPageLoad: boolean = true;
 
   @Input() streamList: any;
+  @Output() viewChanged: EventEmitter<any> = new EventEmitter();
   constructor(
     private tasPipe: TasPipe,
   ) {
@@ -55,7 +57,13 @@ export class MapComponent {
   onMapReady(map: L.Map) {
     this.map = map;
     this.map.addLayer(this.layerGroup);
-    this.addMarkers();
+
+    // Set markers on new view
+    const that = this;
+    map.on('moveend',function(e){
+      const bounds = map.getBounds();
+      that.viewChanged.emit(bounds);
+    });
   }
 
   ngOnChanges() {
@@ -87,6 +95,12 @@ export class MapComponent {
       this.streamList.forEach( stream => {
         this.addMarker(stream);
       });
+
+      if (this.firstPageLoad) {
+        // Fit map bounds
+        this.focusMap();
+        this.firstPageLoad = false;
+      }
     }
   }
 
@@ -125,9 +139,6 @@ export class MapComponent {
 
     // Add stream to markers list
     this.markers.push(stream);
-
-    // Fit map bounds
-    this.focusMap();
   }
 
   // Callback of editEvt from TableComponent

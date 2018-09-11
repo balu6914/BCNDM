@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Query } from '../../../common/interfaces/query.interface';
 import { StreamService } from '../../../common/services/stream.service';
 import { Table, TableType } from '../../../shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-
+import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 
 @Component({
   selector: 'dpc-dashboard-buy',
@@ -15,6 +15,9 @@ export class DashboardBuyComponent implements OnInit {
   user: any;
   table: Table = new Table();
   query = new Query();
+
+  @ViewChild('leafletMap')
+  private map: MapComponent;
 
   constructor(
     private AuthService: AuthService,
@@ -39,6 +42,24 @@ export class DashboardBuyComponent implements OnInit {
       err => {
         console.log(err);
       });
+
+      this.map.viewChanged.subscribe(
+        bounds => {
+          this.query.setPoint('x0', bounds["_southWest" ]["lng"]);
+          this.query.setPoint('y0', bounds["_southWest" ]["lat"]);
+          this.query.setPoint('x1', bounds["_southWest" ]["lng"]);
+          this.query.setPoint('y1', bounds["_northEast" ]["lat"]);
+
+          this.query.setPoint('x2', bounds["_northEast" ]["lng"]);
+          this.query.setPoint('y2', bounds["_northEast" ]["lat"]);
+          this.query.setPoint('x3', bounds["_northEast" ]["lng"]);
+          this.query.setPoint('y3', bounds["_southWest" ]["lat"]);
+          this.fetchStreams();
+        },
+        err => {
+          console.log(err);
+        }
+      );
   }
 
   onPageChange(page: number) {
@@ -60,8 +81,7 @@ export class DashboardBuyComponent implements OnInit {
         this.table = temp;
       },
       err => {
-        console.log(err);
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
       });
   }
 
