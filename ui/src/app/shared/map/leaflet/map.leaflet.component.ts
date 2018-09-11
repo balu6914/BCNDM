@@ -86,9 +86,7 @@ export class MapComponent {
 
   addMarkers() {
     if(this.map) {
-      this.map.removeLayer(this.layerGroup);
-      this.layerGroup = new L.LayerGroup();
-      this.map.addLayer(this.layerGroup);
+      this.layerGroup.clearLayers();
       this.markers = [];
 
       this.streamList.forEach( stream => {
