@@ -16,7 +16,7 @@ export class DashboardBuyComponent implements OnInit {
   table: Table = new Table();
   query = new Query();
 
-  @ViewChild('leafletMap')
+  @ViewChild('map')
   private map: MapComponent;
 
   constructor(
