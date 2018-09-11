@@ -27,7 +27,7 @@ export class DashboardWalletComponent implements OnInit {
   pageData: Page<Subscription>;
   activeStreamsSection: StreamSection = new StreamSection();
   page = 0;
-  limit = 20;
+  limit = 50;
   types = TableType;
 
 
