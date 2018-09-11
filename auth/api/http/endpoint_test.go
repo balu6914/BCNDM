@@ -17,16 +17,18 @@ import (
 )
 
 const (
-	contentType = "application/json"
-	token       = "token"
-	email       = "john.doe@email.com"
-	invalid     = "invalid"
+	contentType   = "application/json"
+	token         = "token"
+	email         = "john.doe@email.com"
+	contact_email = email
+	invalid       = "invalid"
 )
 
 var user = auth.User{
-	ID:       email,
-	Email:    email,
-	Password: "pass",
+	ID:           email,
+	Email:        email,
+	ContactEmail: email,
+	Password:     "pass",
 }
 
 func newService() auth.Service {
@@ -265,12 +267,13 @@ func TestUpdate(t *testing.T) {
 
 	updatedUser := user
 	updatedUser.Password = "new_pass"
+	updatedUser.ContactEmail = "new_email@example.com"
 	data := toJSON(updatedUser)
 
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
-		Email:    invalid,
-		Password: "pass",
+		ContactEmail: invalid,
+		Password:     "pass",
 	})
 
 	cases := []struct {

@@ -55,8 +55,9 @@ func (res updateRes) empty() bool {
 }
 
 type viewRes struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
+	ID           string `json:"id"`
+	Email        string `json:"email"`
+	ContactEmail string `json:email`
 }
 
 func (res viewRes) code() int {
