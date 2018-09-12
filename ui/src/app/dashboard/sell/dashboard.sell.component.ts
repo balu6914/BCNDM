@@ -51,6 +51,24 @@ export class DashboardSellComponent implements OnInit {
     this.table.tableType = TableType.Sell;
     this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
     this.table.hasDetails = true;
+
+    this.map.viewChanged.subscribe(
+      bounds => {
+        this.query.setPoint('x0', bounds["_southWest" ]["lng"]);
+        this.query.setPoint('y0', bounds["_southWest" ]["lat"]);
+        this.query.setPoint('x1', bounds["_southWest" ]["lng"]);
+        this.query.setPoint('y1', bounds["_northEast" ]["lat"]);
+
+        this.query.setPoint('x2', bounds["_northEast" ]["lng"]);
+        this.query.setPoint('y2', bounds["_northEast" ]["lat"]);
+        this.query.setPoint('x3', bounds["_northEast" ]["lng"]);
+        this.query.setPoint('y3', bounds["_southWest" ]["lat"]);
+        this.fetchStreams();
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   // Add Bulk event
