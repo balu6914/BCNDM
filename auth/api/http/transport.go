@@ -99,7 +99,6 @@ func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 
 	req := updateReq{
 		key:          r.Header.Get("Authorization"),
-		Email:        user.Email,
 		ContactEmail: user.ContactEmail,
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,

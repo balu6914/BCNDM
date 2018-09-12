@@ -54,7 +54,6 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Email:        req.Email,
 			Password:     req.Password,
 			ContactEmail: req.ContactEmail,
 			FirstName:    req.FirstName,
@@ -81,10 +80,11 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		res := viewRes{
-			ID:        user.ID,
-			Email:     user.Email,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
+			ID:           user.ID,
+			Email:        user.Email,
+			ContactEmail: user.ContactEmail,
+			FirstName:    user.FirstName,
+			LastName:     user.LastName,
 		}
 
 		return res, nil

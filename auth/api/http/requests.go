@@ -61,7 +61,6 @@ func (req identityReq) validate() error {
 
 type updateReq struct {
 	key          string
-	Email        string `json:"email,omitempty"`
 	Password     string `json:"password,omitempty"`
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
@@ -73,11 +72,7 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	if req.Email == "" || req.ContactEmail == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	if !govalidator.IsEmail(req.Email) || !govalidator.IsEmail(req.ContactEmail) {
+	if !govalidator.IsEmail(req.ContactEmail) {
 		return auth.ErrMalformedEntity
 	}
 
