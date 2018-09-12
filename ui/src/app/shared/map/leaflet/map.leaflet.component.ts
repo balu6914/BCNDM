@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, Output, EventEmitter } from "@angular/core";
 
 import { TasPipe } from "app/common/pipes/converter.pipe";
 
@@ -15,7 +15,11 @@ export class MapComponent {
       L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
     ],
     center: L.latLng({ lat: 48, lng: 2 }),
-    zoom: 5
+    zoom: 5,
+    minZoom: 2,
+    maxBounds: L.latLngBounds(L.latLng(-90, -180),  // southWest
+                              L.latLng(90, 180)),   // northEast
+    maxBoundsViscosity: 1
   };
   drawOptions = {
     position: 'topright',
@@ -34,8 +38,10 @@ export class MapComponent {
   map: L.Map;
   layerGroup = new L.LayerGroup();
   markers = [];
+  firstPageLoad: boolean = true;
 
   @Input() streamList: any;
+  @Output() viewChanged: EventEmitter<any> = new EventEmitter();
   constructor(
     private tasPipe: TasPipe,
   ) {
@@ -55,7 +61,12 @@ export class MapComponent {
   onMapReady(map: L.Map) {
     this.map = map;
     this.map.addLayer(this.layerGroup);
-    this.addMarkers();
+  }
+
+  // This event is triggered when move or zoom is detected
+  onMapMoveEnd() {
+    const bounds = this.map.getBounds();
+    this.viewChanged.emit(bounds);
   }
 
   ngOnChanges() {
@@ -79,14 +90,18 @@ export class MapComponent {
 
   addMarkers() {
     if(this.map) {
-      this.map.removeLayer(this.layerGroup);
-      this.layerGroup = new L.LayerGroup();
-      this.map.addLayer(this.layerGroup);
+      this.layerGroup.clearLayers();
       this.markers = [];
 
       this.streamList.forEach( stream => {
         this.addMarker(stream);
       });
+
+      if (this.firstPageLoad) {
+        // Fit map bounds
+        this.focusMap();
+        this.firstPageLoad = false;
+      }
     }
   }
 
@@ -125,9 +140,6 @@ export class MapComponent {
 
     // Add stream to markers list
     this.markers.push(stream);
-
-    // Fit map bounds
-    this.focusMap();
   }
 
   // Callback of editEvt from TableComponent

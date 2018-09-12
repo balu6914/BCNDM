@@ -13,13 +13,12 @@ export class UnauthorizedInterceptor implements HttpInterceptor {
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const auth = this.inj.get(AuthService);
         return next.handle(req).catch(event =>  {
-            if (event instanceof HttpErrorResponse && event.status == 403) {
+            if (event instanceof HttpErrorResponse && event.status === 403) {
                 console.error("403 Forbiden!")
-                // handle 401 errors
+                // handle 403 errors
                 auth.logout()
-            } else {
-                return Observable.throw(event);
             }
+            return Observable.throw(event);
         });
     }
 }

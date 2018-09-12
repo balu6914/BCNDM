@@ -27,15 +27,16 @@ export class AuthService {
           'Content-Type': 'application/json'
         })
       })
-      .map((res : any) => {
-        let data = res;
+      .map((res: any) => {
+        const data = res;
         this.token = data.token;
         localStorage.setItem('token', this.token);
         this.fetchCurrentUser();
         this.loggedIn.emit(true);
     })
-    .catch((error:any) => Observable.throw(error));
-
+    .catch((error: any) => {
+      return Observable.throw(error);
+    })
   }
   // Logout user, remove token from local storage
   logout() {

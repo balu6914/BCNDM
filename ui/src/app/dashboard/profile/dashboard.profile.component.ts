@@ -14,12 +14,10 @@ export class DashboardProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log("ROOOOOOOOOOOOO")
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
-        console.log("Here is a user, yeeeee", this.user)
       },
       err => {
         console.log(err);
