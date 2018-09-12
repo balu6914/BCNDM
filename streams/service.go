@@ -1,6 +1,17 @@
 package streams
 
-import "errors"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/bigquery"
+	uuid "github.com/satori/go.uuid"
+	"google.golang.org/api/googleapi"
+)
 
 var (
 	// ErrConflict indicates usage of the existing stream id
@@ -68,7 +79,8 @@ type Service interface {
 }
 
 type streamService struct {
-	streams StreamRepository
+	streams  StreamRepository
+	bqClient *bigquery.Client
 }
 
 // NewService instantiates the domain service implementation.
@@ -79,6 +91,53 @@ func NewService(streams StreamRepository) Service {
 }
 
 func (ss streamService) AddStream(stream Stream) (string, error) {
+	if stream.BQ {
+		return ss.addBqStream(stream)
+	}
+	return ss.streams.Save(stream)
+}
+
+func (ss streamService) addBqStream(stream Stream) (string, error) {
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, stream.Project)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	ds := client.Dataset(stream.Dataset)
+	_, err = ds.Metadata(ctx)
+	if err != nil {
+		if e, ok := err.(*googleapi.Error); ok && e.Code == http.StatusNotFound {
+			return "", ErrNotFound
+		}
+		return "", err
+	}
+
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
+	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+	println("ID: ", id)
+
+	// Try to create table to check if query and other data is valid.
+	// In the case of an invalid data, a Stream won't be saved.
+	t := ds.Table(fmt.Sprintf("%s_%s", stream.Table, id))
+	md := bigquery.TableMetadata{
+		Name:           stream.Table,
+		ViewQuery:      q,
+		ExpirationTime: time.Now().Add(10 * time.Second),
+	}
+
+	if err := t.Create(ctx, &md); err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusConflict:
+				return "", ErrConflict
+			case http.StatusBadRequest:
+				return "", ErrMalformedData
+			}
+		}
+		return "", err
+	}
 	return ss.streams.Save(stream)
 }
 
