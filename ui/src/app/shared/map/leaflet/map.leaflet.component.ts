@@ -15,7 +15,11 @@ export class MapComponent {
       L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
     ],
     center: L.latLng({ lat: 48, lng: 2 }),
-    zoom: 5
+    zoom: 5,
+    minZoom: 2,
+    maxBounds: L.latLngBounds(L.latLng(-90, -180),  // southWest
+                              L.latLng(90, 180)),   // northEast
+    maxBoundsViscosity: 1
   };
   drawOptions = {
     position: 'topright',
