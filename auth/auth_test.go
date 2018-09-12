@@ -12,10 +12,11 @@ import (
 const wrong string = "wrong-value"
 
 var user = auth.User{
-	Email:    "user@example.com",
-	Password: "password",
-	ID:       "1",
-	Name:     "user_name",
+	Email:     "user@example.com",
+	Password:  "password",
+	ID:        "1",
+	FirstName: "first",
+	LastName:  "last",
 }
 
 func newService() auth.Service {

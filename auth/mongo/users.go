@@ -122,19 +122,23 @@ func (ur *userRepository) Remove(id string) error {
 }
 
 type mongoUser struct {
-	Email    string        `bson:"email"`
-	Password string        `bson:"password"`
-	ID       bson.ObjectId `bson:"_id,omitempty"`
-	Name     string        `bson:"name,omitempty"`
+	Email        string        `bson:"email,omitempty"`
+	Password     string        `bson:"password,omitempty"`
+	ContactEmail string        `bson:"contact_email,omitempty"`
+	ID           bson.ObjectId `bson:"_id,omitempty"`
+	FirstName    string        `bson:"first_name,omitempty"`
+	LastName     string        `bson:"last_name,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
 	if user.ID == "" {
 		return mongoUser{
-			Email:    user.Email,
-			Password: user.Password,
-			ID:       bson.NewObjectId(),
-			Name:     user.Name,
+			Email:        user.Email,
+			ContactEmail: user.ContactEmail,
+			Password:     user.Password,
+			ID:           bson.NewObjectId(),
+			FirstName:    user.FirstName,
+			LastName:     user.LastName,
 		}, nil
 	}
 
@@ -144,18 +148,22 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 
 	id := bson.ObjectIdHex(user.ID)
 	return mongoUser{
-		Email:    user.Email,
-		Password: user.Password,
-		ID:       id,
-		Name:     user.Name,
+		Email:        user.Email,
+		ContactEmail: user.ContactEmail,
+		Password:     user.Password,
+		ID:           id,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
 	}, nil
 }
 
 func (user mongoUser) toUser() auth.User {
 	return auth.User{
-		Email:    user.Email,
-		Password: user.Password,
-		ID:       user.ID.Hex(),
-		Name:     user.Name,
+		Email:        user.Email,
+		ContactEmail: user.ContactEmail,
+		Password:     user.Password,
+		ID:           user.ID.Hex(),
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
 	}
 }

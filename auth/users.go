@@ -3,11 +3,12 @@ package auth
 // User represents a Monetasa user account. Each user is identified given its
 // email and password.
 type User struct {
-	Email        string `json:"email"`
-	ContactEmail string `json:"contact_email,omitempty"`
-	Password     string `json:"password"`
-	ID           string `json:"id,omitempty"`
-	Name         string `json:"name,omitempty"`
+	Email        string
+	ContactEmail string
+	Password     string
+	ID           string
+	FirstName    string
+	LastName     string
 }
 
 // UserRepository specifies an account persistence API.

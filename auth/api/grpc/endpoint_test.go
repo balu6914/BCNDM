@@ -24,7 +24,8 @@ var user = auth.User{
 	ID:       email,
 	Email:    email,
 	Password: "pass",
-	Name:     "John Doe",
+	FirstName:     "John",
+	LastName:     "Doe",
 }
 
 func TestIdentify(t *testing.T) {

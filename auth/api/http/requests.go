@@ -11,9 +11,11 @@ type apiReq interface {
 }
 
 type registerReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name,omitempty"`
+	Email        string `json:"email"`
+	ContactEmail string `json:"contact_email"`
+	Password     string `json:"password"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
 }
 
 func (req registerReq) validate() error {
@@ -59,9 +61,11 @@ func (req identityReq) validate() error {
 
 type updateReq struct {
 	key          string
-	ContactEmail string `json:"contact_email"`
-	Password     string `json:"password"`
-	Name         string `json:"name"`
+	Email        string `json:"email,omitempty"`
+	Password     string `json:password:omitempty`
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
 }
 
 func (req updateReq) validate() error {
@@ -69,12 +73,16 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	if req.ContactEmail == "" || req.Password == "" {
-		return auth.ErrMalformedEntity
+	if req.Email != "" {
+		if !govalidator.IsEmail(req.Email) {
+			return auth.ErrMalformedEntity
+		}
 	}
 
-	if !govalidator.IsEmail(req.ContactEmail) {
-		return auth.ErrMalformedEntity
+	if req.ContactEmail != "" {
+		if !govalidator.IsEmail(req.ContactEmail) {
+			return auth.ErrMalformedEntity
+		}
 	}
 
 	return nil

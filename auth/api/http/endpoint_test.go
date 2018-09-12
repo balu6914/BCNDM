@@ -20,15 +20,14 @@ const (
 	contentType   = "application/json"
 	token         = "token"
 	email         = "john.doe@email.com"
-	contact_email = email
+	contact_email = "john.doe@email.com"
 	invalid       = "invalid"
 )
 
 var user = auth.User{
-	ID:           email,
-	Email:        email,
-	ContactEmail: email,
-	Password:     "pass",
+	ID:       email,
+	Email:    email,
+	Password: "pass",
 }
 
 func newService() auth.Service {
@@ -266,14 +265,16 @@ func TestUpdate(t *testing.T) {
 	key, _ := svc.Login(user)
 
 	updatedUser := user
-	updatedUser.Password = "new_pass"
-	updatedUser.ContactEmail = "new_email@example.com"
+	updatedUser.Email = "new_email@example.com"
+	updatedUser.ContactEmail = "new_pass@example.com"
+	updatedUser.FirstName = "John"
+	updatedUser.LastName = "Doe"
 	data := toJSON(updatedUser)
 
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
+		Email:        invalid,
 		ContactEmail: invalid,
-		Password:     "pass",
 	})
 
 	cases := []struct {
