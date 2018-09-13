@@ -12,14 +12,14 @@ type apiReq interface {
 
 type registerReq struct {
 	Email        string `json:"email"`
-	ContactEmail string `json:"contact_email"`
 	Password     string `json:"password"`
+	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`
 }
 
 func (req registerReq) validate() error {
-	if req.Email == "" || req.Password == "" {
+	if req.Password == "" {
 		return auth.ErrMalformedEntity
 	}
 
@@ -61,7 +61,6 @@ func (req identityReq) validate() error {
 
 type updateReq struct {
 	key          string
-	Password     string `json:"password,omitempty"`
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`

@@ -54,7 +54,6 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Password:     req.Password,
 			ContactEmail: req.ContactEmail,
 			FirstName:    req.FirstName,
 			LastName:     req.LastName,

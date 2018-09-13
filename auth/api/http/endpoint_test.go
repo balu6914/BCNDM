@@ -25,9 +25,12 @@ const (
 )
 
 var user = auth.User{
-	ID:       email,
-	Email:    email,
-	Password: "pass",
+	ID:           email,
+	Email:        email,
+	ContactEmail: contactEmail,
+	Password:     "pass",
+	FirstName:    "Joe",
+	LastName:     "Doe",
 }
 
 func newService() auth.Service {
@@ -265,7 +268,6 @@ func TestUpdate(t *testing.T) {
 	key, _ := svc.Login(user)
 
 	updatedUser := user
-	updatedUser.Email = "new_email@example.com"
 	updatedUser.ContactEmail = "new_pass@example.com"
 	updatedUser.FirstName = "John"
 	updatedUser.LastName = "Doe"
@@ -273,7 +275,6 @@ func TestUpdate(t *testing.T) {
 
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
-		Email:        invalid,
 		ContactEmail: invalid,
 	})
 

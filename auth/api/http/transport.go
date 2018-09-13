@@ -102,7 +102,6 @@ func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 		ContactEmail: user.ContactEmail,
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
-		Password:     user.Password,
 	}
 
 	return req, nil

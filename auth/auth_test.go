@@ -12,11 +12,12 @@ import (
 const wrong string = "wrong-value"
 
 var user = auth.User{
-	Email:     "user@example.com",
-	Password:  "password",
-	ID:        "1",
-	FirstName: "first",
-	LastName:  "last",
+	Email:        "user@example.com",
+	ContactEmail: "user@example.com",
+	Password:     "password",
+	ID:           "1",
+	FirstName:    "first",
+	LastName:     "last",
 }
 
 func newService() auth.Service {
@@ -94,10 +95,7 @@ func TestUpdate(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
 	key, _ := svc.Login(user)
-	user.Password = "newPassword"
-	user.Email = "new@email.com"
-	invalidUser := user
-	invalidUser.Password = ""
+	user.ContactEmail = "new@email.com"
 
 	cases := []struct {
 		desc string
@@ -106,16 +104,10 @@ func TestUpdate(t *testing.T) {
 		err  error
 	}{
 		{
-			desc: "update user email and password",
+			desc: "update user contact email",
 			key:  key,
 			user: user,
 			err:  nil,
-		},
-		{
-			desc: "update user with invalid data",
-			key:  key,
-			user: invalidUser,
-			err:  auth.ErrMalformedEntity,
 		},
 		{
 			desc: "update user with invalid credentials",

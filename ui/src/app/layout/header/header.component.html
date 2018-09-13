@@ -45,9 +45,9 @@
       </div>
       <div *ngIf="isLoggedin && user"  class="wallet-balance">
         <div class="wallet-balance__title">
-          Wallet balance
+          {{user.email}}
         </div>
-        <div class="wallet-balance__amount">
+        <div class="wallet-balance__amount text-center">
           {{balance.amount | tas }} {{balance.symbol}}
         </div>
       </div>

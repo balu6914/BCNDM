@@ -35,8 +35,8 @@ export class SignupComponent {
         email:    ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
         confirm:  [''],
-        name:     ['', [Validators.maxLength(16)]],
-        surname:  ['', [Validators.maxLength(16)]]
+        first_name:     ['', [Validators.maxLength(16)]],
+        last_name:  ['', [Validators.maxLength(16)]]
       },
       {
         validator: this.passwordMatchValidator
@@ -46,7 +46,7 @@ export class SignupComponent {
     passwordMatchValidator(fg: FormGroup) {
       // Compare passwords only if minLength is valid
       if (fg.get('confirm').value.length > 0) {
-        if (fg.get('password').value == fg.get('confirm').value) {
+      if (fg.get('password').value === fg.get('confirm').value) {
           return null;
         }
         fg.controls.confirm.setErrors({'invalid': true});
@@ -63,7 +63,8 @@ export class SignupComponent {
       const user = {
         email: this.form.value.email,
         password: this.form.value.password,
-        name: `${this.form.value.name} ${this.form.value.surname}`,
+        first_name: this.form.value.first_name,
+        last_name: this.form.value.last_name,
       }
       this.UserService.addUser(user).subscribe(
         response => {

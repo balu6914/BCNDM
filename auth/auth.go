@@ -59,11 +59,6 @@ func (ms *authService) Update(key string, user User) error {
 		return ErrUnauthorizedAccess
 	}
 
-	hash, err := ms.hasher.Hash(user.Password)
-	if err != nil {
-		return ErrMalformedEntity
-	}
-	user.Password = hash
 	user.ID = id
 
 	return ms.users.Update(user)
