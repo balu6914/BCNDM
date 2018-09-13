@@ -6,6 +6,7 @@ import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
 import { DashboardProfileRoutingModule } from './dashboard.profile.routes';
 // Add components
 import { DashboardProfileComponent } from './dashboard.profile.component';
+import { DashboardProfilePasswordUpdateComponent  } from './password/dashboard.profile.change.password.component';
 import { DashboardProfileUpdateComponent } from './update/dashboard.profile.update.component';
 import { CommonAppModule } from '../../common/common.module';
 import { SharedModule } from '../../shared/shared.module';
@@ -23,6 +24,7 @@ import { SharedModule } from '../../shared/shared.module';
   declarations: [
     DashboardProfileComponent,
     DashboardProfileUpdateComponent,
+    DashboardProfilePasswordUpdateComponent,
   ],
   schemas: [
   ]

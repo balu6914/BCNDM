@@ -5,8 +5,8 @@ import {Router} from '@angular/router';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 
-import { User } from '../../common/interfaces/user.interface';
-import { UserService } from '../services/user.service';
+import { User } from 'app/common/interfaces/user.interface';
+import { UserService } from 'app/common/services/user.service';
 import { AuthService } from '../services/auth.service';
 
 const emailValidator = Validators.pattern('^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$');

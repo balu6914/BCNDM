@@ -6,6 +6,7 @@ import { AuthService } from '../../auth/services/auth.service';
 @Component({
   selector: 'dpc-dashboard-profile',
   templateUrl: 'dashboard.profile.component.html',
+  styleUrls: ['dashboard.profile.component.scss'],
 })
 export class DashboardProfileComponent implements OnInit {
   user: User;

@@ -2,8 +2,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { User } from '../../common/interfaces/user.interface';
+import { environment } from 'environments/environment';
+import { User } from 'app/common/interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -22,7 +22,7 @@ export class UserService {
   removeUser(id: string) {
     return this.http.delete(`${environment.API_AUTH}`);
   }
-  updateUser(id: string, data): Observable<User> {
+  updateUser(data): Observable<User> {
     return this.http.put<User>(`${environment.API_AUTH}`, data);
   }
 

@@ -4,12 +4,12 @@ import { Router } from '@angular/router';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 
-import { User } from '../../common/interfaces/user.interface';
-import { UserService } from '../services/user.service';
+import { User } from 'app/common/interfaces/user.interface';
+import { UserService } from 'app/common/services/user.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({
-  selector: 'signup-form',
+  selector: 'dpc-signup-form',
   templateUrl: './signup.component.html',
   styleUrls: [ './signup.component.scss' ],
   providers: [
