@@ -12,7 +12,8 @@
           <input type="email" formControlName="email" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.email.errors }" />
           <div *ngIf="submitted && form.controls.email.errors" class="invalid-feedback">
-            Email must be a valid email address.
+            <div *ngIf="form.controls.email.errors.email">Email must be a valid email address.</div>
+            <div *ngIf="form.controls.email.errors.maxlength">The maximum length is 32 characters.</div>
           </div>
         </div>
       </div>
