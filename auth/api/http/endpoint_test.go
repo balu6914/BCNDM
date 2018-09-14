@@ -26,7 +26,7 @@ const (
 var user = auth.User{
 	ID:       email,
 	Email:    email,
-	Password: "pass",
+	Password: "password",
 }
 
 func newService() auth.Service {

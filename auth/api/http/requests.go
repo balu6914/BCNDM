@@ -16,8 +16,18 @@ type registerReq struct {
 	Name     string `json:"name,omitempty"`
 }
 
+const (
+	maxEmailLength    = 32
+	minPasswordLength = 8
+	maxPasswordLength = 16
+	maxNameLength     = 32
+)
+
 func (req registerReq) validate() error {
-	if req.Email == "" || req.Password == "" {
+	if req.Email == "" || len(req.Email) > maxEmailLength ||
+		req.Password == "" || len(req.Password) < minPasswordLength ||
+		len(req.Password) > maxPasswordLength ||
+		len(req.Name) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
