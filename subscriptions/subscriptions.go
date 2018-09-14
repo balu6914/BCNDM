@@ -22,7 +22,7 @@ type Subscription struct {
 
 const (
 	minSubscriptionHours = 0
-	maxSubscriptionHours = 8760
+	maxSubscriptionHours = 365 * 24
 )
 
 // Validate returns an error if user representation is invalid.
