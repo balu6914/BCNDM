@@ -82,7 +82,8 @@
                  [ngClass]="{ 'is-invalid': submitted && form.controls.lat.errors }">
           <div *ngIf="submitted && form.controls.lat.errors" class="invalid-feedback">
             <div *ngIf="form.controls.lat.errors.required">Latitude is riquired.</div>
-            <div *ngIf="form.controls.lat.errors.pattern">Latitude value must be between -90.000000 and 90.000000.</div>
+            <div *ngIf="form.controls.lat.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
+            <div *ngIf="form.controls.lat.errors.min || form.controls.lat.errors.max">Latitude value must be between -90 and 90.</div>
           </div>
         </div>
       </div>
@@ -93,7 +94,8 @@
                  [ngClass]="{ 'is-invalid': submitted && form.controls.long.errors }">
           <div *ngIf="submitted && form.controls.long.errors" class="invalid-feedback">
             <div *ngIf="form.controls.long.errors.required">Longitude is riquired.</div>
-            <div *ngIf="form.controls.long.errors.pattern">Longitude value must be between -180.000000 and 180.000000.</div>
+            <div *ngIf="form.controls.long.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
+            <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between -180 and 180.</div>
           </div>
         </div>
       </div>
