@@ -6,6 +6,7 @@ import { StreamService } from '../../../common/services/stream.service';
 import { Stream } from '../../../common/interfaces/stream.interface';
 import { MitasPipe } from '../../../common/pipes/converter.pipe';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
 
 @Component({
   selector: 'dpc-dashboard-sell-add',
@@ -14,7 +15,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 })
 export class DashboardSellAddComponent {
   form: FormGroup;
-  submitted: boolean = false
+  submitted = false;
 
   @Output() streamCreated: EventEmitter<any> = new EventEmitter();
   constructor(
@@ -24,17 +25,17 @@ export class DashboardSellAddComponent {
     public modalNewStream: BsModalRef,
     public alertService: AlertService,
   ) {
-    const floatValidator = Validators.pattern('[-+]?([0-9]\.[0-9]+|[0-9]+)');
-    const urlValidator = Validators.pattern('(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})');
+    const floatValidator = Validators.pattern(floatRegEx);
+    const urlValidator = Validators.pattern(urlRegEx);
 
     this.form = this.formBuilder.group({
-      'name':        ['', [Validators.required, Validators.maxLength(16)]],
+      'name':        ['', [Validators.required, Validators.maxLength(32)]],
       'type':        ['', [Validators.required, Validators.maxLength(32)]],
       'description': ['', [Validators.required, Validators.maxLength(256)]],
       'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],
       'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
-      'lat':         ['', [Validators.required, Validators.maxLength(9), floatValidator, Validators.min(-90), Validators.max(90)]],
-      'long':        ['', [Validators.required, Validators.maxLength(9), floatValidator, Validators.min(-180), Validators.max(180)]],
+      'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
+      'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
       'snippet':     ['', [Validators.maxLength(256)]]
     });
   }
@@ -49,7 +50,7 @@ export class DashboardSellAddComponent {
         description: this.form.value.description,
         url:         this.form.value.url,
         price:       this.mitasPipe.transform(this.form.value.price),
-        snippet:     this.form.value.snippet || "",
+        snippet:     this.form.value.snippet,
         location: {
           'type': 'Point',
           'coordinates': [
