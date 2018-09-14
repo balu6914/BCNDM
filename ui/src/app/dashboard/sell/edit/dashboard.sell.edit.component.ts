@@ -30,7 +30,7 @@ export class DashboardSellEditComponent implements OnInit {
     const urlValidator = Validators.pattern('(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})');
 
     this.form = this.formBuilder.group({
-      'name':        ['', [Validators.required, Validators.maxLength(16)]],
+      'name':        ['', [Validators.required, Validators.maxLength(32)]],
       'type':        ['', [Validators.required, Validators.maxLength(32)]],
       'description': ['', [Validators.required, Validators.maxLength(256)]],
       'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],

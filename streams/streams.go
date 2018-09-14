@@ -38,10 +38,29 @@ type Page struct {
 	Content []Stream `json:"content"`
 }
 
+const (
+	maxNameLength        = 32
+	maxTypeLength        = 32
+	maxDescriptionLength = 256
+	maxSnippetLength     = 256
+	maxURLLength         = 128
+	minPrice             = 0
+	minLongitude         = -180
+	maxLongitude         = 180
+	minLatitude          = -90
+	maxLatitude          = 90
+)
+
 // Validate returns an error if user representation is invalid.
 func (s *Stream) Validate() error {
-	if s.Name == "" || s.Type == "" ||
-		s.Description == "" || s.URL == "" {
+	if s.Name == "" || (len(s.Name) > maxNameLength) ||
+		s.Type == "" || (len(s.Type) > maxTypeLength) ||
+		s.Description == "" || (len(s.Description) > maxDescriptionLength) ||
+		(len(s.Snippet) > maxSnippetLength) ||
+		s.URL == "" || (len(s.URL) > maxURLLength) ||
+		s.Price <= minPrice ||
+		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
+		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude {
 		return ErrMalformedData
 	}
 
