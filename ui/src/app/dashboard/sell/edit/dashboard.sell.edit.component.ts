@@ -23,7 +23,7 @@ export class DashboardSellEditComponent implements OnInit {
     private streamService: StreamService,
     private mitasPipe: MitasPipe,
     private formBuilder: FormBuilder,
-    public modalNewStream: BsModalRef,
+    public modalEditStream: BsModalRef,
     public alertService: AlertService,
   ) {
     const floatValidator = Validators.pattern('[-+]?([0-9]\.[0-9]+|[0-9]+)');
@@ -70,14 +70,14 @@ export class DashboardSellEditComponent implements OnInit {
         res => {
           stream.id = this.streamID;
           this.streamEdited.emit(stream);
-          this.modalNewStream.hide();
           this.alertService.success(`Stream successfully updated!`);
         },
         err => {
-          this.modalNewStream.hide();
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
+
+      this.modalEditStream.hide();
     }
   }
 }
