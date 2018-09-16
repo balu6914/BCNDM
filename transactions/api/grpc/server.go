@@ -72,9 +72,10 @@ func encodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 func decodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*monetasa.TransferData)
 	return transferReq{
-		from:  req.GetFrom(),
-		to:    req.GetTo(),
-		value: req.GetValue(),
+		streamID: req.GetStreamID(),
+		from:     req.GetFrom(),
+		to:       req.GetTo(),
+		value:    req.GetValue(),
 	}, nil
 }
 

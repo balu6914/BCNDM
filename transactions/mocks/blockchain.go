@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var _ transactions.BlockchainNetwork = (*mockNetwork)(nil)
+var _ transactions.TokenLedger = (*mockNetwork)(nil)
 
 type mockNetwork struct {
 	users     map[string]uint64
@@ -14,7 +14,7 @@ type mockNetwork struct {
 }
 
 // NewBlockchainNetwork returns mock instance of blockchain network.
-func NewBlockchainNetwork(users map[string]uint64, remaining uint64) transactions.BlockchainNetwork {
+func NewBlockchainNetwork(users map[string]uint64, remaining uint64) transactions.TokenLedger {
 	return &mockNetwork{
 		users:     users,
 		remaining: remaining,

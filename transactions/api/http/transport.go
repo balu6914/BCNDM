@@ -8,6 +8,7 @@ import (
 	"monetasa"
 	"monetasa/transactions"
 	"net/http"
+	"strconv"
 	"time"
 
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -17,7 +18,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const contentType = "application/json"
+const (
+	contentType = "application/json"
+	page        = "page"
+	limit       = "limit"
+	owner       = "owner"
+	partner     = "partner"
+	defPage     = 0
+	defLimit    = 10
+	defOwner    = false
+	defPartner  = false
+)
 
 var (
 	errMalformedEntity        = errors.New("malformed entity")
@@ -50,6 +61,24 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 	r.Post("/tokens/withdraw", kithttp.NewServer(
 		withdrawEndpoint(svc),
 		decodeWithdrawReq,
+		encodeResponse,
+		opts...,
+	))
+	r.Post("/contracts", kithttp.NewServer(
+		createContractsEndpoint(svc),
+		decodeCreateContractsReq,
+		encodeResponse,
+		opts...,
+	))
+	r.Patch("/contracts/sign", kithttp.NewServer(
+		signContractEndpoint(svc),
+		decodeSignContractReq,
+		encodeResponse,
+		opts...,
+	))
+	r.Get("/contracts", kithttp.NewServer(
+		listContractsEndpoint(svc),
+		decodeListContractsReq,
 		encodeResponse,
 		opts...,
 	))
@@ -107,6 +136,78 @@ func decodeWithdrawReq(_ context.Context, r *http.Request) (interface{}, error) 
 	}
 
 	req.userID = id
+
+	return req, nil
+}
+
+func decodeCreateContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	id, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var req createContractsReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.ownerID = id
+
+	return req, nil
+}
+
+func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	id, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var req signContractReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.ownerID = id
+
+	return req, nil
+}
+
+func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	id, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+	pageNo := uintQueryParam(r, page, defPage)
+	limit := uintQueryParam(r, limit, defLimit)
+
+	isOwner := boolQueryParam(r, owner, defOwner)
+	isPartner := boolQueryParam(r, partner, defPartner)
+	var role transactions.Role
+	if isOwner {
+		role = role | transactions.Owner
+	}
+	if isPartner {
+		role = role | transactions.Partner
+	}
+
+	req := listContractsReq{
+		userID: id,
+		page:   pageNo,
+		limit:  limit,
+		role:   role,
+	}
 
 	return req, nil
 }
@@ -176,4 +277,32 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}
+}
+
+func boolQueryParam(req *http.Request, name string, fallback bool) bool {
+	vals := bone.GetQuery(req, name)
+	if len(vals) == 0 {
+		return fallback
+	}
+
+	val, err := strconv.ParseBool(vals[0])
+	if err != nil {
+		return fallback
+	}
+
+	return val
+}
+
+func uintQueryParam(req *http.Request, name string, fallback uint64) uint64 {
+	vals := bone.GetQuery(req, name)
+	if len(vals) == 0 {
+		return fallback
+	}
+
+	val, err := strconv.ParseUint(vals[0], 10, 64)
+	if err != nil {
+		return fallback
+	}
+
+	return val
 }

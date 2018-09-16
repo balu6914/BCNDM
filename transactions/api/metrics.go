@@ -43,13 +43,13 @@ func (mm *metricsMiddleware) Balance(userID string) (uint64, error) {
 	return mm.svc.Balance(userID)
 }
 
-func (mm *metricsMiddleware) Transfer(from, to string, value uint64) error {
+func (mm *metricsMiddleware) Transfer(stream, from, to string, value uint64) error {
 	defer func(begin time.Time) {
 		mm.counter.With("method", "transfer").Add(1)
 		mm.latency.With("method", "transfer").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return mm.svc.Transfer(from, to, value)
+	return mm.svc.Transfer(stream, from, to, value)
 }
 
 func (mm *metricsMiddleware) BuyTokens(account string, value uint64) error {
@@ -68,4 +68,31 @@ func (mm *metricsMiddleware) WithdrawTokens(account string, value uint64) error 
 	}(time.Now())
 
 	return mm.svc.WithdrawTokens(account, value)
+}
+
+func (mm *metricsMiddleware) CreateContracts(contracts ...transactions.Contract) (err error) {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "create_contracts").Add(1)
+		mm.latency.With("method", "create_contracts").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.CreateContracts(contracts...)
+}
+
+func (mm *metricsMiddleware) SignContract(contract transactions.Contract) (err error) {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "sign_contract").Add(1)
+		mm.latency.With("method", "sign_contract").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.SignContract(contract)
+}
+
+func (mm *metricsMiddleware) ListContracts(userID string, pageNo uint64, limit uint64, role transactions.Role) transactions.ContractPage {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "list_contracts").Add(1)
+		mm.latency.With("method", "list_contracts").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.ListContracts(userID, pageNo, limit, role)
 }
