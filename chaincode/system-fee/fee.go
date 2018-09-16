@@ -73,23 +73,34 @@ func (fc feeChaincode) SetFee(stub shim.ChaincodeStubInterface, fee Fee) error {
 	return nil
 }
 
-func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, value uint64) error {
+func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, owner string, value uint64, transfers ...Transfer) error {
+	sum := value
+	for _, t := range transfers {
+		sum += t.Value
+	}
+
 	fee := fc.Fee(stub)
 	wholeValue := uint64(math.Pow(10, decimals))
 
-	feeValue := fee.Value * value / wholeValue
+	feeValue := fee.Value * sum / wholeValue
 
-	transfers := []Transfer{
-		Transfer{
-			To:    to,
-			Value: value - feeValue,
-		},
-		Transfer{
+	ts := []Transfer{
+		{
 			To:    fee.Owner,
 			Value: feeValue,
 		},
+		{
+			To:    owner,
+			Value: value - feeValue,
+		},
+	}
+	for _, t := range ts {
+		ts = append(ts, Transfer{
+			To:    t.To,
+			Value: t.Value,
+		})
 	}
 
 	// Transfer tokens.
-	return fc.ts.Transfer(stub, transfers...)
+	return fc.ts.Transfer(stub, ts...)
 }

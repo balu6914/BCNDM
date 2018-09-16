@@ -20,6 +20,11 @@ FEE_CHAIN_PATH=github.com/chaincode/system-fee
 FEE_CHAIN_VER=1.0
 FEE_CHAIN_INIT_FN='{"Args":["init","{\"owner\": \"Admin@org1.monetasa.com\", \"value\": 10000}"]}'
 
+CONTRACTS_CHAIN_ID=contracts
+CONTRACTS_CHAIN_PATH=github.com/chaincode/contracts
+CONTRACTS_CHAIN_VER=1.0
+CONTRACTS_CHAIN_INIT_FN='{"Args":["init"]}'
+
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
 
 LOCATION=$PWD
@@ -72,6 +77,20 @@ cd $LOCATION
 # Install chaincode
 peer chaincode install -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -p $FEE_CHAIN_PATH
 
+cd $GOPATH/src/github.com/chaincode/contracts
+# Install govendor tool
+go get -u github.com/kardianos/govendor
+
+govendor init
+
+# Fetch deps
+govendor fetch github.com/hyperledger/fabric/protos/msp
+
+cd $LOCATION
+
+# Install chaincode
+peer chaincode install -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -p $CONTRACTS_CHAIN_PATH
+
 sleep 5
 
 # Init/provision system with TAS
@@ -79,6 +98,9 @@ peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VE
 
 # Init/provision system with system fee
 peer chaincode instantiate -o $ORDERER_URL -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -c "$FEE_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+
+# Init/provision system with system fee
+peer chaincode instantiate -o $ORDERER_URL -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -c "$CONTRACTS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
 sleep 5
 

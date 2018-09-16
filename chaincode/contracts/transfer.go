@@ -8,15 +8,21 @@ import (
 )
 
 const (
-	erc20Chaincode = "token"
-	transfer       = "groupTransfer"
+	feeChaincode = "fee"
+	transfer     = "transfer"
 )
 
 // TransferService defines token transfer service API.
 type TransferService interface {
 	// Transfer given amount from callers account to specified account. Returns
 	// error only if transaction can't be executed.
-	Transfer(shim.ChaincodeStubInterface, ...Transfer) error
+	Transfer(shim.ChaincodeStubInterface, string, uint64, ...Transfer) error
+}
+
+// Transfer contains transfer data.
+type Transfer struct {
+	To    string
+	Value uint64
 }
 
 var _ TransferService = (*transferService)(nil)
@@ -32,13 +38,18 @@ func NewTransferService() TransferService {
 	}
 }
 
-func (ts transferService) Transfer(stub shim.ChaincodeStubInterface, transfers ...Transfer) error {
-	req := []transferReq{}
+func (ts transferService) Transfer(stub shim.ChaincodeStubInterface, owner string, value uint64, transfers ...Transfer) error {
+	trs := []transferReq{}
 	for _, tr := range transfers {
-		req = append(req, transferReq{
+		trs = append(trs, transferReq{
 			To:    tr.To,
 			Value: tr.Value,
 		})
+	}
+	req := transferStatusReq{
+		Owner:     owner,
+		Value:     value,
+		Transfers: trs,
 	}
 
 	payload, err := json.Marshal(req)
@@ -47,10 +58,16 @@ func (ts transferService) Transfer(stub shim.ChaincodeStubInterface, transfers .
 	}
 
 	args := [][]byte{[]byte(transfer), payload}
-	res := stub.InvokeChaincode(erc20Chaincode, args, stub.GetChannelID())
+	res := stub.InvokeChaincode(feeChaincode, args, stub.GetChannelID())
 	if res.GetStatus() != shim.OK {
 		return errors.New(res.GetMessage())
 	}
 
 	return nil
+}
+
+type transferStatusReq struct {
+	Owner     string        `json:"owner"`
+	Value     uint64        `json:"value"`
+	Transfers []transferReq `json:"transfers"`
 }

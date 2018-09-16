@@ -8,11 +8,7 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-var (
-	errFailedSerialization = errors.New("failed to serialize response data")
-	errIncorrectFunc       = errors.New("incorrect function name")
-	errFailedTransfer      = errors.New("failed to transfer tokens")
-)
+var errIncorrectFunc = errors.New("incorrect function name")
 
 var _ shim.Chaincode = (*chaincodeRouter)(nil)
 
@@ -29,28 +25,10 @@ func NewChaincode(svc Service) shim.Chaincode {
 // Note that chaincode upgrade also calls this function to reset or to
 // migrate data, so be careful when initializing fee.
 func (cr chaincodeRouter) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	function, args := stub.GetFunctionAndParameters()
+	function, _ := stub.GetFunctionAndParameters()
 
 	if function != "init" {
 		return shim.Error(ErrInvalidFuncCall.Error())
-	}
-
-	if len(args) != 1 {
-		return shim.Error(ErrInvalidNumOfArgs.Error())
-	}
-
-	var req feeReq
-	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
-		return shim.Error(ErrInvalidArgument.Error())
-	}
-
-	fee := Fee{
-		Owner: req.Owner,
-		Value: req.Value,
-	}
-
-	if err := cr.svc.Init(stub, fee); err != nil {
-		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)
@@ -62,47 +40,62 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	// call routing
 	switch function {
-	case "fee":
-		return cr.fee(stub)
-	case "setFee":
-		return cr.setFee(stub, args)
+	case "createContracts":
+		return cr.createContracts(stub, args)
+	case "signContract":
+		return cr.signContract(stub, args)
 	case "transfer":
 		return cr.transfer(stub, args)
 	}
+
 	return shim.Error(errIncorrectFunc.Error())
 }
 
-func (cr chaincodeRouter) fee(stub shim.ChaincodeStubInterface) pb.Response {
-	fee := cr.svc.Fee(stub)
-
-	res := feeRes{
-		Owner: fee.Owner,
-		Value: fee.Value,
-	}
-	payload, err := json.Marshal(res)
-	if err != nil {
-		return shim.Error(errFailedSerialization.Error())
-	}
-
-	return shim.Success(payload)
-}
-
-func (cr chaincodeRouter) setFee(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (cr chaincodeRouter) createContracts(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 1 {
 		return shim.Error(ErrInvalidNumOfArgs.Error())
 	}
 
-	var req feeReq
+	var req []contractReq
 	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	fee := Fee{
-		Owner: req.Owner,
-		Value: req.Value,
+	contracts := []Contract{}
+	for _, c := range req {
+		contract := Contract{
+			StreamID:  c.StreamID,
+			StartTime: c.StartTime,
+			EndTime:   c.EndTime,
+			OwnerID:   c.OwnerID,
+			PartnerID: c.PartnerID,
+			Share:     c.Share,
+		}
+		contracts = append(contracts, contract)
 	}
 
-	if err := cr.svc.SetFee(stub, fee); err != nil {
+	if err := cr.svc.CreateContracts(stub, contracts...); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (cr chaincodeRouter) signContract(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error(ErrInvalidNumOfArgs.Error())
+	}
+
+	var req contractReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
+		return shim.Error(ErrInvalidArgument.Error())
+	}
+
+	contract := Contract{
+		StreamID: req.StreamID,
+		EndTime:  req.EndTime,
+	}
+	if err := cr.svc.SignContract(stub, contract); err != nil {
 		return shim.Error(err.Error())
 	}
 
@@ -114,21 +107,12 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ErrInvalidNumOfArgs.Error())
 	}
 
-	var req transferStatusReq
+	var req transferReq
 	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	transfers := []Transfer{}
-	for _, val := range req.Transfers {
-		t := Transfer{
-			To:    val.To,
-			Value: val.Value,
-		}
-		transfers = append(transfers, t)
-	}
-
-	if err := cr.svc.Transfer(stub, req.Owner, req.Value, transfers...); err != nil {
+	if err := cr.svc.Transfer(stub, req.StreamID, req.To, req.Time, req.Value); err != nil {
 		return shim.Error(err.Error())
 	}
 
