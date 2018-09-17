@@ -123,6 +123,38 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
+func TestUpdatePassword(t *testing.T) {
+	svc := newService()
+	svc.Register(user)
+	key, _ := svc.Login(user)
+	user.Password = "newpassword"
+
+	cases := []struct {
+		desc string
+		key  string
+		user auth.User
+		err  error
+	}{
+		{
+			desc: "update user password",
+			key:  key,
+			user: user,
+			err:  nil,
+		},
+		{
+			desc: "update user password invalid credentials",
+			key:  "",
+			user: user,
+			err:  auth.ErrUnauthorizedAccess,
+		},
+	}
+
+	for _, tc := range cases {
+		err := svc.Update(tc.key, tc.user)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+	}
+}
+
 func TestLogin(t *testing.T) {
 	svc := newService()
 	svc.Register(user)

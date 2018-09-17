@@ -25,5 +25,8 @@ export class UserService {
   updateUser(data): Observable<User> {
     return this.http.put<User>(`${environment.API_AUTH}`, data);
   }
+  updatePassword(data): Observable<User> {
+    return this.http.put<User>(`${environment.API_AUTH}/password`, data);
+  }
 
 }

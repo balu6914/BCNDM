@@ -66,6 +66,24 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
+func updatepasswordEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(updatePasswordReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		user := auth.User{
+			Password: req.NewPassword,
+		}
+		if err := svc.UpdatePassword(req.key, req.OldPassword, user); err != nil {
+			return nil, err
+		}
+
+		return updatePasswordRes{}, nil
+	}
+}
+
 func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)

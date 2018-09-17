@@ -52,6 +52,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
+	r.Put("/users/password", kithttp.NewServer(
+		updatepasswordEndpoint(svc),
+		decodePasswordUpdate,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", monetasa.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
@@ -120,6 +127,24 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 	req := credentialsReq{
 		Email:    user.Email,
 		Password: user.Password,
+	}
+
+	return req, nil
+}
+
+func decodePasswordUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	var user auth.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	req := updatePasswordReq{
+		key:         r.Header.Get("Authorization"),
+		NewPassword: user.Password,
 	}
 
 	return req, nil

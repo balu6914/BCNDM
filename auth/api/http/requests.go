@@ -77,3 +77,23 @@ func (req updateReq) validate() error {
 
 	return nil
 }
+
+type updatePasswordReq struct {
+	key         string
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+	RePassword  string `json:"re_password"`
+}
+
+func (req updatePasswordReq) validate() error {
+	if req.OldPassword == "" || req.NewPassword == "" || req.RePassword == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.NewPassword != req.RePassword {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+
+}

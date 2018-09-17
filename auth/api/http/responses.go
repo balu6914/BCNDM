@@ -42,6 +42,8 @@ func (res tokenRes) empty() bool {
 
 type updateRes struct{}
 
+type updatePasswordRes struct{}
+
 func (res updateRes) code() int {
 	return http.StatusOK
 }
