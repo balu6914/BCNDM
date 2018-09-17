@@ -17,11 +17,10 @@ import (
 )
 
 const (
-	contentType  = "application/json"
-	token        = "token"
-	email        = "john.doe@email.com"
-	contactEmail = "john.doe@email.com"
-	invalid      = "invalid"
+	contentType = "application/json"
+	token       = "token"
+	email       = "john.doe@email.com"
+	invalid     = "invalid"
 )
 
 var user = auth.User{

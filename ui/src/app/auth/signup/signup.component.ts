@@ -32,7 +32,7 @@ export class SignupComponent {
     ngOnInit() {
       this.errorMsg = null;
       this.form = this.fb.group({
-        email:    ['', [Validators.required, Validators.email]],
+        email:    ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
         password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
         confirm:  [''],
         first_name:     ['', [Validators.maxLength(16)]],

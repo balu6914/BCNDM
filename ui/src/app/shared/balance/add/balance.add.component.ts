@@ -26,23 +26,23 @@ export class BalanceAddComponent implements OnInit {
     private formBuilder: FormBuilder,
     private mitasPipe: MitasPipe,
     public  alertService: AlertService,
-  ){}
+  ) { }
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      'amount':        ['', Validators.required],
+      'amount': ['', Validators.required],
     });
     this.processing = false;
   }
 
   onSubmit(form, isValid: boolean) {
     this.errorMsg = null;
-    if(isValid) {
+    if (isValid) {
       this.processing = true;
       // Convert to mTAS
       const toMiTasAmount =  {
         amount: this.mitasPipe.transform(form.amount),
-      }
+      };
       this.balanceService.buy(toMiTasAmount).subscribe(
         response => {
           this.balanceUpdate.emit('update');
@@ -54,5 +54,7 @@ export class BalanceAddComponent implements OnInit {
         }
       );
     }
+
+    this.modalAddTokens.hide();
   }
 }

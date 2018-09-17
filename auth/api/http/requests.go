@@ -18,8 +18,18 @@ type registerReq struct {
 	LastName     string `json:"last_name,omitempty"`
 }
 
+const (
+	maxEmailLength    = 32
+	minPasswordLength = 8
+	maxPasswordLength = 16
+	maxNameLength     = 32
+)
+
 func (req registerReq) validate() error {
-	if req.Password == "" {
+	if req.Email == "" || len(req.Email) > maxEmailLength ||
+		req.Password == "" || len(req.Password) < minPasswordLength ||
+		len(req.Password) > maxPasswordLength ||
+		len(req.Name) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
@@ -71,7 +81,7 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	if !govalidator.IsEmail(req.ContactEmail) {
+	if req.Email == "" || req.Password == "" {
 		return auth.ErrMalformedEntity
 	}
 

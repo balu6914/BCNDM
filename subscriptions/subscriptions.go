@@ -20,9 +20,15 @@ type Subscription struct {
 	StreamName  string        `json:"stream_name,omitempty"`
 }
 
+const (
+	minSubscriptionHours = 0
+	maxSubscriptionHours = 365 * 24
+)
+
 // Validate returns an error if user representation is invalid.
 func (sub *Subscription) Validate() error {
-	if sub.Hours <= 0 || !bson.IsObjectIdHex(sub.StreamID) || !bson.IsObjectIdHex(sub.UserID) {
+	if sub.Hours <= minSubscriptionHours || sub.Hours > maxSubscriptionHours ||
+		!bson.IsObjectIdHex(sub.StreamID) || !bson.IsObjectIdHex(sub.UserID) {
 		return ErrMalformedEntity
 	}
 
