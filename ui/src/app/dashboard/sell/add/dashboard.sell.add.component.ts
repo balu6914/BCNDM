@@ -22,7 +22,7 @@ export class DashboardSellAddComponent {
     private streamService: StreamService,
     private mitasPipe: MitasPipe,
     private formBuilder: FormBuilder,
-    public modalNewStream: BsModalRef,
+    public modalAddStream: BsModalRef,
     public alertService: AlertService,
   ) {
     const floatValidator = Validators.pattern(floatRegEx);
@@ -66,14 +66,14 @@ export class DashboardSellAddComponent {
           // Add ID from http response to stream
           stream.id = res['id'];
           this.streamCreated.emit(stream);
-          this.modalNewStream.hide();
           this.alertService.success(`Stream successfully added!`);
         },
         err => {
-          this.modalNewStream.hide();
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
+
+      this.modalAddStream.hide();
     }
   }
 }

@@ -52,14 +52,11 @@ export class DashboardBuyAddComponent {
           this.balance.amount = result.balance;
           this.balance.fiatAmount = this.balance.amount;
           this.balanceService.changed(this.balance);
-          // Close modal and show success message
-          this.modalSubscription.hide();
           this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours`);
         },
         err => {
-          console.error(`Error fetching user balance ${err}`);
+          this.alertService.error(`Error fetching user balance ${err}`);
         });
-
       },
       err => {
         this.modalSubscription.hide();
@@ -69,5 +66,7 @@ export class DashboardBuyAddComponent {
           this.alertService.error(`Something went wrong. Please try again later.`);
         }
       });
+
+    this.modalSubscription.hide();
   }
 }
