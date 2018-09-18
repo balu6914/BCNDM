@@ -7,7 +7,6 @@ RUN apk update \
     && make $SVC_NAME \
     && mv build/monetasa-$SVC_NAME /exe
 
-FROM alpine:3.8
-RUN apk update && apk add libltdl
+FROM scratch
 COPY --from=builder /exe /
 ENTRYPOINT ["/exe"]
