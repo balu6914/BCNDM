@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { User } from '../../common/interfaces/user.interface';
-import { AuthService } from '../../auth/services/auth.service';
+import { User } from 'app/common/interfaces/user.interface';
+import { AuthService } from 'app/auth/services/auth.service';
 
 @Component({
   selector: 'dpc-dashboard-profile',
