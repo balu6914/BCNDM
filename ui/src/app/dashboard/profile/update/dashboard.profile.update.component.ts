@@ -51,7 +51,7 @@ export class DashboardProfileUpdateComponent implements OnInit {
           this.alertService.success('You profile is succesfully updated.');
         },
         err => {
-          // Handle tmp case when user already exists and we don't have error msg on API side yet.
+            // Handle tmp case when user already exists and we don't have error msg on API side yet.
             this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         });
     }

@@ -21,11 +21,11 @@ const (
 )
 
 var user = auth.User{
-	ID:       email,
-	Email:    email,
-	Password: "pass",
-	FirstName:     "John",
-	LastName:     "Doe",
+	ID:        email,
+	Email:     email,
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
 }
 
 func TestIdentify(t *testing.T) {

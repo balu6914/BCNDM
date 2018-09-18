@@ -62,7 +62,7 @@ func (lm *loggingMiddleware) Update(key string, user auth.User) (err error) {
 
 func (lm *loggingMiddleware) UpdatePassword(key string, old string, user auth.User) (err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method update password for key %s and user %s took %s to complete", key, user.Email, time.Since(begin))
+		message := fmt.Sprintf("Method update_password for key %s and user %s took %s to complete", key, user.Email, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return

@@ -55,8 +55,8 @@ func (ms *metricsMiddleware) Update(key string, user auth.User) error {
 
 func (ms *metricsMiddleware) UpdatePassword(key string, old string, user auth.User) error {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "update password").Add(1)
-		ms.latency.With("method", "update password").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "update_password").Add(1)
+		ms.latency.With("method", "update_password").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
 	return ms.svc.UpdatePassword(key, old, user)

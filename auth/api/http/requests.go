@@ -26,22 +26,21 @@ const (
 )
 
 func (req registerReq) validate() error {
-	if req.Email == "" || len(req.Email) > maxEmailLength ||
-		req.Password == "" || len(req.Password) < minPasswordLength ||
+	if req.Email == "" || len(req.Email) > maxEmailLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Password == "" || len(req.Password) < minPasswordLength ||
 		len(req.Password) > maxPasswordLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.FirstName != "" {
-		if len(req.FirstName) > maxNameLength {
-			return auth.ErrMalformedEntity
-		}
+	if req.FirstName != "" && len(req.FirstName) > maxNameLength {
+		return auth.ErrMalformedEntity
 	}
 
-	if req.LastName != "" {
-		if len(req.LastName) > maxNameLength {
-			return auth.ErrMalformedEntity
-		}
+	if req.LastName != "" && len(req.LastName) > maxNameLength {
+		return auth.ErrMalformedEntity
 	}
 
 	if !govalidator.IsEmail(req.Email) {

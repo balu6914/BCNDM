@@ -76,7 +76,7 @@ func (ms *authService) UpdatePassword(key string, old string, user User) error {
 		return ErrNotFound
 	}
 
-	if err = ms.hasher.Compare(old, dbu.Password); err != nil {
+	if err := ms.hasher.Compare(old, dbu.Password); err != nil {
 		return ErrMalformedEntity
 	}
 
