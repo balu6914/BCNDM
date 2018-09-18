@@ -8,9 +8,14 @@ type StreamsService interface {
 
 // Stream represents state of one stream.
 type Stream struct {
-	ID    string
-	Name  string
-	Owner string
-	URL   string
-	Price uint64
+	ID      string
+	Name    string
+	Owner   string
+	URL     string
+	Price   uint64
+	BQ      bool
+	Project string
+	Dataset string
+	Table   string
+	Fields  string
 }

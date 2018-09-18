@@ -1,9 +1,19 @@
 package subscriptions
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 	"time"
+
+	"cloud.google.com/go/bigquery"
+	uuid "github.com/satori/go.uuid"
+	"google.golang.org/api/googleapi"
 )
+
+const bqURL = "http://bigquery.cloud.google.com/table"
 
 var (
 	// ErrConflict indicates usage of the existing stream id for the new stream.
@@ -62,7 +72,42 @@ func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, trans
 	}
 }
 
-func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (_ string, err error) {
+func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (string, error) {
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, stream.Project)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
+	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+	id = fmt.Sprintf("%s_%s", stream.Table, id)
+
+	ds := client.Dataset(stream.Dataset)
+	t := ds.Table(id)
+	md := bigquery.TableMetadata{
+		Name:           stream.Table,
+		ViewQuery:      q,
+		ExpirationTime: end,
+	}
+
+	if err := t.Create(ctx, &md); err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusConflict:
+				return "", ErrConflict
+			case http.StatusBadRequest:
+				return "", ErrMalformedEntity
+			}
+		}
+		return "", err
+	}
+
+	return id, nil
+}
+
+func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (string, error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
@@ -71,9 +116,19 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 	if err != nil {
 		return "", ErrNotFound
 	}
+
+	fmt.Printf("%v\n", stream)
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
+
+	if stream.BQ {
+		id, err := ss.createBqView(stream, sub.EndDate)
+		if err != nil {
+			return "", err
+		}
+		stream.URL = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, stream.Dataset, id)
+	}
 
 	hash, err := ss.proxy.Register(sub.Hours, stream.URL)
 	if err != nil {

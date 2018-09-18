@@ -44,11 +44,16 @@ func decodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(oneRes)
 	stream := monetasa.Stream{
-		Id:    res.id,
-		Name:  res.name,
-		Owner: res.owner,
-		Url:   res.url,
-		Price: res.price,
+		Id:      res.id,
+		Name:    res.name,
+		Owner:   res.owner,
+		Url:     res.url,
+		Price:   res.price,
+		Bq:      res.bq,
+		Project: res.project,
+		Dataset: res.dataset,
+		Table:   res.table,
+		Fields:  res.fields,
 	}
 
 	return &stream, nil
