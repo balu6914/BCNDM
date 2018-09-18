@@ -21,16 +21,27 @@ type registerReq struct {
 const (
 	maxEmailLength    = 32
 	minPasswordLength = 8
-	maxPasswordLength = 16
+	maxPasswordLength = 32
 	maxNameLength     = 32
 )
 
 func (req registerReq) validate() error {
 	if req.Email == "" || len(req.Email) > maxEmailLength ||
 		req.Password == "" || len(req.Password) < minPasswordLength ||
-		len(req.Password) > maxPasswordLength ||
-		len(req.Name) > maxNameLength {
+		len(req.Password) > maxPasswordLength {
 		return auth.ErrMalformedEntity
+	}
+
+	if req.FirstName != "" {
+		if len(req.FirstName) > maxNameLength {
+			return auth.ErrMalformedEntity
+		}
+	}
+
+	if req.LastName != "" {
+		if len(req.LastName) > maxNameLength {
+			return auth.ErrMalformedEntity
+		}
 	}
 
 	if !govalidator.IsEmail(req.Email) {
@@ -81,7 +92,8 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	if req.Email == "" || req.Password == "" {
+	if !govalidator.IsEmail(req.ContactEmail) ||
+		len(req.ContactEmail) > maxEmailLength {
 		return auth.ErrMalformedEntity
 	}
 
@@ -90,12 +102,16 @@ func (req updateReq) validate() error {
 
 type updatePasswordReq struct {
 	key         string
-	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
-	RePassword  string `json:"re_password"`
+	RePassword  string `json:"re_password,omitempty"`
+	OldPassword string `json:"old_password,omitempty"`
 }
 
 func (req updatePasswordReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
 	if req.OldPassword == "" || req.NewPassword == "" || req.RePassword == "" {
 		return auth.ErrMalformedEntity
 	}

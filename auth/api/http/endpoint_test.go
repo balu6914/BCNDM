@@ -17,19 +17,19 @@ import (
 )
 
 const (
-	contentType = "application/json"
-	token       = "token"
-	email       = "john.doe@email.com"
-	invalid     = "invalid"
+	contentType  = "application/json"
+	token        = "token"
+	email        = "john.doe@email.com"
+	contactEmail = "john.doe@email.com"
+	invalid      = "invalid"
 )
 
 var user = auth.User{
-	ID:           email,
-	Email:        email,
-	ContactEmail: contactEmail,
-	Password:     "pass",
-	FirstName:    "Joe",
-	LastName:     "Doe",
+	ID:        email,
+	Email:     email,
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
 }
 
 func newService() auth.Service {
@@ -85,8 +85,10 @@ func TestRegister(t *testing.T) {
 	data := toJSON(user)
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
-		Email:    invalid,
-		Password: "pass",
+		Email:     invalid,
+		Password:  "pass",
+		FirstName: "John",
+		LastName:  "Doe",
 	})
 
 	cases := []struct {
@@ -266,11 +268,11 @@ func TestUpdate(t *testing.T) {
 	svc.Register(user)
 	key, _ := svc.Login(user)
 
-	updatedUser := user
-	updatedUser.ContactEmail = "new_pass@example.com"
-	updatedUser.FirstName = "John"
-	updatedUser.LastName = "Doe"
-	data := toJSON(updatedUser)
+	data := toJSON(testUpdateReq{
+		ContactEmail: "john@email.com",
+		FirstName:    "john",
+		LastName:     "doe",
+	})
 
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
@@ -348,12 +350,111 @@ func TestUpdate(t *testing.T) {
 			status:      http.StatusBadRequest,
 		},
 	}
-
 	for _, tc := range cases {
 		req := testRequest{
 			client:      ts.Client(),
 			method:      http.MethodPut,
 			url:         fmt.Sprintf("%s/users", ts.URL),
+			contentType: tc.contentType,
+			token:       tc.token,
+			body:        strings.NewReader(tc.req),
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+
+}
+
+func TestUpdatePassowrd(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	svc.Register(user)
+	key, _ := svc.Login(user)
+
+	data := toJSON(testUpdatePassswordReq{
+		NewPassword: "newpassword",
+		RePassword:  "newpassword",
+		OldPassword: "password",
+	})
+
+	mismatchData := toJSON(testUpdatePassswordReq{
+		NewPassword: "newpassword",
+		RePassword:  "newpassword1",
+		OldPassword: "password",
+	})
+
+	invalidOldData := toJSON(testUpdatePassswordReq{
+		NewPassword: "newpassword",
+		RePassword:  "newpassword",
+		OldPassword: "password_invalid",
+	})
+
+	cases := []struct {
+		desc        string
+		contentType string
+		req         string
+		token       string
+		status      int
+	}{
+		{
+			desc:        "update existing user password",
+			contentType: contentType,
+			req:         data,
+			token:       key,
+			status:      http.StatusOK,
+		},
+		{
+			desc:        "update user with empty token",
+			contentType: contentType,
+			req:         data,
+			token:       "",
+			status:      http.StatusForbidden,
+		},
+		{
+			desc:        "update user with empty content type",
+			contentType: "",
+			req:         data,
+			token:       key,
+			status:      http.StatusUnsupportedMediaType,
+		},
+		{
+			desc:        "update user with invalid request format",
+			contentType: contentType,
+			req:         "}",
+			token:       key,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "update user with empty JSON request",
+			contentType: contentType,
+			req:         "{}",
+			token:       key,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "update user with wrong old password",
+			contentType: contentType,
+			req:         invalidOldData,
+			token:       key,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "update user with password mismatch",
+			contentType: contentType,
+			req:         mismatchData,
+			token:       key,
+			status:      http.StatusBadRequest,
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client:      ts.Client(),
+			method:      http.MethodPut,
+			url:         fmt.Sprintf("%s/users/password", ts.URL),
 			contentType: tc.contentType,
 			token:       tc.token,
 			body:        strings.NewReader(tc.req),
@@ -402,4 +503,16 @@ func TestView(t *testing.T) {
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", desc, err))
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", desc, tc.status, res.StatusCode))
 	}
+}
+
+type testUpdatePassswordReq struct {
+	NewPassword string `json:"new_password"`
+	RePassword  string `json:"re_password,omitempty"`
+	OldPassword string `json:"old_password,omitempty"`
+}
+
+type testUpdateReq struct {
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
 }

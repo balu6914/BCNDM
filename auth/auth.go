@@ -1,7 +1,5 @@
 package auth
 
-import "fmt"
-
 var _ Service = (*authService)(nil)
 
 type authService struct {
@@ -73,19 +71,20 @@ func (ms *authService) UpdatePassword(key string, old string, user User) error {
 	}
 	user.ID = id
 	// Validate current password with hashed record in DB
-	dbu, err := ms.View(user.ID)
-	oHash, err := ms.hasher.Hash(old)
-	fmt.Println("######################## dbu.Password", dbu.Password)
-	fmt.Println("######################## Hash password", oHash)
-	if dbu.Password != oHash {
-		return ErrUnauthorizedAccess
+	dbu, err := ms.users.OneByID(user.ID)
+	if err != nil {
+		return ErrNotFound
 	}
 
-	hash, err := ms.hasher.Hash(user.Password)
-	if err != nil {
+	if err = ms.hasher.Compare(old, dbu.Password); err != nil {
 		return ErrMalformedEntity
 	}
 
+	hash, err := ms.hasher.Hash(user.Password)
+
+	if err != nil {
+		return ErrMalformedEntity
+	}
 	user.Password = hash
 
 	return ms.users.Update(user)

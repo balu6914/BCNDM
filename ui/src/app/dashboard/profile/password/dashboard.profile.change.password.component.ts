@@ -46,17 +46,17 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    console.log("submit try", this.form)
 
     if (this.form.valid) {
-      console.log("SENNNNNNNNNND", this.form);
-      const data = this.form.value;
-      this.userService.updatePassword(data).subscribe(
+      this.userService.updatePassword(this.form.value).subscribe(
         response => {
-          this.alertService.success('Yousuccesfully change your password.');
+          this.alertService.success('You succesfully change your password.');
+          this.form.reset();
+          this.submitted = false;
         },
         err => {
             this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+            this.submitted = false;
         });
     }
   }

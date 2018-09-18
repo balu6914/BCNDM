@@ -69,20 +69,10 @@ func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
-
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var req registerReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-
-	req := registerReq{
-		Email:        user.Email,
-		ContactEmail: user.Email,
-		Password:     user.Password,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-	}
-
 	return req, nil
 }
 
@@ -95,57 +85,43 @@ func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 }
 
 func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	var req updateReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
 
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-
-	req := updateReq{
-		key:          r.Header.Get("Authorization"),
-		ContactEmail: user.ContactEmail,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-	}
+	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
+	var req credentialsReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
 
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
-	}
-
-	req := credentialsReq{
-		Email:    user.Email,
-		Password: user.Password,
 	}
 
 	return req, nil
 }
 
 func decodePasswordUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	var req updatePasswordReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
 
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 
-	req := updatePasswordReq{
-		key:         r.Header.Get("Authorization"),
-		NewPassword: user.Password,
-	}
+	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }
