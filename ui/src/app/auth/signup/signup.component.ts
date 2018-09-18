@@ -6,7 +6,7 @@ import 'rxjs/add/observable/throw';
 
 import { User } from 'app/common/interfaces/user.interface';
 import { UserService } from 'app/common/services/user.service';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from 'app/auth/services/auth.service';
 
 @Component({
   selector: 'dpc-signup-form',

@@ -7,7 +7,7 @@ import 'rxjs/add/observable/throw';
 
 import { User } from 'app/common/interfaces/user.interface';
 import { UserService } from 'app/common/services/user.service';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from 'app/auth/services/auth.service';
 
 const emailValidator = Validators.pattern('^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$');
 
