@@ -13,8 +13,8 @@ type mockNetwork struct {
 	mutex     *sync.Mutex
 }
 
-// NewBlockchainNetwork returns mock instance of blockchain network.
-func NewBlockchainNetwork(users map[string]uint64, remaining uint64) transactions.TokenLedger {
+// NewTokenLedger returns mock instance of blockchain network.
+func NewTokenLedger(users map[string]uint64, remaining uint64) transactions.TokenLedger {
 	return &mockNetwork{
 		users:     users,
 		remaining: remaining,
@@ -46,7 +46,7 @@ func (mn *mockNetwork) Balance(name string) (uint64, error) {
 	return balance, nil
 }
 
-func (mn *mockNetwork) Transfer(from, to string, value uint64) error {
+func (mn *mockNetwork) Transfer(stream, from, to string, value uint64) error {
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()
 

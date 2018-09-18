@@ -19,16 +19,18 @@ const (
 )
 
 func newService() transactions.Service {
-	repo := mocks.NewUserRepository(map[string]string{
+	ur := mocks.NewUserRepository(map[string]string{
 		userID1: secret,
 		userID2: secret,
 	})
-	bn := mocks.NewBlockchainNetwork(map[string]uint64{
+	tl := mocks.NewTokenLedger(map[string]uint64{
 		userID1: balance,
 		userID2: balance,
 	}, remainingTokens)
+	cl := mocks.NewContractLedger()
+	cr := mocks.NewContractRepository()
 
-	return transactions.New(repo, bn)
+	return transactions.New(ur, tl, cl, cr)
 }
 
 func TestCreateUser(t *testing.T) {
@@ -109,7 +111,7 @@ func TestTransfer(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := svc.Transfer(tc.from, tc.to, tc.value)
+		err := svc.Transfer("", tc.from, tc.to, tc.value)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.err, err))
 	}
 }

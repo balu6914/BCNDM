@@ -37,8 +37,8 @@ func (cr contractRepository) Create(contracts ...transactions.Contract) error {
 		},
 		"active": true,
 	}
-	mcs := []mongoContract{}
-	if count, err := collection.Find(query).Count(); err != nil {
+	count, err := collection.Find(query).Count()
+	if err != nil {
 		return err
 	}
 	if count != 0 {

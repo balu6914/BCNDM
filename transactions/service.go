@@ -3,8 +3,11 @@ package transactions
 import "errors"
 
 const (
+	// Owner role enumeration.
 	Owner Role = 1 << iota
+	// Partner role enumeration.
 	Partner
+	// AllRoles enumeration.
 	AllRoles
 )
 
