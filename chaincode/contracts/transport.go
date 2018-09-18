@@ -86,14 +86,20 @@ func (cr chaincodeRouter) signContract(stub shim.ChaincodeStubInterface, args []
 		return shim.Error(ErrInvalidNumOfArgs.Error())
 	}
 
-	var req contractReq
+	partner, err := callerCN(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	var req signReq
 	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
 	contract := Contract{
-		StreamID: req.StreamID,
-		EndTime:  req.EndTime,
+		StreamID:  req.StreamID,
+		EndTime:   req.EndTime,
+		PartnerID: partner,
 	}
 	if err := cr.svc.SignContract(stub, contract); err != nil {
 		return shim.Error(err.Error())

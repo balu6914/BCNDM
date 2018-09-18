@@ -30,6 +30,21 @@ func (cr contractRepository) Create(contracts ...transactions.Contract) error {
 	defer session.Close()
 	collection := session.DB(dbName).C(contractsCollection)
 
+	query := bson.M{
+		"stream_id": contracts[0].StreamID,
+		"end_time": bson.M{
+			"$gt": time.Now(),
+		},
+		"active": true,
+	}
+	mcs := []mongoContract{}
+	if count, err := collection.Find(query).Count(); err != nil {
+		return err
+	}
+	if count != 0 {
+		return transactions.ErrConflict
+	}
+
 	if err := collection.Insert(mongoContracts...); err != nil {
 		if mgo.IsDup(err) {
 			return transactions.ErrConflict

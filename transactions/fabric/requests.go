@@ -23,7 +23,6 @@ type createContractReq struct {
 }
 
 type signContractReq struct {
-	StreamID  string    `json:"stream_id"`
-	PartnerID string    `json:"partner_id"`
-	EndTime   time.Time `json:"end_time"`
+	StreamID string    `json:"stream_id"`
+	EndTime  time.Time `json:"end_time"`
 }

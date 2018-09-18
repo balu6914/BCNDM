@@ -1,8 +1,11 @@
 package transactions
 
-import "crypto/rand"
+import (
+	"crypto/rand"
+)
 
 const (
+	maxShare  = 90000
 	letters   = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	secretLen = 64
 )
@@ -84,6 +87,14 @@ func (ts transactionService) WithdrawTokens(account string, value uint64) error 
 }
 
 func (ts transactionService) CreateContracts(contracts ...Contract) error {
+	sum := uint64(0)
+	for _, contract := range contracts {
+		sum += contract.Share
+	}
+	if sum > maxShare {
+		return ErrConflict
+	}
+
 	if err := ts.conRepo.Create(contracts...); err != nil {
 		return err
 	}

@@ -51,7 +51,8 @@ type createContractsReq struct {
 }
 
 func (req createContractsReq) validate() error {
-	if req.ownerID == "" || req.StreamID == "" || req.EndTime.Before(time.Now()) {
+	if req.ownerID == "" || req.StreamID == "" ||
+		req.EndTime.Before(time.Now()) || len(req.Items) == 0 {
 		return errMalformedEntity
 	}
 
@@ -78,14 +79,13 @@ func (req contractItem) validate() error {
 }
 
 type signContractReq struct {
-	ownerID   string
+	partnerID string
 	StreamID  string    `json:"stream_id"`
 	EndTime   time.Time `json:"end_time"`
-	PartnerID string    `json:"partner_id"`
 }
 
 func (req signContractReq) validate() error {
-	if req.ownerID == "" || req.StreamID == "" || req.PartnerID == "" {
+	if req.EndTime.Before(time.Now()) || req.partnerID == "" || req.StreamID == "" {
 		return errMalformedEntity
 	}
 

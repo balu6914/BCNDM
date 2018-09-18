@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"time"
 
@@ -65,7 +64,7 @@ func (cc contractChaincode) SignContract(stub shim.ChaincodeStubInterface, signe
 	if err != nil {
 		return ErrGettingState
 	}
-	if data != nil {
+	if data == nil {
 		return ErrNotFound
 	}
 
@@ -90,7 +89,6 @@ func (cc contractChaincode) SignContract(stub shim.ChaincodeStubInterface, signe
 func (cc contractChaincode) Transfer(stub shim.ChaincodeStubInterface, stream string, owner string, currentTime time.Time, value uint64) error {
 	iter, err := stub.GetStateByPartialCompositeKey(objectType, []string{stream})
 	if err != nil {
-		fmt.Println(err)
 		return ErrGettingState
 	}
 	defer iter.Close()
@@ -109,6 +107,18 @@ func (cc contractChaincode) Transfer(stub shim.ChaincodeStubInterface, stream st
 		if err := json.Unmarshal(kv.GetValue(), &contract); err != nil {
 			return ErrGettingState
 		}
+
+		_, keys, err := stub.SplitCompositeKey(kv.GetKey())
+		if err != nil {
+			return ErrGettingState
+		}
+
+		contract.StreamID = keys[0]
+		contract.EndTime, err = time.Parse(format, keys[1])
+		if err != nil {
+			return ErrGettingState
+		}
+		contract.PartnerID = keys[2]
 
 		if contract.EndTime.Before(currentTime) || !contract.Signed {
 			continue

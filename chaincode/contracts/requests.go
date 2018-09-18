@@ -12,6 +12,11 @@ type contractReq struct {
 	Signed    bool      `json:"signed,omitempty"`
 }
 
+type signReq struct {
+	StreamID string    `json:"stream_id,omitempty"`
+	EndTime  time.Time `json:"end_time,omitempty"`
+}
+
 type transferReq struct {
 	StreamID string    `json:"stream_id,omitempty"`
 	Time     time.Time `json:"time,omitempty"`

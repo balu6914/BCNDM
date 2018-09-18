@@ -175,7 +175,7 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 		return nil, err
 	}
 
-	req.ownerID = id
+	req.partnerID = id
 
 	return req, nil
 }

@@ -94,7 +94,7 @@ func (fc feeChaincode) Transfer(stub shim.ChaincodeStubInterface, owner string, 
 			Value: value - feeValue,
 		},
 	}
-	for _, t := range ts {
+	for _, t := range transfers {
 		ts = append(ts, Transfer{
 			To:    t.To,
 			Value: t.Value,

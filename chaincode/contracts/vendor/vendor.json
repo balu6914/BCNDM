@@ -9,10 +9,10 @@
 			"revisionTime": "2018-09-13T20:31:01Z"
 		},
 		{
-			"checksumSHA1": "7jUK9OzL1arQsSuop5KmgKxM2Pc=",
+			"checksumSHA1": "YU+m78bhPrho7TdY30DLB5F+7d8=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "4c724802a701c91f7b96c3b2de95cea198a678eb",
-			"revisionTime": "2018-09-14T16:00:31Z"
+			"revision": "b05dd81dd8a8258b997b911429056a064017d71f",
+			"revisionTime": "2018-09-18T14:06:37Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/contracts"

@@ -90,10 +90,9 @@ func signContractEndpoint(svc transactions.Service) endpoint.Endpoint {
 		}
 
 		contract := transactions.Contract{
-			OwnerID:   req.ownerID,
 			StreamID:  req.StreamID,
 			EndTime:   req.EndTime,
-			PartnerID: req.PartnerID,
+			PartnerID: req.partnerID,
 		}
 
 		if err := svc.SignContract(contract); err != nil {
@@ -131,6 +130,6 @@ func listContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
 			})
 		}
 
-		return page, nil
+		return res, nil
 	}
 }

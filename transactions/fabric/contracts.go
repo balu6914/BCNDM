@@ -87,7 +87,7 @@ func (cl contractLedger) Create(contracts ...transactions.Contract) error {
 func (cl contractLedger) Sign(contract transactions.Contract) error {
 	ctx := cl.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(contract.OwnerID),
+		fabsdk.WithUser(contract.PartnerID),
 		fabsdk.WithOrg(cl.org),
 	)
 
@@ -98,9 +98,8 @@ func (cl contractLedger) Sign(contract transactions.Contract) error {
 	}
 
 	req := signContractReq{
-		StreamID:  contract.StreamID,
-		PartnerID: contract.PartnerID,
-		EndTime:   contract.EndTime,
+		StreamID: contract.StreamID,
+		EndTime:  contract.EndTime,
 	}
 
 	data, err := json.Marshal(req)

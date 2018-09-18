@@ -99,3 +99,15 @@ type contractView struct {
 	Share     uint64    `json:"share"`
 	Signed    bool      `json:"signed"`
 }
+
+func (res listContractsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res listContractsRes) code() int {
+	return http.StatusOK
+}
+
+func (res listContractsRes) empty() bool {
+	return false
+}
