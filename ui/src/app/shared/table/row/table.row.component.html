@@ -1,6 +1,6 @@
 <tr *ngIf="rowType === types.Dashboard">
   <td>{{ row.stream_name }}</td>
-  <td nowrap>{{ row.stream_price }}</td>
+  <td nowrap>{{ row.stream_price | tas}}</td>
   <td nowrap>{{ row.start_date| date }}</td>
   <td nowrap>{{ row.end_date | date }}</td>
   <td nowrap>
@@ -15,7 +15,7 @@
   <td>{{ row.type }}</td>
   <td nowrap>{{ row.start_date| date }}</td>
   <div class="value" [ngClass]="row.type === 'Income' ? 'value--plus' : 'value--minus'">
-    <td nowrap>{{row.stream_price | subscriptionType:row.type}}</td>
+    <td nowrap>{{row.stream_price | tas | subscriptionType:row.type}}</td>
   </div>
 </tr>
 <tr *ngIf="rowType === types.Contract">
