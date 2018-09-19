@@ -39,9 +39,11 @@ export class MapComponent {
   layerGroup = new L.LayerGroup();
   markers = [];
   firstPageLoad: boolean = true;
+  tempId: any;
 
   @Input() streamList: any;
   @Output() viewChanged: EventEmitter<any> = new EventEmitter();
+  @Output() hoverMarker: EventEmitter<any> = new EventEmitter();
   constructor(
     private tasPipe: TasPipe,
   ) {
@@ -50,12 +52,25 @@ export class MapComponent {
   // Get stream type icon
   getIcon(type) {
     const icons = {
-      temperature: "assets/img/icons/map-temp.svg",
-      humidity: "assets/img/icons/map-water.svg",
-      air: "assets/img/icons/map-co2.svg",
-      default: "assets/img/icons/map.svg"
+      chart: 'assets/img/icons/map-chart.svg',
+      temperature: 'assets/img/icons/map-temp.svg',
+      humidity: 'assets/img/icons/map-water.svg',
+      air: 'assets/img/icons/map-co2.svg',
+      default: 'assets/img/icons/map.svg'
     };
-    return icons[type] || icons["default"];
+    return icons[type] || icons['default'];
+  }
+
+  // Get stream type icon
+  getIconHover(type) {
+    const icons = {
+      chart: 'assets/img/icons/map-chart-red.svg',
+      temperature: 'assets/img/icons/map-temp-red.svg',
+      humidity: 'assets/img/icons/map-water-red.svg',
+      air: 'assets/img/icons/map-co2-red.svg',
+      default: 'assets/img/icons/map-red.svg'
+    };
+    return icons[type] || icons['default'];
   }
 
   onMapReady(map: L.Map) {
@@ -67,6 +82,10 @@ export class MapComponent {
   onMapMoveEnd() {
     const bounds = this.map.getBounds();
     this.viewChanged.emit(bounds);
+  }
+
+  onMapMouseMove(event: any) {
+    this.hoverMarker.emit(this.tempId);
   }
 
   ngOnChanges() {
@@ -116,6 +135,7 @@ export class MapComponent {
          })
        }
     );
+
     // Create popup message and add it to marker
     const msg = `
       <div class="map-tooltip">
@@ -129,7 +149,8 @@ export class MapComponent {
           </p>
         </div>
       </div>
-    `
+    `;
+
     newMarker.bindPopup(msg);
 
     // Add marker as a map layer
@@ -137,6 +158,14 @@ export class MapComponent {
 
     // Get ID of the marker and add it to stream object
     stream.mapId = this.layerGroup.getLayerId(newMarker);
+
+    // TODO: Use (leafletMouseMove)="onMapMouseMove($event)"
+    newMarker.on('mouseover', () => {
+      this.tempId = stream.mapId;
+    });
+    newMarker.on('mouseout', () => {
+      this.tempId = 0;
+    });
 
     // Add stream to markers list
     this.markers.push(stream);
@@ -161,4 +190,23 @@ export class MapComponent {
     // Fit map bounds
     this.focusMap();
   }
+
+  mouseHoverMarker(row: any) {
+    const markerLayer = <L.Marker>this.layerGroup.getLayer(row.mapId);
+    const icon = L.icon({
+        iconUrl:  this.getIconHover(row.type),
+        iconSize: [45, 45]
+    }) ;
+    markerLayer.setIcon(icon);
+  }
+
+  mouseUnhoverMarker(row: any) {
+    const markerLayer = <L.Marker>this.layerGroup.getLayer(row.mapId);
+    const icon = L.icon({
+        iconUrl:  this.getIcon(row.type),
+        iconSize: [45, 45]
+    }) ;
+    markerLayer.setIcon(icon);
+  }
+
 }

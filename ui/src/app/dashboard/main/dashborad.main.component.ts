@@ -92,4 +92,12 @@ fetchStreams(page: Page<Subscription>) {
     this.fetchSubscriptions();
   }
 
+  onHoverRow(row) {
+    this.map.mouseHoverMarker(row);
+  }
+
+  onUnhoverRow(row) {
+    this.map.mouseUnhoverMarker(row);
+  }
+
 }

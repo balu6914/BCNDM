@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, ViewChild } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Table, TableType } from '../table';
 import { Stream } from '../../../common/interfaces/stream.interface';
+import { TableRowComponent } from '../row/table.row.component';
 
 @Component({
   selector: 'dpc-table',
@@ -25,12 +26,14 @@ export class TableComponent {
   types = TableType;
   flip = 'inactive';
   selectedRow: any;
+  rowToMark: any;
 
   @Input() table: Table = new Table();
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() pageChanged = new EventEmitter<number>();
-
+  @Output() hoverRow: EventEmitter<any> = new EventEmitter();
+  @Output() unhoverRow: EventEmitter<any> = new EventEmitter();
   constructor() { }
 
 
@@ -45,12 +48,12 @@ export class TableComponent {
     // Remove row
     const list: any = this.table.page.content;
     list.forEach( (row, i) => {
-      if (row.id == id) {
+      if (row.id === id) {
         // Remove row from table
-        this.table.page.content.splice(i,1);
+        this.table.page.content.splice(i, 1);
         // Emit event to DashboardSellComponent
         // If its delted from details page, go back to list
-        if(this.selectedRow && row.id === this.selectedRow.id) {
+        if (this.selectedRow && row.id === this.selectedRow.id) {
           this.flip = 'inactive';
         }
         this.deleteEvt.emit(row.id);
@@ -60,9 +63,9 @@ export class TableComponent {
 
   rowEdited(stream) {
     // Update row values
-    let rows: any = this.table.page.content;
+    const rows: any = this.table.page.content;
     rows.forEach( (row, i) => {
-      if (row.id == stream.id) {
+      if (row.id === stream.id) {
         // Update row table
         this.table.page.content[i] = stream;
         // Emit event to DashboardSellComponent
@@ -75,4 +78,17 @@ export class TableComponent {
   onPageChange(page: number) {
     this.pageChanged.emit(page);
   }
+
+  onHoveringRow(row) {
+    this.hoverRow.emit(row);
+  }
+
+  onUnhoveringRow(row) {
+    this.unhoverRow.emit(row);
+  }
+
+  activateRow(streamId) {
+    this.rowToMark = streamId;
+  }
+
 }

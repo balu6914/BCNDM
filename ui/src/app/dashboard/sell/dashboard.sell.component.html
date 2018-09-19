@@ -39,11 +39,20 @@
               Your streams
             </p>
           </div>
-          <dpc-map-leaflet #map [streamList]="table.page.content"></dpc-map-leaflet>
+          <dpc-map-leaflet #map [streamList]="table.page.content"
+                           (hoverMarker)="onHoverMarker($event)">
+          </dpc-map-leaflet>
         </div>
       </div>
       <div class="col-lg-6 order-1 order-sm-2">
-        <dpc-table (editEvt)="editStream($event)" (deleteEvt)="deleteStream($event)" [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
+        <dpc-table #tableComponent
+                   [table]="table"
+                   (pageChanged)="onPageChange($event)"
+                   (editEvt)="editStream($event)"
+                   (deleteEvt)="deleteStream($event)"
+                   (hoverRow)="onHoverRow($event)"
+                   (unhoverRow)="onUnhoverRow($event)">
+        </dpc-table>
       </div>
     </div>
   </div>
