@@ -39,14 +39,16 @@ func startServer() {
 }
 
 func newService() transactions.Service {
-	repo := mocks.NewUserRepository(map[string]string{
+	ur := mocks.NewUserRepository(map[string]string{
 		id1: secret,
 		id2: secret,
 	})
-	bn := mocks.NewBlockchainNetwork(map[string]uint64{
+	tl := mocks.NewTokenLedger(map[string]uint64{
 		id1: balance,
 		id2: balance,
 	}, remainingTokens)
+	cl := mocks.NewContractLedger()
+	cr := mocks.NewContractRepository()
 
-	return transactions.New(repo, bn)
+	return transactions.New(ur, tl, cl, cr)
 }

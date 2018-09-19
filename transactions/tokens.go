@@ -1,7 +1,7 @@
 package transactions
 
-// BlockchainNetwork contains blockchain specific API definition.
-type BlockchainNetwork interface {
+// TokenLedger contains token specific API definition.
+type TokenLedger interface {
 	// CreateUser creates user on blockchain and returns this private key.
 	CreateUser(string, string) error
 
@@ -9,7 +9,7 @@ type BlockchainNetwork interface {
 	Balance(string) (uint64, error)
 
 	// Transfers tokens from one account to another.
-	Transfer(string, string, uint64) error
+	Transfer(string, string, string, uint64) error
 
 	// BuyTokens transfers tokens to given account.
 	BuyTokens(string, uint64) error

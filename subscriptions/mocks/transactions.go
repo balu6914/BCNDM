@@ -13,7 +13,7 @@ func NewTransactionsService(from uint64) subscriptions.TransactionsService {
 	return transactionsServiceMock{from: from}
 }
 
-func (svc transactionsServiceMock) Transfer(from, to string, value uint64) error {
+func (svc transactionsServiceMock) Transfer(stream, from, to string, value uint64) error {
 	if svc.from < value {
 		return subscriptions.ErrFailedTransfer
 	}

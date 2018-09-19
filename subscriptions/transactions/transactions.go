@@ -21,14 +21,15 @@ func NewService(client monetasa.TransactionsServiceClient) subscriptions.Transac
 	return transactionsService{client: client}
 }
 
-func (ts transactionsService) Transfer(from, to string, value uint64) error {
+func (ts transactionsService) Transfer(streamID, from, to string, value uint64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	td := &monetasa.TransferData{
-		From:  from,
-		To:    to,
-		Value: value,
+		StreamID: streamID,
+		From:     from,
+		To:       to,
+		Value:    value,
 	}
 	if _, err := ts.client.Transfer(ctx, td); err != nil {
 		e, ok := status.FromError(err)

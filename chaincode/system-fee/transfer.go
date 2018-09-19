@@ -19,12 +19,6 @@ type TransferService interface {
 	Transfer(shim.ChaincodeStubInterface, ...Transfer) error
 }
 
-// Transfer contains transfer data.
-type Transfer struct {
-	To    string
-	Value uint64
-}
-
 var _ TransferService = (*transferService)(nil)
 
 type transferService struct {

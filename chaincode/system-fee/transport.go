@@ -114,12 +114,21 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ErrInvalidNumOfArgs.Error())
 	}
 
-	var transfer transferReq
-	if err := json.Unmarshal([]byte(args[0]), &transfer); err != nil {
+	var req transferStatusReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if err := cr.svc.Transfer(stub, transfer.To, transfer.Value); err != nil {
+	transfers := []Transfer{}
+	for _, val := range req.Transfers {
+		t := Transfer{
+			To:    val.To,
+			Value: val.Value,
+		}
+		transfers = append(transfers, t)
+	}
+
+	if err := cr.svc.Transfer(stub, req.Owner, req.Value, transfers...); err != nil {
 		return shim.Error(err.Error())
 	}
 
