@@ -1,15 +1,15 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
+import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
 // Add  routes
 import { DashboardProfileRoutingModule } from './dashboard.profile.routes';
 // Add components
 import { DashboardProfileComponent } from './dashboard.profile.component';
 import { DashboardProfilePasswordUpdateComponent  } from './password/dashboard.profile.change.password.component';
 import { DashboardProfileUpdateComponent } from './update/dashboard.profile.update.component';
-import { CommonAppModule } from '../../common/common.module';
-import { SharedModule } from '../../shared/shared.module';
+import { CommonAppModule } from 'app/common/common.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 @NgModule({
   imports: [
