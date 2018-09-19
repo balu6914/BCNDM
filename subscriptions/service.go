@@ -91,7 +91,7 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		return "", ErrFailedCreateSub
 	}
 
-	if err := ss.transactions.Transfer(userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
 		if err == ErrNotEnoughTokens {
 			return "", err
 		}

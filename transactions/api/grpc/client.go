@@ -55,9 +55,10 @@ func (client grpcClient) CreateUser(ctx context.Context, user *monetasa.ID, _ ..
 
 func (client grpcClient) Transfer(ctx context.Context, td *monetasa.TransferData, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := transferReq{
-		from:  td.GetFrom(),
-		to:    td.GetTo(),
-		value: td.GetValue(),
+		streamID: td.GetStreamID(),
+		from:     td.GetFrom(),
+		to:       td.GetTo(),
+		value:    td.GetValue(),
 	}
 
 	res, err := client.transfer(ctx, req)
@@ -80,9 +81,10 @@ func decodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 func encodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(transferReq)
 	return &monetasa.TransferData{
-		From:  req.from,
-		To:    req.to,
-		Value: req.value,
+		StreamID: req.streamID,
+		From:     req.from,
+		To:       req.to,
+		Value:    req.value,
 	}, nil
 }
 

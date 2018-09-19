@@ -11,7 +11,8 @@ service TransactionsService {
 }
 
 message TransferData {
-    string from  = 1;
-    string to = 2;
-    uint64 value = 3;
+    string streamID = 1;
+    string from  = 2;
+    string to = 3;
+    uint64 value = 4;
 }

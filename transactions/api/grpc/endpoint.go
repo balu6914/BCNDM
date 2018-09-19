@@ -14,7 +14,7 @@ func transferEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		if err := svc.Transfer(req.from, req.to, req.value); err != nil {
+		if err := svc.Transfer(req.streamID, req.from, req.to, req.value); err != nil {
 			return nil, err
 		}
 

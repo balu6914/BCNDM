@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"monetasa/transactions"
+	"time"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -50,5 +51,85 @@ func withdrawEndpoint(svc transactions.Service) endpoint.Endpoint {
 		}
 
 		return withdrawRes{}, nil
+	}
+}
+
+func createContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(createContractsReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		now := time.Now()
+
+		contracts := []transactions.Contract{}
+		for _, item := range req.Items {
+			contracts = append(contracts, transactions.Contract{
+				StreamID:  req.StreamID,
+				OwnerID:   req.ownerID,
+				StartTime: now,
+				EndTime:   req.EndTime,
+				PartnerID: item.PartnerID,
+				Share:     item.Share,
+			})
+		}
+		if err := svc.CreateContracts(contracts...); err != nil {
+			return nil, err
+		}
+
+		return createContractsRes{}, nil
+	}
+}
+
+func signContractEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(signContractReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		contract := transactions.Contract{
+			StreamID:  req.StreamID,
+			EndTime:   req.EndTime,
+			PartnerID: req.partnerID,
+		}
+
+		if err := svc.SignContract(contract); err != nil {
+			return nil, err
+		}
+
+		return signContractRes{}, nil
+	}
+}
+
+func listContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(listContractsReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		page := svc.ListContracts(req.userID, req.page, req.limit, req.role)
+		res := listContractsRes{
+			Page:      page.Page,
+			Limit:     page.Limit,
+			Total:     page.Total,
+			Contracts: []contractView{},
+		}
+
+		for _, contract := range page.Contracts {
+			res.Contracts = append(res.Contracts, contractView{
+				StreamID:  contract.StreamID,
+				StartTime: contract.StartTime,
+				EndTime:   contract.EndTime,
+				OwnerID:   contract.OwnerID,
+				PartnerID: contract.PartnerID,
+				Share:     contract.Share,
+				Signed:    contract.Signed,
+			})
+		}
+
+		return res, nil
 	}
 }

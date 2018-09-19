@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "CbzNfOvaT1G3G9WILmsyjYfYTO0=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "b9c4db9580b625e3cc9b93e57a2ccc214e73b886",
+			"revisionTime": "2018-09-13T20:31:01Z"
+		},
+		{
+			"checksumSHA1": "YU+m78bhPrho7TdY30DLB5F+7d8=",
+			"path": "github.com/hyperledger/fabric/protos/msp",
+			"revision": "b05dd81dd8a8258b997b911429056a064017d71f",
+			"revisionTime": "2018-09-18T14:06:37Z"
+		}
+	],
+	"rootPath": "github.com/chaincode/contracts"
+}

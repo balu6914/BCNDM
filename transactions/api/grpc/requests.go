@@ -13,13 +13,14 @@ func (req createUserReq) validate() error {
 }
 
 type transferReq struct {
-	from  string
-	to    string
-	value uint64
+	streamID string
+	from     string
+	to       string
+	value    uint64
 }
 
 func (req transferReq) validate() error {
-	if req.from == "" || req.to == "" {
+	if req.streamID == "" || req.from == "" || req.to == "" {
 		return errMalformedEntity
 	}
 

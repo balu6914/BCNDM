@@ -1,6 +1,9 @@
 package http
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 type apiRes interface {
 	code() int
@@ -50,4 +53,61 @@ func (res withdrawRes) code() int {
 
 func (res withdrawRes) empty() bool {
 	return true
+}
+
+type createContractsRes struct{}
+
+func (res createContractsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res createContractsRes) code() int {
+	return http.StatusCreated
+}
+
+func (res createContractsRes) empty() bool {
+	return true
+}
+
+type signContractRes struct{}
+
+func (res signContractRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res signContractRes) code() int {
+	return http.StatusOK
+}
+
+func (res signContractRes) empty() bool {
+	return true
+}
+
+type listContractsRes struct {
+	Page      uint64         `json:"page"`
+	Limit     uint64         `json:"limit"`
+	Total     uint64         `json:"total"`
+	Contracts []contractView `json:"contracts"`
+}
+
+type contractView struct {
+	StreamID  string    `json:"stream_id"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+	OwnerID   string    `json:"owner_id"`
+	PartnerID string    `json:"partner_id"`
+	Share     uint64    `json:"share"`
+	Signed    bool      `json:"signed"`
+}
+
+func (res listContractsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res listContractsRes) code() int {
+	return http.StatusOK
+}
+
+func (res listContractsRes) empty() bool {
+	return false
 }

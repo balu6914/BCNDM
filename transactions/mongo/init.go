@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	dbName          = "monetasa-transactions"
-	usersCollection = "users"
+	dbName              = "monetasa-transactions"
+	usersCollection     = "users"
+	contractsCollection = "contracts"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error
@@ -29,6 +30,20 @@ func Connect(addr string, tout int, socketTout int, db string, user string, pass
 
 	ms.SetSocketTimeout(time.Duration(socketTout) * time.Millisecond)
 	ms.SetMode(mgo.Monotonic, true)
+
+	// Create unique constraint in mongoDB.
+	session := ms.Copy()
+	defer session.Close()
+	collection := session.DB(dbName).C(contractsCollection)
+
+	index := mgo.Index{
+		Key:        []string{"stream_id", "partner_id", "end_time"},
+		Unique:     true,
+		DropDups:   false,
+		Background: false,
+		Sparse:     true,
+	}
+	collection.EnsureIndex(index)
 
 	return ms, nil
 }

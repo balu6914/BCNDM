@@ -15,6 +15,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const streamID = "stream_id"
+
 func TestCreateUser(t *testing.T) {
 	conn := createConn(t)
 
@@ -95,9 +97,10 @@ func TestTransfer(t *testing.T) {
 
 	for _, tc := range cases {
 		req := monetasa.TransferData{
-			From:  tc.from,
-			To:    tc.to,
-			Value: tc.value,
+			StreamID: streamID,
+			From:     tc.from,
+			To:       tc.to,
+			Value:    tc.value,
 		}
 
 		_, err := cli.Transfer(ctx, &req)

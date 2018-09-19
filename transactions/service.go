@@ -2,6 +2,15 @@ package transactions
 
 import "errors"
 
+const (
+	// Owner role enumeration.
+	Owner Role = 1 << iota
+	// Partner role enumeration.
+	Partner
+	// AllRoles enumeration.
+	AllRoles
+)
+
 var (
 	// ErrConflict indicates usage of the existing id during account
 	// registration.
@@ -28,6 +37,9 @@ var (
 	ErrNotEnoughTokens = errors.New("not enough tokens")
 )
 
+// Role represents enumeration for user roles.
+type Role int
+
 // Service specifies an API that must be fulfilled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
@@ -41,11 +53,21 @@ type Service interface {
 
 	// Transfer receives from and to ids and amount of tokens that it should
 	// transfer. It returns error only if transfer failed.
-	Transfer(string, string, uint64) error
+	Transfer(string, string, string, uint64) error
 
 	// BuyTokens transfers tokens to user's account.
 	BuyTokens(string, uint64) error
 
 	// WithdrawTokens exchanges tokens for real money.
 	WithdrawTokens(string, uint64) error
+
+	// CreateContracts creates multiple contracts at once.
+	CreateContracts(...Contract) error
+
+	// SignContract signs existing contract.
+	SignContract(Contract) error
+
+	// ListContracts finds and returns page of contracts by contract
+	// owner or partner, depending on passed role.
+	ListContracts(string, uint64, uint64, Role) ContractPage
 }
