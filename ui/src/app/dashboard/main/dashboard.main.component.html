@@ -1,34 +1,32 @@
-<div class="container-fluid">
-  <div class="page-wrapper animated fadeIn">
-    <div class="page-header">
-      <h1 class="page-title">
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <h1 class="page-title">
         Dashboard
       </h1>
+  </div>
+  <div class="row">
+    <div class="col-md-4 col-lg-3">
+      <!-- Balance wallet widget -->
+      <dpc-balance-widget></dpc-balance-widget>
     </div>
-    <div class="row">
-      <div class="col-md-4 col-lg-3">
-        <!-- Balance wallet widget -->
-        <dpc-balance-widget></dpc-balance-widget>
-      </div>
-      <div class="col-md-8 col-lg-9">
-        <!-- Statistics -->
-        <dpc-statistic-graph *ngIf="pageData && pageData.content" [dataOutcome]="sOutcome" [dataIncome]="sIncome"></dpc-statistic-graph>
-      </div>
+    <div class="col-md-8 col-lg-9">
+      <!-- Statistics -->
+      <dpc-statistic-graph *ngIf="pageData && pageData.content" [dataOutcome]="sOutcome" [dataIncome]="sIncome"></dpc-statistic-graph>
     </div>
-    <div class="row row-grow">
-      <div class="col-lg-7 order-2 order-sm-1">
-        <!-- Streams section -->
-        <dpc-dashboard-main-section-streams [page]="pageData" (tabChanged)="switchedTab($event)" (pageChanged)="onPageChanged($event)"></dpc-dashboard-main-section-streams>
-      </div>
-      <div class="col-lg-5 order-1 order-sm-2">
-        <div class="box box-grow">
-          <div class="box__header">
-            <p class="box__title">
-              {{activeStreamsSection.name}} Streams
-            </p>
-          </div>
-          <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
+  </div>
+  <div class="row row-grow">
+    <div class="col-lg-7 order-2 order-sm-1">
+      <!-- Streams section -->
+      <dpc-dashboard-main-section-streams [page]="pageData" (tabChanged)="switchedTab($event)" (pageChanged)="onPageChanged($event)"></dpc-dashboard-main-section-streams>
+    </div>
+    <div class="col-lg-5 order-1 order-sm-2">
+      <div class="box box-grow">
+        <div class="box__header">
+          <p class="box__title">
+            {{activeStreamsSection.name}} Streams
+          </p>
         </div>
+        <dpc-map-leaflet [streamList]="streams"></dpc-map-leaflet>
       </div>
     </div>
   </div>

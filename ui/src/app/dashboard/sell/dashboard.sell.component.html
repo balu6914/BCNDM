@@ -1,27 +1,26 @@
-<div class="container-fluid">
-  <div class="page-wrapper animated fadeIn">
-    <div class="page-header">
-      <div class="page-header-xs--map">
-        <h1 class="page-title">
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <div class="page-header-xs--map">
+      <h1 class="page-title">
           Sell stream
         </h1>
-        <div class="page-header-xs--right">
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
-            <label class="form-check-label" for="showMap">Show Map</label>
-          </div>
+      <div class="page-header-xs--right">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input form-control-lg" id="showMap">
+          <label class="form-check-label" for="showMap">Show Map</label>
         </div>
       </div>
-      <div class="action-buttons">
-        <p class="action-buttons__item">
-          <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()">
+    </div>
+    <div class="action-buttons">
+      <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd()">
             <span class="btn-media__icon btn-media__icon--add">
             </span>
             Add manually
           </button>
-        </p>
-        <p class="action-buttons__item">
-          <label class="btn btn-primary btn-media">
+      </p>
+      <p class="action-buttons__item">
+        <label class="btn btn-primary btn-media">
               <input type="file" (change)="onFileChange($event)" style="display:none">
               <span class="btn-media__icon btn-media__icon--upload">
               </span>

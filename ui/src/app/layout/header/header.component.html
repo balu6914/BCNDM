@@ -8,7 +8,7 @@
 <nav class="topbar js-topbar">
   <div class="container-fluid">
     <div class="topbar__wrapper">
-      <a class="topbar__brand" href="index.html"></a>
+      <a routerLink="/dashboard" class="topbar__brand"></a>
       <div class="topbar__collapse">
         <ul *ngIf="isLoggedin && user"  class="topbar__menu">
           <li class="topbar__item">
@@ -45,9 +45,9 @@
       </div>
       <div *ngIf="isLoggedin && user"  class="wallet-balance">
         <div class="wallet-balance__title">
-          Wallet balance
+          {{user.email}}
         </div>
-        <div class="wallet-balance__amount">
+        <div class="wallet-balance__amount text-center">
           {{balance.amount | tas }} {{balance.symbol}}
         </div>
       </div>
@@ -59,7 +59,7 @@
             <span class="user__toggle-icon"></span>
           </a>
           <div class="dropdown-menu dropdown-menu-right"  *dropdownMenu>
-            <a class="dropdown-item">
+            <a routerLink="/dashboard/profile"  class="dropdown-item">
               <span class="user__icon user__icon--settings"></span>
               Settings
             </a>

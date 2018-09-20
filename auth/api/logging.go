@@ -60,6 +60,19 @@ func (lm *loggingMiddleware) Update(key string, user auth.User) (err error) {
 	return lm.svc.Update(key, user)
 }
 
+func (lm *loggingMiddleware) UpdatePassword(key string, old string, user auth.User) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method update_password for key %s and user %s took %s to complete", key, user.Email, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.UpdatePassword(key, old, user)
+}
+
 func (lm *loggingMiddleware) View(key string) (user auth.User, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method view for key %s and took %s to complete", key, time.Since(begin))

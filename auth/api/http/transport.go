@@ -52,6 +52,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
+	r.Put("/users/password", kithttp.NewServer(
+		updatepasswordEndpoint(svc),
+		decodePasswordUpdate,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", monetasa.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
@@ -62,18 +69,10 @@ func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
-
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var req registerReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-
-	req := registerReq{
-		Email:    user.Email,
-		Password: user.Password,
-		Name:     user.Name,
-	}
-
 	return req, nil
 }
 
@@ -86,39 +85,43 @@ func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 }
 
 func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	var req updateReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
 
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-
-	req := updateReq{
-		key:      r.Header.Get("Authorization"),
-		Email:    user.Email,
-		Password: user.Password,
-		Name:     user.Name,
-	}
+	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
+	var req credentialsReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
 
-	var user auth.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 
-	req := credentialsReq{
-		Email:    user.Email,
-		Password: user.Password,
+	return req, nil
+}
+
+func decodePasswordUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+	var req updatePasswordReq
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
 	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }

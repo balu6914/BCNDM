@@ -15,9 +15,11 @@ func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Email:    req.Email,
-			Password: req.Password,
-			Name:     req.Name,
+			Email:        req.Email,
+			ContactEmail: req.Email,
+			Password:     req.Password,
+			FirstName:    req.FirstName,
+			LastName:     req.LastName,
 		}
 		err := svc.Register(user)
 		return createRes{}, err
@@ -52,15 +54,33 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		user := auth.User{
-			Email:    req.Email,
-			Password: req.Password,
-			Name:     req.Name,
+			ContactEmail: req.ContactEmail,
+			FirstName:    req.FirstName,
+			LastName:     req.LastName,
 		}
 		if err := svc.Update(req.key, user); err != nil {
 			return nil, err
 		}
 
 		return updateRes{}, nil
+	}
+}
+
+func updatepasswordEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(updatePasswordReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		user := auth.User{
+			Password: req.NewPassword,
+		}
+		if err := svc.UpdatePassword(req.key, req.OldPassword, user); err != nil {
+			return nil, err
+		}
+
+		return updatePasswordRes{}, nil
 	}
 }
 
@@ -77,8 +97,11 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		res := viewRes{
-			ID:    user.ID,
-			Email: user.Email,
+			ID:           user.ID,
+			Email:        user.Email,
+			ContactEmail: user.ContactEmail,
+			FirstName:    user.FirstName,
+			LastName:     user.LastName,
 		}
 
 		return res, nil

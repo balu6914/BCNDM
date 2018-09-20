@@ -42,6 +42,8 @@ func (res tokenRes) empty() bool {
 
 type updateRes struct{}
 
+type updatePasswordRes struct{}
+
 func (res updateRes) code() int {
 	return http.StatusOK
 }
@@ -55,8 +57,11 @@ func (res updateRes) empty() bool {
 }
 
 type viewRes struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
+	ID           string `json:"id"`
+	Email        string `json:"email"`
+	ContactEmail string `json:"contact_email"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
 }
 
 func (res viewRes) code() int {

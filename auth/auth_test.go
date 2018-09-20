@@ -12,10 +12,12 @@ import (
 const wrong string = "wrong-value"
 
 var user = auth.User{
-	Email:    "user@example.com",
-	Password: "password",
-	ID:       "1",
-	Name:     "user_name",
+	Email:        "user@example.com",
+	ContactEmail: "user@example.com",
+	Password:     "password",
+	ID:           "1",
+	FirstName:    "first",
+	LastName:     "last",
 }
 
 func newService() auth.Service {
@@ -93,10 +95,7 @@ func TestUpdate(t *testing.T) {
 	svc := newService()
 	svc.Register(user)
 	key, _ := svc.Login(user)
-	user.Password = "newPassword"
-	user.Email = "new@email.com"
-	invalidUser := user
-	invalidUser.Password = ""
+	user.ContactEmail = "new@email.com"
 
 	cases := []struct {
 		desc string
@@ -105,19 +104,45 @@ func TestUpdate(t *testing.T) {
 		err  error
 	}{
 		{
-			desc: "update user email and password",
+			desc: "update user contact email",
 			key:  key,
 			user: user,
 			err:  nil,
 		},
 		{
-			desc: "update user with invalid data",
+			desc: "update user with invalid credentials",
+			key:  "",
+			user: user,
+			err:  auth.ErrUnauthorizedAccess,
+		},
+	}
+
+	for _, tc := range cases {
+		err := svc.Update(tc.key, tc.user)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+	}
+}
+
+func TestUpdatePassword(t *testing.T) {
+	svc := newService()
+	svc.Register(user)
+	key, _ := svc.Login(user)
+	user.Password = "newpassword"
+
+	cases := []struct {
+		desc string
+		key  string
+		user auth.User
+		err  error
+	}{
+		{
+			desc: "update user password",
 			key:  key,
-			user: invalidUser,
-			err:  auth.ErrMalformedEntity,
+			user: user,
+			err:  nil,
 		},
 		{
-			desc: "update user with invalid credentials",
+			desc: "update user password invalid credentials",
 			key:  "",
 			user: user,
 			err:  auth.ErrUnauthorizedAccess,
