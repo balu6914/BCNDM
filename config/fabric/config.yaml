@@ -33,7 +33,7 @@ client:
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
-    path: "${GOPATH}/src/monetasa/config/crypto-config"
+    path: "${MONETASA_CONFIG}/crypto-config"
 
   # Some SDKs support pluggable KV stores, the properties under "credentialStore" are implementation specific
   credentialStore:
@@ -91,7 +91,7 @@ channels:
 organizations:
   org1:
     mspid: Org1MSP
-    cryptoPath: "${GOPATH}/src/monetasa/config/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
+    cryptoPath: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
     peers:
       - peer0.org1.monetasa.com
     certificateAuthorities:
@@ -106,7 +106,7 @@ orderers:
       ssl-target-name-override: orderer.monetasa.com
       grpc-max-send-message-length: 15
     tlsCACerts:
-      path: "${GOPATH}/src/monetasa/config/crypto-config/ordererOrganizations/monetasa.com/tlsca/tlsca.monetasa.com-cert.pem"
+      path: "${MONETASA_CONFIG}/crypto-config/ordererOrganizations/monetasa.com/tlsca/tlsca.monetasa.com-cert.pem"
 
 # List of peers to send various requests to, including endorsement, query and event listener registration.
 peers:
@@ -120,7 +120,7 @@ peers:
       ssl-target-name-override: peer0.org1.monetasa.com
       grpc.http2.keepalive_time: 15
     tlsCACerts:
-      path: "${GOPATH}/src/monetasa/config/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
+      path: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
 
 
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows certificate management to be done via REST APIs.
@@ -131,7 +131,7 @@ certificateAuthorities:
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
     tlsCACerts:
       # Comma-Separated list of paths
-      path: "${GOPATH}/src/monetasa/config/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
+      path: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
     httpOptions:
       verify: false
     registrar:

@@ -68,8 +68,9 @@ services:
       - MONETASA_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.monetasa.com
       - MONETASA_AUTH_URL=monetasa-auth:8081
       - MONETASA_STREAMS_URL=monetasa-streams:8085
+      - MONETASA_CONFIG=/config
     volumes:
-      - ../config:/go/src/monetasa/config/
+      - ../config:/config
     networks:
       # Link to monetasa fabric net
       - fabric_monetasa-bc-net
