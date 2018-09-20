@@ -1,7 +1,8 @@
-<div class="page-wrapper animated fadeIn">
-  <div class="page-header">
-    <div class="page-header-xs--map">
-      <h1 class="page-title">
+<div class="container-fluid">
+  <div class="page-wrapper animated fadeIn">
+    <div class="page-header">
+      <div class="page-header-xs--map">
+        <h1 class="page-title">
           Buy stream
         </h1>
       <div class="page-header-xs--right">
@@ -20,13 +21,22 @@
               Map
             </p>
           </div>
-          <dpc-map-leaflet #map [streamList]="table.page.content"></dpc-map-leaflet>
+          <dpc-map-leaflet #map [streamList]="table.page.content"
+                           (hoverMarker)="onHoverMarker($event)">
+          </dpc-map-leaflet>
         </div>
       </div>
-    <div class="col-lg-6 order-1 order-sm-2">
-      <dpc-table [table]="table" (pageChanged)="onPageChange($event)"></dpc-table>
+      <div class="col-lg-6 order-1 order-sm-2">
+        <dpc-table #tableComponent [table]="table"
+                   (pageChanged)="onPageChange($event)"
+                   (hoverRow)="onHoverRow($event)"
+                   (unhoverRow)="onUnhoverRow($event)">
+        </dpc-table>
+      </div>
     </div>
   </div>
+</div>
 <!-- Sidebar filters -->
-<dpc-sidebar-filters (filtersUpdate)="onFiltersChange($event)">
+<dpc-sidebar-filters
+  (filtersUpdate)="onFiltersChange($event)">
 </dpc-sidebar-filters>

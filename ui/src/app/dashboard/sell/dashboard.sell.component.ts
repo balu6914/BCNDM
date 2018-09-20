@@ -8,6 +8,7 @@ import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
 import { Table, TableType } from '../../shared/table/table';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 import { User } from '../../common/interfaces/user.interface';
+import { TableComponent } from 'app/shared/table/main/table.component';
 
 @Component({
   providers: [MapComponent],
@@ -24,6 +25,9 @@ export class DashboardSellComponent implements OnInit {
 
   @ViewChild('map')
   private map: MapComponent;
+
+  @ViewChild('tableComponent')
+  private tableComponent: TableComponent;
 
   constructor(
     private streamService: StreamService,
@@ -137,6 +141,18 @@ export class DashboardSellComponent implements OnInit {
   onPageChange(page: number) {
     this.query.page = page;
     this.fetchStreams();
+  }
+
+  onHoverRow(row) {
+    this.map.mouseHoverMarker(row);
+  }
+
+  onUnhoverRow(row) {
+    this.map.mouseUnhoverMarker(row);
+  }
+
+  onHoverMarker(streamId) {
+    this.tableComponent.activateRow(streamId);
   }
 
 }

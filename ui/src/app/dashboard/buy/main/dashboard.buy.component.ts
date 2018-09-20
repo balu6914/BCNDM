@@ -5,6 +5,7 @@ import { StreamService } from '../../../common/services/stream.service';
 import { Table, TableType } from '../../../shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
+import { TableComponent } from 'app/shared/table/main/table.component';
 
 @Component({
   selector: 'dpc-dashboard-buy',
@@ -18,6 +19,9 @@ export class DashboardBuyComponent implements OnInit {
 
   @ViewChild('map')
   private map: MapComponent;
+
+  @ViewChild('tableComponent')
+  private tableComponent: TableComponent;
 
   constructor(
     private AuthService: AuthService,
@@ -83,6 +87,18 @@ export class DashboardBuyComponent implements OnInit {
       err => {
         this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
       });
+  }
+
+  onHoverRow(row) {
+    this.map.mouseHoverMarker(row);
+  }
+
+  onUnhoverRow(row) {
+    this.map.mouseUnhoverMarker(row);
+  }
+
+  onHoverMarker(streamId) {
+    this.tableComponent.activateRow(streamId);
   }
 
 }

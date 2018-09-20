@@ -22,6 +22,7 @@ export class TableRowComponent implements OnInit {
 
   @Input() row: any;
   @Input() rowType: TableType;
+  @Input() rowMarked: any;
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
