@@ -1,12 +1,13 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 // Import third party modules
 import { SidebarModule } from 'ng-sidebar';
-import { NgxSelectModule } from 'ngx-select-ex';
 // Import ngx-bootstrap modules
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { NgxSelectModule } from 'ngx-select-ex';
+import { UiSwitchModule } from 'ngx-ui-switch';
 
 @NgModule({
   imports: [
@@ -14,6 +15,12 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     // Import third party modules
     SidebarModule.forRoot(),
     NgxSelectModule,
+    UiSwitchModule.forRoot({
+      size: 'small',
+      color: '#007bff',
+      checkedLabel: 'yes',
+      uncheckedLabel: 'no'
+    }),
     // Import ngx-bootstrap modules
     BsDropdownModule.forRoot(),
     TooltipModule.forRoot(),
@@ -24,6 +31,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     TooltipModule,
     ModalModule,
     SidebarModule,
+    UiSwitchModule
   ]
 })
-export class AppBootstrapModule {}
+export class AppBootstrapModule { }

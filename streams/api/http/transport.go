@@ -323,6 +323,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 	case streams.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
+	case streams.ErrBigQuery:
+		w.WriteHeader(http.StatusServiceUnavailable)
 	case io.ErrUnexpectedEOF:
 		w.WriteHeader(http.StatusBadRequest)
 	case io.EOF:

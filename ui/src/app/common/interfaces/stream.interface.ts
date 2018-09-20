@@ -9,5 +9,10 @@ export class Stream {
     public snippet?: string,
     public owner?: string,
     public id?: string,
+    public bq?: boolean,
+    public project?: string,
+    public dataset?: string,
+    public table?: string,
+    public fields?: string
   ) { }
 }

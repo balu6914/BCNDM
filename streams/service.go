@@ -30,6 +30,9 @@ var (
 
 	// ErrMalformedData indicates a malformed request.
 	ErrMalformedData = errors.New("malformed data")
+
+	// ErrBigQuery indicates a problem with Google Big Query API.
+	ErrBigQuery = errors.New("Google Big Query error")
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -101,22 +104,20 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, stream.Project)
 	if err != nil {
-		return "", err
+		return "", ErrBigQuery
 	}
 	defer client.Close()
-
 	ds := client.Dataset(stream.Dataset)
 	_, err = ds.Metadata(ctx)
 	if err != nil {
 		if e, ok := err.(*googleapi.Error); ok && e.Code == http.StatusNotFound {
 			return "", ErrNotFound
 		}
-		return "", err
+		return "", ErrBigQuery
 	}
 
 	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
 	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
-	println("ID: ", id)
 
 	// Try to create table to check if query and other data is valid.
 	// In the case of an invalid data, a Stream won't be saved.
@@ -136,7 +137,7 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 				return "", ErrMalformedData
 			}
 		}
-		return "", err
+		return "", ErrBigQuery
 	}
 	return ss.streams.Save(stream)
 }

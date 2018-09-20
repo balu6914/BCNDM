@@ -28,7 +28,7 @@ type Stream struct {
 	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
 	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
-	BQ          bool          `bson:"big_query" json:"big_query,omitempty"`
+	BQ          bool          `bson:"big_query" json:"bq,omitempty"`
 	Fields      string        `bson:"fields,omitempty" json:"fields,omitempty"`
 	Project     string        `bson:"project,omitempty" json:"project,omitempty"`
 	Dataset     string        `bson:"dataset,omitempty" json:"dataset,omitempty"`

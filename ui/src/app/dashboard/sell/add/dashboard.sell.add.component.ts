@@ -16,6 +16,7 @@ import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
 export class DashboardSellAddComponent {
   form: FormGroup;
   submitted = false;
+  bigQuery = false;
 
   @Output() streamCreated: EventEmitter<any> = new EventEmitter();
   constructor(
@@ -29,37 +30,58 @@ export class DashboardSellAddComponent {
     const urlValidator = Validators.pattern(urlRegEx);
 
     this.form = this.formBuilder.group({
-      'name':        ['', [Validators.required, Validators.maxLength(32)]],
-      'type':        ['', [Validators.required, Validators.maxLength(32)]],
-      'description': ['', [Validators.required, Validators.maxLength(256)]],
-      'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],
-      'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
-      'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
-      'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
-      'snippet':     ['', [Validators.maxLength(256)]]
+      'name':        ['name', [Validators.required, Validators.maxLength(32)]],
+      'type':        ['type', [Validators.required, Validators.maxLength(32)]],
+      'description': ['desc', [Validators.required, Validators.maxLength(256)]],
+      'url':         ['http://www.com.com', [Validators.required, Validators.maxLength(128), urlValidator]],
+      'price':       ['22', [Validators.required, Validators.maxLength(9), floatValidator]],
+      'lat':         ['22', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
+      'long':        ['45.566', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
+      'snippet':     ['{my:stream}', [Validators.maxLength(256)]],
+      'project':     [{value: 'digisense-196722', disabled: true}, [Validators.required, Validators.maxLength(256)]],
+      'dataset':     [{value: 'demo', disabled: true}, [Validators.required, Validators.maxLength(256)]],
+      'table':       [{value: 'aqi', disabled: true}, [Validators.required, Validators.maxLength(256)]],
+      'fields':      [{value: 'Time,Value', disabled: true}, [Validators.required, Validators.maxLength(256)]]
     });
   }
 
+
+  changeBQ() {
+    this.bigQuery = !this.bigQuery;
+    this.bigQuery ? this.form.get('project').enable() : this.form.get('project').disable();
+    this.bigQuery ? this.form.get('dataset').enable() : this.form.get('dataset').disable();
+    this.bigQuery ? this.form.get('table').enable() : this.form.get('table').disable();
+    this.bigQuery ? this.form.get('fields').enable() : this.form.get('fields').disable();
+  }
+
+
   onSubmit() {
     this.submitted = true;
-
     if (this.form.valid) {
       const stream: Stream = {
-        name:        this.form.value.name,
-        type:        this.form.value.type,
-        description: this.form.value.description,
-        url:         this.form.value.url,
-        price:       this.mitasPipe.transform(this.form.value.price),
-        snippet:     this.form.value.snippet,
+        name:        this.form.get('name').value,
+        type:        this.form.get('type').value,
+        description: this.form.get('description').value,
+        url:         this.form.get('url').value,
+        price:       this.mitasPipe.transform(this.form.get('price').value),
+        snippet:     this.form.get('snippet').value,
         location: {
           'type': 'Point',
           'coordinates': [
-            parseFloat(this.form.value.long),
-            parseFloat(this.form.value.lat)
+            parseFloat(this.form.get('long').value),
+            parseFloat(this.form.get('lat').value)
           ]
-        }
+        },
+        bq: this.bigQuery
       };
+      if (this.bigQuery) {
+        stream.project = this.form.get('project').value;
+        stream.dataset = this.form.get('dataset').value;
+        stream.table = this.form.get('table').value;
+        stream.fields = this.form.get('fields').value;
+      }
 
+      console.log(stream);
       // Send addStream request
       this.streamService.addStream(stream).subscribe(
         res => {
