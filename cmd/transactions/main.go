@@ -5,12 +5,14 @@ import (
 	"monetasa"
 	authapi "monetasa/auth/api/grpc"
 	log "monetasa/logger"
+	streamsapi "monetasa/streams/api/grpc"
 	"monetasa/transactions"
 	"monetasa/transactions/api"
 	grpcapi "monetasa/transactions/api/grpc"
 	httpapi "monetasa/transactions/api/http"
 	"monetasa/transactions/fabric"
 	"monetasa/transactions/mongo"
+	"monetasa/transactions/streams"
 	"net"
 	"net/http"
 	"os"
@@ -38,6 +40,7 @@ const (
 	envTokenChaincodeID     = "MONETASA_TRANSACTIONS_TOKEN_CHAINCODE"
 	envContractsChaincodeID = "MONETASA_TRANSACTIONS_CONTRACTS_CHAINCODE"
 	envAuthURL              = "MONETASA_AUTH_URL"
+	envStreamsURL           = "MONETASA_STREAMS_URL"
 
 	defHTTPPort             = "8080"
 	defGRPCPort             = "8081"
@@ -51,6 +54,7 @@ const (
 	defTokenChaincodeID     = "token"
 	defContractsChaincodeID = "contracts"
 	defAuthURL              = "localhost:8081"
+	defStreamsURL           = "localhost:8081"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -72,6 +76,7 @@ type conf struct {
 	feeChaincodeID       string
 	contractsChaincodeID string
 	authURL              string
+	streamsURL           string
 }
 
 func main() {
@@ -85,12 +90,16 @@ func main() {
 	ms := connectToDB(cfg, logger)
 	defer ms.Close()
 
-	conn := newGRPCConn(cfg.authURL, logger)
-	defer conn.Close()
+	authConn := newGRPCConn(cfg.authURL, logger)
+	defer authConn.Close()
 
-	ac := authapi.NewClient(conn)
+	ac := authapi.NewClient(authConn)
 
-	svc := newService(cfg, sdk, ms, logger)
+	streamsConn := newGRPCConn(cfg.streamsURL, logger)
+	defer streamsConn.Close()
+	sc := streamsapi.NewClient(streamsConn)
+
+	svc := newService(cfg, sdk, ms, sc, logger)
 
 	errs := make(chan error, 2)
 
@@ -126,6 +135,7 @@ func loadConfig() conf {
 		tokenChaincodeID:     monetasa.Env(envTokenChaincodeID, defTokenChaincodeID),
 		contractsChaincodeID: monetasa.Env(envContractsChaincodeID, defContractsChaincodeID),
 		authURL:              monetasa.Env(envAuthURL, defAuthURL),
+		streamsURL:           monetasa.Env(envStreamsURL, defStreamsURL),
 	}
 }
 
@@ -156,7 +166,7 @@ func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, logger log.Logger) transactions.Service {
+func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient monetasa.StreamsServiceClient, logger log.Logger) transactions.Service {
 	tl := fabric.NewTokenLedger(
 		sdk,
 		cfg.fabricOrgAdmin,
@@ -174,8 +184,9 @@ func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, logger log.Log
 	)
 	users := mongo.NewUserRepository(ms)
 	contracts := mongo.NewContractRepository(ms)
+	sc := streams.NewService(streamsClient)
 
-	svc := transactions.New(users, tl, cl, contracts)
+	svc := transactions.New(users, tl, cl, contracts, sc)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

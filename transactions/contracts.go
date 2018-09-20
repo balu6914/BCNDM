@@ -36,11 +36,12 @@ type ContractPage struct {
 
 // Contract contains contract data.
 type Contract struct {
-	StreamID  string
-	StartTime time.Time
-	EndTime   time.Time
-	OwnerID   string
-	PartnerID string
-	Share     uint64
-	Signed    bool
+	StreamID   string
+	StreamName string
+	StartTime  time.Time
+	EndTime    time.Time
+	OwnerID    string
+	PartnerID  string
+	Share      uint64
+	Signed     bool
 }
