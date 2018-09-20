@@ -646,6 +646,7 @@ font-weight: $font-weight-medium;
   border-bottom: 2px solid transparent;
   padding: 0 5px 5px 5px;
   transition: $transition-base;
+  cursor: pointer;
   &:hover,
   &.active {
     text-decoration: none;
@@ -660,6 +661,7 @@ font-weight: $font-weight-medium;
   justify-content: center;
   .box-nav__item {
     margin-right: 1rem;
+    cursor: pointer;
     &:last-child {
       margin-right: 0;
     }

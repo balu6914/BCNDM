@@ -2,7 +2,7 @@
     <div class="tp-box" [@flipState]="flip">
       <!-- Front side -->
       <div class="front tp-box__side tp-box__front">
-        <div class="box-grow" [ngClass]="{box: table.tableType !== types.Dashboard}" *ngIf="table.page.content.length">
+        <div class="box-grow" [ngClass]="{box: table.tableType !== types.Dashboard && table.tableType !== types.Wallet}" *ngIf="table.page.content.length">
           <div class="box__header">
             <p class="box__title">
               {{table.title}}
@@ -52,7 +52,8 @@
         <!-- No content -->
         <div class="tp-box">
           <div class="front tp-box__side tp-box__front">
-            <div class="box-grow" *ngIf="table.page.content && !table.page.content.length" [ngClass]="{box: table.tableType !== types.Dashboard}">
+            <div class="box-grow" *ngIf="table.page.content && !table.page.content.length"
+              [ngClass]="{box: table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
               <div class="text-center">
                 <div *ngIf="table.tableType === types.Sell">
                   <!-- No my streams -->
@@ -68,6 +69,9 @@
                 </div>
                 <div *ngIf="table.tableType === types.Dashboard">
                   <p class="lead no-content">There are currently no streams for you.</p>
+                </div>
+                <div *ngIf="table.tableType === types.Wallet">
+                  <p class="lead no-content">There are currently no transactions for you.</p>
                 </div>
               </div>
             </div>
