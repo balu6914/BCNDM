@@ -3,7 +3,7 @@
     <p class="box__title">
       Transactions
     </p>
-    <ul *ngIf="page && page.content.length" class="nav box-nav">
+    <ul class="nav box-nav">
       <li (click)="onTabSwitch(types.Bought)" class="box-nav__item">
         <a class="box-nav__link" [ngClass]="{'active': section.name === types.Bought}" data-toggle="pill" role="tab" aria-controls="sold-stream" aria-selected="true">Bought streams</a>
       </li>

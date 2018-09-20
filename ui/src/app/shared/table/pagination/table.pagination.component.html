@@ -1,5 +1,5 @@
 <nav>
-  <ul class="pagination justify-content-center">
+  <ul *ngIf="pages.length > 1" class="pagination justify-content-center">
     <li class="page-item page-item-prev" [ngClass]="page === 0 ? 'disabled' : ''">
       <a class="page-link" tabindex="-1" (click)="pageChange(page - 1)">
         Previous
