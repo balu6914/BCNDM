@@ -3,13 +3,21 @@
     Personal information
   </p>
 </div>
-<div class="box__content">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+<div class="modal-body">
+  <div class="container-fluid">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Wallet Key -->
+    <div class="form-group row">
+      <label class="col-sm-3">Wallet Key</label>
+      <div *ngIf="user" class="col-sm-9 text-info">
+        {{user.id}}
+      </div>
+    </div>
     <div class="form-group row">
       <label for="first_name" class="col-sm-3 col-form-label">First name</label>
       <div class="col-sm-9">
         <input type="text" class="form-control" formControlName="first_name"
-       [ngClass]="{ 'is-invalid': submitted && form.controls.first_name.errors }"/>
+          [ngClass]="{ 'is-invalid': submitted && form.controls.first_name.errors }"/>
         <div *ngIf="submitted && form.controls.first_name.errors" class="invalid-feedback">
           <div *ngIf="form.controls.first_name.errors.maxlength">The maximum length is 16 characters.</div>
         </div>
@@ -19,7 +27,7 @@
       <label for="lastName" class="col-sm-3 col-form-label">Last name</label>
       <div class="col-sm-9">
         <input type="text" class="form-control" formControlName="last_name"
-           [ngClass]="{ 'is-invalid': submitted && form.controls.last_name.errors }"/>
+          [ngClass]="{ 'is-invalid': submitted && form.controls.last_name.errors }"/>
         <div *ngIf="submitted && form.controls.last_name.errors" class="invalid-feedback">
           <div *ngIf="form.controls.last_name.errors.maxlength">The maximum length is 16 characters.</div>
         </div>
@@ -29,14 +37,15 @@
       <label for="staticEmail" class="col-sm-3 col-form-label">Contact E-mail Address</label>
       <div class="col-sm-9">
         <input type="email" class="form-control" formControlName="contact_email"
-                   [ngClass]="{ 'is-invalid': submitted && form.controls.contact_email.errors }">
+          [ngClass]="{ 'is-invalid': submitted && form.controls.contact_email.errors }">
         <div *ngIf="submitted && form.controls.contact_email.errors" class="invalid-feedback">
-            Please enter valid email address.
-        </div>
+          Please enter valid email address.
         </div>
       </div>
-      <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary btn-padding-lg btn-xs-full">Update</button>
-      </div>
-  </form>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary btn-padding-lg btn-xs-full">Update</button>
+    </div>
+    </form>
+  </div>
 </div>
