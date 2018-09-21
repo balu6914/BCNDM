@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -23,9 +23,13 @@ export class ContractService {
     return this.http.patch(`${environment.API_CONTRACTS}/sign`, data);
   }
 
-  get(q: Query): Observable<Page<Contract>>  {
-    return this.http.get<Page<Contract>>(`${environment.API_CONTRACTS}`, {
-      params: q.generateQuery()
+  get(owner: boolean, partner: boolean): Observable<Page<Contract>>  {
+    let params = new HttpParams();
+    params = params.set('owner', owner.toString());
+    params = params.set('limit', partner.toString());
+
+    return this.http.get<Page<Contract>>(`${environment.API_CONTRACTS}`,  {
+      params: params
     });
   }
 
