@@ -8,7 +8,6 @@ import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { Page } from 'app/common/interfaces/page.interface';
 import { DashboardContractsAddComponent } from './add/';
-import { Query } from 'app/common/interfaces/query.interface';
 
 @Component({
   selector: 'dpc-dashboard-contracts-list',
@@ -22,7 +21,6 @@ export class DashboardContractsComponent implements OnInit {
     selectedContract = [];
     table: Table = new Table();
     openedHelp = false;
-    query = new Query();
 
     constructor(
         private modalService: BsModalService,
@@ -37,25 +35,18 @@ export class DashboardContractsComponent implements OnInit {
     this.table.headers = ['Stream Name', 'Share offered', 'Creation date',  'Expiration date', 'Status', ''];
     this.table.page = new Page<Contract>(0, 0, 0, []);
 
-    // Fetch contracts with user as query owner
-    this.authService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
-        this.query.owner = this.user.id;
-        this.contractService.get(this.query).subscribe(
-          result => {
-            const temp = Object.assign({}, this.table);
-            temp.page = result;
-            // Set table content
-            this.table = temp;
-          },
-          err => {
-            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-          }
-        );
+    // Fetch all contracts
+    const isOwner = true;
+    const isPartner = true;
+    this.contractService.get(isOwner, isPartner).subscribe(
+      result => {
+        const temp = Object.assign({}, this.table);
+        temp.page = result;
+        // Set table content
+        this.table = temp;
       },
       err => {
-        console.log(err);
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
       }
     );
   }
