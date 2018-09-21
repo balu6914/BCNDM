@@ -17,15 +17,17 @@ type transactionService struct {
 	tokens    TokenLedger
 	conLedger ContractLedger
 	conRepo   ContractRepository
+	streams   StreamsService
 }
 
 // New instantiaces domain service implementation.
-func New(users UserRepository, tokens TokenLedger, conLedger ContractLedger, conRepo ContractRepository) Service {
+func New(users UserRepository, tokens TokenLedger, conLedger ContractLedger, conRepo ContractRepository, streams StreamsService) Service {
 	return transactionService{
 		users:     users,
 		tokens:    tokens,
 		conLedger: conLedger,
 		conRepo:   conRepo,
+		streams:   streams,
 	}
 }
 
@@ -93,6 +95,19 @@ func (ts transactionService) CreateContracts(contracts ...Contract) error {
 	}
 	if sum > maxShare {
 		return ErrConflict
+	}
+
+	if len(contracts) == 0 {
+		return ErrMalformedEntity
+	}
+
+	stream, err := ts.streams.One(contracts[0].StreamID)
+	if err != nil {
+		return ErrNotFound
+	}
+
+	for i := range contracts {
+		contracts[i].StreamName = stream.Name
 	}
 
 	if err := ts.conRepo.Create(contracts...); err != nil {

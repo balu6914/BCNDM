@@ -11,23 +11,35 @@ type apiReq interface {
 }
 
 type registerReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name,omitempty"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
 }
 
 const (
 	maxEmailLength    = 32
 	minPasswordLength = 8
-	maxPasswordLength = 16
+	maxPasswordLength = 32
 	maxNameLength     = 32
 )
 
 func (req registerReq) validate() error {
-	if req.Email == "" || len(req.Email) > maxEmailLength ||
-		req.Password == "" || len(req.Password) < minPasswordLength ||
-		len(req.Password) > maxPasswordLength ||
-		len(req.Name) > maxNameLength {
+	if req.Email == "" || len(req.Email) > maxEmailLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Password == "" || len(req.Password) < minPasswordLength ||
+		len(req.Password) > maxPasswordLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.FirstName != "" && len(req.FirstName) > maxNameLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.LastName != "" && len(req.LastName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
@@ -68,10 +80,10 @@ func (req identityReq) validate() error {
 }
 
 type updateReq struct {
-	key      string
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
+	key          string
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
 }
 
 func (req updateReq) validate() error {
@@ -79,13 +91,34 @@ func (req updateReq) validate() error {
 		return auth.ErrUnauthorizedAccess
 	}
 
-	if req.Email == "" || req.Password == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	if !govalidator.IsEmail(req.Email) {
+	if !govalidator.IsEmail(req.ContactEmail) ||
+		len(req.ContactEmail) > maxEmailLength {
 		return auth.ErrMalformedEntity
 	}
 
 	return nil
+}
+
+type updatePasswordReq struct {
+	key         string
+	NewPassword string `json:"new_password"`
+	RePassword  string `json:"re_password,omitempty"`
+	OldPassword string `json:"old_password,omitempty"`
+}
+
+func (req updatePasswordReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.OldPassword == "" || req.NewPassword == "" || req.RePassword == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.NewPassword != req.RePassword {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+
 }

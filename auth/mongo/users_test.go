@@ -18,9 +18,11 @@ var db *mgo.Session
 func TestSave(t *testing.T) {
 	repo := mongo.NewUserRepository(db)
 	user := auth.User{
-		Email:    "john.doe@email.com",
-		Password: "pass",
-		Name:     "John Doe",
+		Email:        "john.doe@email.com",
+		ContactEmail: "john.doe@email.com",
+		Password:     "pass",
+		FirstName:    "John",
+		LastName:     "Doe",
 	}
 
 	cases := []struct {
@@ -55,9 +57,11 @@ func TestUpdate(t *testing.T) {
 	repo := mongo.NewUserRepository(db)
 
 	user := auth.User{
-		Email:    "john.doe1@email.com",
-		Password: "pass",
-		Name:     "John Doe",
+		Email:        "john.doe1@email.com",
+		ContactEmail: "john.doe1@email.com",
+		Password:     "pass",
+		FirstName:    "John",
+		LastName:     "Doe",
 	}
 	id, _ := repo.Save(user)
 	otherUser := user
@@ -67,6 +71,9 @@ func TestUpdate(t *testing.T) {
 	otherID, _ := repo.Save(otherUser)
 	otherUser.ID = otherID
 	otherUser.Email = "john.doe1@email.com"
+	otherUser.ContactEmail = "john.doe1@email.com"
+	otherUser.FirstName = "john1"
+	otherUser.LastName = "doe2"
 
 	cases := []struct {
 		desc string
@@ -109,9 +116,10 @@ func TestOneByID(t *testing.T) {
 	repo := mongo.NewUserRepository(db)
 
 	user := auth.User{
-		Email:    "john.doe4@email.com",
-		Password: "pass",
-		Name:     "John Doe",
+		Email:     "john.doe4@email.com",
+		Password:  "pass",
+		FirstName: "John",
+		LastName:  "Doe",
 	}
 	id, _ := repo.Save(user)
 	user.ID = id
@@ -149,9 +157,10 @@ func TestOneByEmail(t *testing.T) {
 	repo := mongo.NewUserRepository(db)
 
 	user := auth.User{
-		Email:    "john.doe5@email.com",
-		Password: "pass",
-		Name:     "John Doe",
+		Email:     "john.doe5@email.com",
+		Password:  "pass",
+		FirstName: "John",
+		LastName:  "Doe",
 	}
 	id, _ := repo.Save(user)
 	user.ID = id
@@ -184,9 +193,11 @@ func TestRemove(t *testing.T) {
 	repo := mongo.NewUserRepository(db)
 
 	user := auth.User{
-		Email:    "john.doe6@email.com",
-		Password: "pass",
-		Name:     "John Doe",
+		Email:        "john.doe6@email.com",
+		ContactEmail: "john.doe6@email.com",
+		Password:     "pass",
+		FirstName:    "John",
+		LastName:     "Doe",
 	}
 	id, _ := repo.Save(user)
 	user.ID = id

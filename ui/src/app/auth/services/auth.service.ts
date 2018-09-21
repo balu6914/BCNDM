@@ -4,8 +4,8 @@ import { Response} from '@angular/http'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { environment } from '../../../environments/environment';
-import { UserService } from './user.service';
+import { environment } from 'environments/environment';
+import { UserService } from 'app/common/services/user.service';
 
 @Injectable()
 export class AuthService {

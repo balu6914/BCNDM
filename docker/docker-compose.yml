@@ -67,6 +67,7 @@ services:
       - MONETASA_TRANSACTIONS_DB_URL=monetasa-transactions-db
       - MONETASA_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.monetasa.com
       - MONETASA_AUTH_URL=monetasa-auth:8081
+      - MONETASA_STREAMS_URL=monetasa-streams:8085
     volumes:
       - ../config:/go/src/monetasa/config/
     networks:

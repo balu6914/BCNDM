@@ -87,17 +87,18 @@ type listContractsRes struct {
 	Page      uint64         `json:"page"`
 	Limit     uint64         `json:"limit"`
 	Total     uint64         `json:"total"`
-	Contracts []contractView `json:"contracts"`
+	Contracts []contractView `json:"content"`
 }
 
 type contractView struct {
-	StreamID  string    `json:"stream_id"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
-	OwnerID   string    `json:"owner_id"`
-	PartnerID string    `json:"partner_id"`
-	Share     uint64    `json:"share"`
-	Signed    bool      `json:"signed"`
+	StreamID   string    `json:"stream_id"`
+	StreamName string    `json:"stream_name"`
+	StartTime  time.Time `json:"start_time"`
+	EndTime    time.Time `json:"end_time"`
+	OwnerID    string    `json:"owner_id"`
+	PartnerID  string    `json:"partner_id"`
+	Share      uint64    `json:"share"`
+	Signed     bool      `json:"signed"`
 }
 
 func (res listContractsRes) headers() map[string]string {

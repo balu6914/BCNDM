@@ -120,13 +120,14 @@ func listContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
 
 		for _, contract := range page.Contracts {
 			res.Contracts = append(res.Contracts, contractView{
-				StreamID:  contract.StreamID,
-				StartTime: contract.StartTime,
-				EndTime:   contract.EndTime,
-				OwnerID:   contract.OwnerID,
-				PartnerID: contract.PartnerID,
-				Share:     contract.Share,
-				Signed:    contract.Signed,
+				StreamID:   contract.StreamID,
+				StreamName: contract.StreamName,
+				StartTime:  contract.StartTime,
+				EndTime:    contract.EndTime,
+				OwnerID:    contract.OwnerID,
+				PartnerID:  contract.PartnerID,
+				Share:      contract.Share,
+				Signed:     contract.Signed,
 			})
 		}
 

@@ -8,6 +8,7 @@ import { WalletBalanceStatisticPipe } from './pipes/balance.income.pipe';
 // services
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
+import { UserService } from './services/user.service';
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import { SubscriptionService } from './services/subscription.service';
     SubscriptionTypePipe,
     WalletBalanceStatisticPipe,
     StreamService,
-    SubscriptionService
+    SubscriptionService,
+    UserService,
   ],
   exports: [
     TasPipe,

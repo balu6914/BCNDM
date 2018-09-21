@@ -3,6 +3,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressInterceptor } from 'ngx-progressbar';
+
+import { CommonAppModule } from 'app/common/common.module';
 // Auth routes
 import { AuthRoutingModule } from './auth.routes';
 import { AuthGuardService } from './guardians/auth.guardian';
@@ -13,7 +15,6 @@ import { AuthService } from './services/auth.service';
 // Interceptors
 import { TokenInterceptor } from './services/token.http.interceptor.service';
 import { UnauthorizedInterceptor } from './services/unauthorized.http.interceptor';
-import { UserService } from './services/user.service';
 // Auth components
 import { SignupComponent } from './signup';
 
@@ -25,13 +26,13 @@ import { SignupComponent } from './signup';
     AuthRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    CommonAppModule,
   ],
   declarations: [
     SignupComponent,
     LoginComponent
   ],
   providers: [
-    UserService,
     AuthService,
     AuthGuardService,
     AuthLoggedinGuardService,

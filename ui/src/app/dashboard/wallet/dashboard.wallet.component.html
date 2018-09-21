@@ -1,20 +1,22 @@
-<div class="page-header">
-  <h1 class="page-title">
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <h1 class="page-title">
     My Wallet
   </h1>
-</div>
-<div class="row">
-  <div class="col-md-4 col-lg-3">
-    <!-- Balance wallet widget -->
-    <dpc-balance-widget [balance]="mockBalance"></dpc-balance-widget>
   </div>
-  <div class="col-md-8 col-lg-9">
-    <!-- Statistics -->
-    <dpc-statistic-graph *ngIf="pageData && pageData.content" [dataOutcome]="sOutcome" [dataIncome]="sIncome"></dpc-statistic-graph>
+  <div class="row">
+    <div class="col-md-4 col-lg-3">
+      <!-- Balance wallet widget -->
+      <dpc-balance-widget [balance]="mockBalance"></dpc-balance-widget>
+    </div>
+    <div class="col-md-8 col-lg-9">
+      <!-- Statistics -->
+      <dpc-statistic-graph *ngIf="pageData && pageData.content" [dataOutcome]="sOutcome" [dataIncome]="sIncome"></dpc-statistic-graph>
+    </div>
   </div>
-</div>
-<div class="row row-grow">
-  <div class="col-12">
-    <dpc-dashboard-table-tabbed [page]="pageData" [type]="types.Wallet" (tabChanged)="switchedTab($event)" (pageChanged)="onPageChanged($event)"></dpc-dashboard-table-tabbed>
+  <div class="row row-grow">
+    <div class="col-12">
+      <dpc-dashboard-table-tabbed [page]="pageData" [type]="types.Wallet" (tabChanged)="switchedTab($event)" (pageChanged)="onPageChanged($event)"></dpc-dashboard-table-tabbed>
+    </div>
   </div>
 </div>

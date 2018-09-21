@@ -181,10 +181,6 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 }
 
 func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
-	if r.Header.Get("Content-Type") != contentType {
-		return nil, errUnsupportedContentType
-	}
-
 	id, err := authorize(r)
 	if err != nil {
 		return nil, err

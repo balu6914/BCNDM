@@ -13,7 +13,7 @@ import { Query } from 'app/common/interfaces/query.interface';
 @Component({
   selector: 'dpc-dashboard-contracts-list',
   templateUrl: './dashboard.contracts.component.html',
-  styleUrls: [ './dashboard.contracts.component.scss' ]
+  styleUrls: ['./dashboard.contracts.component.scss']
 })
 export class DashboardContractsComponent implements OnInit {
     user: any;
@@ -76,6 +76,6 @@ export class DashboardContractsComponent implements OnInit {
         err => {
           console.log(err);
         }
-    );
+      );
   }
 }

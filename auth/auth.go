@@ -59,12 +59,33 @@ func (ms *authService) Update(key string, user User) error {
 		return ErrUnauthorizedAccess
 	}
 
+	user.ID = id
+
+	return ms.users.Update(user)
+}
+
+func (ms *authService) UpdatePassword(key string, old string, user User) error {
+	id, err := ms.idp.Identity(key)
+	if err != nil {
+		return ErrUnauthorizedAccess
+	}
+	user.ID = id
+	// Validate current password with hashed record in DB
+	dbu, err := ms.users.OneByID(user.ID)
+	if err != nil {
+		return ErrNotFound
+	}
+
+	if err := ms.hasher.Compare(old, dbu.Password); err != nil {
+		return ErrMalformedEntity
+	}
+
 	hash, err := ms.hasher.Hash(user.Password)
+
 	if err != nil {
 		return ErrMalformedEntity
 	}
 	user.Password = hash
-	user.ID = id
 
 	return ms.users.Update(user)
 }

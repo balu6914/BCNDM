@@ -1,33 +1,31 @@
-<div class="container-fluid">
-  <div class="page-wrapper animated fadeIn">
-    <div class="page-header">
-      <h1 class="page-title">
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <h1 class="page-title">
         Smart contract
       </h1>
-      <div class="action-buttons">
-        <p class="action-buttons__item">
-          <button type="button" (click)="toggleHelp()" class="btn btn-primary btn-media">
+    <div class="action-buttons">
+      <p class="action-buttons__item">
+        <button type="button" (click)="toggleHelp()" class="btn btn-primary btn-media">
           <span class="btn-media__icon btn-media__icon--help"></span>
           Help
         </button>
-        </p>
-        <p class="action-buttons__item">
-          <button type="button" class="btn btn-primary btn-media" data-toggle="modal" (click)="modalNewContract()">
+      </p>
+      <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media" data-toggle="modal" (click)="modalNewContract()">
           <span class="btn-media__icon btn-media__icon--add"></span>
           Add contract
           </button>
-        </p>
-      </div>
+      </p>
     </div>
-    <div class="row row-grow">
-      <!-- Help container -->
-      <div *ngIf="openedHelp" class="col-lg-4 col-xl-3">
+  </div>
+  <div class="row row-grow">
+    <!-- Help container -->
+    <div *ngIf="openedHelp" class="col-lg-4 col-xl-3">
       <dashboard-contracts-help (closeTrigger)="toggleHelp()" (addContractTrigger)="modalNewContract()"></dashboard-contracts-help>
     </div>
     <!-- Contracts table -->
-      <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">
-        <dpc-table [table]="table"></dpc-table>
-      </div>
+    <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">
+      <dpc-table [table]="table"></dpc-table>
     </div>
   </div>
 </div>
