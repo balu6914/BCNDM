@@ -19,24 +19,30 @@
   </div>
 </tr>
 <tr *ngIf="rowType === types.Contract">
-  <td>{{ row.stream.name }}</td>
-  <td nowrap>{{ row.stream.price | tas }}</td>
+  <td>{{ row.stream_id}}</td>
   <td nowrap>{{ row.share }} %</td>
-  <td nowrap> {{row.expirationDate | date: 'MMM d, y'}}</td>
+  <td nowrap> {{row.start_time | date: 'MMM d, y, h:mm:ss a'}}</td>
+  <td nowrap> {{row.end_time | date: 'MMM d, y, h:mm:ss a'}}</td>
   <td nowrap>
-    <div *ngIf="row.signed && !row.expired" class="status-wrapper">
+    <div *ngIf="row.signed && !(row.end_time < currentDate)" class="status-wrapper">
       <span class="status-icon status-icon--signed"></span>
       <span class="status-icon__text">Signed</span>
     </div>
-    <div *ngIf="!row.signed && !row.expired" class="status-wrapper">
+    <div *ngIf="!row.signed && !(row.end_time < currentDate)" class="status-wrapper">
       <span class="status-icon status-icon--waiting"></span>
       <span class="status-icon__text">Waiting for a signature</span>
     </div>
-    <div *ngIf="row.expired" class="status-wrapper">
+    <div *ngIf="row.end_time < currentDate" class="status-wrapper">
       <span class="status-icon status-icon--expired"></span>
       <span class="status-icon__text">Contract expired</span>
     </div>
   </td>
+  <div class="status-wrapper">
+    <td >
+      <a *ngIf="!row.signed && !(row.end_time < currentDate)"
+         type="button" (click)="openModalSignContract(row)" class="btn btn-primary-alt btn-sm">Sign contract</a>
+    </td>
+  </div>
 </tr>
 <tr *ngIf="rowType === types.Buy || rowType === types.Sell" [ngClass]="{'table-active': row.mapId == rowMarked}">
   <td (click)="selectRow(row)">

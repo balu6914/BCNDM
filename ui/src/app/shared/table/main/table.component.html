@@ -39,7 +39,8 @@
                                    (mouseleave)="onUnhoveringRow(row)"
                                    (rowSelected)="showRowDetails($event)"
                                    (deleteEvt)="rowDeleted($event)"
-                                   (editEvt)="rowEdited($event)">
+                                   (editEvt)="rowEdited($event)"
+                                   (contractSigned)="onContractSigned($event)">
                     </dpc-table-row>
                   </div>
                 </tbody>
