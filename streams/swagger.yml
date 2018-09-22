@@ -300,6 +300,18 @@ definitions:
         description: Price of the stream in miTAS.
       location:
         $ref: '#/definitions/Location'
+      bq:
+        type: boolean
+        description: Indicates whether stream data is from the Big Query or not.
+      project:
+        type: string
+        description: Big Query project.
+      dataset:
+        type: string
+        description: Big Query dataset.
+      table:
+        type: string
+        description: Big Query table.
 
   StreamReq:
     allOf:

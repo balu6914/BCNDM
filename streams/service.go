@@ -116,8 +116,8 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
 	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
 
-	// Try to create table to check if query and other data is valid.
-	// In the case of an invalid data, a Stream won't be saved.
+	// Try to create table to check if query is valid. In the
+	// case of an invalid data, a Stream won't be saved.
 	t := ds.Table(fmt.Sprintf("%s_%s", stream.Table, id))
 	md := bigquery.TableMetadata{
 		Name:           stream.Table,
@@ -136,6 +136,7 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 		}
 		return "", ErrBigQuery
 	}
+
 	return ss.streams.Save(stream)
 }
 
