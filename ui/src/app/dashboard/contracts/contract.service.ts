@@ -26,7 +26,7 @@ export class ContractService {
   get(owner: boolean, partner: boolean): Observable<Page<Contract>>  {
     let params = new HttpParams();
     params = params.set('owner', owner.toString());
-    params = params.set('limit', partner.toString());
+    params = params.set('partner', partner.toString());
 
     return this.http.get<Page<Contract>>(`${environment.API_CONTRACTS}`,  {
       params: params
