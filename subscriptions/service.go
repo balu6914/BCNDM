@@ -72,11 +72,11 @@ func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, trans
 	}
 }
 
-func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (string, error) {
+func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (*bigquery.Table, error) {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, stream.Project)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer client.Close()
 
@@ -96,15 +96,15 @@ func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (strin
 		if e, ok := err.(*googleapi.Error); ok {
 			switch e.Code {
 			case http.StatusConflict:
-				return "", ErrConflict
+				return nil, ErrConflict
 			case http.StatusBadRequest:
-				return "", ErrMalformedEntity
+				return nil, ErrMalformedEntity
 			}
 		}
-		return "", err
+		return nil, err
 	}
 
-	return id, nil
+	return t, nil
 }
 
 func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (string, error) {
@@ -117,21 +117,27 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		return "", ErrNotFound
 	}
 
-	fmt.Printf("%v\n", stream)
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
+	url := stream.URL
 
+	var table *bigquery.Table
 	if stream.BQ {
-		id, err := ss.createBqView(stream, sub.EndDate)
+		table, err := ss.createBqView(stream, sub.EndDate)
 		if err != nil {
 			return "", err
 		}
-		stream.URL = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, stream.Dataset, id)
+
+		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, stream.Dataset, table.TableID)
 	}
 
-	hash, err := ss.proxy.Register(sub.Hours, stream.URL)
+	hash, err := ss.proxy.Register(sub.Hours, url)
 	if err != nil {
+		if table != nil {
+			// Ignore if deletion fails, table will be removed after expiration anyway.
+			table.Delete(context.Background())
+		}
 		return "", err
 	}
 
@@ -139,6 +145,10 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 
 	id, err := ss.subscriptions.Save(sub)
 	if err != nil {
+		if table != nil {
+			table.Delete(context.Background())
+		}
+
 		if err == ErrConflict {
 			return "", ErrConflict
 		}
@@ -147,9 +157,14 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 	}
 
 	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		if table != nil {
+			table.Delete(context.Background())
+		}
+
 		if err == ErrNotEnoughTokens {
 			return "", err
 		}
+
 		return "", ErrFailedTransfer
 	}
 

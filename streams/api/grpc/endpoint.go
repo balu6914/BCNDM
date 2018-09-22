@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"monetasa/streams"
 
 	"github.com/go-kit/kit/endpoint"
@@ -32,8 +31,6 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			table:   stream.Table,
 			fields:  stream.Fields,
 		}
-
-		fmt.Printf("RESPONSE: %v", res)
 
 		return res, nil
 	}

@@ -110,9 +110,6 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ds := client.Dataset(stream.Dataset)
 	_, err = ds.Metadata(ctx)
 	if err != nil {
-		if e, ok := err.(*googleapi.Error); ok && e.Code == http.StatusNotFound {
-			return "", ErrNotFound
-		}
 		return "", ErrBigQuery
 	}
 
