@@ -105,6 +105,9 @@ services:
       - MONETASA_STREAMS_DB_URL=monetasa-streams-db
       - MONETASA_STREAMS_DB_NAME=streams
       - MONETASA_AUTH_URL=monetasa-auth:8081
+      - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+    volumes:
+      - ../config/big-query:/big-query
     networks:
       - monetasa-net
 
@@ -142,6 +145,9 @@ services:
       - MONETASA_STREAMS_URL=monetasa-streams:8085
       - MONETASA_TRANSACTIONS_URL=monetasa-transactions:8083
       - MONETASA_PROXY_URL=http://monetasa-proxy:8085
+      - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+    volumes:
+      - ../config/big-query:/big-query
     networks:
       - monetasa-net
 
