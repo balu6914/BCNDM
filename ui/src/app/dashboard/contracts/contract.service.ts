@@ -28,7 +28,7 @@ export class ContractService {
     params = params.set('owner', owner.toString());
     params = params.set('partner', partner.toString());
 
-    return this.http.get<Page<Contract>>(`${environment.API_CONTRACTS}`,  {
+    return this.http.get<Page<Contract>>(`${environment.API_CONTRACTS}`, {
       params: params
     });
   }
