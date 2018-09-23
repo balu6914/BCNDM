@@ -1,15 +1,15 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
-import { TasPipe } from "app/common/pipes/converter.pipe";
+import { TasPipe } from 'app/common/pipes/converter.pipe';
 
 import * as L from 'leaflet';
 
 @Component({
-  selector: "dpc-map-leaflet",
-  templateUrl: "./map.leaflet.component.html",
-  styleUrls: ["./map.leaflet.component.scss"]
+  selector: 'dpc-map-leaflet',
+  templateUrl: './map.leaflet.component.html',
+  styleUrls: ['./map.leaflet.component.scss']
 })
-export class MapComponent {
+export class MapComponent implements OnChanges {
   options = {
     layers: [
       L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
@@ -38,7 +38,7 @@ export class MapComponent {
   map: L.Map;
   layerGroup = new L.LayerGroup();
   markers = [];
-  firstPageLoad: boolean = true;
+  firstPageLoad = true;
   tempId: any;
 
   @Input() streamList: any;
@@ -47,6 +47,10 @@ export class MapComponent {
   constructor(
     private tasPipe: TasPipe,
   ) {
+  }
+
+  ngOnChanges() {
+    this.addMarkers();
   }
 
   // Get stream type icon
@@ -88,10 +92,6 @@ export class MapComponent {
     this.hoverMarker.emit(this.tempId);
   }
 
-  ngOnChanges() {
-    this.addMarkers();
-  }
-
   focusMap() {
     // Get markers bounds and set the new map view with flyToBounds effect
     const markers = this.layerGroup.getLayers();
@@ -108,7 +108,7 @@ export class MapComponent {
   }
 
   addMarkers() {
-    if(this.map) {
+    if (this.map) {
       this.layerGroup.clearLayers();
       this.markers = [];
 
@@ -169,6 +169,11 @@ export class MapComponent {
 
     // Add stream to markers list
     this.markers.push(stream);
+
+    // Do map focus only when adding streams from ui
+    if (!this.firstPageLoad) {
+      this.focusMap();
+    }
   }
 
   // Callback of editEvt from TableComponent
