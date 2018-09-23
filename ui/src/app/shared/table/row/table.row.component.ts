@@ -3,6 +3,8 @@ import { ngCopy } from 'angular-6-clipboard';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
+import { AuthService } from 'app/auth/services/auth.service';
+import { User } from 'app/common/interfaces/user.interface';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
@@ -11,6 +13,7 @@ import { Stream, Subscription } from 'app/common/interfaces';
 import { TasPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from '../table';
 
+
 @Component({
   selector: 'dpc-table-row',
   templateUrl: './table.row.component.html',
@@ -18,6 +21,7 @@ import { TableType } from '../table';
 })
 
 export class TableRowComponent implements OnInit {
+  user: User;
   types = TableType;
   bsModalRef: BsModalRef;
   currentDate: string;
@@ -31,6 +35,7 @@ export class TableRowComponent implements OnInit {
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
 
   constructor(
+    private authService: AuthService,
     private modalService: BsModalService,
     private tasPipe: TasPipe,
   ) { }
@@ -40,6 +45,16 @@ export class TableRowComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Fetch current User
+    this.authService.getCurrentUser().subscribe(
+      data => {
+        this.user = data;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+
     const date = new Date();
     this.currentDate = date.toISOString();
   }
