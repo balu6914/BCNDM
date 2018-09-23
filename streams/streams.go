@@ -81,6 +81,10 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
+	if s.BQ && (s.Project == "" || s.Dataset == "" || s.Table == "" || s.Fields == "") {
+		return ErrMalformedData
+	}
+
 	return nil
 }
 

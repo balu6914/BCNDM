@@ -82,8 +82,7 @@ type Service interface {
 }
 
 type streamService struct {
-	streams  StreamRepository
-	bqClient *bigquery.Client
+	streams StreamRepository
 }
 
 // NewService instantiates the domain service implementation.

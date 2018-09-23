@@ -29,11 +29,6 @@ func (req addStreamReq) validate() error {
 		return streams.ErrMalformedData
 	}
 
-	if req.stream.BQ &&
-		(req.stream.Project == "" || req.stream.Dataset == "" || req.stream.Table == "") {
-		return streams.ErrMalformedData
-	}
-
 	return req.stream.Validate()
 }
 
