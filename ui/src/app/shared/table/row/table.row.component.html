@@ -39,7 +39,7 @@
   </td>
   <div class="status-wrapper">
     <td >
-      <a *ngIf="!row.signed && !(row.end_time < currentDate) && row.owner_id == user.id"
+      <a *ngIf="!row.signed && !(row.end_time < currentDate) && row.partner_id == user.id"
          type="button" (click)="openModalSignContract(row)" class="btn btn-primary-alt btn-sm">Sign contract</a>
     </td>
   </div>
