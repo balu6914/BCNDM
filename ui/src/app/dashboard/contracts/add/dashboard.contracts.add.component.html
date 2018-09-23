@@ -21,18 +21,15 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="parties" class="col-sm-4 col-form-label">Partner ID*</label>
-          <div class="col-sm-8">
+          <label for="parties" class="col-sm-4 col-form-label">Partner ID / Share offered*</label>
+          <div class="col-sm-6">
             <input type="text" formControlName="parties" class="form-control"
                    [ngClass]="{ 'is-invalid': submitted && form.controls.parties.errors }">
             <div *ngIf="submitted && form.controls.parties.errors" class="invalid-feedback">
               <div *ngIf="form.controls.parties.errors.required">Partner ID is required.</div>
             </div>
           </div>
-        </div>
-        <div class="form-group row">
-          <label for="shareOffered" class="col-sm-4 col-form-label">Share offered*</label>
-          <div class="col-sm-8">
+          <div class="col-sm-2">
             <input type="number" [min]="1" [max]="99" formControlName="shareOffered" class="form-control"
                    [ngClass]="{ 'is-invalid': submitted && form.controls.shareOffered.errors }">
             <div *ngIf="submitted && form.controls.shareOffered.errors" class="invalid-feedback">
