@@ -15,7 +15,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
   styleUrls: [ './dashboard.contracts.add.component.scss' ]
 })
 export class DashboardContractsAddComponent implements OnInit {
-  user: User;
+  user = <User>{};
   query = new Query();
   form: FormGroup;
   streamsName = [];
