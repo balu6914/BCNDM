@@ -30,18 +30,18 @@ export class DashboardSellAddComponent {
     const urlValidator = Validators.pattern(urlRegEx);
 
     this.form = this.formBuilder.group({
-      'name':        ['name', [Validators.required, Validators.maxLength(32)]],
-      'type':        ['type', [Validators.required, Validators.maxLength(32)]],
-      'description': ['desc', [Validators.required, Validators.maxLength(256)]],
-      'url':         ['http://www.com.com', [Validators.required, Validators.maxLength(128), urlValidator]],
-      'price':       ['22', [Validators.required, Validators.maxLength(9), floatValidator]],
-      'lat':         ['22', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
-      'long':        ['45.566', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
-      'snippet':     ['{my:stream}', [Validators.maxLength(256)]],
-      'project':     [{value: 'digisense-196722', disabled: true}, [Validators.required, Validators.maxLength(256)]],
-      'dataset':     [{value: 'demo', disabled: true}, [Validators.required, Validators.maxLength(256)]],
-      'table':       [{value: 'aqi', disabled: true}, [Validators.required, Validators.maxLength(256)]],
-      'fields':      [{value: 'Time,Value', disabled: true}, [Validators.required, Validators.maxLength(256)]]
+      'name':        ['', [Validators.required, Validators.maxLength(32)]],
+      'type':        ['', [Validators.required, Validators.maxLength(32)]],
+      'description': ['', [Validators.required, Validators.maxLength(256)]],
+      'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],
+      'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
+      'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
+      'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
+      'snippet':     ['', [Validators.maxLength(256)]],
+      'project':     [{value: '', disabled: true}, []],
+      'dataset':     [{value: '', disabled: true}, []],
+      'table':       [{value: '', disabled: true}, []],
+      'fields':      [{value: '', disabled: true}, []]
     });
   }
 
