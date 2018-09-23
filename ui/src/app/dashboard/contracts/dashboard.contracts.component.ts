@@ -35,15 +35,24 @@ export class DashboardContractsComponent implements OnInit {
     this.table.headers = ['Stream Name', 'Share offered', 'Creation date',  'Expiration date', 'Status', ''];
     this.table.page = new Page<Contract>(0, 0, 0, []);
 
-    // Fetch all contracts
-    const isOwner = true;
-    const isPartner = true;
-    this.contractService.get(isOwner, isPartner).subscribe(
-      result => {
-        const temp = Object.assign({}, this.table);
-        temp.page = result;
-        // Set table content
-        this.table = temp;
+    // Fetch current User
+    this.authService.getCurrentUser().subscribe(
+      data => {
+        this.user = data;
+        // Fetch all contracts
+        const isOwner = true;
+        const isPartner = true;
+        this.contractService.get(isOwner, isPartner).subscribe(
+          result => {
+            const temp = Object.assign({}, this.table);
+            temp.page = result;
+            // Set table content
+            this.table = temp;
+          },
+          err => {
+            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          }
+        );
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
