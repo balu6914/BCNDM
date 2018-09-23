@@ -31,9 +31,9 @@ export class DashboardProfileUpdateComponent implements OnInit {
       last_name: ['', [Validators.maxLength(16)]]
     });
     this.form.setValue({
-      contact_email: this.user.contact_email,
-      first_name: this.user.first_name,
-      last_name: this.user.last_name
+      contact_email: this.user.contact_email || '',
+      first_name: this.user.first_name || '',
+      last_name: this.user.last_name || ''
     });
   }
 
@@ -45,7 +45,7 @@ export class DashboardProfileUpdateComponent implements OnInit {
         contact_email: this.form.value.contact_email,
         first_name: this.form.value.first_name,
         last_name: this.form.value.last_name,
-      }
+      };
       this.userService.updateUser(user).subscribe(
         response => {
           this.alertService.success('You profile is succesfully updated.');
