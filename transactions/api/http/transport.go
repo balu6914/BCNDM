@@ -192,10 +192,13 @@ func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, er
 	isPartner := boolQueryParam(r, partner, defPartner)
 	var role transactions.Role
 	if isOwner {
-		role = role | transactions.Owner
+		role = transactions.Owner
 	}
 	if isPartner {
-		role = role | transactions.Partner
+		role = transactions.Partner
+	}
+	if isOwner && isPartner {
+		role = transactions.AllRoles
 	}
 
 	req := listContractsReq{

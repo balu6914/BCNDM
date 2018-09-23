@@ -1,0 +1,54 @@
+<!-- Sign Contract -->
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Sign Contract</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalSignContract.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <div class="box__content">
+      <div class="row">
+        <div class="col-sm-4 col-md-12">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Stream name
+              </div>
+              <div class="stream__text">
+                {{ contract.stream_id }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stream__title">
+                Signer
+              </div>
+              <div class="stream__text">
+                {{ contract.partner_id }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stream__title">
+                Creation date
+              </div>
+              <div class="stream__text">
+                {{ contract.start_time }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Expiration date
+              </div>
+              <div class="stream__text">
+                {{ contract.end_time }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Are you sure?</p>
+    <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
+    <button type="button" class="btn btn-danger" (click)="modalSignContract.hide()">No</button>
+  </div>
+</div>

@@ -113,7 +113,7 @@ export class MapComponent implements OnChanges {
       this.markers = [];
 
       this.streamList.forEach( stream => {
-        this.addMarker(stream);
+        this.addMarkerNoFocus(stream);
       });
 
       if (this.firstPageLoad) {
@@ -124,7 +124,7 @@ export class MapComponent implements OnChanges {
     }
   }
 
-  addMarker(stream: any) {
+  addMarkerNoFocus(stream: any) {
     // Create marker and set icon
     const newMarker = L.marker(
       [stream.location.coordinates[1],
@@ -169,11 +169,13 @@ export class MapComponent implements OnChanges {
 
     // Add stream to markers list
     this.markers.push(stream);
+  }
 
+  // Callback of addEvt from TableComponent
+  addMarker(stream) {
     // Do map focus only when adding streams from ui
-    if (!this.firstPageLoad) {
-      this.focusMap();
-    }
+    this.addMarkerNoFocus(stream);
+    this.focusMap();
   }
 
   // Callback of editEvt from TableComponent

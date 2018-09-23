@@ -1,11 +1,10 @@
 export class Contract {
   constructor(
-    public id: string,
-    public stream: object,
-    public creationDate: string,
-    public expirationDate: string,
+    public stream_id: string,
+    public stream_name: string,
+    public start_time: string,
+    public end_time: string,
     public share: string,
-    public signed: boolean,
-    public expired: boolean,
+    public signed: boolean
   ) { }
 }

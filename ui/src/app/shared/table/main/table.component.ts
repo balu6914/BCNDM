@@ -34,6 +34,7 @@ export class TableComponent {
   @Output() pageChanged = new EventEmitter<number>();
   @Output() hoverRow: EventEmitter<any> = new EventEmitter();
   @Output() unhoverRow: EventEmitter<any> = new EventEmitter();
+  @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   constructor() { }
 
 
@@ -91,4 +92,14 @@ export class TableComponent {
     this.rowToMark = streamId;
   }
 
+  onContractSigned(contract: any) {
+    // Update signed field
+    const rows: any = this.table.page.content;
+    rows.forEach( (row, i) => {
+      if (row.stream_id === contract.stream_id) {
+        contract.signed = true;
+        this.table.page.content[i] = contract;
+      }
+    });
+  }
 }
