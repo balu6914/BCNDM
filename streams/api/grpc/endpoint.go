@@ -25,11 +25,11 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			owner:   stream.Owner,
 			url:     stream.URL,
 			price:   stream.Price,
-			bq:      stream.BQ,
-			project: stream.Project,
-			dataset: stream.Dataset,
-			table:   stream.Table,
-			fields:  stream.Fields,
+			bq:      stream.External,
+			project: stream.BQ.Project,
+			dataset: stream.BQ.Dataset,
+			table:   stream.BQ.Table,
+			fields:  stream.BQ.Fields,
 		}
 
 		return res, nil

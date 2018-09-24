@@ -18,8 +18,6 @@ import { UiSwitchModule } from 'ngx-ui-switch';
     UiSwitchModule.forRoot({
       size: 'small',
       color: '#007bff',
-      checkedLabel: 'yes',
-      uncheckedLabel: 'no'
     }),
     // Import ngx-bootstrap modules
     BsDropdownModule.forRoot(),
@@ -34,4 +32,4 @@ import { UiSwitchModule } from 'ngx-ui-switch';
     UiSwitchModule
   ]
 })
-export class AppBootstrapModule { }
+export class AppBootstrapModule {}

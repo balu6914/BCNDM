@@ -31,11 +31,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Describe your stream*</label>
         <div class="col-sm-8">
-          <textarea type="text" formControlName="description" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.description.errors }">
-
-
-
- </textarea>
+          <textarea type="text" formControlName="description" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.description.errors }"></textarea>
           <div *ngIf="submitted && form.controls.description.errors" class="invalid-feedback">
             <div *ngIf="form.controls.description.errors.required">Description is required.</div>
             <div *ngIf="form.controls.description.errors.maxlength">The maximum length is 256 characters.</div>
@@ -45,15 +41,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Your stream snippet*</label>
         <div class="col-sm-8">
-          <textarea type="text" formControlName="snippet" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }">
-
-
-
-
-
-
-
-          </textarea>
+          <textarea type="text" formControlName="snippet" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }"></textarea>
           <div *ngIf="submitted && form.controls.snippet.erors" class="invalid-feedback">
             <div *ngIf="form.controls.snippet.errors.maxlength">The maximum length is 256 characters.</div>
           </div>

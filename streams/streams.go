@@ -17,6 +17,22 @@ type Location struct {
 	Coordinates [2]float64 `json:"coordinates,omitempty"`
 }
 
+// BigQuery holds Big Query related data.
+type BigQuery struct {
+	Project string `bson:"project,omitempty" json:"project,omitempty"`
+	Dataset string `bson:"dataset,omitempty" json:"dataset,omitempty"`
+	Table   string `bson:"table,omitempty" json:"table,omitempty"`
+	Fields  string `bson:"fields,omitempty" json:"fields,omitempty"`
+}
+
+// Validate provides basic checks of parameters related to the Big Query.
+func (bq BigQuery) Validate() bool {
+	return bq.Project != "" &&
+		bq.Dataset != "" &&
+		bq.Fields != "" &&
+		bq.Table != ""
+}
+
 // Stream represents data stream to be exchanged through platform.
 type Stream struct {
 	Owner       string        `bson:"owner,omitempty" json:"owner,omitempty"`
@@ -28,11 +44,8 @@ type Stream struct {
 	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
 	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
-	BQ          bool          `bson:"big_query" json:"bq,omitempty"`
-	Fields      string        `bson:"fields,omitempty" json:"fields,omitempty"`
-	Project     string        `bson:"project,omitempty" json:"project,omitempty"`
-	Dataset     string        `bson:"dataset,omitempty" json:"dataset,omitempty"`
-	Table       string        `bson:"table,omitempty" json:"table,omitempty"`
+	External    bool          `bson:"external" json:"external,omitempty"`
+	BQ          BigQuery      `bson:"big_query,omitempty" json:"bq,omitempty"`
 }
 
 // Page represents paged result for list response.
@@ -56,7 +69,7 @@ const (
 	maxLatitude          = 90
 )
 
-// Validate returns an error if user representation is invalid.
+// Validate returns an error if stream representation is invalid.
 func (s *Stream) Validate() error {
 	if s.Name == "" || (len(s.Name) > maxNameLength) ||
 		s.Type == "" || (len(s.Type) > maxTypeLength) ||
@@ -81,7 +94,7 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
-	if s.BQ && (s.Project == "" || s.Dataset == "" || s.Table == "" || s.Fields == "") {
+	if s.External && !s.BQ.Validate() {
 		return ErrMalformedData
 	}
 

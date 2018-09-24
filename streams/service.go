@@ -93,7 +93,7 @@ func NewService(streams StreamRepository) Service {
 }
 
 func (ss streamService) AddStream(stream Stream) (string, error) {
-	if stream.BQ {
+	if stream.External {
 		return ss.addBqStream(stream)
 	}
 	return ss.streams.Save(stream)
@@ -101,25 +101,26 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 
 func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, stream.Project)
+	client, err := bigquery.NewClient(ctx, stream.BQ.Project)
 	if err != nil {
 		return "", ErrBigQuery
 	}
 	defer client.Close()
-	ds := client.Dataset(stream.Dataset)
+	ds := client.Dataset(stream.BQ.Dataset)
 	_, err = ds.Metadata(ctx)
 	if err != nil {
 		return "", ErrBigQuery
 	}
 
-	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
+	bq := stream.BQ
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", bq.Fields, bq.Project, bq.Dataset, bq.Table)
 	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
 
 	// Try to create table to check if query is valid. In the
 	// case of an invalid data, a Stream won't be saved.
-	t := ds.Table(fmt.Sprintf("%s_%s", stream.Table, id))
+	t := ds.Table(fmt.Sprintf("%s_%s", bq.Table, id))
 	md := bigquery.TableMetadata{
-		Name:           stream.Table,
+		Name:           bq.Table,
 		ViewQuery:      q,
 		ExpirationTime: time.Now().Add(10 * time.Second),
 	}

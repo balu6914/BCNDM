@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -92,6 +93,7 @@ func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, er
 	}
 	defer r.Body.Close()
 
+	fmt.Printf("Stream: %v\n", stream)
 	if stream.Location.Type == "" {
 		stream.Location.Type = defLocType
 	}
