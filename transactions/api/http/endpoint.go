@@ -126,7 +126,7 @@ func listContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
 				EndTime:    contract.EndTime,
 				OwnerID:    contract.OwnerID,
 				PartnerID:  contract.PartnerID,
-				Share:      contract.Share,
+				Share:      float64(contract.Share) / shareScale,
 				Signed:     contract.Signed,
 			})
 		}

@@ -97,7 +97,7 @@ type contractView struct {
 	EndTime    time.Time `json:"end_time"`
 	OwnerID    string    `json:"owner_id"`
 	PartnerID  string    `json:"partner_id"`
-	Share      uint64    `json:"share"`
+	Share      float64   `json:"share"`
 	Signed     bool      `json:"signed"`
 }
 
