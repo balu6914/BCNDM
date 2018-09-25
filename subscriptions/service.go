@@ -89,7 +89,7 @@ func (ss subscriptionsService) createBqView(token string, stream Stream, end tim
 	datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
 
 	ds := client.Dataset(datasetID)
-	email, err := ss.auth.Email(context.Background(), &monetasa.UserID{Value: token})
+	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: token})
 	if err != nil {
 		return nil, err
 	}
@@ -158,16 +158,16 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 
 	println(url, table)
 
-	// hash, err := ss.proxy.Register(sub.Hours, url)
-	// if err != nil {
-	// 	if table != nil {
-	// 		// Ignore if deletion fails, table will be removed after expiration anyway.
-	// 		table.Delete(context.Background())
-	// 	}
-	// 	return "", err
-	// }
+	hash, err := ss.proxy.Register(sub.Hours, url)
+	if err != nil {
+		if table != nil {
+			// Ignore if deletion fails, table will be removed after expiration anyway.
+			table.Delete(context.Background())
+		}
+		return "", err
+	}
 
-	// sub.StreamURL = hash
+	sub.StreamURL = hash
 
 	id, err := ss.subscriptions.Save(sub)
 	if err != nil {
@@ -182,17 +182,17 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return "", ErrFailedCreateSub
 	}
 
-	// if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
-	// 	if table != nil {
-	// 		table.Delete(context.Background())
-	// 	}
+	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		if table != nil {
+			table.Delete(context.Background())
+		}
 
-	// 	if err == ErrNotEnoughTokens {
-	// 		return "", err
-	// 	}
+		if err == ErrNotEnoughTokens {
+			return "", err
+		}
 
-	// 	return "", ErrFailedTransfer
-	// }
+		return "", ErrFailedTransfer
+	}
 
 	ss.subscriptions.Activate(id)
 

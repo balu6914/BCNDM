@@ -12,14 +12,3 @@ func (req identityReq) validate() error {
 	}
 	return nil
 }
-
-type emailReq struct {
-	id string
-}
-
-func (req emailReq) validate() error {
-	if req.id == "" {
-		return auth.ErrMalformedEntity
-	}
-	return nil
-}

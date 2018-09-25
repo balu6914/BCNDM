@@ -42,7 +42,7 @@ func (s *grpcServer) Identify(ctx context.Context, token *monetasa.Token) (*mone
 	return res.(*monetasa.UserID), nil
 }
 
-func (s *grpcServer) Email(ctx context.Context, id *monetasa.UserID) (*monetasa.UserEmail, error) {
+func (s *grpcServer) Email(ctx context.Context, id *monetasa.Token) (*monetasa.UserEmail, error) {
 	_, res, err := s.email.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
@@ -61,8 +61,8 @@ func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}
 }
 
 func decodeEmailRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.UserID)
-	return emailReq{req.GetValue()}, nil
+	req := grpcReq.(*monetasa.Token)
+	return identityReq{req.GetValue()}, nil
 }
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {

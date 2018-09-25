@@ -24,11 +24,11 @@ func identifyEndpoint(svc auth.Service) endpoint.Endpoint {
 
 func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(emailReq)
+		req := request.(identityReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-		u, err := svc.View(req.id)
+		u, err := svc.View(req.token)
 		if err != nil {
 			return emailRes{}, err
 		}
