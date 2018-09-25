@@ -109,6 +109,13 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ds := client.Dataset(stream.BQ.Dataset)
 	_, err = ds.Metadata(ctx)
 	if err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusBadRequest, http.StatusNotFound:
+				return "", ErrMalformedData
+
+			}
+		}
 		return "", ErrBigQuery
 	}
 
@@ -130,7 +137,7 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 			switch e.Code {
 			case http.StatusConflict:
 				return "", ErrConflict
-			case http.StatusBadRequest:
+			case http.StatusBadRequest, http.StatusNotFound:
 				return "", ErrMalformedData
 			}
 		}

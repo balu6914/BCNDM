@@ -97,7 +97,7 @@ func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (*bigq
 			switch e.Code {
 			case http.StatusConflict:
 				return nil, ErrConflict
-			case http.StatusBadRequest:
+			case http.StatusBadRequest, http.StatusNotFound:
 				return nil, ErrMalformedEntity
 			}
 		}
