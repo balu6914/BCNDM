@@ -75,21 +75,13 @@ func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams S
 	}
 }
 
-func (ss subscriptionsService) createBqView(token string, stream Stream, end time.Time) (*bigquery.Table, error) {
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, stream.Project)
-	if err != nil {
-		return nil, err
+func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken, datasetID string, stream Stream) (*bigquery.Dataset, error) {
+	if client == nil {
+		return nil, ErrFailedCreateSub
 	}
-	defer client.Close()
-
-	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
-	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
-	tableID := fmt.Sprintf("%s_%s", stream.Table, id)
-	datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
 
 	ds := client.Dataset(datasetID)
-	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: token})
+	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: userToken})
 	if err != nil {
 		return nil, err
 	}
@@ -104,31 +96,36 @@ func (ss subscriptionsService) createBqView(token string, stream Stream, end tim
 		Access: []*bigquery.AccessEntry{ae},
 	}
 
-	err = ds.Create(ctx, &meta)
+	err = ds.Create(context.Background(), &meta)
 	if err != nil {
 		return nil, err
 	}
 
+	return ds, nil
+}
+
+func (ss subscriptionsService) createTable(ds *bigquery.Dataset, stream Stream, expire time.Time, tableID string) error {
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
 	t := ds.Table(tableID)
 	tableMeta := bigquery.TableMetadata{
 		Name:           stream.Table,
 		ViewQuery:      q,
-		ExpirationTime: end,
+		ExpirationTime: expire,
 	}
 
-	if err := t.Create(ctx, &tableMeta); err != nil {
+	if err := t.Create(context.Background(), &tableMeta); err != nil {
 		if e, ok := err.(*googleapi.Error); ok {
 			switch e.Code {
 			case http.StatusConflict:
-				return nil, ErrConflict
+				return ErrConflict
 			case http.StatusBadRequest, http.StatusNotFound:
-				return nil, ErrMalformedEntity
+				return ErrMalformedEntity
 			}
 		}
-		return nil, err
+		return err
 	}
 
-	return t, nil
+	return nil
 }
 
 func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (string, error) {
@@ -146,23 +143,34 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.StreamPrice = stream.Price
 	url := stream.URL
 
-	var table *bigquery.Table
+	var ds *bigquery.Dataset
 	if stream.External {
-		table, err := ss.createBqView(token, stream, sub.EndDate)
+		ctx := context.Background()
+		client, err := bigquery.NewClient(ctx, stream.Project)
 		if err != nil {
 			return "", err
 		}
+		defer client.Close()
+		id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+		tableID := fmt.Sprintf("%s_%s", stream.Table, id)
+		datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
+		ds, err := ss.createDataset(client, token, datasetID, stream)
+		if err != nil {
+			return "", err
+		}
+		if err = ss.createTable(ds, stream, sub.EndDate, tableID); err != nil {
+			ds.Delete(ctx)
+			return "", err
+		}
 
-		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, stream.Dataset, table.TableID)
+		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, ds.DatasetID, tableID)
 	}
-
-	println(url, table)
 
 	hash, err := ss.proxy.Register(sub.Hours, url)
 	if err != nil {
-		if table != nil {
+		if ds != nil {
 			// Ignore if deletion fails, table will be removed after expiration anyway.
-			table.Delete(context.Background())
+			ds.Delete(context.Background())
 		}
 		return "", err
 	}
@@ -171,8 +179,8 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 
 	id, err := ss.subscriptions.Save(sub)
 	if err != nil {
-		if table != nil {
-			table.Delete(context.Background())
+		if ds != nil {
+			ds.Delete(context.Background())
 		}
 
 		if err == ErrConflict {
@@ -183,8 +191,8 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	}
 
 	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
-		if table != nil {
-			table.Delete(context.Background())
+		if ds != nil {
+			ds.Delete(context.Background())
 		}
 
 		if err == ErrNotEnoughTokens {
