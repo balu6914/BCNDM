@@ -28,6 +28,7 @@ const (
 	defLimit    = 10
 	defOwner    = false
 	defPartner  = false
+	shareScale  = 1000
 )
 
 var (
@@ -157,6 +158,10 @@ func decodeCreateContractsReq(_ context.Context, r *http.Request) (interface{}, 
 
 	req.ownerID = id
 
+	for i := range req.Items {
+		req.Items[i].Share *= shareScale
+	}
+
 	return req, nil
 }
 
@@ -181,10 +186,6 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 }
 
 func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
-	if r.Header.Get("Content-Type") != contentType {
-		return nil, errUnsupportedContentType
-	}
-
 	id, err := authorize(r)
 	if err != nil {
 		return nil, err
@@ -196,10 +197,13 @@ func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, er
 	isPartner := boolQueryParam(r, partner, defPartner)
 	var role transactions.Role
 	if isOwner {
-		role = role | transactions.Owner
+		role = transactions.Owner
 	}
 	if isPartner {
-		role = role | transactions.Partner
+		role = transactions.Partner
+	}
+	if isOwner && isPartner {
+		role = transactions.AllRoles
 	}
 
 	req := listContractsReq{

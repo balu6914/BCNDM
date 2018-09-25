@@ -3,12 +3,16 @@ import { ngCopy } from 'angular-6-clipboard';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { DashboardSellEditComponent } from '../../../dashboard/sell/edit';
-import { DashboardSellDeleteComponent } from '../../../dashboard/sell/delete';
-import { DashboardBuyAddComponent } from '../../../dashboard/buy/add';
-import { Stream, Subscription } from '../../../common/interfaces';
-import { TasPipe } from '../../../common/pipes/converter.pipe';
+import { AuthService } from 'app/auth/services/auth.service';
+import { User } from 'app/common/interfaces/user.interface';
+import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
+import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
+import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
+import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
+import { Stream, Subscription } from 'app/common/interfaces';
+import { TasPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from '../table';
+
 
 @Component({
   selector: 'dpc-table-row',
@@ -17,8 +21,10 @@ import { TableType } from '../table';
 })
 
 export class TableRowComponent implements OnInit {
+  user: User;
   types = TableType;
   bsModalRef: BsModalRef;
+  currentDate: string;
 
   @Input() row: any;
   @Input() rowType: TableType;
@@ -26,8 +32,10 @@ export class TableRowComponent implements OnInit {
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
+  @Output() contractSigned: EventEmitter<any> = new EventEmitter();
 
   constructor(
+    private authService: AuthService,
     private modalService: BsModalService,
     private tasPipe: TasPipe,
   ) { }
@@ -37,6 +45,18 @@ export class TableRowComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Fetch current User
+    this.authService.getCurrentUser().subscribe(
+      data => {
+        this.user = data;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+
+    const date = new Date();
+    this.currentDate = date.toISOString();
   }
 
   public copyToClipboard() {
@@ -106,9 +126,23 @@ export class TableRowComponent implements OnInit {
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 
+  openModalSignContract(row: any) {
+    const initialState = {
+      contract: row,
+    };
+
+    this.bsModalRef = this.modalService.show(DashboardContractsSignComponent, {initialState})
+      .content.contractSigned.subscribe(
+        contract => {
+          this.contractSigned.emit(contract);
+        }
+      );
+  }
+
   // Select/Click on Row emits a selectedRow event and pass selected row data
   // In order to show row details.
   selectRow(row: Stream) {
     this.rowSelected.emit(row);
   }
+
 }

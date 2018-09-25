@@ -49,6 +49,7 @@ func newService() transactions.Service {
 	}, remainingTokens)
 	cl := mocks.NewContractLedger()
 	cr := mocks.NewContractRepository()
+	streams := mocks.NewStreamsService(map[string]transactions.Stream{})
 
-	return transactions.New(ur, tl, cl, cr)
+	return transactions.New(ur, tl, cl, cr, streams)
 }

@@ -20,6 +20,13 @@
 		 	"^/transactions": ""
 	 	 }
 	},
+  "/transactions/contracts/*": {
+		"target": "http://localhost:8082",
+		"secure": false,
+		"pathRewrite": {
+		 	"^/transactions": ""
+	 	 }
+	},
 	"/streams/*": {
 		"target": "http://localhost:8084",
 		"secure": false,

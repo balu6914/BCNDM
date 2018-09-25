@@ -120,6 +120,8 @@ func (cr contractRepository) List(userID string, pageNo, limit uint64, role tran
 			{"owner_id": userID},
 			{"partner_id": userID},
 		}
+	default:
+		return transactions.ContractPage{}
 	}
 
 	count, err := collection.Find(query).Count()
@@ -179,36 +181,39 @@ func (cr contractRepository) setActive(contract transactions.Contract, active bo
 }
 
 type mongoContract struct {
-	StreamID  string    `bson:"stream_id,omitempty"`
-	StartTime time.Time `bson:"start_time,omitempty"`
-	EndTime   time.Time `bson:"end_time,omitempty"`
-	OwnerID   string    `bson:"owner_id,omitempty"`
-	PartnerID string    `bson:"partner_id,omitempty"`
-	Share     uint64    `bson:"share,omitempty"`
-	Signed    bool      `bson:"signed,omitempty"`
-	Active    bool      `bson:"active"`
+	StreamID   string    `bson:"stream_id,omitempty"`
+	StreamName string    `bson:"stream_name,omitempty"`
+	StartTime  time.Time `bson:"start_time,omitempty"`
+	EndTime    time.Time `bson:"end_time,omitempty"`
+	OwnerID    string    `bson:"owner_id,omitempty"`
+	PartnerID  string    `bson:"partner_id,omitempty"`
+	Share      uint64    `bson:"share,omitempty"`
+	Signed     bool      `bson:"signed,omitempty"`
+	Active     bool      `bson:"active"`
 }
 
 func toMongoContract(contract transactions.Contract) mongoContract {
 	return mongoContract{
-		StreamID:  contract.StreamID,
-		StartTime: contract.StartTime,
-		EndTime:   contract.EndTime,
-		OwnerID:   contract.OwnerID,
-		PartnerID: contract.PartnerID,
-		Share:     contract.Share,
-		Signed:    contract.Signed,
+		StreamID:   contract.StreamID,
+		StreamName: contract.StreamName,
+		StartTime:  contract.StartTime,
+		EndTime:    contract.EndTime,
+		OwnerID:    contract.OwnerID,
+		PartnerID:  contract.PartnerID,
+		Share:      contract.Share,
+		Signed:     contract.Signed,
 	}
 }
 
 func toContract(contract mongoContract) transactions.Contract {
 	return transactions.Contract{
-		StreamID:  contract.StreamID,
-		StartTime: contract.StartTime,
-		EndTime:   contract.EndTime,
-		OwnerID:   contract.OwnerID,
-		PartnerID: contract.PartnerID,
-		Share:     contract.Share,
-		Signed:    contract.Signed,
+		StreamID:   contract.StreamID,
+		StreamName: contract.StreamName,
+		StartTime:  contract.StartTime,
+		EndTime:    contract.EndTime,
+		OwnerID:    contract.OwnerID,
+		PartnerID:  contract.PartnerID,
+		Share:      contract.Share,
+		Signed:     contract.Signed,
 	}
 }
