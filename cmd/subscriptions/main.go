@@ -88,7 +88,7 @@ func main() {
 	defer streamsConn.Close()
 	sc := streamsapi.NewClient(streamsConn)
 
-	svc := newService(ms, sc, tc, cfg.ProxyURL, logger)
+	svc := newService(ac, ms, sc, tc, cfg.ProxyURL, logger)
 
 	errs := make(chan error, 2)
 
@@ -147,13 +147,13 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
+func newService(ac monetasa.AuthServiceClient, ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
 	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewSubscriptionRepository(ms)
-	svc := subscriptions.New(repo, ss, ps, ts)
+	svc := subscriptions.New(ac, repo, ss, ps, ts)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(

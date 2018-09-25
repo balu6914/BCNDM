@@ -37,7 +37,6 @@ func (ms *authService) Register(user User) error {
 	}
 
 	return nil
-
 }
 
 func (ms *authService) Login(user User) (string, error) {

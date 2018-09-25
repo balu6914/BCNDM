@@ -113,7 +113,6 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 			switch e.Code {
 			case http.StatusBadRequest, http.StatusNotFound:
 				return "", ErrMalformedData
-
 			}
 		}
 		return "", ErrBigQuery

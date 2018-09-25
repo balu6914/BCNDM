@@ -15,7 +15,7 @@ func addSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		id, err := svc.AddSubscription(req.UserID, req.Subscription)
+		id, err := svc.AddSubscription(req.UserID, req.UserToken, req.Subscription)
 		if err != nil {
 			return nil, err
 		}

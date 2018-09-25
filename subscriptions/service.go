@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"monetasa"
 	"net/http"
 	"strings"
 	"time"
@@ -44,7 +45,7 @@ var (
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	// AddSubscription subscribes to a stream making a new Subscription.
-	AddSubscription(string, Subscription) (string, error)
+	AddSubscription(string, string, Subscription) (string, error)
 
 	// SearchSubscriptions searches subscriptions by the query.
 	SearchSubscriptions(Query) (Page, error)
@@ -56,6 +57,7 @@ type Service interface {
 var _ Service = (*subscriptionsService)(nil)
 
 type subscriptionsService struct {
+	auth          monetasa.AuthServiceClient
 	subscriptions SubscriptionRepository
 	streams       StreamsService
 	proxy         Proxy
@@ -63,8 +65,9 @@ type subscriptionsService struct {
 }
 
 // New instantiates the domain service implementation.
-func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
+func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
 	return &subscriptionsService{
+		auth:          auth,
 		subscriptions: subs,
 		streams:       streams,
 		proxy:         proxy,
@@ -72,7 +75,7 @@ func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, trans
 	}
 }
 
-func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (*bigquery.Table, error) {
+func (ss subscriptionsService) createBqView(token string, stream Stream, end time.Time) (*bigquery.Table, error) {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, stream.Project)
 	if err != nil {
@@ -82,17 +85,38 @@ func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (*bigq
 
 	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
 	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
-	id = fmt.Sprintf("%s_%s", stream.Table, id)
+	tableID := fmt.Sprintf("%s_%s", stream.Table, id)
+	datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
 
-	ds := client.Dataset(stream.Dataset)
-	t := ds.Table(id)
-	md := bigquery.TableMetadata{
+	ds := client.Dataset(datasetID)
+	email, err := ss.auth.Email(context.Background(), &monetasa.UserID{Value: token})
+	if err != nil {
+		return nil, err
+	}
+
+	ae := &bigquery.AccessEntry{
+		Role:       bigquery.ReaderRole,
+		EntityType: bigquery.UserEmailEntity,
+		Entity:     email.GetValue(),
+	}
+
+	meta := bigquery.DatasetMetadata{
+		Access: []*bigquery.AccessEntry{ae},
+	}
+
+	err = ds.Create(ctx, &meta)
+	if err != nil {
+		return nil, err
+	}
+
+	t := ds.Table(tableID)
+	tableMeta := bigquery.TableMetadata{
 		Name:           stream.Table,
 		ViewQuery:      q,
 		ExpirationTime: end,
 	}
 
-	if err := t.Create(ctx, &md); err != nil {
+	if err := t.Create(ctx, &tableMeta); err != nil {
 		if e, ok := err.(*googleapi.Error); ok {
 			switch e.Code {
 			case http.StatusConflict:
@@ -107,7 +131,7 @@ func (ss subscriptionsService) createBqView(stream Stream, end time.Time) (*bigq
 	return t, nil
 }
 
-func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (string, error) {
+func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (string, error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
@@ -124,7 +148,7 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 
 	var table *bigquery.Table
 	if stream.External {
-		table, err := ss.createBqView(stream, sub.EndDate)
+		table, err := ss.createBqView(token, stream, sub.EndDate)
 		if err != nil {
 			return "", err
 		}
@@ -132,16 +156,18 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, stream.Dataset, table.TableID)
 	}
 
-	hash, err := ss.proxy.Register(sub.Hours, url)
-	if err != nil {
-		if table != nil {
-			// Ignore if deletion fails, table will be removed after expiration anyway.
-			table.Delete(context.Background())
-		}
-		return "", err
-	}
+	println(url, table)
 
-	sub.StreamURL = hash
+	// hash, err := ss.proxy.Register(sub.Hours, url)
+	// if err != nil {
+	// 	if table != nil {
+	// 		// Ignore if deletion fails, table will be removed after expiration anyway.
+	// 		table.Delete(context.Background())
+	// 	}
+	// 	return "", err
+	// }
+
+	// sub.StreamURL = hash
 
 	id, err := ss.subscriptions.Save(sub)
 	if err != nil {
@@ -156,17 +182,17 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 		return "", ErrFailedCreateSub
 	}
 
-	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
-		if table != nil {
-			table.Delete(context.Background())
-		}
+	// if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+	// 	if table != nil {
+	// 		table.Delete(context.Background())
+	// 	}
 
-		if err == ErrNotEnoughTokens {
-			return "", err
-		}
+	// 	if err == ErrNotEnoughTokens {
+	// 		return "", err
+	// 	}
 
-		return "", ErrFailedTransfer
-	}
+	// 	return "", ErrFailedTransfer
+	// }
 
 	ss.subscriptions.Activate(id)
 
