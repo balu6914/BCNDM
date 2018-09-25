@@ -123,7 +123,7 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 	url := stream.URL
 
 	var table *bigquery.Table
-	if stream.BQ {
+	if stream.External {
 		table, err := ss.createBqView(stream, sub.EndDate)
 		if err != nil {
 			return "", err

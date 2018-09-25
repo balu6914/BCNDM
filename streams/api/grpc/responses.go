@@ -1,15 +1,15 @@
 package grpc
 
 type oneRes struct {
-	id      string
-	name    string
-	owner   string
-	url     string
-	price   uint64
-	bq      bool
-	project string
-	dataset string
-	table   string
-	fields  string
-	err     error
+	id       string
+	name     string
+	owner    string
+	url      string
+	price    uint64
+	external bool
+	project  string
+	dataset  string
+	table    string
+	fields   string
+	err      error
 }

@@ -14,7 +14,7 @@ message Stream {
     string owner = 3;
     string url = 4;
     uint64 price = 5;
-    bool bq = 6;
+    bool external = 6;
     string project = 7;
     string dataset = 8;
     string table = 9;
