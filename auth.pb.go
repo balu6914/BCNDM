@@ -34,7 +34,7 @@ func (m *Token) Reset()         { *m = Token{} }
 func (m *Token) String() string { return proto.CompactTextString(m) }
 func (*Token) ProtoMessage()    {}
 func (*Token) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_591416c9025735de, []int{0}
+	return fileDescriptor_auth_83f5feffffbce72f, []int{0}
 }
 func (m *Token) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Token.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *UserID) Reset()         { *m = UserID{} }
 func (m *UserID) String() string { return proto.CompactTextString(m) }
 func (*UserID) ProtoMessage()    {}
 func (*UserID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_591416c9025735de, []int{1}
+	return fileDescriptor_auth_83f5feffffbce72f, []int{1}
 }
 func (m *UserID) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserID.Unmarshal(m, b)
@@ -110,7 +110,7 @@ func (m *UserEmail) Reset()         { *m = UserEmail{} }
 func (m *UserEmail) String() string { return proto.CompactTextString(m) }
 func (*UserEmail) ProtoMessage()    {}
 func (*UserEmail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_591416c9025735de, []int{2}
+	return fileDescriptor_auth_83f5feffffbce72f, []int{2}
 }
 func (m *UserEmail) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserEmail.Unmarshal(m, b)
@@ -248,9 +248,9 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "auth.proto",
 }
 
-func init() { proto.RegisterFile("auth.proto", fileDescriptor_auth_591416c9025735de) }
+func init() { proto.RegisterFile("auth.proto", fileDescriptor_auth_83f5feffffbce72f) }
 
-var fileDescriptor_auth_591416c9025735de = []byte{
+var fileDescriptor_auth_83f5feffffbce72f = []byte{
 	// 161 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
 	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xc8, 0xcd, 0xcf, 0x4b, 0x2d, 0x49, 0x2c, 0x4e,

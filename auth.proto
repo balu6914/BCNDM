@@ -15,6 +15,6 @@ message UserID {
     string value = 1;
 }
 
-message UserEmail{
+message UserEmail {
     string value = 1;
 }

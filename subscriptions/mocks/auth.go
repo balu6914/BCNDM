@@ -30,7 +30,7 @@ func (svc authClientMock) Identify(_ context.Context, in *monetasa.Token, opts .
 	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 }
 
-func (svc authClientMock) Email(_ context.Context, in *monetasa.UserID, opts ...grpc.CallOption) (*monetasa.UserEmail, error) {
+func (svc authClientMock) Email(_ context.Context, in *monetasa.Token, opts ...grpc.CallOption) (*monetasa.UserEmail, error) {
 	if id, ok := svc.emails[in.Value]; ok {
 		return &monetasa.UserEmail{Value: id}, nil
 	}

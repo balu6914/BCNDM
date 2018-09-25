@@ -74,29 +74,29 @@ func TestEmail(t *testing.T) {
 	defer cancel()
 
 	cases := map[string]struct {
-		id    string
+		token string
 		email string
 		err   error
 	}{
 		"get an email": {
-			id:    user.Email,
+			token: user.Email,
 			email: user.Email,
 			err:   nil,
 		},
 		"get an email with an empty id": {
-			id:    "",
+			token: "",
 			email: "",
 			err:   status.Error(codes.InvalidArgument, "received invalid request"),
 		},
 		"get an email with an invalid id": {
-			id:    invalid,
+			token: invalid,
 			email: "",
 			err:   status.Error(codes.Unauthenticated, "failed to identify user from key"),
 		},
 	}
 
 	for desc, tc := range cases {
-		email, err := client.Email(ctx, &monetasa.UserID{Value: tc.id})
+		email, err := client.Email(ctx, &monetasa.Token{Value: tc.token})
 		assert.Equal(t, tc.email, email.GetValue(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetValue()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
