@@ -97,48 +97,43 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Big Query</label>
         <div class="col-sm-8">
-          <ui-switch (change)="changeBQ($event)"></ui-switch>
+          <ui-switch (change)="changeExt($event)"></ui-switch>
         </div>
       </div>
       <div class="form-group">
         <div class="form-group row">
           <label for="project" class="col-sm-4 col-form-label">Project</label>
           <div class="col-sm-8">
-            <input [disabled]="!bigQuery" formControlName="project" type="text" class="form-control" id="project">
-            <div *ngIf="submitted && form.controls.type.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.type.errors.required">Project is required.</div>
-              <div *ngIf="form.controls.type.errors.maxlength">The maximum length is 256 characters.</div>
+            <input formControlName="project" type="text" class="form-control" id="project" [ngClass]="{ 'is-invalid': submitted && form.controls.project.errors }">
+            <div *ngIf="submitted && form.controls.project.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.project.errors.required">Project is riquired.</div>
             </div>
           </div>
         </div>
         <div class="form-group row">
           <label for="dataset" class="col-sm-4 col-form-label">Dataset</label>
           <div class="col-sm-8">
-            <input [disabled]="!bigQuery" formControlName="dataset" type="text" class="form-control" id="dataset">
-            <div *ngIf="submitted && form.controls.type.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.type.errors.required">Dataset is required.</div>
-              <div *ngIf="form.controls.type.errors.maxlength">The maximum length is 256 characters.</div>
+            <input formControlName="dataset" type="text" class="form-control" id="dataset" [ngClass]="{ 'is-invalid': submitted && form.controls.dataset.errors }">
+            <div *ngIf="submitted && form.controls.dataset.errors" class="invalid-feedback">
+              <div>Dataset is required.</div>
             </div>
           </div>
         </div>
         <div class="form-group row">
           <label for="table" class="col-sm-4 col-form-label">Table</label>
           <div class="col-sm-8">
-            <input [disabled]="!bigQuery" formControlName="table" type="text" class="form-control" id="table">
-            <div *ngIf="submitted && form.controls.type.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.type.errors.required">Table is required.</div>
-              <div *ngIf="form.controls.type.errors.maxlength">The maximum length is 256 characters.</div>
+            <input formControlName="table" type="text" class="form-control" id="table" [ngClass]="{ 'is-invalid': submitted && form.controls.table.errors }">
+            <div *ngIf="submitted && form.controls.table.errors" class="invalid-feedback">
+              <div>Table is required.</div>
             </div>
           </div>
         </div>
         <div class="form-group row">
           <label for="fields" class="col-sm-4 col-form-label">Select fields</label>
           <div class="col-sm-8">
-            <input [disabled]="!bigQuery" formControlName="fields" type="text" class="form-control" id="fields"
-              required>
-            <div *ngIf="submitted && form.controls.type.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.type.errors.required">Fields are required.</div>
-              <div *ngIf="form.controls.type.errors.maxlength">The maximum length is 256 characters.</div>
+            <input formControlName="fields" type="text" class="form-control" id="fields" [ngClass]="{ 'is-invalid': submitted && form.controls.fields.errors }">
+            <div *ngIf="submitted && form.controls.fields.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.fields.errors.required">Fields are required.</div>
             </div>
           </div>
         </div>

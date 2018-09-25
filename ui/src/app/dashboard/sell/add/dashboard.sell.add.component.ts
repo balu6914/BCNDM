@@ -1,22 +1,21 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-
-import { StreamService } from '../../../common/services/stream.service';
-import { Stream, BigQuery } from '../../../common/interfaces/stream.interface';
-import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BigQuery, Stream } from '../../../common/interfaces/stream.interface';
+import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { StreamService } from '../../../common/services/stream.service';
 
 @Component({
   selector: 'dpc-dashboard-sell-add',
   templateUrl: './dashboard.sell.add.component.html',
   styleUrls: ['./dashboard.sell.add.component.scss']
 })
-export class DashboardSellAddComponent {
+export class DashboardSellAddComponent implements OnInit {
   form: FormGroup;
   submitted = false;
-  bigQuery = false;
+  external = false;
 
   @Output()
   streamCreated: EventEmitter<any> = new EventEmitter();
@@ -26,10 +25,11 @@ export class DashboardSellAddComponent {
     private formBuilder: FormBuilder,
     public modalAddStream: BsModalRef,
     public alertService: AlertService
-  ) {
+  ) { }
+
+  ngOnInit() {
     const floatValidator = Validators.pattern(floatRegEx);
     const urlValidator = Validators.pattern(urlRegEx);
-
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(32)]],
       type: ['', [Validators.required, Validators.maxLength(32)]],
@@ -60,31 +60,38 @@ export class DashboardSellAddComponent {
         ]
       ],
       snippet: ['', [Validators.maxLength(256)]],
-      project: [{ value: '', disabled: true }, []],
-      dataset: [{ value: '', disabled: true }, []],
-      table:   [{ value: '', disabled: true }, []],
-      fields:  [{ value: '', disabled: true }, []]
+      project: [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
+      dataset: [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
+      table:   [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
+      fields:  [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]]
     });
   }
+  requiredBQ(c: FormControl) {
+    if (this.external && c.value === '') {
+      return {required: true};
+    }
+    return null;
+  }
 
-  changeBQ() {
-    this.bigQuery = !this.bigQuery;
-    this.bigQuery
+  changeExt() {
+    this.external = !this.external;
+    this.external
       ? this.form.get('project').enable()
       : this.form.get('project').disable();
-    this.bigQuery
+    this.external
       ? this.form.get('dataset').enable()
       : this.form.get('dataset').disable();
-    this.bigQuery
+    this.external
       ? this.form.get('table').enable()
       : this.form.get('table').disable();
-    this.bigQuery
+    this.external
       ? this.form.get('fields').enable()
       : this.form.get('fields').disable();
   }
 
   onSubmit() {
     this.submitted = true;
+
     if (this.form.valid) {
       const stream: Stream = {
         name: this.form.get('name').value,
@@ -100,9 +107,9 @@ export class DashboardSellAddComponent {
             parseFloat(this.form.get('lat').value)
           ]
         },
-        external: this.bigQuery
+        external: this.external
       };
-      if (this.bigQuery) {
+      if (this.external) {
         stream.bq = new BigQuery(
           this.form.get('project').value,
           this.form.get('dataset').value,
@@ -111,7 +118,6 @@ export class DashboardSellAddComponent {
         );
       }
 
-      console.log(stream);
       // Send addStream request
       this.streamService.addStream(stream).subscribe(
         res => {
