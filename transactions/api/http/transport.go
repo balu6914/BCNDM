@@ -28,6 +28,7 @@ const (
 	defLimit    = 10
 	defOwner    = false
 	defPartner  = false
+	shareScale  = 1000
 )
 
 var (
@@ -156,6 +157,10 @@ func decodeCreateContractsReq(_ context.Context, r *http.Request) (interface{}, 
 	}
 
 	req.ownerID = id
+
+	for i := range req.Items {
+		req.Items[i].Share *= shareScale
+	}
 
 	return req, nil
 }
