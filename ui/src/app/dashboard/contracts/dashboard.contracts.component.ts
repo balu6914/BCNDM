@@ -21,6 +21,11 @@ export class DashboardContractsComponent implements OnInit {
     selectedContract = [];
     table: Table = new Table();
     openedHelp = false;
+    query = {
+      isOwner: true,
+      isPartner: true,
+      page: 0
+    };
 
     constructor(
         private modalService: BsModalService,
@@ -39,20 +44,7 @@ export class DashboardContractsComponent implements OnInit {
     this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
-        // Fetch all contracts
-        const isOwner = true;
-        const isPartner = true;
-        this.contractService.get(isOwner, isPartner).subscribe(
-          result => {
-            const temp = Object.assign({}, this.table);
-            temp.page = result;
-            // Set table content
-            this.table = temp;
-          },
-          err => {
-            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-          }
-        );
+        this.fetchContracts();
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
@@ -60,8 +52,23 @@ export class DashboardContractsComponent implements OnInit {
     );
   }
 
-  toggleHelp() {
-    this.openedHelp = !this.openedHelp;
+  fetchContracts() {
+    this.contractService.get(this.query).subscribe(
+      result => {
+        const temp = Object.assign({}, this.table);
+        temp.page = result;
+        // Set table content
+        this.table = temp;
+      },
+      err => {
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+      }
+    );
+  }
+
+  onPageChange(page: number) {
+    this.query.page = page;
+    this.fetchContracts();
   }
 
   modalNewContract() {
@@ -71,11 +78,25 @@ export class DashboardContractsComponent implements OnInit {
     this.modalService.show(DashboardContractsAddComponent)
       .content.contractCreated.subscribe(
         response => {
-          this.table.page.content.push(response);
+          response.parties.forEach(partner => {
+            const row: Contract = {
+              stream_name: response.stream_name,
+              share: partner.share,
+              start_time: response.start_time,
+              end_time: response.end_time,
+              partner_id: partner.partner_id,
+              signed: false,
+            };
+            this.table.page.content.push(row);
+          });
         },
         err => {
           console.log(err);
         }
       );
-  }
+    }
+
+    toggleHelp() {
+      this.openedHelp = !this.openedHelp;
+    }
 }

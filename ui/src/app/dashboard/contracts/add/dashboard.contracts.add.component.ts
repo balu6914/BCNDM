@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { AuthService } from 'app/auth/services/auth.service';
@@ -18,9 +18,11 @@ export class DashboardContractsAddComponent implements OnInit {
   user = <User>{};
   query = new Query();
   form: FormGroup;
+  parties: FormArray;
   streamsName = [];
   streams = [];
   submitted = false;
+  invalidShare = false;
   date = new Date();
   minDate: string;
 
@@ -38,11 +40,33 @@ export class DashboardContractsAddComponent implements OnInit {
     this.minDate = this.date.toISOString().split('T')[0];
 
     this.form = this.formBuilder.group({
-      streamName:   ['', [Validators.required]],
-      parties:      ['', [Validators.required]],
-      shareOffered: ['', [Validators.required]],
-      endTime:      ['', [Validators.required]]
+      streamName: ['', [Validators.required]],
+      endTime:    ['', [Validators.required]],
+      parties:    this.formBuilder.array([this.createPartner()])
+    },
+    {
+      validator: this.shareValidator
     });
+  }
+
+  createPartner(): FormGroup {
+    return this.formBuilder.group({
+      partner: ['', [Validators.required]],
+      share:   ['', [Validators.required, Validators.min(1), Validators.max(100)]],
+    });
+  }
+
+  shareValidator(fg: FormGroup) {
+    // Check if partner sharing sum is < 100
+    let sum = 0;
+    fg.value.parties.forEach( (item, i) => {
+        sum += parseInt(item.share, 10);
+        if (sum > 100) {
+          fg.controls.parties['controls'][i].controls.share.setErrors({'shareSum': true});
+        }
+    });
+
+    return null;
   }
 
   ngOnInit () {
@@ -78,21 +102,23 @@ export class DashboardContractsAddComponent implements OnInit {
       const createContractReq = {
         stream_id: streamID,
         end_time: `${this.form.value.endTime}T00:00:00Z`,
-        items: [
-          {
-            partner_id: this.form.value.parties,
-            share: parseInt(this.form.value.shareOffered, 10)
-          }
-        ],
+        items: [],
       };
+
+      this.form.value.parties.forEach( (item, i) => {
+          createContractReq.items.push({
+            partner_id: item.partner,
+            share: parseInt(item.share, 10)
+          });
+      });
 
       this.contractService.create(createContractReq).subscribe(
         data => {
           const contractRow = {
-            stream_id: streamID,
-            start_time:  new Date().toISOString(),
-            end_time: this.form.value.endTime,
-            share: this.form.value.shareOffered
+            stream_name: this.form.value.streamName,
+            start_time: new Date().toISOString(),
+            end_time: createContractReq.end_time,
+            parties: createContractReq.items,
           };
           this.contractCreated.emit(contractRow);
           this.alertService.success(`Contract succesfully created!`);
@@ -104,5 +130,14 @@ export class DashboardContractsAddComponent implements OnInit {
 
       this.modalNewContract.hide();
     }
+  }
+
+  onAddPartner() {
+    this.parties = this.form.get('parties') as FormArray;
+    this.parties.push(this.createPartner());
+  }
+
+  onDeletePartner(index: number) {
+    this.parties.controls.splice(index, 1);
   }
 }
