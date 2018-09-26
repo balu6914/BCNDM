@@ -30,10 +30,10 @@ export class DashboardContractsAddComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private streamService: StreamService,
-    private  contractService: ContractService,
+    private contractService: ContractService,
     private formBuilder: FormBuilder,
-    public  modalNewContract: BsModalRef,
-    public  alertService: AlertService,
+    public modalNewContract: BsModalRef,
+    public alertService: AlertService,
   ) {
     // Add one day to current date and set it as min date
     this.date.setDate(this.date.getDate() + 1);
@@ -43,8 +43,7 @@ export class DashboardContractsAddComponent implements OnInit {
       streamName: ['', [Validators.required]],
       endTime:    ['', [Validators.required]],
       parties:    this.formBuilder.array([this.createPartner()])
-    },
-    {
+    }, {
       validator: this.shareValidator
     });
   }
@@ -62,7 +61,10 @@ export class DashboardContractsAddComponent implements OnInit {
     fg.value.parties.forEach( (item, i) => {
         sum += parseInt(item.share, 10);
         if (sum > 100) {
-          fg.controls.parties['controls'][i].controls.share.setErrors({'shareSum': true});
+          // Create a custon error field used as *ngIf condition for  style
+          fg.controls.parties['controls'][i].controls.share.setErrors({
+            'shareSum': true
+          });
         }
     });
 
@@ -105,11 +107,12 @@ export class DashboardContractsAddComponent implements OnInit {
         items: [],
       };
 
-      this.form.value.parties.forEach( (item, i) => {
-          createContractReq.items.push({
-            partner_id: item.partner,
-            share: parseInt(item.share, 10)
-          });
+      this.form.value.parties.forEach( item => {
+        const partner = {
+          partner_id: item.partner,
+          share: parseInt(item.share, 10)
+        };
+        createContractReq.items.push(partner);
       });
 
       this.contractService.create(createContractReq).subscribe(
