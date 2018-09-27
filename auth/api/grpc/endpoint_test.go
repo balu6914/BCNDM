@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,7 +33,8 @@ func TestIdentify(t *testing.T) {
 	svc.Register(user)
 
 	authAddr := fmt.Sprintf("localhost:%d", port)
-	conn, _ := grpc.Dial(authAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())
+	require.Nil(t, err, "unexpected error dialing GRPC: %s", err)
 	client := grpcapi.NewClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -68,7 +70,8 @@ func TestIdentify(t *testing.T) {
 
 func TestEmail(t *testing.T) {
 	authAddr := fmt.Sprintf("localhost:%d", port)
-	conn, _ := grpc.Dial(authAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())
+	require.Nil(t, err, "unexpected error dialing GRPC: %s", err)
 	client := grpcapi.NewClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

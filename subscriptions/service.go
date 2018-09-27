@@ -96,8 +96,7 @@ func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken,
 		Access: []*bigquery.AccessEntry{ae},
 	}
 
-	err = ds.Create(context.Background(), &meta)
-	if err != nil {
+	if err = ds.Create(context.Background(), &meta); err != nil {
 		return nil, err
 	}
 
@@ -145,8 +144,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 
 	var ds *bigquery.Dataset
 	if stream.External {
-		ctx := context.Background()
-		client, err := bigquery.NewClient(ctx, stream.Project)
+		client, err := bigquery.NewClient(context.Background(), stream.Project)
 		if err != nil {
 			return "", err
 		}
@@ -159,7 +157,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return "", err
 		}
 		if err = ss.createTable(ds, stream, sub.EndDate, tableID); err != nil {
-			ds.Delete(ctx)
+			ds.Delete(context.Background())
 			return "", err
 		}
 
