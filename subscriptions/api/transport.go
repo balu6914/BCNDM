@@ -118,6 +118,7 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 
 	req := addSubReq{
 		UserID:       userID,
+		UserToken:    r.Header.Get("Authorization"),
 		Subscription: sub,
 	}
 

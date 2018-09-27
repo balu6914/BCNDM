@@ -37,11 +37,16 @@ func (client grpcClient) One(ctx context.Context, id *monetasa.ID, _ ...grpc.Cal
 
 	sr := res.(oneRes)
 	stream := monetasa.Stream{
-		Id:    sr.id,
-		Name:  sr.name,
-		Owner: sr.owner,
-		Url:   sr.url,
-		Price: sr.price,
+		Id:       sr.id,
+		Name:     sr.name,
+		Owner:    sr.owner,
+		Url:      sr.url,
+		Price:    sr.price,
+		External: sr.external,
+		Project:  sr.project,
+		Dataset:  sr.dataset,
+		Table:    sr.table,
+		Fields:   sr.fields,
 	}
 
 	return &stream, sr.err
@@ -55,11 +60,16 @@ func encodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*monetasa.Stream)
 	stream := oneRes{
-		id:    res.GetId(),
-		name:  res.GetName(),
-		owner: res.GetOwner(),
-		url:   res.GetUrl(),
-		price: res.GetPrice(),
+		id:       res.GetId(),
+		name:     res.GetName(),
+		owner:    res.GetOwner(),
+		url:      res.GetUrl(),
+		price:    res.GetPrice(),
+		external: res.GetExternal(),
+		project:  res.GetProject(),
+		dataset:  res.GetDataset(),
+		table:    res.GetTable(),
+		fields:   res.GetFields(),
 	}
 
 	return stream, nil

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "digisense-196722",
+  "private_key_id": "1987a4981f2e65b48c79f271a4fcd15c1480bf5a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDHFqG/eWHoLD3T\nPwfOMn/RkxGlBIy6Kkve7/87sPgLFeP+W+hHcxF/w1suHFoOHBM9+E+Y6wBzDbiD\nA6w7h17QJcY12506Oo5qT5YwOLGG0dFpK0VV7SJs7NcU+yW4AnuUMSokRmX/rMRE\n3zNjxekrA3rhaWFrO6PS+rHlG+d/kDL7Dm5wT8vhSxPd8xA2rSAIdjDe8PmrekR6\nQ5buZhw+DzO887AqAIFUqpRacg8Om+QDsKoBDk7mzXq3bSGC+sNCXibqsVpzwrpB\nl3HZjy9hWiI1f04HVe/+l05psZmpe6OH9lungpeJF+B3ScL+uT160WHScUxf/EN7\nxxI6k+4TAgMBAAECggEABTv7JiNTWWCcZfWZqv3KytktMWrEe8GltHXC/trSxHS8\nDKbn1hpmqeE21ag+nTiv2tNNFqpunN7jUA7yt68QLHuUbjv1a3Tjcf9SdAxxiYsr\nOySSte/Mh6Fjk9DOWx9u68gfy+g/emJx17ELtqz+kP9VXq5cUw60anGsyx/g224v\nThtocSsZHQ/zZ8QYUpcaAQSvJdtJaMHikR+yYFWnIFP9KIbaWzM2toqefXQNzRmL\nODBFvE5f12S+Y1dqCiyDnJEDC6P8D+3G6BLJIbtTtihyrubHK1huKg3j4xB1rPQD\nIbMYrp09eqey0oG3TPMavY1ROK9oZdLL8xOlKHHSPQKBgQDqNn22o3ylqQ4IvOm5\n3NYwF/FDFgPY7ttw5tInXG8e7NZBoQBsATe6b7XeNTjWWjD1C/m+/V0E/LKhbeKi\nx8fC6BW/WWFJhcBxl5TjsmxikFN2wdD+y2BBAX+uVnfJ9PHoO67fZfZRcNswbfWc\n4HVIbguoHbGP4e5VZjj3XkSjnQKBgQDZm7FH/uE4zO8psdZr2Zt8VwgYJ7vnAnBs\nZhSxbLwPr3eBX2z09j4SaglVcC4ykM7TibBgJP91Jpg2Bo46HlsKbVssmCrcE0RV\nJmUgwDa720uQtuygH02jMiQwP1mgz29UrTjxWZqF4ZXRhpY35cwFqJnDzwTcLa4u\n+uFg3dThbwKBgQCMZuQPs4vKZ0CRfmYCVF9V71Ri6fSee/mygbxjeibm/AUozJJL\nLKOysLrunSsYXHLSwz4Q/yNfFPkkipH9ERQwRB6dWcBXacXGkp7frJsKrwhJvcBC\nrbpi3boj0ZP3zk2h8P1Q0HfLtILBUnmVdHz6UXXNbxd9cGwGZ8QojitJhQKBgQDB\nYs3gD7EUC3wX78WAvzig/a9h2B3zJIXIr8eADgPrZKKtxKJN6HAtaTK2TSWhJnPI\nJrsqFnc4I35ttNG88LEzyQ+Xx/t+7Vhy29ZPjsKVnEPBbe9INcmHWM40WnhKo05r\nUC4kvt7GUD4WoKbrMjtoY/eSvm2xRp9ffPHCZiID3QKBgQDX5mU2hKYkJ9qlpBAO\naUYJ6oujYV+AezItUTdKGjWQIIR9d6NBu26aANAW5glCi/zNAIZL86y1+2Pt4RCI\nLvH7biLZCtpa+m1OyPlhwASUUbOSVne8VAPAE6QRbjZ0Hxt2ZdQrGZFNxIja3mzz\n0iO7UvSckY55uNU8HDJAq4nkMA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "stream-role@digisense-196722.iam.gserviceaccount.com",
+  "client_id": "117420851477022964706",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/stream-role%40digisense-196722.iam.gserviceaccount.com"
+}

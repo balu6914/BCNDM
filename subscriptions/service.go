@@ -1,9 +1,20 @@
 package subscriptions
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"monetasa"
+	"net/http"
+	"strings"
 	"time"
+
+	"cloud.google.com/go/bigquery"
+	uuid "github.com/satori/go.uuid"
+	"google.golang.org/api/googleapi"
 )
+
+const bqURL = "http://bigquery.cloud.google.com/table"
 
 var (
 	// ErrConflict indicates usage of the existing stream id for the new stream.
@@ -34,7 +45,7 @@ var (
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	// AddSubscription subscribes to a stream making a new Subscription.
-	AddSubscription(string, Subscription) (string, error)
+	AddSubscription(string, string, Subscription) (string, error)
 
 	// SearchSubscriptions searches subscriptions by the query.
 	SearchSubscriptions(Query) (Page, error)
@@ -46,6 +57,7 @@ type Service interface {
 var _ Service = (*subscriptionsService)(nil)
 
 type subscriptionsService struct {
+	auth          monetasa.AuthServiceClient
 	subscriptions SubscriptionRepository
 	streams       StreamsService
 	proxy         Proxy
@@ -53,8 +65,9 @@ type subscriptionsService struct {
 }
 
 // New instantiates the domain service implementation.
-func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
+func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
 	return &subscriptionsService{
+		auth:          auth,
 		subscriptions: subs,
 		streams:       streams,
 		proxy:         proxy,
@@ -62,7 +75,59 @@ func New(subs SubscriptionRepository, streams StreamsService, proxy Proxy, trans
 	}
 }
 
-func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) (_ string, err error) {
+func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken, datasetID string, stream Stream) (*bigquery.Dataset, error) {
+	if client == nil {
+		return nil, ErrFailedCreateSub
+	}
+
+	ds := client.Dataset(datasetID)
+	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: userToken})
+	if err != nil {
+		return nil, err
+	}
+
+	ae := &bigquery.AccessEntry{
+		Role:       bigquery.ReaderRole,
+		EntityType: bigquery.UserEmailEntity,
+		Entity:     email.GetValue(),
+	}
+
+	meta := bigquery.DatasetMetadata{
+		Access: []*bigquery.AccessEntry{ae},
+	}
+
+	if err = ds.Create(context.Background(), &meta); err != nil {
+		return nil, err
+	}
+
+	return ds, nil
+}
+
+func (ss subscriptionsService) createTable(ds *bigquery.Dataset, stream Stream, expire time.Time, tableID string) error {
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
+	t := ds.Table(tableID)
+	tableMeta := bigquery.TableMetadata{
+		Name:           stream.Table,
+		ViewQuery:      q,
+		ExpirationTime: expire,
+	}
+
+	if err := t.Create(context.Background(), &tableMeta); err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusConflict:
+				return ErrConflict
+			case http.StatusBadRequest, http.StatusNotFound:
+				return ErrMalformedEntity
+			}
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (string, error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
@@ -71,12 +136,40 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 	if err != nil {
 		return "", ErrNotFound
 	}
+
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
+	url := stream.URL
 
-	hash, err := ss.proxy.Register(sub.Hours, stream.URL)
+	var ds *bigquery.Dataset
+	if stream.External {
+		client, err := bigquery.NewClient(context.Background(), stream.Project)
+		if err != nil {
+			return "", err
+		}
+		defer client.Close()
+		id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+		tableID := fmt.Sprintf("%s_%s", stream.Table, id)
+		datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
+		ds, err := ss.createDataset(client, token, datasetID, stream)
+		if err != nil {
+			return "", err
+		}
+		if err = ss.createTable(ds, stream, sub.EndDate, tableID); err != nil {
+			ds.Delete(context.Background())
+			return "", err
+		}
+
+		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, ds.DatasetID, tableID)
+	}
+
+	hash, err := ss.proxy.Register(sub.Hours, url)
 	if err != nil {
+		if ds != nil {
+			// Ignore if deletion fails, table will be removed after expiration anyway.
+			ds.Delete(context.Background())
+		}
 		return "", err
 	}
 
@@ -84,6 +177,10 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 
 	id, err := ss.subscriptions.Save(sub)
 	if err != nil {
+		if ds != nil {
+			ds.Delete(context.Background())
+		}
+
 		if err == ErrConflict {
 			return "", ErrConflict
 		}
@@ -92,9 +189,14 @@ func (ss subscriptionsService) AddSubscription(userID string, sub Subscription) 
 	}
 
 	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		if ds != nil {
+			ds.Delete(context.Background())
+		}
+
 		if err == ErrNotEnoughTokens {
 			return "", err
 		}
+
 		return "", ErrFailedTransfer
 	}
 
