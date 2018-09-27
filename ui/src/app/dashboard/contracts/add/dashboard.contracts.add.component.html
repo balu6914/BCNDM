@@ -36,13 +36,12 @@
               </div>
             </div>
             <div class="col-sm-2">
-              <input formControlName="share" class="form-control" type="text"
+              <input formControlName="share" class="form-control" [min]="1" [max]="100" type="number"
                      [ngClass]="{ 'is-invalid': submitted && (form.controls.parties.controls[i].controls.share.errors || invalidShare) }">
               <div *ngIf="submitted && form.controls.parties.controls[i].controls.share.errors" class="invalid-feedback">
                 <div *ngIf="form.controls.parties.controls[i].controls.share.errors.required">Share is required.</div>
-                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.min ||
-                            form.controls.parties.controls[i].controls.share.errors.max">Share must be between 1% and 100%.</div>
-                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.shareSum">Invalid sum.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.min">Share must be greater than 1%.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.shareSum">Total share must be 100%.</div>
               </div>
             </div>
             <div *ngIf="i == 0">

@@ -51,7 +51,7 @@ export class DashboardContractsAddComponent implements OnInit {
   createPartner(): FormGroup {
     return this.formBuilder.group({
       partner: ['', [Validators.required]],
-      share:   ['', [Validators.required, Validators.min(1), Validators.max(100)]],
+      share:   ['', [Validators.required, Validators.min(1)]],
     });
   }
 
