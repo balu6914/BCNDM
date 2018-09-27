@@ -81,10 +81,10 @@ export class DashboardContractsComponent implements OnInit {
           response.parties.forEach(partner => {
             const row: Contract = {
               stream_name: response.stream_name,
-              share: partner.share,
               start_time: response.start_time,
               end_time: response.end_time,
               partner_id: partner.partner_id,
+              share: partner.share,
               signed: false,
             };
             this.table.page.content.push(row);
