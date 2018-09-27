@@ -25,7 +25,9 @@
     </div>
     <!-- Contracts table -->
     <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">
-      <dpc-table [table]="table"></dpc-table>
+      <dpc-table [table]="table"
+                 (pageChanged)="onPageChange($event)">
+      </dpc-table>
     </div>
   </div>
 </div>
