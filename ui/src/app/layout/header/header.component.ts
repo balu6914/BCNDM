@@ -4,7 +4,7 @@ import { BalanceService } from '../../shared/balance/balance.service';
 import { Balance } from '../../common/interfaces/balance.interface';
 
 @Component({
-  selector: 'header-component',
+  selector: 'dpc-header-component',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   providers: [
@@ -35,15 +35,16 @@ export class HeaderComponent implements OnInit {
 
         this.AuthService.getCurrentUser()
           .subscribe(data => {
-            this.user = data;
-            // Get user balance
-            this.getBalance();
+            if (data.id) {
+              this.user = data;
+              // Get user balance
+              this.getBalance();
+            }
           });
       });
     }
 
   getBalance() {
-    let promise = new Promise((resolve, reject) => {
       this.balanceService.get().subscribe(
         (result: any) => {
           this.balance.amount = result.balance;
@@ -51,19 +52,11 @@ export class HeaderComponent implements OnInit {
           this.balance.fiatAmount = this.balance.amount;
           // Publish new balance data to balance message buss
           this.balanceService.changed(this.balance);
-          resolve();
         },
         err => {
           console.error("Error fetching user balance ", err)
-          reject();
         });
-    });
-    return promise;
   }
-
-
-
-
 
   logout() {
     this.AuthService.logout();

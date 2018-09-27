@@ -3,23 +3,10 @@
       <!-- Front side -->
       <div class="front tp-box__side tp-box__front">
         <div class="box-grow" [ngClass]="{box: table.tableType !== types.Dashboard && table.tableType !== types.Wallet}" *ngIf="table.page.content.length">
-          <div class="box__header">
+          <div *ngIf="table.title" class="box__header">
             <p class="box__title">
               {{table.title}}
             </p>
-            <form>
-              <div class="form-search">
-                <label class="sr-only" for="inlineFormInputGroup">Username</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <div class="input-group-text">
-                      <img src="../../../assets/img/icons/search.svg" alt="">
-                    </div>
-                  </div>
-                  <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search">
-                </div>
-              </div>
-            </form>
           </div>
           <div class="box__content">
             <div class="table-responsive table-scroll-vertical">

@@ -8,7 +8,7 @@ import { Query } from '../../../common/interfaces/query.interface';
   styleUrls: [ './sidebar.filters.component.scss' ]
 })
 export class SidebarFiltersComponent {
-    _opened: boolean = false
+    _opened = false
     form: FormGroup;
     // TODO: Remove mocked cities
     mockCities: string[];

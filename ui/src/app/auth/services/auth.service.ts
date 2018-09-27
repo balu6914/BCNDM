@@ -41,8 +41,9 @@ export class AuthService {
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
-    this.user = null;
+    this.loggedIn.emit(false);
     this.router.navigate(['login'])
+    this.user = {};
   }
 
     // Check if user is logged in
