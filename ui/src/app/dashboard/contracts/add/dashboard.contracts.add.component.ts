@@ -44,14 +44,27 @@ export class DashboardContractsAddComponent implements OnInit {
       endTime:    ['', [Validators.required]],
       parties:    this.formBuilder.array([this.createPartner()])
     }, {
-      validator: this.shareValidator
+      validator: [this.shareValidator, this.partnerValidator.bind(this)]
     });
+
   }
 
   createPartner(): FormGroup {
     return this.formBuilder.group({
       partner: ['', [Validators.required]],
       share:   ['', [Validators.required, Validators.min(1)]],
+    });
+  }
+
+  partnerValidator(fg: FormGroup) {
+    // Verify that partner ID is not the owner ID
+    fg.value.parties.forEach( (item, i) => {
+        if (item.partner === this.user.id) {
+          // Create a custom error field used as *ngIf condition for style
+          fg.controls.parties['controls'][i].controls.partner.setErrors({
+            'ownerID': true
+          });
+        }
     });
   }
 

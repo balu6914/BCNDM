@@ -33,6 +33,7 @@
                      [ngClass]="{ 'is-invalid': submitted && form.controls.parties.controls[i].controls.partner.errors }">
               <div *ngIf="submitted && form.controls.parties.controls[i].controls.partner.errors" class="invalid-feedback">
                 <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.required">Partner ID is required.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.ownerID">Partner ID cannot be your own ID.</div>
               </div>
             </div>
             <div class="col-sm-2">
