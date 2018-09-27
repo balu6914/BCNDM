@@ -42,8 +42,10 @@ make subscriptions
 make install
 
 # set the environment variables and run the service
-MONETASA_SUBSCRIPTIONS_PORT=[Service port] MONETASA_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] MONETASA_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] MONETASA_SUBSCRIPTIONS_DB_USER=[Database user] MONETASA_SUBSCRIPTIONS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] MONETASA_PROXY_URL=[Proxy service URL] $GOBIN/monetasa-subscriptions
+MONETASA_SUBSCRIPTIONS_PORT=[Service port] MONETASA_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] MONETASA_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] MONETASA_SUBSCRIPTIONS_DB_USER=[Database user] MONETASA_SUBSCRIPTIONS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] MONETASA_PROXY_URL=[Proxy service URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/monetasa-subscriptions
 ```
+
+Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.
 
 ## Usage
 

@@ -300,6 +300,28 @@ definitions:
         description: Price of the stream in miTAS.
       location:
         $ref: '#/definitions/Location'
+      external:
+        type: boolean
+        description: Indicates whether stream data is from external service or not.
+      bq:
+        $ref: '#/definitions/BigQuery'
+
+  BigQuery:
+    type: object
+    description: Represents a data related to the Big Query.
+    properties:
+      project:
+        type: string
+        description: Big Query project.
+      dataset:
+        type: string
+        description: Big Query dataset.
+      table:
+        type: string
+        description: Big Query table.
+      fields:
+        type: string
+        description: Query fields separated by comma.
 
   StreamReq:
     allOf:

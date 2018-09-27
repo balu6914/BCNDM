@@ -20,9 +20,9 @@ func LoggingMiddleware(svc subscriptions.Service, logger log.Logger) subscriptio
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) AddSubscription(token string, sub subscriptions.Subscription) (id string, err error) {
+func (lm *loggingMiddleware) AddSubscription(userID, userToken string, sub subscriptions.Subscription) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method add_subscription for user %s took %s to complete", sub.UserID, time.Since(begin))
+		message := fmt.Sprintf("Method add_subscription for user %s took %s to complete", userID, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -31,7 +31,7 @@ func (lm *loggingMiddleware) AddSubscription(token string, sub subscriptions.Sub
 
 	}(time.Now())
 
-	return lm.svc.AddSubscription(token, sub)
+	return lm.svc.AddSubscription(userID, userToken, sub)
 }
 
 func (lm *loggingMiddleware) ViewSubscription(userID, subID string) (sub subscriptions.Subscription, err error) {

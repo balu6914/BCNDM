@@ -34,3 +34,7 @@ func (mac *mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ 
 
 	return &monetasa.UserID{Value: id}, nil
 }
+
+func (mac *mockAuthClient) Email(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserEmail, error) {
+	return &monetasa.UserEmail{Value: ""}, nil
+}
