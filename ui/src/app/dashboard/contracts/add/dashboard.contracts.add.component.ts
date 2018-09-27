@@ -143,7 +143,7 @@ export class DashboardContractsAddComponent implements OnInit {
           if (err.status === 500) {
             this.alertService.error(`Not created. An active contract already exist for this stream.`);
           } else {
-            this.alertService.error('Error: ${err.status} - ${err.statusText}.');
+            this.alertService.error(`Error: ${err.status} - ${err.statusText}.`);
           }
         }
       );
