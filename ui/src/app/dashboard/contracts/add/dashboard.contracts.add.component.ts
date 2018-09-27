@@ -61,7 +61,7 @@ export class DashboardContractsAddComponent implements OnInit {
     fg.value.parties.forEach( (item, i) => {
         sum += parseInt(item.share, 10);
         if (sum > 100) {
-          // Create a custon error field used as *ngIf condition for  style
+          // Create a custom error field used as *ngIf condition for style
           fg.controls.parties['controls'][i].controls.share.setErrors({
             'shareSum': true
           });
