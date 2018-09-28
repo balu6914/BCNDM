@@ -2,11 +2,13 @@ import { Component, OnInit, Input } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { Balance } from '../../common/interfaces/balance.interface';
+import { User } from 'app/common/interfaces/user.interface';
+import { Balance } from 'app/common/interfaces/balance.interface';
 import { BalanceService } from './balance.service';
 import { BalanceAddComponent } from './add/balance.add.component';
 import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component';
-import { MitasPipe } from '../../common/pipes/converter.pipe';
+import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { AuthService } from 'app/auth/services/auth.service';
 
 @Component({
   selector: 'dpc-balance-widget',
@@ -16,8 +18,11 @@ import { MitasPipe } from '../../common/pipes/converter.pipe';
 export class BalanceComponent implements OnInit {
   balance = new Balance();
   modalRef: BsModalRef;
+  user: User;
 
+  @Input() showWalletKey: boolean;
   constructor(
+    private authService: AuthService,
     private modalService: BsModalService,
     private balanceService: BalanceService,
     private mitasPipe: MitasPipe,
@@ -51,7 +56,15 @@ export class BalanceComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.getBalance();
+    this.authService.getCurrentUser().subscribe(
+      data => {
+        this.user = data;
+        this.getBalance();
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   getBalance() {

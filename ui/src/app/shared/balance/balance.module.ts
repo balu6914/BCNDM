@@ -6,8 +6,7 @@ import { CommonAppModule } from '../../common/common.module';
 import { BalanceAddComponent } from './add/balance.add.component';
 import { BalanceComponent } from './balance.component';
 import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component';
-
-
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -15,7 +14,8 @@ import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component'
     FormsModule,
     ReactiveFormsModule,
     AppBootstrapModule,
-    CommonAppModule
+    CommonAppModule,
+    ClipboardModule,
   ],
   declarations: [
     BalanceComponent,
