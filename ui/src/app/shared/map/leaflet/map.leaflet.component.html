@@ -7,7 +7,8 @@
            [leafletDrawOptions]="drawOptions"
            (leafletMapReady)="onMapReady($event)"
            (leafletMapMoveEnd)="onMapMoveEnd($event)"
-           (leafletMouseMove)="onMapMouseMove($event)">
+           (leafletMouseMove)="onMapMouseMove($event)"
+           (leafletClick)="onMapClick($event)">
     </div>
   </div>
 </div>
