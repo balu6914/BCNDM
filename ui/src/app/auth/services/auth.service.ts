@@ -10,7 +10,7 @@ import { UserService } from 'app/common/services/user.service';
 @Injectable()
 export class AuthService {
   token: string;
-  user: any;
+  user: Observable<any>;
   @Output() loggedIn: EventEmitter<Boolean> = new EventEmitter();
 
   constructor(private http: HttpClient, private router: Router, private UserService: UserService) {
@@ -42,8 +42,8 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     this.loggedIn.emit(false);
-    this.router.navigate(['login'])
     this.user = {};
+    this.router.navigate(['login'])
   }
 
     // Check if user is logged in
@@ -52,17 +52,18 @@ export class AuthService {
     }
 
     setCurrentUser(data) {
-        if(data) {
+        if (data) {
             this.user = data;
             this.loggedIn.emit(true);
         }
     }
 
     getCurrentUser() {
-        if(this.user) {
+        if (this.user && this.user.id) {
+          console.log("yes it is", this.user)
             return Observable.of(this.user)
         } else {
-            if(this.isLoggedin()) {
+            if (this.isLoggedin()) {
               return this.fetchCurrentUser()
             }
         }

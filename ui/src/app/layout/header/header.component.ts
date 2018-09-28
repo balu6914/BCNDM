@@ -35,11 +35,12 @@ export class HeaderComponent implements OnInit {
 
         this.AuthService.getCurrentUser()
           .subscribe(data => {
-            if (data.id) {
+            console.log("I have data", data)
               this.user = data;
               // Get user balance
-              this.getBalance();
-            }
+              if (data && data.id) {
+                this.getBalance();
+              }
           });
       });
     }
@@ -60,6 +61,5 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.AuthService.logout();
-    this.isLoggedin = false;
   }
 }
