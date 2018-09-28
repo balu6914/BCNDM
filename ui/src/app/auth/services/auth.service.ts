@@ -1,5 +1,7 @@
 import {Injectable, EventEmitter, Output} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 import { Response} from '@angular/http'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -59,7 +61,7 @@ export class AuthService {
 
     getCurrentUser() {
         if(this.user) {
-            return Observable.of(this.user)
+            return of(this.user)
         } else {
             if(this.isLoggedin()) {
               return this.fetchCurrentUser()
