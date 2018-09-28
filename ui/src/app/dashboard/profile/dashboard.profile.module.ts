@@ -10,6 +10,7 @@ import { DashboardProfilePasswordUpdateComponent  } from './password/dashboard.p
 import { DashboardProfileUpdateComponent } from './update/dashboard.profile.update.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { SharedModule } from 'app/shared/shared.module';
     CommonAppModule,
     SharedModule,
     DashboardProfileRoutingModule,
+    ClipboardModule,
   ],
   declarations: [
     DashboardProfileComponent,
