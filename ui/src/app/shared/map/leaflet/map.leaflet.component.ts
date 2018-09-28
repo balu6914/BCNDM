@@ -12,7 +12,8 @@ import * as L from 'leaflet';
 export class MapComponent implements OnChanges {
   options = {
     layers: [
-      L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
+      L.tileLayer('https://api.mapbox.com/styles/v1/gesaleh/cjk0yt1dj8snd2sk6xqz29gha/tiles/256/{z}/{x}/{y}@2x?' +
+      'access_token=pk.eyJ1IjoiZ2VzYWxlaCIsImEiOiJjamQ4bXFuZ3kybDZiMnhxcjl6Mjlmc3hmIn0.RVdSuXXmCgZJubeCAncjJQ', {})
     ],
     center: L.latLng({ lat: 48, lng: 2 }),
     zoom: 5,
@@ -40,6 +41,8 @@ export class MapComponent implements OnChanges {
   markers = [];
   firstPageLoad = true;
   tempId: any;
+  drawLayerGroup = new L.LayerGroup();
+  drawCreated = false;
 
   @Input() streamList: any;
   @Output() viewChanged: EventEmitter<any> = new EventEmitter();
@@ -80,20 +83,47 @@ export class MapComponent implements OnChanges {
   onMapReady(map: L.Map) {
     this.map = map;
     this.map.addLayer(this.layerGroup);
+    this.map.addLayer(this.drawLayerGroup);
+
+    // Set markers and polygon layer inside the created polygon
+    map.on('draw:created', e => {
+      const event = e as L.DrawEvents.Created;
+      const layer = event.layer as L.Rectangle;
+      this.drawLayerGroup.addLayer(layer);
+      const drawBounds = layer.getBounds();
+      this.viewChanged.emit(drawBounds);
+      this.map.flyToBounds(drawBounds, {});
+      this.drawCreated = true;
+    });
+
+    map.on('draw:drawstart', e => {
+      this.drawLayerGroup.clearLayers();
+    });
   }
 
   // This event is triggered when move or zoom is detected
   onMapMoveEnd() {
+    if (!this.drawCreated) {
+      this.drawLayerGroup.clearLayers();
+      const bounds = this.map.getBounds();
+      this.viewChanged.emit(bounds);
+    }
+  }
+
+  // On click fetch always all streams in current view.
+  onMapClick() {
+    this.drawLayerGroup.clearLayers();
     const bounds = this.map.getBounds();
     this.viewChanged.emit(bounds);
+    this.drawCreated = false;
   }
 
   onMapMouseMove(event: any) {
     this.hoverMarker.emit(this.tempId);
   }
 
+  // Get marker bounds to apply flyToBounds effect on new map view
   focusMap() {
-    // Get markers bounds and set the new map view with flyToBounds effect
     const markers = this.layerGroup.getLayers();
 
     if (markers && markers.length) {
@@ -187,10 +217,10 @@ export class MapComponent implements OnChanges {
   // Callback of deleteEvt from TableComponent
   removeMarker(id) {
     this.markers.forEach( (stream, i) => {
-      if (stream.id == id) {
+      if (stream.id === id) {
         const markerLayer = this.layerGroup.getLayer(stream.mapId);
         this.layerGroup.removeLayer(markerLayer);
-        this.markers.splice(i,1);
+        this.markers.splice(i, 1);
       }
     });
 
