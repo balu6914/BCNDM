@@ -4,6 +4,7 @@ MAINTAINER Nikola Marcetic <nikola@mainflux.com>
 
 RUN mkdir /src
 
+RUN npm config set unsafe-perm true
 RUN npm install nodemon -g
 
 WORKDIR /src
