@@ -41,8 +41,10 @@ make streams
 make install
 
 # set the environment variables and run the service
-MONETASA_STREAMS_HTTP_PORT=[Service HTTP port] MONETASA_STREAMS_GRPC_PORT=[Service gRPC port] MONETASA_STREAMS_DB_URL=[List of database cluster URLs] MONETASA_STREAMS_DB_NAME=[Name of the database used by the service] MONETASA_STREAMS_DB_USER=[Database user] MONETASA_STREAMS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] $GOBIN/monetasa-streams
+MONETASA_STREAMS_HTTP_PORT=[Service HTTP port] MONETASA_STREAMS_GRPC_PORT=[Service gRPC port] MONETASA_STREAMS_DB_URL=[List of database cluster URLs] MONETASA_STREAMS_DB_NAME=[Name of the database used by the service] MONETASA_STREAMS_DB_USER=[Database user] MONETASA_STREAMS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/monetasa-streams
 ```
+
+Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.
 
 ## Usage
 

@@ -4,6 +4,7 @@ package monetasa;
 
 service AuthService {
     rpc Identify(Token) returns (UserID) {}
+    rpc Email(Token) returns (UserEmail) {}
 }
 
 message Token {
@@ -11,5 +12,9 @@ message Token {
 }
 
 message UserID {
+    string value = 1;
+}
+
+message UserEmail {
     string value = 1;
 }

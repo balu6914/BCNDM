@@ -17,6 +17,7 @@ type apiReq interface {
 
 type addSubReq struct {
 	UserID       string
+	UserToken    string
 	Subscription subscriptions.Subscription
 }
 

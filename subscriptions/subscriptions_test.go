@@ -42,8 +42,8 @@ func newService(tokens map[string]string) subscriptions.Service {
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
-
-	return subscriptions.New(subs, streams, proxy, transactions)
+	auth := mocks.NewAuthClient(tokens, nil)
+	return subscriptions.New(auth, subs, streams, proxy, transactions)
 }
 
 func TestAddSubscription(t *testing.T) {
@@ -88,7 +88,7 @@ func TestAddSubscription(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := svc.AddSubscription(tc.sub.UserID, tc.sub)
+		_, err := svc.AddSubscription(tc.sub.UserID, "", tc.sub)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
@@ -101,12 +101,12 @@ func TestSearchSubscriptions(t *testing.T) {
 	total := uint64(20)
 	for i := 0; i < 20; i++ {
 		s.ID = bson.NewObjectId()
-		svc.AddSubscription(user1ID, s)
+		svc.AddSubscription(user1ID, "", s)
 	}
 
 	s.ID = bson.NewObjectId()
 	s.StreamID = stream2ID
-	svc.AddSubscription(user2ID, s)
+	svc.AddSubscription(user2ID, "", s)
 
 	cases := []struct {
 		desc  string
@@ -194,7 +194,7 @@ func TestSearchSubscriptions(t *testing.T) {
 func TestViewSubscription(t *testing.T) {
 	svc := newService(map[string]string{token: user1ID})
 
-	_, err := svc.AddSubscription(subscription.UserID, subscription)
+	_, err := svc.AddSubscription(subscription.UserID, "", subscription)
 	require.Nil(t, err, "Saving Subscription expected to succeed.")
 
 	cases := []struct {

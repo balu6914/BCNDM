@@ -20,7 +20,7 @@ import (
 	"syscall"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+	fabricConfig "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
@@ -36,7 +36,7 @@ const (
 	envDBName               = "MONETASA_TRANSACTIONS_DB_NAME"
 	envFabricOrgAdmin       = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
 	envFabricOrgName        = "MONETASA_TRANSACTIONS_FABRIC_NAME"
-	envFabricConfFile       = "MONETASA_TRANSACTIONS_FABRIC_CONF"
+	envMonetasaConfig       = "MONETASA_CONFIG"
 	envTokenChaincodeID     = "MONETASA_TRANSACTIONS_TOKEN_CHAINCODE"
 	envContractsChaincodeID = "MONETASA_TRANSACTIONS_CONTRACTS_CHAINCODE"
 	envAuthURL              = "MONETASA_AUTH_URL"
@@ -50,17 +50,18 @@ const (
 	defDBName               = "transactions"
 	defFabricOrgAdmin       = "admin"
 	defFabricOrgName        = "org1"
-	defFabricConfFile       = "/src/monetasa/config/fabric/config.yaml"
+	defMonetasaConfig       = "/src/monetasa/config"
 	defTokenChaincodeID     = "token"
 	defContractsChaincodeID = "contracts"
 	defAuthURL              = "localhost:8081"
 	defStreamsURL           = "localhost:8081"
 
+	fabricConfigFile = "fabric/config.yaml"
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
 )
 
-type conf struct {
+type config struct {
 	httpPort             string
 	grpcPort             string
 	dbURL                string
@@ -71,7 +72,7 @@ type conf struct {
 	dbSocketTimeout      int
 	fabricOrgAdmin       string
 	fabricOrgName        string
-	fabricConfFile       string
+	fabricConfigFile     string
 	tokenChaincodeID     string
 	feeChaincodeID       string
 	contractsChaincodeID string
@@ -84,7 +85,7 @@ func main() {
 
 	logger := log.New(os.Stdout)
 
-	sdk := newFabricSDK(cfg.fabricConfFile, logger)
+	sdk := newFabricSDK(cfg.fabricConfigFile, logger)
 	defer sdk.Close()
 
 	ms := connectToDB(cfg, logger)
@@ -117,10 +118,11 @@ func main() {
 	logger.Error(fmt.Sprintf("Auth service terminated: %s", err))
 }
 
-func loadConfig() conf {
-	confPath := monetasa.Env(envFabricConfFile, defFabricConfFile)
-	fullConfPath := fmt.Sprintf("%s%s", os.Getenv("GOPATH"), confPath)
-	return conf{
+func loadConfig() config {
+	configDir := monetasa.Env(envMonetasaConfig, defMonetasaConfig)
+	configFile := fmt.Sprintf("%s/%s", configDir, fabricConfigFile)
+
+	return config{
 		httpPort:             monetasa.Env(envHTTPPort, defHTTPPort),
 		grpcPort:             monetasa.Env(envGRPCPort, defGRPCPort),
 		dbURL:                monetasa.Env(envDBURL, defDBURL),
@@ -131,7 +133,7 @@ func loadConfig() conf {
 		dbSocketTimeout:      dbSocketTimeout,
 		fabricOrgAdmin:       monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
 		fabricOrgName:        monetasa.Env(envFabricOrgName, defFabricOrgName),
-		fabricConfFile:       fullConfPath,
+		fabricConfigFile:     configFile,
 		tokenChaincodeID:     monetasa.Env(envTokenChaincodeID, defTokenChaincodeID),
 		contractsChaincodeID: monetasa.Env(envContractsChaincodeID, defContractsChaincodeID),
 		authURL:              monetasa.Env(envAuthURL, defAuthURL),
@@ -139,8 +141,8 @@ func loadConfig() conf {
 	}
 }
 
-func newFabricSDK(confPath string, logger log.Logger) *fabsdk.FabricSDK {
-	sdk, err := fabsdk.New(config.FromFile(confPath))
+func newFabricSDK(configFile string, logger log.Logger) *fabsdk.FabricSDK {
+	sdk, err := fabsdk.New(fabricConfig.FromFile(configFile))
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to initialize fabric SDK: %s", err))
 		os.Exit(1)
@@ -149,7 +151,7 @@ func newFabricSDK(confPath string, logger log.Logger) *fabsdk.FabricSDK {
 	return sdk
 }
 
-func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
+func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	ms, err := mongo.Connect(
 		cfg.dbURL,
 		cfg.dbConnectTimeout,
@@ -166,7 +168,7 @@ func connectToDB(cfg conf, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func newService(cfg conf, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient monetasa.StreamsServiceClient, logger log.Logger) transactions.Service {
+func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient monetasa.StreamsServiceClient, logger log.Logger) transactions.Service {
 	tl := fabric.NewTokenLedger(
 		sdk,
 		cfg.fabricOrgAdmin,

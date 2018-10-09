@@ -57,6 +57,10 @@ func (req createContractsReq) validate() error {
 	}
 
 	for _, item := range req.Items {
+		if req.ownerID == item.PartnerID {
+			return errMalformedEntity
+		}
+
 		if err := item.validate(); err != nil {
 			return err
 		}

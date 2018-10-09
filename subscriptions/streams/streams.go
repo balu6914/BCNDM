@@ -28,11 +28,16 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 	}
 
 	stream := subscriptions.Stream{
-		ID:    s.GetId(),
-		Name:  s.GetName(),
-		Owner: s.GetOwner(),
-		URL:   s.GetUrl(),
-		Price: s.GetPrice(),
+		ID:       s.GetId(),
+		Name:     s.GetName(),
+		Owner:    s.GetOwner(),
+		URL:      s.GetUrl(),
+		Price:    s.GetPrice(),
+		External: s.GetExternal(),
+		Project:  s.GetProject(),
+		Dataset:  s.GetDataset(),
+		Table:    s.GetTable(),
+		Fields:   s.GetFields(),
 	}
 
 	return stream, nil

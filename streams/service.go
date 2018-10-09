@@ -1,6 +1,17 @@
 package streams
 
-import "errors"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/bigquery"
+	uuid "github.com/satori/go.uuid"
+	"google.golang.org/api/googleapi"
+)
 
 var (
 	// ErrConflict indicates usage of the existing stream id
@@ -19,6 +30,9 @@ var (
 
 	// ErrMalformedData indicates a malformed request.
 	ErrMalformedData = errors.New("malformed data")
+
+	// ErrBigQuery indicates a problem with Google Big Query API.
+	ErrBigQuery = errors.New("Google Big Query error")
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -79,6 +93,56 @@ func NewService(streams StreamRepository) Service {
 }
 
 func (ss streamService) AddStream(stream Stream) (string, error) {
+	if stream.External {
+		return ss.addBqStream(stream)
+	}
+	return ss.streams.Save(stream)
+}
+
+func (ss streamService) addBqStream(stream Stream) (string, error) {
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, stream.BQ.Project)
+	if err != nil {
+		return "", ErrBigQuery
+	}
+	defer client.Close()
+	ds := client.Dataset(stream.BQ.Dataset)
+	_, err = ds.Metadata(ctx)
+	if err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusBadRequest, http.StatusNotFound:
+				return "", ErrMalformedData
+			}
+		}
+		return "", ErrBigQuery
+	}
+
+	bq := stream.BQ
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", bq.Fields, bq.Project, bq.Dataset, bq.Table)
+	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+
+	// Try to create table to check if query is valid. In the
+	// case of an invalid data, a Stream won't be saved.
+	t := ds.Table(fmt.Sprintf("%s_%s", bq.Table, id))
+	md := bigquery.TableMetadata{
+		Name:           bq.Table,
+		ViewQuery:      q,
+		ExpirationTime: time.Now().Add(10 * time.Second),
+	}
+
+	if err := t.Create(ctx, &md); err != nil {
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusConflict:
+				return "", ErrConflict
+			case http.StatusBadRequest, http.StatusNotFound:
+				return "", ErrMalformedData
+			}
+		}
+		return "", ErrBigQuery
+	}
+
 	return ss.streams.Save(stream)
 }
 

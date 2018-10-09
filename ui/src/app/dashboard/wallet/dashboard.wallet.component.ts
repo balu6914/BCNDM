@@ -29,7 +29,7 @@ export class DashboardWalletComponent implements OnInit {
   page = 0;
   limit = 50;
   types = TableType;
-
+  showWalletKey = true;
 
   constructor(
     private authService: AuthService,

@@ -1,5 +1,7 @@
 import {Injectable, EventEmitter, Output} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 import { Response} from '@angular/http'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -10,7 +12,7 @@ import { UserService } from 'app/common/services/user.service';
 @Injectable()
 export class AuthService {
   token: string;
-  user: Observable<any>;
+  user: any;
   @Output() loggedIn: EventEmitter<Boolean> = new EventEmitter();
 
   constructor(private http: HttpClient, private router: Router, private UserService: UserService) {
@@ -41,8 +43,7 @@ export class AuthService {
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
-    this.loggedIn.emit(false);
-    this.user = {};
+    this.user = null;
     this.router.navigate(['login'])
   }
 
@@ -59,9 +60,8 @@ export class AuthService {
     }
 
     getCurrentUser() {
-        if (this.user && this.user.id) {
-          console.log("yes it is", this.user)
-            return Observable.of(this.user)
+        if(this.user) {
+            return of(this.user)
         } else {
             if (this.isLoggedin()) {
               return this.fetchCurrentUser()

@@ -11,8 +11,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Name*</label>
         <div class="col-sm-8">
-          <input type="text" formControlName="name" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.name.errors }" />
+          <input type="text" formControlName="name" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.name.errors }" />
           <div *ngIf="submitted && form.controls.name.errors" class="invalid-feedback">
             <div *ngIf="form.controls.name.errors.required">Name is required.</div>
             <div *ngIf="form.controls.name.errors.maxlength">The maximum length is 32 characters.</div>
@@ -22,8 +21,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Type*</label>
         <div class="col-sm-8">
-          <input type="text" formControlName="type" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.type.errors }" />
+          <input type="text" formControlName="type" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.type.errors }" />
           <div *ngIf="submitted && form.controls.type.errors" class="invalid-feedback">
             <div *ngIf="form.controls.type.errors.required">Type is required.</div>
             <div *ngIf="form.controls.type.errors.maxlength">The maximum length is 32 characters.</div>
@@ -33,8 +31,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Describe your stream*</label>
         <div class="col-sm-8">
-          <textarea type="text" formControlName="description" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && form.controls.description.errors }"> </textarea>
+          <textarea type="text" formControlName="description" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.description.errors }"></textarea>
           <div *ngIf="submitted && form.controls.description.errors" class="invalid-feedback">
             <div *ngIf="form.controls.description.errors.required">Description is required.</div>
             <div *ngIf="form.controls.description.errors.maxlength">The maximum length is 256 characters.</div>
@@ -44,9 +41,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Your stream snippet*</label>
         <div class="col-sm-8">
-          <textarea type="text" formControlName="snippet" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }">
-          </textarea>
+          <textarea type="text" formControlName="snippet" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }"></textarea>
           <div *ngIf="submitted && form.controls.snippet.erors" class="invalid-feedback">
             <div *ngIf="form.controls.snippet.errors.maxlength">The maximum length is 256 characters.</div>
           </div>
@@ -55,8 +50,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Stream URL*</label>
         <div class="col-sm-8">
-          <input type="text"formControlName="url" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.url.errors }" />
+          <input type="text" formControlName="url" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.url.errors }" />
           <div *ngIf="submitted && form.controls.url.errors" class="invalid-feedback">
             <div *ngIf="form.controls.url.errors.required">URL is riquired.</div>
             <div *ngIf="form.controls.url.errors.maxlength">The maximum length is 128 characters.</div>
@@ -67,8 +61,7 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Tokens per hour*</label>
         <div class="col-sm-8">
-          <input type="text"formControlName="price" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.price.errors }" />
+          <input type="text" formControlName="price" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.price.errors }" />
           <div *ngIf="submitted && form.controls.price.errors" class="invalid-feedback">
             <div *ngIf="form.controls.price.errors.required">Price is riquired.</div>
             <div *ngIf="form.controls.price.errors.pattern">Price must be between 0.00000001 and 1000 TAS.</div>
@@ -78,24 +71,70 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Latitude of the sensor*</label>
         <div class="col-sm-8">
-          <input formControlName="lat" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.lat.errors }">
+          <input formControlName="lat" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.lat.errors }">
           <div *ngIf="submitted && form.controls.lat.errors" class="invalid-feedback">
             <div *ngIf="form.controls.lat.errors.required">Latitude is riquired.</div>
-            <div *ngIf="form.controls.lat.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
-            <div *ngIf="form.controls.lat.errors.min || form.controls.lat.errors.max">Latitude value must be between -90 and 90.</div>
+            <div *ngIf="form.controls.lat.errors.pattern">Longitude must be a number with an accuracy of maximum 7
+              decimals.</div>
+            <div *ngIf="form.controls.lat.errors.min || form.controls.lat.errors.max">Latitude value must be between
+              -90 and 90.</div>
           </div>
         </div>
       </div>
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Longitude of the sensor*</label>
         <div class="col-sm-8">
-          <input formControlName="long" class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && form.controls.long.errors }">
+          <input formControlName="long" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.long.errors }">
           <div *ngIf="submitted && form.controls.long.errors" class="invalid-feedback">
             <div *ngIf="form.controls.long.errors.required">Longitude is riquired.</div>
-            <div *ngIf="form.controls.long.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
-            <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between -180 and 180.</div>
+            <div *ngIf="form.controls.long.errors.pattern">Longitude must be a number with an accuracy of maximum 7
+              decimals.</div>
+            <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between
+              -180 and 180.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Big Query</label>
+        <div class="col-sm-8">
+          <ui-switch (change)="changeExt($event)"></ui-switch>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-group row">
+          <label for="project" class="col-sm-4 col-form-label">Project</label>
+          <div class="col-sm-8">
+            <input formControlName="project" type="text" class="form-control" id="project" [ngClass]="{ 'is-invalid': submitted && form.controls.project.errors }">
+            <div *ngIf="submitted && form.controls.project.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.project.errors.required">Project is riquired.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="dataset" class="col-sm-4 col-form-label">Dataset</label>
+          <div class="col-sm-8">
+            <input formControlName="dataset" type="text" class="form-control" id="dataset" [ngClass]="{ 'is-invalid': submitted && form.controls.dataset.errors }">
+            <div *ngIf="submitted && form.controls.dataset.errors" class="invalid-feedback">
+              <div>Dataset is required.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="table" class="col-sm-4 col-form-label">Table</label>
+          <div class="col-sm-8">
+            <input formControlName="table" type="text" class="form-control" id="table" [ngClass]="{ 'is-invalid': submitted && form.controls.table.errors }">
+            <div *ngIf="submitted && form.controls.table.errors" class="invalid-feedback">
+              <div>Table is required.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="fields" class="col-sm-4 col-form-label">Select fields</label>
+          <div class="col-sm-8">
+            <input formControlName="fields" type="text" class="form-control" id="fields" [ngClass]="{ 'is-invalid': submitted && form.controls.fields.errors }">
+            <div *ngIf="submitted && form.controls.fields.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.fields.errors.required">Fields are required.</div>
+            </div>
           </div>
         </div>
       </div>

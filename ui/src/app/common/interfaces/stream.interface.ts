@@ -1,3 +1,13 @@
+
+export class BigQuery {
+  constructor(
+    public project: string,
+    public dataset: string,
+    public table: string,
+    public fields: string
+  ) { }
+}
+
 export class Stream {
   constructor(
     public name: string,
@@ -9,5 +19,7 @@ export class Stream {
     public snippet?: string,
     public owner?: string,
     public id?: string,
+    public external?: boolean,
+    public bq?: BigQuery
   ) { }
 }

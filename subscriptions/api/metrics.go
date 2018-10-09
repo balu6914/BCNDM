@@ -26,13 +26,13 @@ func MetricsMiddleware(svc subscriptions.Service, counter metrics.Counter, laten
 	}
 }
 
-func (ms *metricsMiddleware) AddSubscription(token string, subs subscriptions.Subscription) (string, error) {
+func (ms *metricsMiddleware) AddSubscription(id, token string, subs subscriptions.Subscription) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "add_subscription").Add(1)
 		ms.latency.With("method", "add_subscription").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.AddSubscription(token, subs)
+	return ms.svc.AddSubscription(id, token, subs)
 }
 
 func (ms *metricsMiddleware) ViewSubscription(userID, subID string) (subscriptions.Subscription, error) {

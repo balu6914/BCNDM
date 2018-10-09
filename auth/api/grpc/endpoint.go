@@ -21,3 +21,17 @@ func identifyEndpoint(svc auth.Service) endpoint.Endpoint {
 		return identityRes{id, nil}, nil
 	}
 }
+
+func emailEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(identityReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		u, err := svc.View(req.token)
+		if err != nil {
+			return emailRes{}, err
+		}
+		return emailRes{u.Email, nil}, nil
+	}
+}

@@ -49,8 +49,8 @@ func newService() subscriptions.Service {
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
-
-	return subscriptions.New(subs, streams, proxy, transactions)
+	auth := mocks.NewAuthClient(nil, nil)
+	return subscriptions.New(auth, subs, streams, proxy, transactions)
 }
 
 func newServer(svc subscriptions.Service, ac monetasa.AuthServiceClient) *httptest.Server {
@@ -91,7 +91,7 @@ func toJSON(data interface{}) string {
 func TestCreateSubscription(t *testing.T) {
 	ac := mocks.NewAuthClient(map[string]string{
 		token: userID,
-	})
+	}, nil)
 	svc := newService()
 	ss := newServer(svc, ac)
 	defer ss.Close()
@@ -141,10 +141,10 @@ func TestCreateSubscription(t *testing.T) {
 func TestViewSubscription(t *testing.T) {
 	ac := mocks.NewAuthClient(map[string]string{
 		token: userID,
-	})
+	}, nil)
 
 	svc := newService()
-	_, err := svc.AddSubscription(userID, sub)
+	_, err := svc.AddSubscription(userID, "", sub)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	ss := newServer(svc, ac)

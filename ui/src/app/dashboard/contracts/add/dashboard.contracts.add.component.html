@@ -12,28 +12,44 @@
         <div class="form-group row">
           <label for="streamName" class="col-sm-4 col-form-label">Stream*</label>
           <div class="col-sm-8">
-            <select formControlName="streamName" class="form-control selectpicker">
+            <select formControlName="streamName" class="form-control selectpicker"
+                    [ngClass]="{ 'is-invalid': submitted && form.controls.streamName.errors }">
               <option *ngFor="let stream of streamsName">
                   {{stream}}
               </option>
               <option value="" disabled selected hidden>Select your Stream</option>
             </select>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="parties" class="col-sm-4 col-form-label">Partner ID / Share offered*</label>
-          <div class="col-sm-6">
-            <input type="text" formControlName="parties" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && form.controls.parties.errors }">
-            <div *ngIf="submitted && form.controls.parties.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.parties.errors.required">Partner ID is required.</div>
+            <div *ngIf="submitted && form.controls.streamName.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.streamName.errors.required">Stream name is required.</div>
             </div>
           </div>
-          <div class="col-sm-2">
-            <input type="number" [min]="1" [max]="99" formControlName="shareOffered" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && form.controls.shareOffered.errors }">
-            <div *ngIf="submitted && form.controls.shareOffered.errors" class="invalid-feedback">
-              <div *ngIf="form.controls.shareOffered.errors.required">Share offered is required.</div>
+        </div>
+        <div formArrayName="parties"
+          *ngFor="let partner of form.get('parties').controls; let i = index;">
+          <div class="form-group row" [formGroupName]="i">
+            <label class="col-sm-4 col-form-label">Partner ID / Share offered*</label>
+            <div class="col-sm-5">
+              <input formControlName="partner" class="form-control"
+                     [ngClass]="{ 'is-invalid': submitted && form.controls.parties.controls[i].controls.partner.errors }">
+              <div *ngIf="submitted && form.controls.parties.controls[i].controls.partner.errors" class="invalid-feedback">
+                <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.required">Partner ID is required.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.ownerID">Partner ID cannot be your own ID.</div>
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <input formControlName="share" class="form-control" [min]="1" [max]="100" type="number"
+                     [ngClass]="{ 'is-invalid': submitted && (form.controls.parties.controls[i].controls.share.errors || invalidShare) }">
+              <div *ngIf="submitted && form.controls.parties.controls[i].controls.share.errors" class="invalid-feedback">
+                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.required">Share is required.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.min">Share must be greater than 1%.</div>
+                <div *ngIf="form.controls.parties.controls[i].controls.share.errors.shareSum">Total share must be 100%.</div>
+              </div>
+            </div>
+            <div *ngIf="i == 0">
+              <button (click)="onAddPartner()" class="btn btn-primary">+</button>
+            </div>
+            <div *ngIf="i != 0">
+              <button (click)="onDeletePartner(i)" class="btn btn-danger btn-responsive">-</button>
             </div>
           </div>
         </div>
