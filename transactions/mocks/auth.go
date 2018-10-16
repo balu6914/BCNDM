@@ -36,5 +36,5 @@ func (mac *mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ 
 }
 
 func (mac *mockAuthClient) Email(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserEmail, error) {
-	return &monetasa.UserEmail{Value: ""}, nil
+	return &monetasa.UserEmail{Email: "", ContactEmail: ""}, nil
 }
