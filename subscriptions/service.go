@@ -14,7 +14,10 @@ import (
 	"google.golang.org/api/googleapi"
 )
 
-const bqURL = "http://bigquery.cloud.google.com/table"
+const (
+	bqURL       = "http://bigquery.cloud.google.com/table"
+	gmailSuffix = "@gmail.com"
+)
 
 var (
 	// ErrConflict indicates usage of the existing stream id for the new stream.
@@ -75,6 +78,18 @@ func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams S
 	}
 }
 
+func (ss subscriptionsService) checkEmail(userEmail monetasa.UserEmail) (string, error) {
+	email := strings.ToLower(userEmail.Email)
+	contactEmail := strings.ToLower(userEmail.ContactEmail)
+	if strings.HasSuffix(email, gmailSuffix) {
+		return userEmail.Email, nil
+	}
+	if strings.HasSuffix(contactEmail, gmailSuffix) {
+		return userEmail.ContactEmail, nil
+	}
+	return "", ErrMalformedEntity
+}
+
 func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken, datasetID string, stream Stream) (*bigquery.Dataset, error) {
 	if client == nil {
 		return nil, ErrFailedCreateSub
@@ -86,10 +101,15 @@ func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken,
 		return nil, err
 	}
 
+	gmail, err := ss.checkEmail(*email)
+	if err != nil {
+		return nil, err
+	}
+
 	ae := &bigquery.AccessEntry{
 		Role:       bigquery.ReaderRole,
 		EntityType: bigquery.UserEmailEntity,
-		Entity:     email.GetValue(),
+		Entity:     gmail,
 	}
 
 	meta := bigquery.DatasetMetadata{
