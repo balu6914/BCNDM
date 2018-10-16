@@ -16,6 +16,8 @@ var _ Authorization = (*authService)(nil)
 type Authorization interface {
 	// Authorize method is used to authorize http request.
 	Authorize(r *http.Request) (string, error)
+	// Email method is used to fetch email and contactEmail for the user.
+	Email(token string) (monetasa.UserEmail, error)
 }
 
 type authService struct {
@@ -43,4 +45,17 @@ func (ss authService) Authorize(r *http.Request) (string, error) {
 	}
 
 	return res.GetValue(), nil
+}
+
+func (ss authService) Email(token string) (monetasa.UserEmail, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	res, err := ss.auth.Email(ctx, &monetasa.Token{Value: token})
+	if err != nil {
+		ss.logger.Error(fmt.Sprintf("failed to fetch users emails: %s", err))
+		return monetasa.UserEmail{}, ErrUnauthorizedAccess
+	}
+
+	return *res, nil
 }
