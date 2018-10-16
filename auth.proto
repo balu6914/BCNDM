@@ -16,5 +16,6 @@ message UserID {
 }
 
 message UserEmail {
-    string value = 1;
+    string email = 1;
+    string contactEmail = 2;
 }
