@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	defLocType = "Point"
-	gmail      = "@gmail.com"
+	defLocType  = "Point"
+	gmailSuffix = "@gmail.com"
 )
 
 var (
@@ -83,12 +83,14 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	return r
 }
 
-func checkEmail(email monetasa.UserEmail) (string, error) {
-	if strings.HasSuffix(email.Email, gmail) {
-		return email.Email, nil
+func checkEmail(userEmail monetasa.UserEmail) (string, error) {
+	email := strings.ToLower(userEmail.Email)
+	contactEmail := strings.ToLower(userEmail.ContactEmail)
+	if strings.HasSuffix(email, gmailSuffix) {
+		return userEmail.Email, nil
 	}
-	if strings.HasSuffix(email.ContactEmail, gmail) {
-		return email.ContactEmail, nil
+	if strings.HasSuffix(contactEmail, gmailSuffix) {
+		return userEmail.ContactEmail, nil
 	}
 	return "", streams.ErrMalformedData
 }
