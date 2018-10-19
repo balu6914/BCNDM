@@ -33,27 +33,27 @@ func NewAuthorization(auth monetasa.AuthServiceClient, logger log.Logger) Author
 	}
 }
 
-func (ss authService) Authorize(r *http.Request) (string, error) {
+func (as authService) Authorize(r *http.Request) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	key := r.Header.Get("Authorization")
-	res, err := ss.auth.Identify(ctx, &monetasa.Token{Value: key})
+	res, err := as.auth.Identify(ctx, &monetasa.Token{Value: key})
 	if err != nil {
-		ss.logger.Error(fmt.Sprintf("failed to authorize request: %s", err))
+		as.logger.Error(fmt.Sprintf("failed to authorize request: %s", err))
 		return "", ErrUnauthorizedAccess
 	}
 
 	return res.GetValue(), nil
 }
 
-func (ss authService) Email(token string) (monetasa.UserEmail, error) {
+func (as authService) Email(token string) (monetasa.UserEmail, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	res, err := ss.auth.Email(ctx, &monetasa.Token{Value: token})
+	res, err := as.auth.Email(ctx, &monetasa.Token{Value: token})
 	if err != nil {
-		ss.logger.Error(fmt.Sprintf("failed to fetch users emails: %s", err))
+		as.logger.Error(fmt.Sprintf("failed to fetch users emails: %s", err))
 		return monetasa.UserEmail{}, ErrUnauthorizedAccess
 	}
 

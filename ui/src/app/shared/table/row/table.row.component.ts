@@ -120,7 +120,7 @@ export class TableRowComponent implements OnInit {
       const gmailSuffix = '@gmail.com';
       if (!(this.user.email.toLowerCase().endsWith(gmailSuffix) ||
         this.user.contact_email.toLowerCase().endsWith(gmailSuffix))) {
-          this.alertService.warning('Please use you Gmail account as a contact email address.');
+          this.alertService.warning('Please use your Gmail account as a contact email address.');
           return;
       }
     }
