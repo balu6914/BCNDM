@@ -13,6 +13,8 @@ import (
 	"google.golang.org/api/googleapi"
 )
 
+const bqURL = "http://bigquery.cloud.google.com/table"
+
 var (
 	// ErrConflict indicates usage of the existing stream id
 	// for the new stream.
@@ -159,6 +161,8 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 		}
 		return "", ErrBigQuery
 	}
+
+	stream.URL = fmt.Sprintf("%s/%s:%s.%s", bqURL, bq.Project, bq.Dataset, t.TableID)
 
 	return ss.streams.Save(stream)
 }
