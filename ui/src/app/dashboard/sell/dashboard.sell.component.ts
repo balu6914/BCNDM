@@ -58,15 +58,15 @@ export class DashboardSellComponent implements OnInit {
 
     this.map.viewChanged.subscribe(
       bounds => {
-        this.query.setPoint('x0', bounds["_southWest" ]["lng"]);
-        this.query.setPoint('y0', bounds["_southWest" ]["lat"]);
-        this.query.setPoint('x1', bounds["_southWest" ]["lng"]);
-        this.query.setPoint('y1', bounds["_northEast" ]["lat"]);
+        this.query.setPoint('x0', bounds['_southWest' ]['lng']);
+        this.query.setPoint('y0', bounds['_southWest' ]['lat']);
+        this.query.setPoint('x1', bounds['_southWest' ]['lng']);
+        this.query.setPoint('y1', bounds['_northEast' ]['lat']);
 
-        this.query.setPoint('x2', bounds["_northEast" ]["lng"]);
-        this.query.setPoint('y2', bounds["_northEast" ]["lat"]);
-        this.query.setPoint('x3', bounds["_northEast" ]["lng"]);
-        this.query.setPoint('y3', bounds["_southWest" ]["lat"]);
+        this.query.setPoint('x2', bounds['_northEast' ]['lng']);
+        this.query.setPoint('y2', bounds['_northEast' ]['lat']);
+        this.query.setPoint('x3', bounds['_northEast' ]['lng']);
+        this.query.setPoint('y3', bounds['_southWest' ]['lat']);
         this.fetchStreams();
       },
       err => {
@@ -97,8 +97,14 @@ export class DashboardSellComponent implements OnInit {
   }
 
   openModalAdd() {
+    const gmailSuffix = '@gmail.com';
+    const initialState = {
+      bqMail: this.user.email.toLowerCase().endsWith(gmailSuffix) ||
+        this.user.contact_email.toLowerCase().endsWith(gmailSuffix)
+    };
+
     // Show DashboardSellAddComponent as Modal
-    this.modalService.show(DashboardSellAddComponent)
+    this.modalService.show(DashboardSellAddComponent, { initialState })
       .content.streamCreated.subscribe(
         stream => {
           // Push new stream to table
@@ -107,7 +113,7 @@ export class DashboardSellComponent implements OnInit {
           this.map.addMarker(stream);
         },
         err => {
-          console.log(err)
+          console.log(err);
         }
       );
   }

@@ -67,7 +67,7 @@ func decodeEmailRequest(_ context.Context, grpcReq interface{}) (interface{}, er
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(emailRes)
-	return &monetasa.UserEmail{Value: res.email}, encodeError(res.err)
+	return &monetasa.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
 }
 
 func encodeError(err error) error {

@@ -12,6 +12,7 @@ import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
 import { Stream, Subscription } from 'app/common/interfaces';
 import { TasPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from '../table';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 
 @Component({
@@ -38,6 +39,7 @@ export class TableRowComponent implements OnInit {
     private authService: AuthService,
     private modalService: BsModalService,
     private tasPipe: TasPipe,
+    private alertService: AlertService
   ) { }
 
   private isStream(row: Stream | Subscription): row is Stream {
@@ -114,6 +116,14 @@ export class TableRowComponent implements OnInit {
   }
 
   openModalSubscription(row: any) {
+    if (row.external) {
+      const gmailSuffix = '@gmail.com';
+      if (!(this.user.email.toLowerCase().endsWith(gmailSuffix) ||
+        this.user.contact_email.toLowerCase().endsWith(gmailSuffix))) {
+          this.alertService.warning('Please use your Gmail account as a contact email address.');
+          return;
+      }
+    }
     // Parameter stream is set on modal component
     const initialState = {
       stream: {

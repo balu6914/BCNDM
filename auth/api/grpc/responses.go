@@ -6,6 +6,7 @@ type identityRes struct {
 }
 
 type emailRes struct {
-	email string
-	err   error
+	email        string
+	contactEmail string
+	err          error
 }

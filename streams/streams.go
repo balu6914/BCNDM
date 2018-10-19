@@ -19,6 +19,9 @@ type Location struct {
 
 // BigQuery holds Big Query related data.
 type BigQuery struct {
+	// Email represents Gmail address of the owner. It can be either Email
+	// or ContactEmail of the owner.
+	Email   string `bson:"email,omitempty" json:"email,omitempty"`
 	Project string `bson:"project,omitempty" json:"project,omitempty"`
 	Dataset string `bson:"dataset,omitempty" json:"dataset,omitempty"`
 	Table   string `bson:"table,omitempty" json:"table,omitempty"`
@@ -27,7 +30,8 @@ type BigQuery struct {
 
 // Validate provides basic checks of parameters related to the Big Query.
 func (bq BigQuery) Validate() bool {
-	return bq.Project != "" &&
+	return bq.Email != "" &&
+		bq.Project != "" &&
 		bq.Dataset != "" &&
 		bq.Fields != "" &&
 		bq.Table != ""
