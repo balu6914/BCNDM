@@ -99,6 +99,16 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 	return ss.streams.Save(stream)
 }
 
+func (ss streamService) checkAccess(owner string, access []*bigquery.AccessEntry) error {
+	for _, ae := range access {
+		if ae.EntityType == bigquery.UserEmailEntity && ae.Entity == owner &&
+			(ae.Role == bigquery.OwnerRole || ae.Role == bigquery.ReaderRole) {
+			return nil
+		}
+	}
+	return ErrUnauthorizedAccess
+}
+
 func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, stream.BQ.Project)
@@ -107,7 +117,7 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	}
 	defer client.Close()
 	ds := client.Dataset(stream.BQ.Dataset)
-	_, err = ds.Metadata(ctx)
+	meta, err := ds.Metadata(ctx)
 	if err != nil {
 		if e, ok := err.(*googleapi.Error); ok {
 			switch e.Code {
@@ -116,6 +126,9 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 			}
 		}
 		return "", ErrBigQuery
+	}
+	if err := ss.checkAccess(stream.BQ.Email, meta.Access); err != nil {
+		return "", err
 	}
 
 	bq := stream.BQ
