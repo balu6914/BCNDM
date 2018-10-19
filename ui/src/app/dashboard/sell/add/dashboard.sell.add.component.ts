@@ -134,6 +134,10 @@ export class DashboardSellAddComponent implements OnInit {
           this.alertService.success(`Stream successfully added!`);
         },
         err => {
+          if (err.status === 401) {
+            this.alertService.error('You don\'t have permission to add this Stream.');
+            return;
+          }
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );

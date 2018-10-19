@@ -341,10 +341,12 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
-	case streams.ErrMalformedData:
+	case streams.ErrMalformedData, streams.ErrBigQuery:
 		w.WriteHeader(http.StatusBadRequest)
 	case streams.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
+	case streams.ErrInvalidBQAccess:
+		w.WriteHeader(http.StatusUnauthorized)
 	case streams.ErrNotFound:
 		w.WriteHeader(http.StatusNotFound)
 	case streams.ErrWrongType:

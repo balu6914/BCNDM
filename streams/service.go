@@ -33,6 +33,10 @@ var (
 
 	// ErrBigQuery indicates a problem with Google Big Query API.
 	ErrBigQuery = errors.New("Google Big Query error")
+
+	// ErrInvalidBQAccess indicates unauthorized user for accessing
+	// the Big Query API.
+	ErrInvalidBQAccess = errors.New("wrong user role")
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -106,7 +110,7 @@ func (ss streamService) checkAccess(owner string, access []*bigquery.AccessEntry
 			return nil
 		}
 	}
-	return ErrUnauthorizedAccess
+	return ErrInvalidBQAccess
 }
 
 func (ss streamService) addBqStream(stream Stream) (string, error) {
