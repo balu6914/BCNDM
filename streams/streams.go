@@ -65,7 +65,7 @@ const (
 	maxTypeLength        = 32
 	maxDescriptionLength = 256
 	maxSnippetLength     = 256
-	maxURLLength         = 128
+	maxURLLength         = 256
 	minPrice             = 0
 	minLongitude         = -180
 	maxLongitude         = 180
@@ -79,14 +79,13 @@ func (s *Stream) Validate() error {
 		s.Type == "" || (len(s.Type) > maxTypeLength) ||
 		s.Description == "" || (len(s.Description) > maxDescriptionLength) ||
 		(len(s.Snippet) > maxSnippetLength) ||
-		s.URL == "" || (len(s.URL) > maxURLLength) ||
 		s.Price <= minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
 		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude {
 		return ErrMalformedData
 	}
 
-	if !govalidator.IsURL(s.URL) {
+	if !s.External && (!govalidator.IsURL(s.URL) || len(s.URL) > maxURLLength) {
 		return ErrMalformedData
 	}
 
