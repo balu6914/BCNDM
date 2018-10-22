@@ -16,6 +16,8 @@ export class DashboardSellAddComponent implements OnInit {
   form: FormGroup;
   submitted = false;
   external = false;
+  bqTouched = false;
+  bqMail = false;
 
   @Output()
   streamCreated: EventEmitter<any> = new EventEmitter();
@@ -74,6 +76,11 @@ export class DashboardSellAddComponent implements OnInit {
   }
 
   changeExt() {
+    this.bqTouched = true;
+    if (!this.bqMail) {
+      return;
+    }
+
     this.external = !this.external;
     this.external
       ? this.form.get('project').enable()

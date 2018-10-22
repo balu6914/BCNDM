@@ -16,7 +16,10 @@ import (
 	"monetasa/streams"
 )
 
-const defLocType = "Point"
+const (
+	defLocType  = "Point"
+	gmailSuffix = "@gmail.com"
+)
 
 var (
 	authService    streams.Authorization
@@ -80,6 +83,18 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	return r
 }
 
+func checkEmail(userEmail monetasa.UserEmail) (string, error) {
+	email := strings.ToLower(userEmail.Email)
+	contactEmail := strings.ToLower(userEmail.ContactEmail)
+	if strings.HasSuffix(email, gmailSuffix) {
+		return userEmail.Email, nil
+	}
+	if strings.HasSuffix(contactEmail, gmailSuffix) {
+		return userEmail.ContactEmail, nil
+	}
+	return "", streams.ErrMalformedData
+}
+
 func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	owner, err := authService.Authorize(r)
 	if err != nil {
@@ -94,6 +109,19 @@ func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, er
 
 	if stream.Location.Type == "" {
 		stream.Location.Type = defLocType
+	}
+
+	if stream.External {
+		token := r.Header.Get("Authorization")
+		ownerEmail, err := authService.Email(token)
+		if err != nil {
+			return nil, err
+		}
+		email, err := checkEmail(ownerEmail)
+		if err != nil {
+			return nil, err
+		}
+		stream.BQ.Email = email
 	}
 
 	stream.Owner = owner

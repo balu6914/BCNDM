@@ -97,7 +97,10 @@
       <div class="form-group row">
         <label class="col-sm-4 col-form-label">Big Query</label>
         <div class="col-sm-8">
-          <ui-switch (change)="changeExt($event)"></ui-switch>
+          <ui-switch (click)="changeExt($event)" [disabled]="!bqMail"></ui-switch>
+          <div *ngIf="!bqMail && bqTouched" class="alert alert-warning">
+            You need to have a Gmail account as your main or contact email address in order to use Big Query.
+          </div>
         </div>
       </div>
       <div class="form-group">

@@ -100,7 +100,7 @@ func TestEmail(t *testing.T) {
 
 	for desc, tc := range cases {
 		email, err := client.Email(ctx, &monetasa.Token{Value: tc.token})
-		assert.Equal(t, tc.email, email.GetValue(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetValue()))
+		assert.Equal(t, tc.email, email.GetEmail(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetEmail()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
 }

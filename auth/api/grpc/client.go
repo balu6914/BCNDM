@@ -55,7 +55,7 @@ func (client grpcClient) Email(ctx context.Context, id *monetasa.Token, _ ...grp
 	}
 
 	emailRes := res.(emailRes)
-	return &monetasa.UserEmail{Value: emailRes.email}, emailRes.err
+	return &monetasa.UserEmail{Email: emailRes.email, ContactEmail: emailRes.contactEmail}, emailRes.err
 }
 
 func encodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
@@ -75,5 +75,5 @@ func encodeEmailRequest(_ context.Context, grpcReq interface{}) (interface{}, er
 
 func decodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*monetasa.UserEmail)
-	return emailRes{res.GetValue(), nil}, nil
+	return emailRes{res.GetEmail(), res.GetContactEmail(), nil}, nil
 }

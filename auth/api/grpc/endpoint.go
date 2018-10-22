@@ -32,6 +32,6 @@ func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 		if err != nil {
 			return emailRes{}, err
 		}
-		return emailRes{u.Email, nil}, nil
+		return emailRes{u.Email, u.ContactEmail, nil}, nil
 	}
 }
