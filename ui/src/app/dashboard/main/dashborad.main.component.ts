@@ -22,7 +22,7 @@ export class DashboardMainComponent implements OnInit {
   streamTypes: StreamsType;
   activeStreamsSection: StreamSection = new StreamSection();
   page = 0;
-  limit = 50;
+  limit = 5;
 
   constructor(
     private AuthService: AuthService,

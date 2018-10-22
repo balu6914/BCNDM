@@ -1,7 +1,7 @@
 <div class="tp-wrapper">
-    <div class="tp-box" [@flipState]="flip">
+    <div [@flipState]="flip" [ngClass]="{'tp-box': table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
       <!-- Front side -->
-      <div class="front tp-box__side tp-box__front">
+      <div class="front tp-box__side tp-box__front" [ngClass]="{'tp-box__side': table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
         <div class="box-grow" [ngClass]="{box: table.tableType !== types.Dashboard && table.tableType !== types.Wallet}" *ngIf="table.page.content.length">
           <div *ngIf="table.title" class="box__header">
             <p class="box__title">
@@ -38,8 +38,8 @@
           </div>
         </div>
         <!-- No content -->
-        <div class="tp-box">
-          <div class="front tp-box__side tp-box__front">
+        <div class="tp-box" [ngClass]="{'tp-box': table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
+          <div class="front tp-box__side tp-box__front"  [ngClass]="{'tp-box__side': table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
             <div class="box-grow" *ngIf="table.page.content && !table.page.content.length"
               [ngClass]="{box: table.tableType !== types.Dashboard && table.tableType !== types.Wallet}">
               <div class="text-center">

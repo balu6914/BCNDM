@@ -3,11 +3,11 @@
     <p class="box__title">
       My wallet
     </p>
-    <div *ngIf="showWalletKey">
-      <div type="button" ngxClipboard [cbContent]="user.id" style="cursor: pointer"
+    <div *ngIf="showWalletKey && user">
+      <a class="btn btn-primary-alt btn-sm" ngxClipboard [cbContent]="user.id" style="cursor: pointer"
            data-toggle="tooltip" data-placement="top" title="Click to copy">
         Key: {{user.id}}
-      </div>
+      </a>
     </div>
   </div>
   <div class="box__content">
