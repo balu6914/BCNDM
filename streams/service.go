@@ -13,6 +13,8 @@ import (
 	"google.golang.org/api/googleapi"
 )
 
+const bqURL = "http://bigquery.cloud.google.com/table"
+
 var (
 	// ErrConflict indicates usage of the existing stream id
 	// for the new stream.
@@ -33,6 +35,10 @@ var (
 
 	// ErrBigQuery indicates a problem with Google Big Query API.
 	ErrBigQuery = errors.New("Google Big Query error")
+
+	// ErrInvalidBQAccess indicates unauthorized user for accessing
+	// the Big Query API.
+	ErrInvalidBQAccess = errors.New("wrong user role")
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -99,6 +105,15 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 	return ss.streams.Save(stream)
 }
 
+func (ss streamService) checkAccess(owner string, access []*bigquery.AccessEntry) error {
+	for _, ae := range access {
+		if ae.EntityType == bigquery.UserEmailEntity && ae.Entity == owner && ae.Role == bigquery.OwnerRole {
+			return nil
+		}
+	}
+	return ErrInvalidBQAccess
+}
+
 func (ss streamService) addBqStream(stream Stream) (string, error) {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, stream.BQ.Project)
@@ -107,7 +122,7 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 	}
 	defer client.Close()
 	ds := client.Dataset(stream.BQ.Dataset)
-	_, err = ds.Metadata(ctx)
+	meta, err := ds.Metadata(ctx)
 	if err != nil {
 		if e, ok := err.(*googleapi.Error); ok {
 			switch e.Code {
@@ -116,6 +131,9 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 			}
 		}
 		return "", ErrBigQuery
+	}
+	if err := ss.checkAccess(stream.BQ.Email, meta.Access); err != nil {
+		return "", err
 	}
 
 	bq := stream.BQ
@@ -142,6 +160,8 @@ func (ss streamService) addBqStream(stream Stream) (string, error) {
 		}
 		return "", ErrBigQuery
 	}
+
+	stream.URL = fmt.Sprintf("%s/%s:%s.%s", bqURL, bq.Project, bq.Dataset, t.TableID)
 
 	return ss.streams.Save(stream)
 }

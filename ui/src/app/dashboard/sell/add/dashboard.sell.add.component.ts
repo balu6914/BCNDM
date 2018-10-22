@@ -94,6 +94,9 @@ export class DashboardSellAddComponent implements OnInit {
     this.external
       ? this.form.get('fields').enable()
       : this.form.get('fields').disable();
+     !this.external
+      ? this.form.get('url').enable()
+      : this.form.get('url').disable();
   }
 
   onSubmit() {
@@ -104,7 +107,6 @@ export class DashboardSellAddComponent implements OnInit {
         name: this.form.get('name').value,
         type: this.form.get('type').value,
         description: this.form.get('description').value,
-        url: this.form.get('url').value,
         price: this.mitasPipe.transform(this.form.get('price').value),
         snippet: this.form.get('snippet').value,
         location: {
@@ -123,6 +125,8 @@ export class DashboardSellAddComponent implements OnInit {
           this.form.get('table').value,
           this.form.get('fields').value
         );
+      } else {
+        stream.url = this.form.get('url').value;
       }
 
       // Send addStream request
@@ -134,6 +138,10 @@ export class DashboardSellAddComponent implements OnInit {
           this.alertService.success(`Stream successfully added!`);
         },
         err => {
+          if (err.status === 401) {
+            this.alertService.error('You don\'t have permission to add this Stream.');
+            return;
+          }
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
