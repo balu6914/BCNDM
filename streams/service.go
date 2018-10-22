@@ -107,8 +107,7 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 
 func (ss streamService) checkAccess(owner string, access []*bigquery.AccessEntry) error {
 	for _, ae := range access {
-		if ae.EntityType == bigquery.UserEmailEntity && ae.Entity == owner &&
-			(ae.Role == bigquery.OwnerRole || ae.Role == bigquery.ReaderRole) {
+		if ae.EntityType == bigquery.UserEmailEntity && ae.Entity == owner && ae.Role == bigquery.OwnerRole {
 			return nil
 		}
 	}
