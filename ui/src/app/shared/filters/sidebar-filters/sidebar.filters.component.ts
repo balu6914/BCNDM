@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { Query } from '../../../common/interfaces/query.interface';
+import { Query } from 'app/common/interfaces/query.interface';
 
 @Component({
   selector: 'dpc-sidebar-filters',
@@ -8,7 +8,7 @@ import { Query } from '../../../common/interfaces/query.interface';
   styleUrls: [ './sidebar.filters.component.scss' ]
 })
 export class SidebarFiltersComponent {
-    _opened = false
+    _opened = false;
     form: FormGroup;
 
     @Output()
