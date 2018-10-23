@@ -38,7 +38,7 @@ export class BalanceComponent implements OnInit {
           (response) => {
               this.modalRef.hide();
           },
-        )
+        ).catch(err => console.log(err));
         });
     }
     // Open Withdraw tokens dialog
@@ -51,7 +51,7 @@ export class BalanceComponent implements OnInit {
           (response) => {
               this.modalRef.hide();
           },
-        )
+        ).catch(err => console.log(err));
         });
     }
 

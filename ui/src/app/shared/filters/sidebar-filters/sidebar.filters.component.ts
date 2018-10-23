@@ -19,6 +19,7 @@ export class SidebarFiltersComponent {
     constructor(
       private formBuilder: FormBuilder,
     ) {
+
        // Update form control city value on selected value change
        this.selectCityControl.valueChanges.subscribe(value =>
          this.form.patchValue({city: value})

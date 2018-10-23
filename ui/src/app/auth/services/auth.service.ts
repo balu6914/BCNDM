@@ -43,6 +43,7 @@ export class AuthService {
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
+    this.loggedIn.emit(false);
     this.user = null;
     this.router.navigate(['login'])
   }
@@ -53,7 +54,7 @@ export class AuthService {
     }
 
     setCurrentUser(data) {
-        if(data) {
+        if (data) {
             this.user = data;
             this.loggedIn.emit(true);
         }
@@ -63,7 +64,7 @@ export class AuthService {
         if(this.user) {
             return of(this.user)
         } else {
-            if(this.isLoggedin()) {
+            if (this.isLoggedin()) {
               return this.fetchCurrentUser()
             }
         }

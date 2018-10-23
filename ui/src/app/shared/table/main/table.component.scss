@@ -39,12 +39,13 @@
         }
       }
     }
-    .map-wrapper {
-      min-height: 300px;
-      .map {
-        flex-grow: 1;
-      }
-    }
+  .no-content {
+    padding: 100px;
+    font-weight: 100;
+    font-size: 2rem;
+    color: #9EAFC8;
+  }
+
   }
 }
 

@@ -358,7 +358,7 @@ cursor: pointer;
   tbody {
     flex: 1 1 auto;
     display: block;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
   tr {
     width: 100%;
@@ -647,6 +647,7 @@ font-weight: $font-weight-medium;
   border-bottom: 2px solid transparent;
   padding: 0 5px 5px 5px;
   transition: $transition-base;
+  cursor: pointer;
   &:hover,
   &.active {
     text-decoration: none;
@@ -661,6 +662,7 @@ font-weight: $font-weight-medium;
   justify-content: center;
   .box-nav__item {
     margin-right: 1rem;
+    cursor: pointer;
     &:last-child {
       margin-right: 0;
     }
@@ -1198,7 +1200,6 @@ body {
     }
   }
   .map-wrapper {
-    min-height: 300px;
     .map {
       flex-grow: 1;
     }
@@ -1240,4 +1241,21 @@ body {
   .offcanvas-trigger.is-active {
     transform: translate3d(100%, 0, 0);
   }
+}
+
+.box-grow {
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 123, 255, 1);
+    background-color: #007bff;
+  }
+
 }
