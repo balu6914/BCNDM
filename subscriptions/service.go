@@ -196,9 +196,22 @@ func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, clien
 		return err
 	}
 
+	mdUpdate := []*bigquery.AccessEntry{}
+	for _, v := range md.Access {
+		if v.View != nil {
+			_, err := v.View.Metadata(ctx)
+			// TODO Add error check and possibly much more complex handling.
+			if err != nil {
+				mdUpdate = append(mdUpdate, v)
+			}
+			continue
+		}
+		mdUpdate = append(mdUpdate, v)
+	}
+
 	t := client.Dataset(dstID).Table(tableID)
 	update := bigquery.DatasetMetadataToUpdate{
-		Access: append(md.Access, &bigquery.AccessEntry{
+		Access: append(mdUpdate, &bigquery.AccessEntry{
 			EntityType: bigquery.ViewEntity,
 			View:       t},
 		),
