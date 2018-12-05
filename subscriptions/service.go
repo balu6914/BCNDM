@@ -201,7 +201,7 @@ func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, clien
 		if v.View != nil {
 			_, err := v.View.Metadata(ctx)
 			// TODO Add error check and possibly much more complex handling.
-			if err != nil {
+			if err == nil {
 				mdUpdate = append(mdUpdate, v)
 			}
 			continue
