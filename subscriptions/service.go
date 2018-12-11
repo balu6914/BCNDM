@@ -199,7 +199,7 @@ func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, clien
 	mdUpdate := []*bigquery.AccessEntry{}
 	for _, v := range md.Access {
 		if v.View != nil {
-			_, err := ds.Table(v.View.TableID).Metadata(ctx)
+			_, err := client.Dataset(v.View.DatasetID).Table(v.View.TableID).Metadata(ctx)
 			// TODO Add error check and possibly much more complex handling.
 			if err == nil {
 				mdUpdate = append(mdUpdate, v)
