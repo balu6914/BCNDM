@@ -251,8 +251,7 @@ func (ss subscriptionsService) createBQ(url *string, token string, stream Stream
 		return nil, err
 	}
 
-	viewURL := fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, datasetID, viewID)
-	url = &viewURL
+	*url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, datasetID, viewID)
 	return client.Dataset(datasetID), nil
 }
 
