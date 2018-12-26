@@ -34,7 +34,7 @@ export class DashboardSellEditComponent implements OnInit {
       'name':        ['', [Validators.required, Validators.maxLength(32)]],
       'type':        ['', [Validators.required, Validators.maxLength(32)]],
       'description': ['', [Validators.required, Validators.maxLength(256)]],
-      'url':         ['', [Validators.required, Validators.maxLength(128), urlValidator]],
+      'url':         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
       'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
       'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
       'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],

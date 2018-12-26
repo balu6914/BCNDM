@@ -36,11 +36,8 @@ export class DashboardSellAddComponent implements OnInit {
       name: ['', [Validators.required, Validators.maxLength(32)]],
       type: ['', [Validators.required, Validators.maxLength(32)]],
       description: ['', [Validators.required, Validators.maxLength(256)]],
-      url: ['', [Validators.required, Validators.maxLength(128), urlValidator]],
-      price: [
-        '',
-        [Validators.required, Validators.maxLength(9), floatValidator]
-      ],
+      url: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      price: ['', [Validators.required, Validators.maxLength(9), floatValidator]],
       lat: [
         '',
         [
