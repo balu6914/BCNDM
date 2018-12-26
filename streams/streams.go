@@ -65,7 +65,7 @@ const (
 	maxTypeLength        = 32
 	maxDescriptionLength = 256
 	maxSnippetLength     = 256
-	maxURLLength         = 256
+	maxURLLength         = 2048
 	minPrice             = 0
 	minLongitude         = -180
 	maxLongitude         = 180
