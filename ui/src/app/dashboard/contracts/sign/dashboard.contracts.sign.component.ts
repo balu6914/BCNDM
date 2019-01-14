@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BsModalRef } from 'ngx-bootstrap';
 
 import { ContractService } from 'app/dashboard/contracts/contract.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';

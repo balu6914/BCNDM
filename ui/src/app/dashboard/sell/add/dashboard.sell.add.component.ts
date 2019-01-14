@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BsModalRef } from 'ngx-bootstrap';
 import { BigQuery, Stream } from '../../../common/interfaces/stream.interface';
 import { MitasPipe } from '../../../common/pipes/converter.pipe';
 import { StreamService } from '../../../common/services/stream.service';
