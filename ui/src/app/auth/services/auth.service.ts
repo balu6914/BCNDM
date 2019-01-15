@@ -2,6 +2,7 @@ import {Injectable, EventEmitter, Output} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/map';
 import { Response} from '@angular/http'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
