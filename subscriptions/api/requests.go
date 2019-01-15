@@ -1,7 +1,7 @@
 package api
 
 import (
-	"monetasa/subscriptions"
+	"datapace/subscriptions"
 
 	"gopkg.in/mgo.v2/bson"
 )

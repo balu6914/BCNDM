@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"monetasa/transactions"
+	"datapace/transactions"
 
 	"github.com/go-kit/kit/endpoint"
 )

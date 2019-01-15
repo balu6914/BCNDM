@@ -1,4 +1,4 @@
 FROM scratch
 ARG SVC_NAME
-COPY monetasa-$SVC_NAME /exe
+COPY datapace-$SVC_NAME /exe
 ENTRYPOINT ["/exe"]

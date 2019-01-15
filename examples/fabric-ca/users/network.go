@@ -1,6 +1,6 @@
 package users
 
-import "monetasa/examples/blockchain"
+import "datapace/examples/blockchain"
 
 // BC network instance
 type BcNetwork struct {

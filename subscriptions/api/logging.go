@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	log "monetasa/logger"
-	"monetasa/subscriptions"
+	log "datapace/logger"
+	"datapace/subscriptions"
 )
 
 var _ subscriptions.Service = (*loggingMiddleware)(nil)

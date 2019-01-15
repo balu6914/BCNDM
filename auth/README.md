@@ -12,14 +12,14 @@ default values.
 
 | Variable                  | Description                              | Default        |
 |---------------------------|------------------------------------------|----------------|
-| MONETASA_AUTH_HTTP_PORT   | Auth service HTTP port                   | 8080           |
-| MONETASA_AUTH_GRPC_PORT   | Auth service gRPC port                   | 8081           |
-| MONETASA_AUTH_DB_URL      | List of database cluster URLs            | 0.0.0.0        |
-| MONETASA_AUTH_DB_USER     | Database user                            |                |
-| MONETASA_AUTH_DB_PASS     | Database password                        |                |
-| MONETASA_AUTH_DB_NAME     | Name of the database used by the service | auth           |
-| MONETASA_TRANSACTIONS_URL | Transactions service gRPC URL            | localhost:8081 |
-| MONETASA_AUTH_SECRET      | Authorization secret                     | monetasa       |
+| DATAPACE_AUTH_HTTP_PORT   | Auth service HTTP port                   | 8080           |
+| DATAPACE_AUTH_GRPC_PORT   | Auth service gRPC port                   | 8081           |
+| DATAPACE_AUTH_DB_URL      | List of database cluster URLs            | 0.0.0.0        |
+| DATAPACE_AUTH_DB_USER     | Database user                            |                |
+| DATAPACE_AUTH_DB_PASS     | Database password                        |                |
+| DATAPACE_AUTH_DB_NAME     | Name of the database used by the service | auth           |
+| DATAPACE_TRANSACTIONS_URL | Transactions service gRPC URL            | localhost:8081 |
+| DATAPACE_AUTH_SECRET      | Authorization secret                     | datapace       |
 
 ## Deployment
 
@@ -29,7 +29,7 @@ The service itself is distributed as Docker container. You can find a Docker com
 To start the service outside of the container, execute the following shell script:
 
 ```bash
-cd $GOPATH/src/monetasa
+cd $GOPATH/src/datapace
 
 # compile the transactions
 make transactions
@@ -38,7 +38,7 @@ make transactions
 make install
 
 # set the environment variables and run the service
-MONETASA_AUTH_HTTP_PORT=[Auth service HTTP port] MONETASA_AUTH_GRPC_PORT=[Auth service gRPC port] MONETASA_AUTH_DB_URL=[List of database cluster URLs] MONETASA_AUTH_DB_USER=[Database user] MONETASA_AUTH_DB_PASS=[Database password] MONETASA_AUTH_DB_NAME=[Name of the database used by the service] MONETASA_TRANSACTIONS_URL=[Transactions service gRPC URL] MONETASA_AUTH_SECRET=[Authorization secret] $GOBIN/monetasa-auth
+DATAPACE_AUTH_HTTP_PORT=[Auth service HTTP port] DATAPACE_AUTH_GRPC_PORT=[Auth service gRPC port] DATAPACE_AUTH_DB_URL=[List of database cluster URLs] DATAPACE_AUTH_DB_USER=[Database user] DATAPACE_AUTH_DB_PASS=[Database password] DATAPACE_AUTH_DB_NAME=[Name of the database used by the service] DATAPACE_TRANSACTIONS_URL=[Transactions service gRPC URL] DATAPACE_AUTH_SECRET=[Authorization secret] $GOBIN/datapace-auth
 ```
 
 ## Usage

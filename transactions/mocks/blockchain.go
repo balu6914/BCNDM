@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"monetasa/transactions"
+	"datapace/transactions"
 	"sync"
 )
 

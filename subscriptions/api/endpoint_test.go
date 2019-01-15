@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"monetasa"
-	"monetasa/subscriptions"
-	httpapi "monetasa/subscriptions/api"
-	"monetasa/subscriptions/mocks"
+	"datapace"
+	"datapace/subscriptions"
+	httpapi "datapace/subscriptions/api"
+	"datapace/subscriptions/mocks"
 	"strings"
 
 	"net/http"
@@ -53,7 +53,7 @@ func newService() subscriptions.Service {
 	return subscriptions.New(auth, subs, streams, proxy, transactions)
 }
 
-func newServer(svc subscriptions.Service, ac monetasa.AuthServiceClient) *httptest.Server {
+func newServer(svc subscriptions.Service, ac datapace.AuthServiceClient) *httptest.Server {
 	mux := httpapi.MakeHandler(svc, ac)
 	return httptest.NewServer(mux)
 }

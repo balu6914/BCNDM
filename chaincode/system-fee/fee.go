@@ -9,7 +9,7 @@ import (
 
 const (
 	feeKey  = "__fee"
-	adminCN = "Admin@org1.monetasa.com"
+	adminCN = "Admin@org1.datapace.com"
 
 	// Decimals represent number of zeros in 100% value, in this case it's 5, so
 	// 100% == 100000.

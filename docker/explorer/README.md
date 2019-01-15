@@ -4,7 +4,7 @@ Docker image of hyperledger explorer.
 ## Build
 From the Datapace root dir execute:
 ```sh
-docker build -f docker/explorer/Dockerfile -t monetasa/hyperledger-explorer .
+docker build -f docker/explorer/Dockerfile -t datapace/hyperledger-explorer .
 ```
 
 > `-t` flag lets you tag your image so it's easier to find later using the `docker images` command.

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"monetasa/examples/blockchain"
-	"monetasa/examples/fabric-ca/users"
+	"datapace/examples/blockchain"
+	"datapace/examples/fabric-ca/users"
 )
 
 func main() {

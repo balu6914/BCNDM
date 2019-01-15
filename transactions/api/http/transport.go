@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"monetasa"
-	"monetasa/transactions"
+	"datapace"
+	"datapace/transactions"
 	"net/http"
 	"strconv"
 	"time"
@@ -35,11 +35,11 @@ var (
 	errMalformedEntity        = errors.New("malformed entity")
 	errUnauthorizedAccess     = errors.New("missing or invalid credentials provided")
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      monetasa.AuthServiceClient
+	auth                      datapace.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.Handler {
+func MakeHandler(svc transactions.Service, ac datapace.AuthServiceClient) http.Handler {
 	auth = ac
 
 	opts := []kithttp.ServerOption{
@@ -84,7 +84,7 @@ func MakeHandler(svc transactions.Service, ac monetasa.AuthServiceClient) http.H
 		opts...,
 	))
 
-	r.GetFunc("/version", monetasa.Version())
+	r.GetFunc("/version", datapace.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -243,7 +243,7 @@ func authorize(r *http.Request) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	id, err := auth.Identify(ctx, &monetasa.Token{Value: token})
+	id, err := auth.Identify(ctx, &datapace.Token{Value: token})
 	if err != nil {
 		e, ok := status.FromError(err)
 		if ok && e.Code() == codes.Unauthenticated {

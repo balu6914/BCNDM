@@ -1,7 +1,7 @@
 package http
 
 import (
-	"monetasa/auth"
+	"datapace/auth"
 
 	"github.com/asaskevich/govalidator"
 )

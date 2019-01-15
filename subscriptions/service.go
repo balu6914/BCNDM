@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"monetasa"
+	"datapace"
 	"net/http"
 	"strings"
 	"time"
@@ -60,7 +60,7 @@ type Service interface {
 var _ Service = (*subscriptionsService)(nil)
 
 type subscriptionsService struct {
-	auth          monetasa.AuthServiceClient
+	auth          datapace.AuthServiceClient
 	subscriptions SubscriptionRepository
 	streams       StreamsService
 	proxy         Proxy
@@ -68,7 +68,7 @@ type subscriptionsService struct {
 }
 
 // New instantiates the domain service implementation.
-func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
+func New(auth datapace.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
 	return &subscriptionsService{
 		auth:          auth,
 		subscriptions: subs,
@@ -78,7 +78,7 @@ func New(auth monetasa.AuthServiceClient, subs SubscriptionRepository, streams S
 	}
 }
 
-func (ss subscriptionsService) checkEmail(userEmail monetasa.UserEmail) (string, error) {
+func (ss subscriptionsService) checkEmail(userEmail datapace.UserEmail) (string, error) {
 	email := strings.ToLower(userEmail.Email)
 	contactEmail := strings.ToLower(userEmail.ContactEmail)
 	if strings.HasSuffix(email, gmailSuffix) {
@@ -96,7 +96,7 @@ func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken,
 	}
 
 	ds := client.Dataset(datasetID)
-	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: userToken})
+	email, err := ss.auth.Email(context.Background(), &datapace.Token{Value: userToken})
 	if err != nil {
 		return nil, err
 	}

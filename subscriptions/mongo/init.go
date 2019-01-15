@@ -9,7 +9,7 @@ import (
 // DBName - DB name
 // CollectionName - Collection name
 const (
-	dbName         = "monetasa-subscriptions"
+	dbName         = "datapace-subscriptions"
 	collentionName = "subscriptions"
 )
 

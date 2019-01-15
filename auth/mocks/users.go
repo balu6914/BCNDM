@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"monetasa/auth"
+	"datapace/auth"
 	"sync"
 )
 

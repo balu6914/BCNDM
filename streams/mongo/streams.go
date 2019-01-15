@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"monetasa/streams"
+	"datapace/streams"
 	"strings"
 
 	"gopkg.in/mgo.v2"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	dbName     = "monetasa-streams"
+	dbName     = "datapace-streams"
 	collection = "streams"
 	unknown    = "unknown conflict"
 	errMsg     = "Some of the URLs already exist in the database."

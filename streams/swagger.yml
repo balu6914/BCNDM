@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  title: Monetasa streams service
+  title: Datapace streams service
   description: HTTP API for managing data streams.
   version: "1.0.0"
 consumes:

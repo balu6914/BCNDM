@@ -14,17 +14,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"monetasa"
-	"monetasa/subscriptions"
+	"datapace"
+	"datapace/subscriptions"
 )
 
 var (
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      monetasa.AuthServiceClient
+	auth                      datapace.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc subscriptions.Service, ac monetasa.AuthServiceClient) http.Handler {
+func MakeHandler(svc subscriptions.Service, ac datapace.AuthServiceClient) http.Handler {
 	auth = ac
 
 	opts := []kithttp.ServerOption{
@@ -61,7 +61,7 @@ func MakeHandler(svc subscriptions.Service, ac monetasa.AuthServiceClient) http.
 		opts...,
 	))
 
-	r.GetFunc("/version", monetasa.Version())
+	r.GetFunc("/version", datapace.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -77,7 +77,7 @@ func authorize(r *http.Request) (string, error) {
 	defer cancel()
 
 	// TODO: move this code to auth interface in service package root.
-	id, err := auth.Identify(ctx, &monetasa.Token{Value: token})
+	id, err := auth.Identify(ctx, &datapace.Token{Value: token})
 	if err != nil {
 		e, ok := status.FromError(err)
 		if ok && e.Code() == codes.Unauthenticated {

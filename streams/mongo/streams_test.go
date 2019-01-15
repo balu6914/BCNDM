@@ -3,9 +3,9 @@ package mongo_test
 import (
 	"fmt"
 	"math/rand"
-	log "monetasa/logger"
-	"monetasa/streams"
-	"monetasa/streams/mongo"
+	log "datapace/logger"
+	"datapace/streams"
+	"datapace/streams/mongo"
 	"os"
 	"testing"
 
@@ -17,7 +17,7 @@ import (
 
 const (
 	url        = "localhost"
-	testDB     = "monetasa-streams"
+	testDB     = "datapace-streams"
 	collection = "streams"
 	limit      = uint64(3)
 	maxPage    = uint64(100)

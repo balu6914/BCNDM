@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"monetasa"
+	"datapace"
 
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var _ monetasa.TransactionsServiceClient = (*grpcClient)(nil)
+var _ datapace.TransactionsServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
 	createUser endpoint.Endpoint
@@ -18,10 +18,10 @@ type grpcClient struct {
 }
 
 // NewClient returns new gRPC client instance.
-func NewClient(conn *grpc.ClientConn) monetasa.TransactionsServiceClient {
+func NewClient(conn *grpc.ClientConn) datapace.TransactionsServiceClient {
 	createUser := kitgrpc.NewClient(
 		conn,
-		"monetasa.TransactionsService",
+		"datapace.TransactionsService",
 		"CreateUser",
 		encodeCreateUserRequest,
 		decodeCreateUserResponse,
@@ -30,7 +30,7 @@ func NewClient(conn *grpc.ClientConn) monetasa.TransactionsServiceClient {
 
 	transfer := kitgrpc.NewClient(
 		conn,
-		"monetasa.TransactionsService",
+		"datapace.TransactionsService",
 		"Transfer",
 		encodeTransferRequest,
 		decodeTransferResponse,
@@ -43,7 +43,7 @@ func NewClient(conn *grpc.ClientConn) monetasa.TransactionsServiceClient {
 	}
 }
 
-func (client grpcClient) CreateUser(ctx context.Context, user *monetasa.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) CreateUser(ctx context.Context, user *datapace.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
 	res, err := client.createUser(ctx, createUserReq{id: user.GetValue()})
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (client grpcClient) CreateUser(ctx context.Context, user *monetasa.ID, _ ..
 	return &empty.Empty{}, cur.err
 }
 
-func (client grpcClient) Transfer(ctx context.Context, td *monetasa.TransferData, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) Transfer(ctx context.Context, td *datapace.TransferData, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := transferReq{
 		streamID: td.GetStreamID(),
 		from:     td.GetFrom(),
@@ -71,7 +71,7 @@ func (client grpcClient) Transfer(ctx context.Context, td *monetasa.TransferData
 
 func encodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(createUserReq)
-	return &monetasa.ID{Value: req.id}, nil
+	return &datapace.ID{Value: req.id}, nil
 }
 
 func decodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
@@ -80,7 +80,7 @@ func decodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 
 func encodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(transferReq)
-	return &monetasa.TransferData{
+	return &datapace.TransferData{
 		StreamID: req.streamID,
 		From:     req.from,
 		To:       req.to,

@@ -2,8 +2,8 @@ package transactions_test
 
 import (
 	"fmt"
-	"monetasa/transactions"
-	"monetasa/transactions/mocks"
+	"datapace/transactions"
+	"datapace/transactions/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

@@ -1,6 +1,6 @@
 package mocks
 
-import "monetasa/transactions"
+import "datapace/transactions"
 
 var _ transactions.UserRepository = (*mockUserRepository)(nil)
 

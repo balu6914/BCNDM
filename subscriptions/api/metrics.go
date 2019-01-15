@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"monetasa/subscriptions"
+	"datapace/subscriptions"
 
 	"github.com/go-kit/kit/metrics"
 )

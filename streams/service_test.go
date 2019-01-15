@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/mgo.v2/bson"
 
-	"monetasa/streams"
-	"monetasa/streams/mocks"
+	"datapace/streams"
+	"datapace/streams/mocks"
 )
 
 const (

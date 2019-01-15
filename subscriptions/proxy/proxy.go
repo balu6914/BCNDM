@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"monetasa/subscriptions"
+	"datapace/subscriptions"
 	"net/http"
 )
 

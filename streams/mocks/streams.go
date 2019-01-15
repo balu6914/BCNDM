@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"monetasa/streams"
+	"datapace/streams"
 	"strings"
 	"sync"
 

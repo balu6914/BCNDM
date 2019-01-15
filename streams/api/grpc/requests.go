@@ -1,6 +1,6 @@
 package grpc
 
-import "monetasa/streams"
+import "datapace/streams"
 
 type oneReq struct {
 	id string

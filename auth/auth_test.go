@@ -2,8 +2,8 @@ package auth_test
 
 import (
 	"fmt"
-	"monetasa/auth"
-	"monetasa/auth/mocks"
+	"datapace/auth"
+	"datapace/auth/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

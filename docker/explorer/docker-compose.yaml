@@ -11,10 +11,10 @@ services:
       - ../explorer/artifacts/explorerpg.sql:/docker-entrypoint-initdb.d/explorerpg.sql
       - ../explorer/artifacts/updatepg.sql:/docker-entrypoint-initdb.d/updatepg.sql
     networks:
-      - monetasa-bc-net
+      - datapace-bc-net
 
   explorer:
-    image: monetasa/hyperledger-explorer
+    image: datapace/hyperledger-explorer
     container_name: fabric-explorer
     hostname: explorer
     restart: always
@@ -25,7 +25,7 @@ services:
     ports:
       - "9090:8080"
     networks:
-      - monetasa-bc-net
+      - datapace-bc-net
     depends_on:
       - explorer-db
       - cli

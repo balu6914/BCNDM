@@ -12,8 +12,8 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 
-	"monetasa"
-	"monetasa/streams"
+	"datapace"
+	"datapace/streams"
 )
 
 const (
@@ -78,12 +78,12 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 		opts...,
 	))
 
-	r.GetFunc("/version", monetasa.Version())
+	r.GetFunc("/version", datapace.Version())
 
 	return r
 }
 
-func checkEmail(userEmail monetasa.UserEmail) (string, error) {
+func checkEmail(userEmail datapace.UserEmail) (string, error) {
 	email := strings.ToLower(userEmail.Email)
 	contactEmail := strings.ToLower(userEmail.ContactEmail)
 	if strings.HasSuffix(email, gmailSuffix) {

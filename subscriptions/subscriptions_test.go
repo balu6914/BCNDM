@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2/bson"
 
-	"monetasa/subscriptions"
-	"monetasa/subscriptions/mocks"
+	"datapace/subscriptions"
+	"datapace/subscriptions/mocks"
 )
 
 const (

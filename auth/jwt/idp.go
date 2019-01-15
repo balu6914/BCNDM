@@ -4,13 +4,13 @@ package jwt
 import (
 	"time"
 
-	"monetasa/auth"
+	"datapace/auth"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (
-	issuer   = "monetasa"
+	issuer   = "datapace"
 	duration = 10 * time.Hour
 )
 

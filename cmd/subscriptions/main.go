@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"monetasa"
+	"datapace"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	authapi "monetasa/auth/api/grpc"
-	log "monetasa/logger"
-	streamsapi "monetasa/streams/api/grpc"
-	"monetasa/subscriptions"
-	"monetasa/subscriptions/api"
-	"monetasa/subscriptions/mongo"
-	"monetasa/subscriptions/proxy"
-	"monetasa/subscriptions/streams"
-	"monetasa/subscriptions/transactions"
-	transactionsapi "monetasa/transactions/api/grpc"
+	authapi "datapace/auth/api/grpc"
+	log "datapace/logger"
+	streamsapi "datapace/streams/api/grpc"
+	"datapace/subscriptions"
+	"datapace/subscriptions/api"
+	"datapace/subscriptions/mongo"
+	"datapace/subscriptions/proxy"
+	"datapace/subscriptions/streams"
+	"datapace/subscriptions/transactions"
+	transactionsapi "datapace/transactions/api/grpc"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -27,17 +27,17 @@ import (
 )
 
 const (
-	envSubsPort        = "MONETASA_SUBSCRIPTIONS_PORT"
-	envAuthURL         = "MONETASA_AUTH_URL"
-	envTransactionsURL = "MONETASA_TRANSACTIONS_URL"
-	envStreamsURL      = "MONETASA_STREAMS_URL"
+	envSubsPort        = "DATAPACE_SUBSCRIPTIONS_PORT"
+	envAuthURL         = "DATAPACE_AUTH_URL"
+	envTransactionsURL = "DATAPACE_TRANSACTIONS_URL"
+	envStreamsURL      = "DATAPACE_STREAMS_URL"
 
 	// HTTP prefixed, because all others are gRPC.
-	envProxyURL      = "MONETASA_PROXY_URL"
-	envMongoURL      = "MONETASA_SUBSCRIPTIONS_DB_URL"
-	envMongoUser     = "MONETASA_SUBSCRIPTIONS_DB_USER"
-	envMongoPass     = "MONETASA_SUBSCRIPTIONS_DB_PASS"
-	envMongoDatabase = "MONETASA_SUBSCRIPTIONS_DB_NAME"
+	envProxyURL      = "DATAPACE_PROXY_URL"
+	envMongoURL      = "DATAPACE_SUBSCRIPTIONS_DB_URL"
+	envMongoUser     = "DATAPACE_SUBSCRIPTIONS_DB_USER"
+	envMongoPass     = "DATAPACE_SUBSCRIPTIONS_DB_PASS"
+	envMongoDatabase = "DATAPACE_SUBSCRIPTIONS_DB_NAME"
 
 	defSubsPort        = "8080"
 	defAuthURL         = "localhost:8081"
@@ -106,17 +106,17 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		SubsPort:            monetasa.Env(envSubsPort, defSubsPort),
-		StreamsURL:          monetasa.Env(envStreamsURL, defStreamsURL),
-		TransactionsURL:     monetasa.Env(envTransactionsURL, defTransactionsURL),
-		ProxyURL:            monetasa.Env(envProxyURL, defProxyURL),
-		MongoURL:            monetasa.Env(envMongoURL, defMongoURL),
-		MongoUser:           monetasa.Env(envMongoUser, defMongoUser),
-		MongoPass:           monetasa.Env(envMongoPass, defMongoPass),
-		MongoDatabase:       monetasa.Env(envMongoDatabase, defMongoDatabase),
+		SubsPort:            datapace.Env(envSubsPort, defSubsPort),
+		StreamsURL:          datapace.Env(envStreamsURL, defStreamsURL),
+		TransactionsURL:     datapace.Env(envTransactionsURL, defTransactionsURL),
+		ProxyURL:            datapace.Env(envProxyURL, defProxyURL),
+		MongoURL:            datapace.Env(envMongoURL, defMongoURL),
+		MongoUser:           datapace.Env(envMongoUser, defMongoUser),
+		MongoPass:           datapace.Env(envMongoPass, defMongoPass),
+		MongoDatabase:       datapace.Env(envMongoDatabase, defMongoDatabase),
 		MongoConnectTimeout: defMongoConnectTimeout,
 		MongoSocketTimeout:  defMongoSocketTimeout,
-		AuthURL:             monetasa.Env(envAuthURL, defAuthURL),
+		AuthURL:             datapace.Env(envAuthURL, defAuthURL),
 	}
 }
 
@@ -147,7 +147,7 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(ac monetasa.AuthServiceClient, ms *mgo.Session, sc monetasa.StreamsServiceClient, tc monetasa.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
+func newService(ac datapace.AuthServiceClient, ms *mgo.Session, sc datapace.StreamsServiceClient, tc datapace.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
 	ps := proxy.New(proxyURL)
@@ -175,7 +175,7 @@ func newService(ac monetasa.AuthServiceClient, ms *mgo.Session, sc monetasa.Stre
 	return svc
 }
 
-func serveHTTPServer(svc subscriptions.Service, ac monetasa.AuthServiceClient, port string, logger log.Logger, errs chan error) {
+func serveHTTPServer(svc subscriptions.Service, ac datapace.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Subscriptions service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, api.MakeHandler(svc, ac))

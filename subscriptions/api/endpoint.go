@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"monetasa/subscriptions"
+	"datapace/subscriptions"
 
 	"github.com/go-kit/kit/endpoint"
 )

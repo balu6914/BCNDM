@@ -1,6 +1,6 @@
 package mocks
 
-import "monetasa/auth"
+import "datapace/auth"
 
 var _ auth.Hasher = (*hasherMock)(nil)
 

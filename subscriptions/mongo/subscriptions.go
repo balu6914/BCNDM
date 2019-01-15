@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"monetasa/subscriptions"
+	"datapace/subscriptions"
 	"time"
 
 	"gopkg.in/mgo.v2"

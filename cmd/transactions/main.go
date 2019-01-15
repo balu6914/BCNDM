@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"monetasa"
-	authapi "monetasa/auth/api/grpc"
-	log "monetasa/logger"
-	streamsapi "monetasa/streams/api/grpc"
-	"monetasa/transactions"
-	"monetasa/transactions/api"
-	grpcapi "monetasa/transactions/api/grpc"
-	httpapi "monetasa/transactions/api/http"
-	"monetasa/transactions/fabric"
-	"monetasa/transactions/mongo"
-	"monetasa/transactions/streams"
+	"datapace"
+	authapi "datapace/auth/api/grpc"
+	log "datapace/logger"
+	streamsapi "datapace/streams/api/grpc"
+	"datapace/transactions"
+	"datapace/transactions/api"
+	grpcapi "datapace/transactions/api/grpc"
+	httpapi "datapace/transactions/api/http"
+	"datapace/transactions/fabric"
+	"datapace/transactions/mongo"
+	"datapace/transactions/streams"
 	"net"
 	"net/http"
 	"os"
@@ -28,19 +28,19 @@ import (
 )
 
 const (
-	envHTTPPort             = "MONETASA_TRANSACTIONS_HTTP_PORT"
-	envGRPCPort             = "MONETASA_TRANSACTIONS_GRPC_PORT"
-	envDBURL                = "MONETASA_TRANSACTIONS_DB_URL"
-	envDBUser               = "MONETASA_TRANSACTIONS_DB_USER"
-	envDBPass               = "MONETASA_TRANSACTIONS_DB_PASS"
-	envDBName               = "MONETASA_TRANSACTIONS_DB_NAME"
-	envFabricOrgAdmin       = "MONETASA_TRANSACTIONS_FABRIC_ADMIN"
-	envFabricOrgName        = "MONETASA_TRANSACTIONS_FABRIC_NAME"
-	envMonetasaConfig       = "MONETASA_CONFIG"
-	envTokenChaincodeID     = "MONETASA_TRANSACTIONS_TOKEN_CHAINCODE"
-	envContractsChaincodeID = "MONETASA_TRANSACTIONS_CONTRACTS_CHAINCODE"
-	envAuthURL              = "MONETASA_AUTH_URL"
-	envStreamsURL           = "MONETASA_STREAMS_URL"
+	envHTTPPort             = "DATAPACE_TRANSACTIONS_HTTP_PORT"
+	envGRPCPort             = "DATAPACE_TRANSACTIONS_GRPC_PORT"
+	envDBURL                = "DATAPACE_TRANSACTIONS_DB_URL"
+	envDBUser               = "DATAPACE_TRANSACTIONS_DB_USER"
+	envDBPass               = "DATAPACE_TRANSACTIONS_DB_PASS"
+	envDBName               = "DATAPACE_TRANSACTIONS_DB_NAME"
+	envFabricOrgAdmin       = "DATAPACE_TRANSACTIONS_FABRIC_ADMIN"
+	envFabricOrgName        = "DATAPACE_TRANSACTIONS_FABRIC_NAME"
+	envDatapaceConfig       = "DATAPACE_CONFIG"
+	envTokenChaincodeID     = "DATAPACE_TRANSACTIONS_TOKEN_CHAINCODE"
+	envContractsChaincodeID = "DATAPACE_TRANSACTIONS_CONTRACTS_CHAINCODE"
+	envAuthURL              = "DATAPACE_AUTH_URL"
+	envStreamsURL           = "DATAPACE_STREAMS_URL"
 
 	defHTTPPort             = "8080"
 	defGRPCPort             = "8081"
@@ -50,7 +50,7 @@ const (
 	defDBName               = "transactions"
 	defFabricOrgAdmin       = "admin"
 	defFabricOrgName        = "org1"
-	defMonetasaConfig       = "/src/monetasa/config"
+	defDatapaceConfig       = "/src/datapace/config"
 	defTokenChaincodeID     = "token"
 	defContractsChaincodeID = "contracts"
 	defAuthURL              = "localhost:8081"
@@ -119,25 +119,25 @@ func main() {
 }
 
 func loadConfig() config {
-	configDir := monetasa.Env(envMonetasaConfig, defMonetasaConfig)
+	configDir := datapace.Env(envDatapaceConfig, defDatapaceConfig)
 	configFile := fmt.Sprintf("%s/%s", configDir, fabricConfigFile)
 
 	return config{
-		httpPort:             monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:             monetasa.Env(envGRPCPort, defGRPCPort),
-		dbURL:                monetasa.Env(envDBURL, defDBURL),
-		dbUser:               monetasa.Env(envDBUser, defDBUser),
-		dbPass:               monetasa.Env(envDBPass, defDBPass),
-		dbName:               monetasa.Env(envDBName, defDBName),
+		httpPort:             datapace.Env(envHTTPPort, defHTTPPort),
+		grpcPort:             datapace.Env(envGRPCPort, defGRPCPort),
+		dbURL:                datapace.Env(envDBURL, defDBURL),
+		dbUser:               datapace.Env(envDBUser, defDBUser),
+		dbPass:               datapace.Env(envDBPass, defDBPass),
+		dbName:               datapace.Env(envDBName, defDBName),
 		dbConnectTimeout:     dbConnectTimeout,
 		dbSocketTimeout:      dbSocketTimeout,
-		fabricOrgAdmin:       monetasa.Env(envFabricOrgAdmin, defFabricOrgAdmin),
-		fabricOrgName:        monetasa.Env(envFabricOrgName, defFabricOrgName),
+		fabricOrgAdmin:       datapace.Env(envFabricOrgAdmin, defFabricOrgAdmin),
+		fabricOrgName:        datapace.Env(envFabricOrgName, defFabricOrgName),
 		fabricConfigFile:     configFile,
-		tokenChaincodeID:     monetasa.Env(envTokenChaincodeID, defTokenChaincodeID),
-		contractsChaincodeID: monetasa.Env(envContractsChaincodeID, defContractsChaincodeID),
-		authURL:              monetasa.Env(envAuthURL, defAuthURL),
-		streamsURL:           monetasa.Env(envStreamsURL, defStreamsURL),
+		tokenChaincodeID:     datapace.Env(envTokenChaincodeID, defTokenChaincodeID),
+		contractsChaincodeID: datapace.Env(envContractsChaincodeID, defContractsChaincodeID),
+		authURL:              datapace.Env(envAuthURL, defAuthURL),
+		streamsURL:           datapace.Env(envStreamsURL, defStreamsURL),
 	}
 }
 
@@ -168,7 +168,7 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient monetasa.StreamsServiceClient, logger log.Logger) transactions.Service {
+func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient datapace.StreamsServiceClient, logger log.Logger) transactions.Service {
 	tl := fabric.NewTokenLedger(
 		sdk,
 		cfg.fabricOrgAdmin,
@@ -219,7 +219,7 @@ func newGRPCConn(authURL string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func startHTTPServer(svc transactions.Service, ac monetasa.AuthServiceClient, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(svc transactions.Service, ac datapace.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Users HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, ac))
@@ -233,7 +233,7 @@ func startGRPCServer(svc transactions.Service, port string, logger log.Logger, e
 	}
 
 	server := grpc.NewServer()
-	monetasa.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
+	datapace.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Transactions gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

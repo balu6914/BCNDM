@@ -1,9 +1,9 @@
 # General network config required by fabric-sdk-go
 
-name: "monetasa-dev-network"
+name: "datapace-dev-network"
 
 # Describe what the target network is/does.
-description: "The network which will host Monetasa development network"
+description: "The network which will host Datapace development network"
 
 # Schema version of the content. Used by the SDK to apply the corresponding parsing rules.
 version: 2
@@ -33,15 +33,15 @@ client:
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
-    path: "${MONETASA_CONFIG}/crypto-config"
+    path: "${DATAPACE_CONFIG}/crypto-config"
 
   # Some SDKs support pluggable KV stores, the properties under "credentialStore" are implementation specific
   credentialStore:
-    path: "/tmp/monetasa-service-kvs"
+    path: "/tmp/datapace-service-kvs"
 
      # [Optional]. Specific to the CryptoSuite implementation used by GO SDK. Software-based implementations requiring a key store. PKCS#11 based implementations does not.
     cryptoStore:
-      path: "/tmp/monetasa-service-msp"
+      path: "/tmp/datapace-service-msp"
 
   # BCCSP config for the client. Used by GO SDK. It's the Blockchain Cryptographic Service Provider.
   # It offers the implementation of cryptographic standards and algorithms.
@@ -63,11 +63,11 @@ client:
 channels:
   myc:
     # orderers:
-    #   - orderer.monetasa.com
+    #   - orderer.datapace.com
     #
     # Network entity which maintains a ledger and runs chaincode containers in order to perform operations to the ledger. Peers are owned and maintained by members.
     peers:
-      peer0.org1.monetasa.com:
+      peer0.org1.datapace.com:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -91,63 +91,63 @@ channels:
 organizations:
   org1:
     mspid: Org1MSP
-    cryptoPath: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/users/Admin@org1.monetasa.com/msp"
+    cryptoPath: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp"
     peers:
-      - peer0.org1.monetasa.com
+      - peer0.org1.datapace.com
     certificateAuthorities:
-      - ca.org1.monetasa.com
+      - ca.org1.datapace.com
 
 # List of orderers to send transaction and channel create/update requests to.
 # The orderers consent on the order of transactions in a block to be committed to the ledger. For the time being only one orderer is needed.
 orderers:
-  orderer.monetasa.com:
-    url: grpcs://orderer.monetasa.com:7050
+  orderer.datapace.com:
+    url: grpcs://orderer.datapace.com:7050
     grpcOptions:
-      ssl-target-name-override: orderer.monetasa.com
+      ssl-target-name-override: orderer.datapace.com
       grpc-max-send-message-length: 15
     tlsCACerts:
-      path: "${MONETASA_CONFIG}/crypto-config/ordererOrganizations/monetasa.com/tlsca/tlsca.monetasa.com-cert.pem"
+      path: "${DATAPACE_CONFIG}/crypto-config/ordererOrganizations/datapace.com/tlsca/tlsca.datapace.com-cert.pem"
 
 # List of peers to send various requests to, including endorsement, query and event listener registration.
 peers:
-  peer0.org1.monetasa.com:
+  peer0.org1.datapace.com:
     # this URL is used to send endorsement and query requests
-    url: grpcs://peer0.org1.monetasa.com:7051
+    url: grpcs://peer0.org1.datapace.com:7051
     # this URL is used to connect the EventHub and registering event listeners
-    eventUrl: grpcs://peer0.org1.monetasa.com:7053
+    eventUrl: grpcs://peer0.org1.datapace.com:7053
     # These parameters should be set in coordination with the keepalive policy on the server
     grpcOptions:
-      ssl-target-name-override: peer0.org1.monetasa.com
+      ssl-target-name-override: peer0.org1.datapace.com
       grpc.http2.keepalive_time: 15
     tlsCACerts:
-      path: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
+      path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
 
 
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows certificate management to be done via REST APIs.
 certificateAuthorities:
-  ca.org1.monetasa.com:
+  ca.org1.datapace.com:
     # Change this according to your fabric-ca URL
-    url: http://ca.org1.monetasa.com:7054
+    url: http://ca.org1.datapace.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
     tlsCACerts:
       # Comma-Separated list of paths
-      path: "${MONETASA_CONFIG}/crypto-config/peerOrganizations/org1.monetasa.com/tlsca/tlsca.org1.monetasa.com-cert.pem"
+      path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
     httpOptions:
       verify: false
     registrar:
-      enrollId: Admin@org1.monetasa.com
+      enrollId: Admin@org1.datapace.com
       enrollSecret: adminpw
-    caName: ca.org1.monetasa.com
+    caName: ca.org1.datapace.com
 
 entityMatchers:
  peer:
-  - pattern: (\w+).org1.monetasa.(\w+)
+  - pattern: (\w+).org1.datapace.(\w+)
     urlSubstitutionExp: localhost:7051
     eventUrlSubstitutionExp: localhost:7053
-    sslTargetOverrideUrlSubstitutionExp: peer0.org1.monetasa.com
-    mappedHost: local.peer0.org1.monetasa.com
+    sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
+    mappedHost: local.peer0.org1.datapace.com
 orderer:
-  - pattern: (\w+).monetasa.(\w+)
+  - pattern: (\w+).datapace.(\w+)
     urlSubstitutionExp: localhost:7050
-    sslTargetOverrideUrlSubstitutionExp: orderer.monetasa.com
-    mappedHost: orderer.monetasa.com
+    sslTargetOverrideUrlSubstitutionExp: orderer.datapace.com
+    mappedHost: orderer.datapace.com

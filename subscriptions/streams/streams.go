@@ -2,19 +2,19 @@ package streams
 
 import (
 	"context"
-	"monetasa"
-	"monetasa/subscriptions"
+	"datapace"
+	"datapace/subscriptions"
 	"time"
 )
 
 var _ subscriptions.StreamsService = (*streamsService)(nil)
 
 type streamsService struct {
-	client monetasa.StreamsServiceClient
+	client datapace.StreamsServiceClient
 }
 
 // NewService returns instance of streams service client.
-func NewService(client monetasa.StreamsServiceClient) subscriptions.StreamsService {
+func NewService(client datapace.StreamsServiceClient) subscriptions.StreamsService {
 	return streamsService{client: client}
 }
 
@@ -22,7 +22,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	s, err := ss.client.One(ctx, &monetasa.ID{Value: id})
+	s, err := ss.client.One(ctx, &datapace.ID{Value: id})
 	if err != nil {
 		return subscriptions.Stream{}, err
 	}

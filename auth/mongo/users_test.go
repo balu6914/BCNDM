@@ -2,8 +2,8 @@ package mongo_test
 
 import (
 	"fmt"
-	"monetasa/auth"
-	"monetasa/auth/mongo"
+	"datapace/auth"
+	"datapace/auth/mongo"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

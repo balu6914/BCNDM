@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"monetasa"
-	"monetasa/auth"
-	"monetasa/auth/api"
-	grpcapi "monetasa/auth/api/grpc"
-	httpapi "monetasa/auth/api/http"
-	"monetasa/auth/bcrypt"
-	"monetasa/auth/jwt"
-	"monetasa/auth/mongo"
-	"monetasa/auth/transactions"
-	log "monetasa/logger"
-	transactionsapi "monetasa/transactions/api/grpc"
+	"datapace"
+	"datapace/auth"
+	"datapace/auth/api"
+	grpcapi "datapace/auth/api/grpc"
+	httpapi "datapace/auth/api/http"
+	"datapace/auth/bcrypt"
+	"datapace/auth/jwt"
+	"datapace/auth/mongo"
+	"datapace/auth/transactions"
+	log "datapace/logger"
+	transactionsapi "datapace/transactions/api/grpc"
 	"net"
 	"net/http"
 	"os"
@@ -26,14 +26,14 @@ import (
 )
 
 const (
-	envHTTPPort        = "MONETASA_AUTH_HTTP_PORT"
-	envGRPCPort        = "MONETASA_AUTH_GRPC_PORT"
-	envDBURL           = "MONETASA_AUTH_DB_URL"
-	envDBUser          = "MONETASA_AUTH_DB_USER"
-	envDBPass          = "MONETASA_AUTH_DB_PASS"
-	envDBName          = "MONETASA_AUTH_DB_NAME"
-	envTransactionsURL = "MONETASA_TRANSACTIONS_URL"
-	envSecret          = "MONETASA_AUTH_SECRET"
+	envHTTPPort        = "DATAPACE_AUTH_HTTP_PORT"
+	envGRPCPort        = "DATAPACE_AUTH_GRPC_PORT"
+	envDBURL           = "DATAPACE_AUTH_DB_URL"
+	envDBUser          = "DATAPACE_AUTH_DB_USER"
+	envDBPass          = "DATAPACE_AUTH_DB_PASS"
+	envDBName          = "DATAPACE_AUTH_DB_NAME"
+	envTransactionsURL = "DATAPACE_TRANSACTIONS_URL"
+	envSecret          = "DATAPACE_AUTH_SECRET"
 
 	defHTTPPort        = "8080"
 	defGRPCPort        = "8081"
@@ -42,7 +42,7 @@ const (
 	defDBPass          = ""
 	defDBName          = "auth"
 	defTransactionsURL = "localhost:8081"
-	defSecret          = "monetasa"
+	defSecret          = "datapace"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -94,16 +94,16 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		httpPort:         monetasa.Env(envHTTPPort, defHTTPPort),
-		grpcPort:         monetasa.Env(envGRPCPort, defGRPCPort),
-		dbURL:            monetasa.Env(envDBURL, defDBURL),
-		dbUser:           monetasa.Env(envDBUser, defDBUser),
-		dbPass:           monetasa.Env(envDBPass, defDBPass),
-		dbName:           monetasa.Env(envDBName, defDBName),
+		httpPort:         datapace.Env(envHTTPPort, defHTTPPort),
+		grpcPort:         datapace.Env(envGRPCPort, defGRPCPort),
+		dbURL:            datapace.Env(envDBURL, defDBURL),
+		dbUser:           datapace.Env(envDBUser, defDBUser),
+		dbPass:           datapace.Env(envDBPass, defDBPass),
+		dbName:           datapace.Env(envDBName, defDBName),
 		dbConnectTimeout: dbConnectTimeout,
 		dbSocketTimeout:  dbSocketTimeout,
-		transactionsURL:  monetasa.Env(envTransactionsURL, defTransactionsURL),
-		secret:           monetasa.Env(envSecret, defSecret),
+		transactionsURL:  datapace.Env(envTransactionsURL, defTransactionsURL),
+		secret:           datapace.Env(envSecret, defSecret),
 	}
 }
 
@@ -134,7 +134,7 @@ func newGRPCConn(transactionsURL string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(cfg config, ms *mgo.Session, tc monetasa.TransactionsServiceClient, logger log.Logger) auth.Service {
+func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, logger log.Logger) auth.Service {
 	users := mongo.NewUserRepository(ms)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.secret)
@@ -175,7 +175,7 @@ func startGRPCServer(svc auth.Service, port string, logger log.Logger, errs chan
 	}
 
 	server := grpc.NewServer()
-	monetasa.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
+	datapace.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Auth gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

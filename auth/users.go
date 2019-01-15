@@ -1,6 +1,6 @@
 package auth
 
-// User represents a Monetasa user account. Each user is identified given its
+// User represents a Datapace user account. Each user is identified given its
 // email and password.
 type User struct {
 	Email        string

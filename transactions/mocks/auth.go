@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"context"
-	"monetasa"
+	"datapace"
 	"sync"
 
 	"google.golang.org/grpc"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ monetasa.AuthServiceClient = (*mockAuthClient)(nil)
+var _ datapace.AuthServiceClient = (*mockAuthClient)(nil)
 
 type mockAuthClient struct {
 	users map[string]string
@@ -18,11 +18,11 @@ type mockAuthClient struct {
 }
 
 // NewAuthClient returns auth client mock instance.
-func NewAuthClient(users map[string]string) monetasa.AuthServiceClient {
+func NewAuthClient(users map[string]string) datapace.AuthServiceClient {
 	return &mockAuthClient{users: users, mutex: &sync.Mutex{}}
 }
 
-func (mac *mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserID, error) {
+func (mac *mockAuthClient) Identify(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserID, error) {
 	mac.mutex.Lock()
 	defer mac.mutex.Unlock()
 
@@ -32,9 +32,9 @@ func (mac *mockAuthClient) Identify(_ context.Context, token *monetasa.Token, _ 
 		return nil, status.Error(codes.Unauthenticated, "failed to identify user from key")
 	}
 
-	return &monetasa.UserID{Value: id}, nil
+	return &datapace.UserID{Value: id}, nil
 }
 
-func (mac *mockAuthClient) Email(_ context.Context, token *monetasa.Token, _ ...grpc.CallOption) (*monetasa.UserEmail, error) {
-	return &monetasa.UserEmail{Email: "", ContactEmail: ""}, nil
+func (mac *mockAuthClient) Email(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserEmail, error) {
+	return &datapace.UserEmail{Email: "", ContactEmail: ""}, nil
 }

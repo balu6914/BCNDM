@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	dbName          = "monetasa-auth"
+	dbName          = "datapace-auth"
 	usersCollection = "users"
 )
 

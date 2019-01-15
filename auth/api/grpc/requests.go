@@ -1,6 +1,6 @@
 package grpc
 
-import "monetasa/auth"
+import "datapace/auth"
 
 type identityReq struct {
 	token string

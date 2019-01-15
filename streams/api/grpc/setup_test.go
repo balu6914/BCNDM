@@ -2,10 +2,10 @@ package grpc_test
 
 import (
 	"fmt"
-	"monetasa"
-	"monetasa/streams"
-	grpcapi "monetasa/streams/api/grpc"
-	"monetasa/streams/mocks"
+	"datapace"
+	"datapace/streams"
+	grpcapi "datapace/streams/api/grpc"
+	"datapace/streams/mocks"
 	"net"
 	"os"
 	"testing"
@@ -33,7 +33,7 @@ func startServer() {
 	svc = newService()
 	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	server := grpc.NewServer()
-	monetasa.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
+	datapace.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)
 }
 

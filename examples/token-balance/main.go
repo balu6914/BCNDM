@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"monetasa/examples/blockchain"
-	"monetasa/examples/token-balance/token"
+	"datapace/examples/blockchain"
+	"datapace/examples/token-balance/token"
 	"os"
 )
 

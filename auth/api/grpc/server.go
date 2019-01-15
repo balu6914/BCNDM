@@ -2,15 +2,15 @@ package grpc
 
 import (
 	"context"
-	"monetasa"
-	"monetasa/auth"
+	"datapace"
+	"datapace/auth"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-var _ monetasa.AuthServiceServer = (*grpcServer)(nil)
+var _ datapace.AuthServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
 	identify kitgrpc.Handler
@@ -18,7 +18,7 @@ type grpcServer struct {
 }
 
 // NewServer instantiates new Auth gRPC server.
-func NewServer(svc auth.Service) monetasa.AuthServiceServer {
+func NewServer(svc auth.Service) datapace.AuthServiceServer {
 	identify := kitgrpc.NewServer(
 		identifyEndpoint(svc),
 		decodeIdentifyRequest,
@@ -34,40 +34,40 @@ func NewServer(svc auth.Service) monetasa.AuthServiceServer {
 	return &grpcServer{identify, email}
 }
 
-func (s *grpcServer) Identify(ctx context.Context, token *monetasa.Token) (*monetasa.UserID, error) {
+func (s *grpcServer) Identify(ctx context.Context, token *datapace.Token) (*datapace.UserID, error) {
 	_, res, err := s.identify.ServeGRPC(ctx, token)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	return res.(*monetasa.UserID), nil
+	return res.(*datapace.UserID), nil
 }
 
-func (s *grpcServer) Email(ctx context.Context, id *monetasa.Token) (*monetasa.UserEmail, error) {
+func (s *grpcServer) Email(ctx context.Context, id *datapace.Token) (*datapace.UserEmail, error) {
 	_, res, err := s.email.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	return res.(*monetasa.UserEmail), nil
+	return res.(*datapace.UserEmail), nil
 }
 
 func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.Token)
+	req := grpcReq.(*datapace.Token)
 	return identityReq{req.GetValue()}, nil
 }
 
 func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(identityRes)
-	return &monetasa.UserID{Value: res.id}, encodeError(res.err)
+	return &datapace.UserID{Value: res.id}, encodeError(res.err)
 }
 
 func decodeEmailRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.Token)
+	req := grpcReq.(*datapace.Token)
 	return identityReq{req.GetValue()}, nil
 }
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(emailRes)
-	return &monetasa.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
+	return &datapace.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
 }
 
 func encodeError(err error) error {

@@ -3,7 +3,7 @@ package http
 import (
 	"gopkg.in/mgo.v2/bson"
 
-	"monetasa/streams"
+	"datapace/streams"
 )
 
 const (

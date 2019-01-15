@@ -3,8 +3,8 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"monetasa/chaincode/mocks"
-	token "monetasa/chaincode/token"
+	"datapace/chaincode/mocks"
+	token "datapace/chaincode/token"
 	"testing"
 
 	"github.com/hyperledger/fabric/common/util"

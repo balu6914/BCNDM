@@ -9,10 +9,10 @@
 			"revisionTime": "2018-08-04T22:03:15Z"
 		},
 		{
-			"checksumSHA1": "YU+m78bhPrho7TdY30DLB5F+7d8=",
+			"checksumSHA1": "ZzWCzHsWRI/LAxhZYUMqVcIAsZQ=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "fd3e868a570b9b0fe843cb2c6daaa1cbdf9ea5cc",
-			"revisionTime": "2018-09-20T13:17:46Z"
+			"revision": "9d540c1dd49ef9dab72a827e609036857c722408",
+			"revisionTime": "2019-01-14T14:06:52Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/system-fee"

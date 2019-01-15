@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	dbName              = "monetasa-transactions"
+	dbName              = "datapace-transactions"
 	usersCollection     = "users"
 	contractsCollection = "contracts"
 )

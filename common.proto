@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package monetasa;
+package datapace;
 
 message ID {
     string value = 1;

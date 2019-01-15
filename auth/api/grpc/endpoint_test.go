@@ -3,9 +3,9 @@ package grpc_test
 import (
 	"context"
 	"fmt"
-	"monetasa"
-	"monetasa/auth"
-	grpcapi "monetasa/auth/api/grpc"
+	"datapace"
+	"datapace/auth"
+	grpcapi "datapace/auth/api/grpc"
 	"testing"
 	"time"
 
@@ -62,7 +62,7 @@ func TestIdentify(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		id, err := client.Identify(ctx, &monetasa.Token{Value: tc.token})
+		id, err := client.Identify(ctx, &datapace.Token{Value: tc.token})
 		assert.Equal(t, tc.id, id.GetValue(), fmt.Sprintf("%s: expected %s got %s", desc, tc.id, id.GetValue()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
@@ -99,7 +99,7 @@ func TestEmail(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		email, err := client.Email(ctx, &monetasa.Token{Value: tc.token})
+		email, err := client.Email(ctx, &datapace.Token{Value: tc.token})
 		assert.Equal(t, tc.email, email.GetEmail(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetEmail()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}

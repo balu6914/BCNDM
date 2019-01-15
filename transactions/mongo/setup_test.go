@@ -2,8 +2,8 @@ package mongo_test
 
 import (
 	"fmt"
-	log "monetasa/logger"
-	"monetasa/transactions/mongo"
+	log "datapace/logger"
+	"datapace/transactions/mongo"
 	"os"
 	"testing"
 
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	testDB          = "monetasa"
+	testDB          = "datapace"
 	userDB          = ""
 	passDB          = ""
 	timeoutDB       = 5000

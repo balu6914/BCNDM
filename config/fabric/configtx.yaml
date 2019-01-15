@@ -10,7 +10,7 @@ Organizations:
     - &OrdererOrg
         Name: OrdererOrg
         ID: OrdererMSP
-        MSPDir: ../crypto-config/ordererOrganizations/monetasa.com/msp
+        MSPDir: ../crypto-config/ordererOrganizations/datapace.com/msp
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
     - &Org1
@@ -19,13 +19,13 @@ Organizations:
         Name: Org1MSP
         # ID to load the MSP definition as
         ID: Org1MSP
-        MSPDir: ../crypto-config/peerOrganizations/org1.monetasa.com/msp
+        MSPDir: ../crypto-config/peerOrganizations/org1.datapace.com/msp
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.org1.monetasa.com
+            - Host: peer0.org1.datapace.com
               Port: 7051
 
 ################################################################################
@@ -43,7 +43,7 @@ Orderer: &OrdererDefaults
     OrdererType: solo
 
     Addresses:
-        - orderer.monetasa.com:7050
+        - orderer.datapace.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -91,7 +91,7 @@ Application: &ApplicationDefaults
 ################################################################################
 Profiles:
 
-    MonetasaOrdererGenesis:
+    DatapaceOrdererGenesis:
         Orderer:
             <<: *OrdererDefaults
             Organizations:
@@ -104,7 +104,7 @@ Profiles:
             SampleConsortium:
                 Organizations:
                     - *Org1
-    MonetasaChannel:
+    DatapaceChannel:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults

@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"monetasa"
-	"monetasa/streams"
+	"datapace"
+	"datapace/streams"
 	"net/http"
 )
 
@@ -21,8 +21,8 @@ func (a authorization) Authorize(r *http.Request) (string, error) {
 	return "", streams.ErrUnauthorizedAccess
 }
 
-func (a authorization) Email(token string) (monetasa.UserEmail, error) {
-	return monetasa.UserEmail{}, nil
+func (a authorization) Email(token string) (datapace.UserEmail, error) {
+	return datapace.UserEmail{}, nil
 }
 
 // NewAuth returns mock auth service.

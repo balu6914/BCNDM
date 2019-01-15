@@ -3,8 +3,8 @@ package grpc_test
 import (
 	"context"
 	"fmt"
-	"monetasa"
-	grpcapi "monetasa/transactions/api/grpc"
+	"datapace"
+	grpcapi "datapace/transactions/api/grpc"
 	"testing"
 	"time"
 
@@ -51,7 +51,7 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := cli.CreateUser(ctx, &monetasa.ID{Value: tc.id})
+		_, err := cli.CreateUser(ctx, &datapace.ID{Value: tc.id})
 		e, ok := status.FromError(err)
 		assert.True(t, ok, "OK expected to be true")
 		assert.Equal(t, tc.status, e.Code(), fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.status, e.Code()))
@@ -96,7 +96,7 @@ func TestTransfer(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		req := monetasa.TransferData{
+		req := datapace.TransferData{
 			StreamID: streamID,
 			From:     tc.from,
 			To:       tc.to,

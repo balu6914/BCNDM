@@ -3,9 +3,9 @@ package grpc_test
 import (
 	"context"
 	"fmt"
-	"monetasa"
-	"monetasa/streams"
-	grpcapi "monetasa/streams/api/grpc"
+	"datapace"
+	"datapace/streams"
+	grpcapi "datapace/streams/api/grpc"
 	"testing"
 	"time"
 
@@ -35,12 +35,12 @@ func TestOne(t *testing.T) {
 
 	cases := map[string]struct {
 		id     string
-		stream *monetasa.Stream
+		stream *datapace.Stream
 		err    error
 	}{
 		"get existing stream": {
 			id: stream.ID.Hex(),
-			stream: &monetasa.Stream{
+			stream: &datapace.Stream{
 				Owner: stream.Owner,
 				Id:    stream.ID.Hex(),
 				Url:   stream.URL,
@@ -56,7 +56,7 @@ func TestOne(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		stream, err := cli.One(ctx, &monetasa.ID{Value: tc.id})
+		stream, err := cli.One(ctx, &datapace.ID{Value: tc.id})
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 		assert.Equal(t, tc.stream, stream, fmt.Sprintf("%s: expected %v got %v", desc, tc.stream, stream))
 	}

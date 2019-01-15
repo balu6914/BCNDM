@@ -3,8 +3,8 @@ package fabric
 import (
 	"encoding/json"
 	"fmt"
-	log "monetasa/logger"
-	"monetasa/transactions"
+	log "datapace/logger"
+	"datapace/transactions"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"monetasa/transactions"
+	"datapace/transactions"
 	"time"
 
 	"github.com/go-kit/kit/metrics"

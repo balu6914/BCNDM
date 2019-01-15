@@ -1,5 +1,5 @@
-# Monetasa Proxy
-Proxy service is part of [Monetasa](monetasa.com) infrastructure.The purpose of service is to act as reverse proxy between subscriber(the user who buy the stream subscription) and stream source (the user who is providing/selling the stream) in [Monetasa](monetasa.com) system.
+# Datapace Proxy
+Proxy service is part of [Datapace](datapace.com) infrastructure.The purpose of service is to act as reverse proxy between subscriber(the user who buy the stream subscription) and stream source (the user who is providing/selling the stream) in [Datapace](datapace.com) system.
 
 ## How It Works
 The service provides one HTTP API end point for route registration
@@ -58,13 +58,13 @@ You'll need the following software installed to get started.
 Clone this repository
 
 ```bash
-git clone git@gitlab.com:drasko/monetasa-proxy.git
+git clone git@gitlab.com:drasko/datapace-proxy.git
 ```
 
 Change into the directory.
 
 ```bash
-cd monetasa-proxy
+cd datapace-proxy
 ```
 
 Install the dependencies. If you're running Mac OS or Linux, you may need to run `sudo npm install` instead, depending on how your machine is configured.

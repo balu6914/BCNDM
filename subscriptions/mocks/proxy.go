@@ -1,6 +1,6 @@
 package mocks
 
-import "monetasa/subscriptions"
+import "datapace/subscriptions"
 
 var _ subscriptions.Proxy = (*mockProxy)(nil)
 

@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"monetasa"
-	authapi "monetasa/auth/api/grpc"
-	log "monetasa/logger"
-	"monetasa/streams"
-	"monetasa/streams/api"
-	grpcapi "monetasa/streams/api/grpc"
-	httpapi "monetasa/streams/api/http"
-	"monetasa/streams/mongo"
+	"datapace"
+	authapi "datapace/auth/api/grpc"
+	log "datapace/logger"
+	"datapace/streams"
+	"datapace/streams/api"
+	grpcapi "datapace/streams/api/grpc"
+	httpapi "datapace/streams/api/http"
+	"datapace/streams/mongo"
 	"net"
 	"net/http"
 	"os"
@@ -24,13 +24,13 @@ import (
 )
 
 const (
-	envHTTPPort = "MONETASA_STREAMS_HTTP_PORT"
-	envGRPCPort = "MONETASA_STREAMS_GRPC_PORT"
-	envDBURL    = "MONETASA_STREAMS_DB_URL"
-	envDBName   = "MONETASA_STREAMS_DB_NAME"
-	envDBUser   = "MONETASA_STREAMS_DB_USER"
-	envDBPass   = "MONETASA_STREAMS_DB_PASS"
-	envAuthURL  = "MONETASA_AUTH_URL"
+	envHTTPPort = "DATAPACE_STREAMS_HTTP_PORT"
+	envGRPCPort = "DATAPACE_STREAMS_GRPC_PORT"
+	envDBURL    = "DATAPACE_STREAMS_DB_URL"
+	envDBName   = "DATAPACE_STREAMS_DB_NAME"
+	envDBUser   = "DATAPACE_STREAMS_DB_USER"
+	envDBPass   = "DATAPACE_STREAMS_DB_PASS"
+	envAuthURL  = "DATAPACE_AUTH_URL"
 
 	defHTTPPort = "8080"
 	defGRPCPort = "8081"
@@ -82,15 +82,15 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		HTTPPort:         monetasa.Env(envHTTPPort, defHTTPPort),
-		GRPCPort:         monetasa.Env(envGRPCPort, defGRPCPort),
-		DBURL:            monetasa.Env(envDBURL, defDBURL),
-		DBName:           monetasa.Env(envDBName, defDBName),
-		DBUser:           monetasa.Env(envDBUser, defDBUser),
-		DBPass:           monetasa.Env(envDBPass, defDBPass),
+		HTTPPort:         datapace.Env(envHTTPPort, defHTTPPort),
+		GRPCPort:         datapace.Env(envGRPCPort, defGRPCPort),
+		DBURL:            datapace.Env(envDBURL, defDBURL),
+		DBName:           datapace.Env(envDBName, defDBName),
+		DBUser:           datapace.Env(envDBUser, defDBUser),
+		DBPass:           datapace.Env(envDBPass, defDBPass),
 		DBConnectTimeout: dbConnectTimeout,
 		DBSocketTimeout:  dbSocketTimeout,
-		AuthURL:          monetasa.Env(envAuthURL, defAuthURL),
+		AuthURL:          datapace.Env(envAuthURL, defAuthURL),
 	}
 }
 
@@ -163,7 +163,7 @@ func startGRPCServer(svc streams.Service, port string, logger log.Logger, errs c
 	}
 
 	server := grpc.NewServer()
-	monetasa.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
+	datapace.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Streams gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

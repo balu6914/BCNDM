@@ -2,41 +2,41 @@ package grpc
 
 import (
 	"context"
-	"monetasa"
+	"datapace"
 
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc"
 )
 
-var _ monetasa.StreamsServiceClient = (*grpcClient)(nil)
+var _ datapace.StreamsServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
 	one endpoint.Endpoint
 }
 
 // NewClient returns new gRPC client instance.
-func NewClient(conn *grpc.ClientConn) monetasa.StreamsServiceClient {
+func NewClient(conn *grpc.ClientConn) datapace.StreamsServiceClient {
 	return grpcClient{
 		one: kitgrpc.NewClient(
 			conn,
-			"monetasa.StreamsService",
+			"datapace.StreamsService",
 			"One",
 			encodeOneRequest,
 			decodeOneResponse,
-			monetasa.Stream{},
+			datapace.Stream{},
 		).Endpoint(),
 	}
 }
 
-func (client grpcClient) One(ctx context.Context, id *monetasa.ID, _ ...grpc.CallOption) (*monetasa.Stream, error) {
+func (client grpcClient) One(ctx context.Context, id *datapace.ID, _ ...grpc.CallOption) (*datapace.Stream, error) {
 	res, err := client.one(ctx, oneReq{id: id.GetValue()})
 	if err != nil {
 		return nil, err
 	}
 
 	sr := res.(oneRes)
-	stream := monetasa.Stream{
+	stream := datapace.Stream{
 		Id:       sr.id,
 		Name:     sr.name,
 		Owner:    sr.owner,
@@ -54,11 +54,11 @@ func (client grpcClient) One(ctx context.Context, id *monetasa.ID, _ ...grpc.Cal
 
 func encodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(oneReq)
-	return &monetasa.ID{Value: req.id}, nil
+	return &datapace.ID{Value: req.id}, nil
 }
 
 func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
-	res := grpcRes.(*monetasa.Stream)
+	res := grpcRes.(*datapace.Stream)
 	stream := oneRes{
 		id:       res.GetId(),
 		name:     res.GetName(),

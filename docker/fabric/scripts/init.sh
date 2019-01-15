@@ -6,26 +6,26 @@ set -e
 CHANNEL_PATH=./artifacts/myc.tx
 CHANNEL_BLOCK=myc.block
 
-ORDERER_URL=orderer.monetasa.com:7050
+ORDERER_URL=orderer.datapace.com:7050
 
 CHANNEL_ID=myc
 
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
 TOKEN_CHAIN_VER=1.0
-TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Monetasa Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
 
 FEE_CHAIN_ID=fee
 FEE_CHAIN_PATH=github.com/chaincode/system-fee
 FEE_CHAIN_VER=1.0
-FEE_CHAIN_INIT_FN='{"Args":["init","{\"owner\": \"Admin@org1.monetasa.com\", \"value\": 10000}"]}'
+FEE_CHAIN_INIT_FN='{"Args":["init","{\"owner\": \"Admin@org1.datapace.com\", \"value\": 10000}"]}'
 
 CONTRACTS_CHAIN_ID=contracts
 CONTRACTS_CHAIN_PATH=github.com/chaincode/contracts
 CONTRACTS_CHAIN_VER=1.0
 CONTRACTS_CHAIN_INIT_FN='{"Args":["init"]}'
 
-CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/monetasa.com/orderers/orderer.monetasa.com/msp/tlscacerts/tlsca.monetasa.com-cert.pem
+CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/msp/tlscacerts/tlsca.datapace.com-cert.pem
 
 LOCATION=$PWD
 

@@ -15,15 +15,15 @@ default values.
 
 | Variable                       | Description                              | Default               |
 |--------------------------------|------------------------------------------|-----------------------|
-| MONETASA_SUBSCRIPTIONS_PORT    | Stream service port                      | localhost             |
-| MONETASA_SUBSCRIPTIONS_DB_URL  | List of database cluster URLs            | 0.0.0.0               |
-| MONETASA_SUBSCRIPTIONS_DB_NAME | Name of the database used by the service | subscriptions         |
-| MONETASA_SUBSCRIPTIONS_DB_USER | Database user                            |                       |
-| MONETASA_SUBSCRIPTIONS_DB_PASS | Database password                        |                       |
-| MONETASA_AUTH_URL              | Auth service gRPC URL                    | localhost:8081        |
-| MONETASA_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081        |
-| MONETASA_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081        |
-| MONETASA_PROXY_URL             | Proxy service URL                        | http://localhost:8080 |
+| DATAPACE_SUBSCRIPTIONS_PORT    | Stream service port                      | localhost             |
+| DATAPACE_SUBSCRIPTIONS_DB_URL  | List of database cluster URLs            | 0.0.0.0               |
+| DATAPACE_SUBSCRIPTIONS_DB_NAME | Name of the database used by the service | subscriptions         |
+| DATAPACE_SUBSCRIPTIONS_DB_USER | Database user                            |                       |
+| DATAPACE_SUBSCRIPTIONS_DB_PASS | Database password                        |                       |
+| DATAPACE_AUTH_URL              | Auth service gRPC URL                    | localhost:8081        |
+| DATAPACE_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081        |
+| DATAPACE_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081        |
+| DATAPACE_PROXY_URL             | Proxy service URL                        | http://localhost:8080 |
 
 ## Deployment
 
@@ -33,7 +33,7 @@ The service itself is distributed as Docker container. You can find a Docker com
 To start the service outside of the container, execute the following shell script:
 
 ```bash
-cd $GOPATH/src/monetasa
+cd $GOPATH/src/datapace
 
 # compile the subscriptions
 make subscriptions
@@ -42,7 +42,7 @@ make subscriptions
 make install
 
 # set the environment variables and run the service
-MONETASA_SUBSCRIPTIONS_PORT=[Service port] MONETASA_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] MONETASA_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] MONETASA_SUBSCRIPTIONS_DB_USER=[Database user] MONETASA_SUBSCRIPTIONS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] MONETASA_PROXY_URL=[Proxy service URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/monetasa-subscriptions
+DATAPACE_SUBSCRIPTIONS_PORT=[Service port] DATAPACE_SUBSCRIPTIONS_DB_URL=[List of database cluster URLs] DATAPACE_SUBSCRIPTIONS_DB_NAME=[Name of the database used by the service] DATAPACE_SUBSCRIPTIONS_DB_USER=[Database user] DATAPACE_SUBSCRIPTIONS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] DATAPACE_PROXY_URL=[Proxy service URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/datapace-subscriptions
 ```
 
 Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.

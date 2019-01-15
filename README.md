@@ -6,13 +6,13 @@ IoT data marketplace based on blockchain.
 ## Install
 ```
 cd $GOPATH/src
-git@github.com:Datapace/datapace.git monetasa
+git@github.com:Datapace/datapace.git datapace
 ```
 
 For read-only access (non-developer) you can use `https` and avoid setting necessary GitHub SSH keys:
 ```
 cd $GOPATH/src
-git clone https://github.com/Datapace/datapace.git monetasa
+git clone https://github.com/Datapace/datapace.git datapace
 ```
 
 
@@ -123,9 +123,9 @@ first assure that all `localhost` mappings are present in `/etc/hosts`:
 drasko@Marx:~$ cat /etc/hosts
 127.0.0.1	localhost
 127.0.1.1	Marx
-127.0.1.1	orderer.monetasa.com
-127.0.1.1	peer0.org1.monetasa.com
-127.0.1.1	ca.org1.monetasa.com
+127.0.1.1	orderer.datapace.com
+127.0.1.1	peer0.org1.datapace.com
+127.0.1.1	ca.org1.datapace.com
 ...
 ```
 This is needed because FabricSDK reads information from `config.yaml` and to avoid changing it drastically

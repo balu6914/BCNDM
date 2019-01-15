@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"monetasa"
-	"monetasa/auth"
+	"datapace"
+	"datapace/auth"
 	"net/http"
 
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -59,7 +59,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.GetFunc("/version", monetasa.Version())
+	r.GetFunc("/version", datapace.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r

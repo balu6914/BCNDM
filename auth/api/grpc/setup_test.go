@@ -2,10 +2,10 @@ package grpc_test
 
 import (
 	"fmt"
-	"monetasa"
-	"monetasa/auth"
-	grpcapi "monetasa/auth/api/grpc"
-	"monetasa/auth/mocks"
+	"datapace"
+	"datapace/auth"
+	grpcapi "datapace/auth/api/grpc"
+	"datapace/auth/mocks"
 	"net"
 	"os"
 	"testing"
@@ -36,6 +36,6 @@ func newService() auth.Service {
 func startGRPCServer(svc auth.Service, port int) {
 	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	server := grpc.NewServer()
-	monetasa.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
+	datapace.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)
 }

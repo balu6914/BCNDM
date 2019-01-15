@@ -1,12 +1,12 @@
 
 FROM golang:1.10-alpine AS builder
 ARG SVC_NAME
-WORKDIR /go/src/monetasa
+WORKDIR /go/src/datapace
 COPY . .
 RUN apk update \
     && apk add make \
     && make $SVC_NAME \
-    && mv build/monetasa-$SVC_NAME /exe
+    && mv build/datapace-$SVC_NAME /exe
 
 FROM golang:1.10-alpine
 COPY --from=builder /exe /

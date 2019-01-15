@@ -12,9 +12,9 @@ CRYPTO_CONF_DIR=config/crypto-config
 
 FABRIC_CFG_PATH=config/fabric
 GENESIS_BLOCK_PATH=docker/fabric/artifacts/genesis.block
-GENESIS_BLOCK_PROFILE=MonetasaOrdererGenesis
+GENESIS_BLOCK_PROFILE=DatapaceOrdererGenesis
 CH_OUTPUT_PATH=docker/fabric/artifacts/myc.tx
-CH_PROFILE=MonetasaChannel
+CH_PROFILE=DatapaceChannel
 CH_ID=myc
 
 BASE_COMPOSE_FILE=docker/fabric/base/docker-compose-base.yaml
@@ -26,7 +26,7 @@ if [ -d $CRYPTO_CONF_DIR ]; then
   sudo rm -rf $CRYPTO_CONF_DIR
 fi
 
-rm -rf /tmp/monetasa-service-*
+rm -rf /tmp/datapace-service-*
 
 ###
 # Fabric keys
@@ -44,7 +44,7 @@ FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputCreateChannelTx $CH_OUTPUT_P
 ###
 # Update docker-compose
 ###
-NEW_CERT_NAME=`find $CRYPTO_CONF_DIR/peerOrganizations/org1.monetasa.com/ca/ -type f -name "*_sk" | xargs basename`
+NEW_CERT_NAME=`find $CRYPTO_CONF_DIR/peerOrganizations/org1.datapace.com/ca/ -type f -name "*_sk" | xargs basename`
 sed -i -- "s#\(FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
 sed -i -- "s#\(FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config\)/.*#\1/$NEW_CERT_NAME#" $BASE_COMPOSE_FILE
 

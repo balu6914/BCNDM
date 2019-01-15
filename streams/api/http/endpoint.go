@@ -2,7 +2,7 @@ package http
 
 import (
 	"context"
-	"monetasa/streams"
+	"datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
 	"gopkg.in/mgo.v2/bson"

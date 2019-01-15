@@ -16,13 +16,13 @@ default values.
 
 | Variable                   | Description                              | Default        |
 |----------------------------|------------------------------------------|----------------|
-| MONETASA_STREAMS_HTTP_PORT | Stream service HTTP port                 | 8080           |
-| MONETASA_STREAMS_GRPC_PORT | Stream service gRPC port                 | 8081           |
-| MONETASA_STREAMS_DB_URL    | List of database cluster URLs            | 0.0.0.0        |
-| MONETASA_STREAMS_DB_NAME   | Name of the database used by the service | streams        |
-| MONETASA_STREAMS_DB_USER   | Database user                            |                |
-| MONETASA_STREAMS_DB_PASS   | Database password                        |                |
-| MONETASA_AUTH_URL          | Auth service gRPC URL                    | localhost:8081 |
+| DATAPACE_STREAMS_HTTP_PORT | Stream service HTTP port                 | 8080           |
+| DATAPACE_STREAMS_GRPC_PORT | Stream service gRPC port                 | 8081           |
+| DATAPACE_STREAMS_DB_URL    | List of database cluster URLs            | 0.0.0.0        |
+| DATAPACE_STREAMS_DB_NAME   | Name of the database used by the service | streams        |
+| DATAPACE_STREAMS_DB_USER   | Database user                            |                |
+| DATAPACE_STREAMS_DB_PASS   | Database password                        |                |
+| DATAPACE_AUTH_URL          | Auth service gRPC URL                    | localhost:8081 |
 
 ## Deployment
 
@@ -32,7 +32,7 @@ The service itself is distributed as Docker container. You can find a Docker com
 To start the service outside of the container, execute the following shell script:
 
 ```bash
-cd $GOPATH/src/monetasa
+cd $GOPATH/src/datapace
 
 # compile the streams
 make streams
@@ -41,7 +41,7 @@ make streams
 make install
 
 # set the environment variables and run the service
-MONETASA_STREAMS_HTTP_PORT=[Service HTTP port] MONETASA_STREAMS_GRPC_PORT=[Service gRPC port] MONETASA_STREAMS_DB_URL=[List of database cluster URLs] MONETASA_STREAMS_DB_NAME=[Name of the database used by the service] MONETASA_STREAMS_DB_USER=[Database user] MONETASA_STREAMS_DB_PASS=[Database password] MONETASA_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/monetasa-streams
+DATAPACE_STREAMS_HTTP_PORT=[Service HTTP port] DATAPACE_STREAMS_GRPC_PORT=[Service gRPC port] DATAPACE_STREAMS_DB_URL=[List of database cluster URLs] DATAPACE_STREAMS_DB_NAME=[Name of the database used by the service] DATAPACE_STREAMS_DB_USER=[Database user] DATAPACE_STREAMS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/datapace-streams
 ```
 
 Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.

@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"monetasa/streams"
+	"datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
 )

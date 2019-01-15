@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"monetasa/transactions"
+	"datapace/transactions"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"

@@ -2,8 +2,8 @@ package transactions
 
 import (
 	"context"
-	"monetasa"
-	"monetasa/subscriptions"
+	"datapace"
+	"datapace/subscriptions"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -13,11 +13,11 @@ import (
 var _ subscriptions.TransactionsService = (*transactionsService)(nil)
 
 type transactionsService struct {
-	client monetasa.TransactionsServiceClient
+	client datapace.TransactionsServiceClient
 }
 
 // NewService returns new transactions service instance.
-func NewService(client monetasa.TransactionsServiceClient) subscriptions.TransactionsService {
+func NewService(client datapace.TransactionsServiceClient) subscriptions.TransactionsService {
 	return transactionsService{client: client}
 }
 
@@ -25,7 +25,7 @@ func (ts transactionsService) Transfer(streamID, from, to string, value uint64) 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	td := &monetasa.TransferData{
+	td := &datapace.TransferData{
 		StreamID: streamID,
 		From:     from,
 		To:       to,

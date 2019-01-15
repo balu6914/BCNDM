@@ -2,7 +2,7 @@ package http
 
 import (
 	"context"
-	"monetasa/auth"
+	"datapace/auth"
 
 	"github.com/go-kit/kit/endpoint"
 )

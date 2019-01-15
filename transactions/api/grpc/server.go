@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
-	"monetasa"
-	"monetasa/transactions"
+	"datapace"
+	"datapace/transactions"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -14,7 +14,7 @@ import (
 
 var errMalformedEntity = errors.New("malformed entity")
 
-var _ monetasa.TransactionsServiceServer = (*grpcServer)(nil)
+var _ datapace.TransactionsServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
 	createUser kitgrpc.Handler
@@ -22,7 +22,7 @@ type grpcServer struct {
 }
 
 // NewServer instantiates new Auth gRPC server.
-func NewServer(svc transactions.Service) monetasa.TransactionsServiceServer {
+func NewServer(svc transactions.Service) datapace.TransactionsServiceServer {
 	createUser := kitgrpc.NewServer(
 		createUserEndpoint(svc),
 		decodeCreateUserRequest,
@@ -41,7 +41,7 @@ func NewServer(svc transactions.Service) monetasa.TransactionsServiceServer {
 	}
 }
 
-func (s grpcServer) CreateUser(ctx context.Context, user *monetasa.ID) (*empty.Empty, error) {
+func (s grpcServer) CreateUser(ctx context.Context, user *datapace.ID) (*empty.Empty, error) {
 	_, res, err := s.createUser.ServeGRPC(ctx, user)
 	if err != nil {
 		return nil, encodeError(err)
@@ -50,7 +50,7 @@ func (s grpcServer) CreateUser(ctx context.Context, user *monetasa.ID) (*empty.E
 	return res.(*empty.Empty), nil
 }
 
-func (s grpcServer) Transfer(ctx context.Context, td *monetasa.TransferData) (*empty.Empty, error) {
+func (s grpcServer) Transfer(ctx context.Context, td *datapace.TransferData) (*empty.Empty, error) {
 	_, res, err := s.transfer.ServeGRPC(ctx, td)
 	if err != nil {
 		return nil, encodeError(err)
@@ -60,7 +60,7 @@ func (s grpcServer) Transfer(ctx context.Context, td *monetasa.TransferData) (*e
 }
 
 func decodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.ID)
+	req := grpcReq.(*datapace.ID)
 	return createUserReq{id: req.GetValue()}, nil
 }
 
@@ -70,7 +70,7 @@ func encodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 }
 
 func decodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*monetasa.TransferData)
+	req := grpcReq.(*datapace.TransferData)
 	return transferReq{
 		streamID: req.GetStreamID(),
 		from:     req.GetFrom(),

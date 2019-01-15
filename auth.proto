@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package monetasa;
+package datapace;
 
 service AuthService {
     rpc Identify(Token) returns (UserID) {}
