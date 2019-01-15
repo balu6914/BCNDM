@@ -1,7 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
-
 import { BalanceService } from '../balance.service';
 import { Balance } from '../../../common/interfaces/balance.interface';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
