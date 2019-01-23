@@ -32,6 +32,10 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/contracts/dashboard.contracts.module#DashboardContractsModule',
            },
            {
+               path: 'access',
+               loadChildren: 'app/dashboard/access/dashboard.access.module#DashboardAccessModule',
+           },
+           {
                path: 'profile',
                loadChildren: 'app/dashboard/profile/dashboard.profile.module#DashboardProfileModule',
            },

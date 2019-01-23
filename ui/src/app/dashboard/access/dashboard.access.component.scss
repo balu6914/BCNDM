@@ -1,0 +1,33 @@
+.access-container-table {
+    padding: 10px;
+    .table-search {
+        background: #fff;
+        text-align: center;
+    }
+    .datatable-body-row  {
+            cursor: pointer;
+        &:hover {
+            background-color: #141a27 !important;
+
+        }
+        &.active {
+            background-color: #141a27 !important;
+            color: #fff;
+   }
+    }
+    i {
+        color: #2196f3;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+
+.access-container-section {
+    min-height: 600px;
+    height: 100%;
+    a {
+        color: #2196f3;
+    }
+}

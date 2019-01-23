@@ -1,0 +1,54 @@
+<div class="box">
+  <div class="box__header">
+    <p class="box__title">
+      How it works?
+    </p>
+    <a (click)="close()" class="btn-close box__close js-help-close"></a>
+  </div>
+  <div class="box__content">
+    <div class="help-wrapper">
+      <div class="help">
+        <div class="help__media">
+          <img src="assets/img/help/invoice.svg" alt="" class="help__img">
+        </div>
+        <div class="help__content">
+          <p class="help__title">
+            Create new access control
+          </p>
+          <div class="help__text">
+            As an organizatrion, you can create new access control for other organizations.
+          </div>
+        </div>
+      </div>
+      <div class="help">
+        <div class="help__media">
+          <img src="assets/img/help/user.svg" alt="" class="help__img">
+        </div>
+        <div class="help__content">
+          <p class="help__title">
+            Add partners
+          </p>
+          <div class="help__text">
+            Add a list of partners that will be able to acces your data.
+          </div>
+        </div>
+      </div>
+      <div class="help">
+        <div class="help__media">
+          <img src="assets/img/help/pen.svg" alt="" class="help__img">
+        </div>
+        <div class="help__content">
+          <p class="help__title">
+            Wait for sign
+          </p>
+          <div class="help__text">
+            Wait your partners signature to start sharing data.
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="box--element-no-margin help__btn">
+      <button type="button" (click)="create()" class="btn btn-primary">Get started</button>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <h1 class="page-title">
+        Access Control
+      </h1>
+    <div class="action-buttons">
+      <p class="action-buttons__item">
+        <button type="button" (click)="toggleHelp()" class="btn btn-primary btn-media">
+          <span class="btn-media__icon btn-media__icon--help"></span>
+          Help
+        </button>
+      </p>
+      <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media" data-toggle="modal" (click)="modalNewAccess()">
+          <span class="btn-media__icon btn-media__icon--add"></span>
+          Request access
+          </button>
+      </p>
+    </div>
+  </div>
+  <div class="row row-grow">
+    <!-- Help container -->
+    <div *ngIf="openedHelp" class="col-lg-4 col-xl-3">
+      <dpc-dashboard-access-help (closeTrigger)="toggleHelp()" (addAccessTrigger)="modalNewAccess()"></dpc-dashboard-access-help>
+    </div>
+    <!-- Access table -->
+    <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">
+      <dpc-table [table]="table"
+                 (pageChanged)="onPageChange($event)">
+      </dpc-table>
+    </div>
+  </div>
+</div>

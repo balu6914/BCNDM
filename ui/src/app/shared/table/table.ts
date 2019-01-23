@@ -1,10 +1,11 @@
-import { Stream, Subscription, Contract } from '../../common/interfaces';
-import { Page } from '../../common/interfaces/page.interface';
+import { Stream, Subscription, Contract, Access } from 'app/common/interfaces';
+import { Page } from 'app/common/interfaces/page.interface';
 
 export enum TableType {
   Buy,
   Sell,
   Contract,
+  Access,
   Dashboard,
   Wallet
 }
@@ -12,7 +13,7 @@ export enum TableType {
 export class Table {
   title: string;
   headers: string[];
-  page: Page<Stream | Subscription | Contract>;
+  page: Page<Stream | Subscription | Contract | Access>;
   tableType: TableType;
   hasDetails: Boolean = false;
 
