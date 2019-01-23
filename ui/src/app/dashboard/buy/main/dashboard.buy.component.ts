@@ -32,7 +32,7 @@ export class DashboardBuyComponent implements OnInit {
   ngOnInit() {
     this.table.title = 'Streams';
     this.table.tableType = TableType.Buy;
-    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price', ''];
     this.table.hasDetails = true;
 
     // Fetch current User

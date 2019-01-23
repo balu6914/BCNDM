@@ -53,7 +53,7 @@ export class DashboardSellComponent implements OnInit {
     // Config table
     this.table.title = 'Streams';
     this.table.tableType = TableType.Sell;
-    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price', ''];
     this.table.hasDetails = true;
 
     this.map.viewChanged.subscribe(
