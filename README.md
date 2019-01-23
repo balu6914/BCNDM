@@ -61,7 +61,8 @@ For the installation of Go `protobuf` tools and `gRPC` take a look [here](https:
 ## Deploy
 Hyperledger Fabric network and Datapace dApp are deployed in the form of docker composition.
 
-More information can be found in [README](docker/README.md) in `docker` dir.
+More information about tools necessary for deployment and deployment itself can
+be found in [README](docker/README.md) in `docker` dir.
 
 In order to build backend microservices (i.e. Datapace dApp) you will need to make dockers:
 
