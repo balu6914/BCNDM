@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ArchwizardModule } from 'ng2-archwizard';
 
-import { LayoutModule } from '../layout'
+import { LayoutModule } from '../layout';
 // Auth module
 import { AuthModule } from '../auth/auth.module';
 

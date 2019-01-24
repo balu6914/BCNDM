@@ -35,6 +35,8 @@ export class TableComponent {
   @Output() hoverRow: EventEmitter<any> = new EventEmitter();
   @Output() unhoverRow: EventEmitter<any> = new EventEmitter();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
+  @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
+
   constructor() { }
 
 
@@ -101,5 +103,9 @@ export class TableComponent {
         this.table.page.content[i] = contract;
       }
     });
+  }
+
+  onCheckboxChangedEvt(row: Stream) {
+    this.checkboxChangedEvt.emit(row);
   }
 }
