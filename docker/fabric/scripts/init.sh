@@ -25,6 +25,11 @@ CONTRACTS_CHAIN_PATH=github.com/chaincode/contracts
 CONTRACTS_CHAIN_VER=1.0
 CONTRACTS_CHAIN_INIT_FN='{"Args":["init"]}'
 
+ACCESS_CHAIN_ID=access
+ACCESS_CHAIN_PATH=github.com/chaincode/access-requests
+ACCESS_CHAIN_VER=1.0
+ACCESS_CHAIN_INIT_FN='{"Args":["init"]}'
+
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/msp/tlscacerts/tlsca.datapace.com-cert.pem
 
 LOCATION=$PWD
@@ -91,6 +96,20 @@ cd $LOCATION
 # Install chaincode
 peer chaincode install -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -p $CONTRACTS_CHAIN_PATH
 
+cd $GOPATH/src/github.com/chaincode/access-requests
+# Install govendor tool
+go get -u github.com/kardianos/govendor
+
+govendor init
+
+# Fetch deps
+govendor fetch github.com/hyperledger/fabric/protos/msp
+
+cd $LOCATION
+
+# Install chaincode
+peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN_PATH
+
 sleep 5
 
 # Init/provision system with TAS
@@ -99,8 +118,11 @@ peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VE
 # Init/provision system with system fee
 peer chaincode instantiate -o $ORDERER_URL -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -c "$FEE_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
-# Init/provision system with system fee
+# Init/provision system with contracts
 peer chaincode instantiate -o $ORDERER_URL -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -c "$CONTRACTS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+
+# Init/provision system with access control
+peer chaincode instantiate -o $ORDERER_URL -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -c "$ACCESS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
 sleep 5
 
