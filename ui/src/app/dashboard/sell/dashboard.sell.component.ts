@@ -128,8 +128,13 @@ export class DashboardSellComponent implements OnInit {
   }
 
   onFiltersChange(filters: any) {
+<<<<<<< HEAD
     filters.minPrice = this.mitasPipe.transform(filters.minPrice);
     filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
+=======
+    filters.minPrice=this.mitasPipe.transform(filters.minPrice);
+    filters.maxPrice=this.mitasPipe.transform(filters.maxPrice);
+>>>>>>> DPC-95 Fix : Search streams min and max price don't accept floats
     Object.assign(this.query, filters);
     this.fetchStreams();
   } 
