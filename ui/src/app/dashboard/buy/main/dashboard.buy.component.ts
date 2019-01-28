@@ -77,13 +77,6 @@ export class DashboardBuyComponent implements OnInit {
     filters.minPrice = this.mitasPipe.transform(filters.minPrice);
     filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
-<<<<<<< HEAD
-    filters.minPrice = this.mitasPipe.transform(filters.minPrice);
-    filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
-=======
-    filters.minPrice=this.mitasPipe.transform(filters.minPrice);
-    filters.maxPrice=this.mitasPipe.transform(filters.maxPrice);
->>>>>>> DPC-95 Fix : Search streams min and max price don't accept floats
     this.fetchStreams();
   }
 
