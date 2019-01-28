@@ -132,7 +132,7 @@ export class DashboardSellComponent implements OnInit {
     filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
     this.fetchStreams();
-  } 
+  }
 
   private fetchStreams() {
     this.streamService.searchStreams(this.query).subscribe(

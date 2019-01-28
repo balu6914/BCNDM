@@ -77,6 +77,8 @@ export class DashboardBuyComponent implements OnInit {
     filters.minPrice = this.mitasPipe.transform(filters.minPrice);
     filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
+    filters.minPrice=this.mitasPipe.transform(filters.minPrice);
+    filters.maxPrice=this.mitasPipe.transform(filters.maxPrice);
     this.fetchStreams();
   }
 
