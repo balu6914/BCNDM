@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AuthService } from '../../../auth/services/auth.service';
-import { Query } from '../../../common/interfaces/query.interface';
-import { StreamService } from '../../../common/services/stream.service';
-import { Table, TableType } from '../../../shared/table/table';
+import { AuthService } from 'app/auth/services/auth.service';
+import { Query } from 'app/common/interfaces/query.interface';
+import { StreamService } from 'app/common/services/stream.service';
+import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 import { TableComponent } from 'app/shared/table/main/table.component';

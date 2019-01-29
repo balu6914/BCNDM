@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
-import { Page } from '../../common/interfaces/page.interface';
-import { Subscription } from '../../common/interfaces';
-import { StreamsType, StreamSection } from '../../shared/table/table-tabbed/section.streams';
-import { SubscriptionService } from '../../common/services/subscription.service';
-import { StreamService } from '../../common/services/stream.service';
-import { TasPipe } from '../../common/pipes/converter.pipe';
+import { Page } from 'app/common/interfaces/page.interface';
+import { Subscription } from 'app/common/interfaces';
+import { StreamsType, StreamSection } from 'app/shared/table/table-tabbed/section.streams';
+import { SubscriptionService } from 'app/common/services/subscription.service';
+import { StreamService } from 'app/common/services/stream.service';
+import { TasPipe } from 'app/common/pipes/converter.pipe';
 import { forkJoin } from 'rxjs/observable/forkJoin';
-import { TableType } from '../../shared/table/table';
+import { TableType } from 'app/shared/table/table';
 
 
 @Component({

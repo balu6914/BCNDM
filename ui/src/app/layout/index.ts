@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgProgressModule } from 'ngx-progressbar';
 import {RouterModule} from '@angular/router';
 import { AppBootstrapModule } from '../app-bootstrap/app-bootstrap.module'
-import { CommonAppModule } from '../common/common.module';
+import { CommonAppModule } from 'app/common/common.module';
 
  // Layout Cmponents
 import { HeaderComponent } from './header';

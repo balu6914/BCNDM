@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
 import { Page } from '../interfaces/page.interface';
 import { Query } from '../interfaces/query.interface';
 import { Stream } from '../interfaces/stream.interface';

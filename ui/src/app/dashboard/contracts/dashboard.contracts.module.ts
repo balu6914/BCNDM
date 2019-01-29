@@ -11,9 +11,9 @@ import { DashboardContractsDetailsComponent } from './contract-details/dashboard
 import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
 import { DashboardContractsSignComponent } from './sign/dashboard.contracts.sign.component';
 import { DashboardContractsHelpComponent } from './help/dashboard.contracts.help.component';
-import { CommonAppModule } from '../../common/common.module';
-import { SharedModule } from '../../shared/shared.module';
-import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
+import { CommonAppModule } from 'app/common/common.module';
+import { SharedModule } from 'app/shared/shared.module';
+import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
 
 @NgModule({
   imports: [

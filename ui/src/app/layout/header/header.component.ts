@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ISubscription } from 'rxjs/Subscription';
 
-import { AuthService } from '../../auth/services/auth.service';
-import { BalanceService } from '../../shared/balance/balance.service';
-import { Balance } from '../../common/interfaces/balance.interface';
+import { AuthService } from 'app/auth/services/auth.service';
+import { BalanceService } from 'app/shared/balance/balance.service';
+import { Balance } from 'app/common/interfaces/balance.interface';
 
 @Component({
   selector: 'dpc-header-component',

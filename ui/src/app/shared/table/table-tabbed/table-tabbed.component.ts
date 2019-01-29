@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Page } from '../../../common/interfaces/page.interface';
-import { Subscription } from '../../../common/interfaces/subscription.interface';
+import { Page } from 'app/common/interfaces/page.interface';
+import { Subscription } from 'app/common/interfaces/subscription.interface';
 import { Table, TableType } from '../table';
 import { StreamSection, StreamsType } from './section.streams';
 

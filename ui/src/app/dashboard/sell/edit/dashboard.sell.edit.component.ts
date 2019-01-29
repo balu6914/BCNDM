@@ -1,9 +1,9 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
-import { StreamService } from '../../../common/services/stream.service';
-import { Stream } from '../../../common/interfaces/stream.interface';
-import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { StreamService } from 'app/common/services/stream.service';
+import { Stream } from 'app/common/interfaces/stream.interface';
+import { MitasPipe } from 'app/common/pipes/converter.pipe';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
 
