@@ -12,7 +12,6 @@ import { BigQuery, Stream } from 'app/common/interfaces/stream.interface';
 })
 export class DashboardAiExecuteComponent implements OnInit {
   form: FormGroup;
-  submitted = false;
   streams = [];
   algos = [];
 
