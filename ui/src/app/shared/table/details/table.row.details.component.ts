@@ -4,7 +4,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { TasPipe } from 'app/common/pipes/converter.pipe';
-import { TableType } from '../table';
+import { TableType } from 'app/shared/table/table';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';

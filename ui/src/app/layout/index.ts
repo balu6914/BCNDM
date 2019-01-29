@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgProgressModule } from 'ngx-progressbar';
 import {RouterModule} from '@angular/router';
-import { AppBootstrapModule } from '../app-bootstrap/app-bootstrap.module'
+import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
 import { CommonAppModule } from 'app/common/common.module';
 
  // Layout Cmponents

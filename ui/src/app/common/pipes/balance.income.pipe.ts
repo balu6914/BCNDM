@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Subscription } from '../interfaces/subscription.interface';
+import { Subscription } from 'app/common/interfaces/subscription.interface';
 import * as moment from 'moment';
 import { TasPipe } from './converter.pipe';
 
