@@ -77,7 +77,7 @@ export class DashboardAccessComponent implements OnInit {
   modalNewAccess() {
     // Make sure  help container is closed
     this.openedHelp = false;
-    // Show DashboardSellAddComponent as Modal
+    // Show DashboardAccessAddComponent as Modal
     this.modalService.show(DashboardAccessAddComponent)
       .content.accessCreated.subscribe(
         response => {

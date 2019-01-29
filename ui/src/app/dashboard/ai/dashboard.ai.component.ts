@@ -104,7 +104,7 @@ export class DashboardAiComponent implements OnInit {
       algos: this.checkedAlgos,
     };
 
-    // Show DashboardSellAddComponent as Modal
+    // Show DashboardAiExecuteComponent as Modal
     this.modalService.show(DashboardAiExecuteComponent, { initialState })
       .content.executionStarted.subscribe(
         response => {

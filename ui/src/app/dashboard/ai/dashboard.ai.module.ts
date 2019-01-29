@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // AI routes
-import { DashboardAIRoutingModule } from './dashboard.ai.routes';
+import { DashboardAiRoutingModule } from './dashboard.ai.routes';
 // AI components
 import { DashboardAiComponent } from './dashboard.ai.component';
 import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.component';
@@ -20,7 +20,7 @@ import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
     ReactiveFormsModule,
     NgPipesModule,
     CommonAppModule,
-    DashboardAIRoutingModule,
+    DashboardAiRoutingModule,
     SharedModule,
   ],
   declarations: [

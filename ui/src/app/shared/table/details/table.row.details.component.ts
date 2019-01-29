@@ -93,7 +93,7 @@ export class TableRowDetailsComponent implements OnInit {
         price: this.stream.price,
       },
     };
-    // Open DashboardSellAddComponent Modal
+    // Open DashboardBuyAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 
