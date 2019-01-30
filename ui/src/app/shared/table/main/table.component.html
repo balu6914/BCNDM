@@ -27,7 +27,8 @@
                                    (rowSelected)="showRowDetails($event)"
                                    (deleteEvt)="rowDeleted($event)"
                                    (editEvt)="rowEdited($event)"
-                                   (contractSigned)="onContractSigned($event)">
+                                   (contractSigned)="onContractSigned($event)"
+                                   (checkboxChangedEvt)="onCheckboxChangedEvt($event)">
                     </dpc-table-row>
                   </div>
                 </tbody>
@@ -67,6 +68,12 @@
         </div>
       </div>
       <!-- Back side -->
-      <dpc-table-row-details class="back tp-box__side tp-box__back" [stream]="selectedRow" [rowType]="table.tableType" (backClicked)="flip = 'inactive'" (deleteEvt)="rowDeleted($event)" (editEvt)="rowEdited($event)"></dpc-table-row-details>
+      <dpc-table-row-details class="back tp-box__side tp-box__back"
+                             [stream]="selectedRow"
+                             [rowType]="table.tableType"
+                             (backClicked)="flip = 'inactive'"
+                             (deleteEvt)="rowDeleted($event)"
+                             (editEvt)="rowEdited($event)">
+      </dpc-table-row-details>
     </div>
   </div>

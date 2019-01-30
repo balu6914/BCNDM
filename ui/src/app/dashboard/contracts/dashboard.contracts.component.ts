@@ -74,7 +74,7 @@ export class DashboardContractsComponent implements OnInit {
   modalNewContract() {
     // Make sure  help container is closed
     this.openedHelp = false;
-    // Show DashboardSellAddComponent as Modal
+    // Show DashboardContractsAddComponent as Modal
     this.modalService.show(DashboardContractsAddComponent)
       .content.contractCreated.subscribe(
         response => {

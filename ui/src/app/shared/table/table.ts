@@ -7,7 +7,8 @@ export enum TableType {
   Contract,
   Access,
   Dashboard,
-  Wallet
+  Wallet,
+  Ai,
 }
 
 export class Table {

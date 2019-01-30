@@ -36,6 +36,10 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/access/dashboard.access.module#DashboardAccessModule',
            },
            {
+               path: 'ai',
+               loadChildren: 'app/dashboard/ai/dashboard.ai.module#DashboardAiModule',
+            },
+            {
                path: 'profile',
                loadChildren: 'app/dashboard/profile/dashboard.profile.module#DashboardProfileModule',
            },
