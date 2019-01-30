@@ -11,7 +11,7 @@ import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
 import { Stream, Subscription } from 'app/common/interfaces';
 import { TasPipe } from 'app/common/pipes/converter.pipe';
-import { TableType } from '../table';
+import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 

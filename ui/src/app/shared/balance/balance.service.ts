@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
-import { environment } from '../../../environments/environment';
-import { Balance } from '../../common/interfaces/balance.interface';
+import { environment } from 'environments/environment';
+import { Balance } from 'app/common/interfaces/balance.interface';
 
 @Injectable({
   providedIn: 'root'

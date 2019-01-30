@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, ComponentRef, Input } from '@angular/core';
-import { AlertType } from '../alerts';
+import { AlertType } from 'app/shared/alerts/alerts';
 
 @Component({
   selector: 'dpc-alert',
@@ -46,4 +46,3 @@ export class AlertComponent {
   }
 
 }
-

@@ -1,7 +1,7 @@
 import { ComponentRef, Injectable } from '@angular/core';
-import { AlertContainerComponent } from '../alert-container/alert-container.component';
-import { AlertComponent } from '../alert/alert.component';
-import { AlertType } from '../alerts';
+import { AlertContainerComponent } from 'app/shared/alerts/alert-container/alert-container.component';
+import { AlertComponent } from 'app/shared/alerts/alert/alert.component';
+import { AlertType } from 'app/shared/alerts/alerts';
 import { DomService } from './dom.service';
 
 @Injectable()

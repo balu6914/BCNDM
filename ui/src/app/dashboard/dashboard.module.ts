@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ArchwizardModule } from 'ng2-archwizard';
 
-import { LayoutModule } from '../layout';
+import { LayoutModule } from 'app/layout';
 // Auth module
-import { AuthModule } from '../auth/auth.module';
+import { AuthModule } from 'app/auth/auth.module';
 
 import { DashboardRoutingModule } from './dashboard.routes';
 
@@ -14,10 +14,10 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardMainComponent } from './main';
 import { DashboardMainStreamsComponent } from './main/section-streams/dashboard.main.streams.component';
 
-import { CommonAppModule } from '../common/common.module';
+import { CommonAppModule } from 'app/common/common.module';
 
 import { ClipboardModule } from 'ngx-clipboard';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 @NgModule({
   imports: [

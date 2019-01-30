@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
+import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
 // Add wallet routes
 import { DashboardWalletRoutingModule } from './dashboard.wallet.routes';
 // Add components

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
-import { SubscriptionService } from '../../../common/services/subscription.service';
+import { SubscriptionService } from 'app/common/services/subscription.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { BalanceService } from '../../../shared/balance/balance.service';
-import { Balance } from '../../../common/interfaces/balance.interface';
+import { BalanceService } from 'app/shared/balance/balance.service';
+import { Balance } from 'app/common/interfaces/balance.interface';
 import 'rxjs/add/observable/throw';
 
 @Component({

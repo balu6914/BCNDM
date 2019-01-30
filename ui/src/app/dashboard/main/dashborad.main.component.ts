@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../auth/services/auth.service';
-import { Page } from '../../common/interfaces/page.interface';
-import { Subscription } from '../../common/interfaces/subscription.interface';
-import { TasPipe } from '../../common/pipes/converter.pipe';
-import { StreamService } from '../../common/services/stream.service';
-import { SubscriptionService } from '../../common/services/subscription.service';
+import { AuthService } from 'app/auth/services/auth.service';
+import { Page } from 'app/common/interfaces/page.interface';
+import { Subscription } from 'app/common/interfaces/subscription.interface';
+import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { StreamService } from 'app/common/services/stream.service';
+import { SubscriptionService } from 'app/common/services/subscription.service';
 import { StreamSection, StreamsType } from './section-streams/section.streams';
 
 @Component({

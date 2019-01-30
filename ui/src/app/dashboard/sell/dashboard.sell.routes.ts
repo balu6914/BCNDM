@@ -3,7 +3,7 @@ import { Routes, CanActivate, RouterModule } from '@angular/router';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 import { DashboardSellEditComponent } from './edit/dashboard.sell.edit.component';
 import { DashboardSellComponent } from './dashboard.sell.component';
-import { AuthGuardService as AuthGuard } from '../../auth/guardians/auth.guardian';
+import { AuthGuardService as AuthGuard } from 'app/auth/guardians/auth.guardian';
 
 // Define our Auth Routes
 const routes: Routes = [

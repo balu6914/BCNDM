@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { Page } from '../interfaces/page.interface';
-import { Query } from '../interfaces/query.interface';
-import { Stream } from '../interfaces/stream.interface';
+import { environment } from 'environments/environment';
+import { Page } from 'app/common/interfaces/page.interface';
+import { Query } from 'app/common/interfaces/query.interface';
+import { Stream } from 'app/common/interfaces/stream.interface';
 
 @Injectable()
 export class StreamService {
