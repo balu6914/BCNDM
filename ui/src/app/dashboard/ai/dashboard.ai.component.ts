@@ -117,24 +117,24 @@ export class DashboardAiComponent implements OnInit {
     }
 
     onStreamSelected(row: Stream) {
-      for (let i = 0; i < this.checkedStreams.length; i++) {
-        if (row.id === this.checkedStreams[i].id) {
-          this.checkedStreams.splice(i, 1);
-          return;
-        }
+      const index = this.checkedStreams.findIndex(
+        stream =>  row.id === stream.id
+      );
+      if (index === -1) {
+        this.checkedStreams.push(row);
+      } else {
+        this.checkedStreams.splice(index, 1);
       }
-
-      this.checkedStreams.push(row);
     }
 
     onAlgoSelected(row: Stream) {
-      for (let i = 0; i < this.checkedAlgos.length; i++) {
-        if (row.id === this.checkedAlgos[i].id) {
-          this.checkedAlgos.splice(i, 1);
-          return;
-        }
+      const index = this.checkedAlgos.findIndex(
+        algo =>  row.id === algo.id
+      );
+      if (index === -1) {
+        this.checkedAlgos.push(row);
+      } else {
+        this.checkedAlgos.splice(index, 1);
       }
-
-      this.checkedAlgos.push(row);
     }
 }
