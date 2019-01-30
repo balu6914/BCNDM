@@ -1,0 +1,152 @@
+swagger: "2.0"
+info:
+  title: Datapace Executions Service
+  description: HTTP API for managing executions.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /executions:
+    get:
+      summary: Retrieves list of owned executions
+      tags:
+        - executions
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Users executions retrieved.
+          schema:
+            $ref: "#/definitions/Executions"
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+    post:
+      summary: Creates new execution.
+      tags:
+        - executions
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: executions
+          description: JSON-formatted document describing list of new executions.
+          in: body
+          schema:
+            $ref: "#/definitions/StartExecutionsReq"
+          required: true
+      responses:
+        200:
+          description: Executions created.
+          schema:
+            $ref: "#/definitions/StartExecutionsRes"
+        400:
+          description: Request was sent in invalid format.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /executions/{executionId}:
+    get:
+      summary: Fetch single execution by id.
+      tags:
+        - executions
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: executionId
+          description: Execution identifier.
+          in: path
+          schema:
+            $ref: "#/definitions/ExecutionId"
+          required: true
+      responses:
+        200:
+          description: Fetched execution successfully.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Execution doesn't exist.
+        415:
+          description: Missing or invalid content type.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  StartExecutionsReq:
+    type: object
+    properties:
+      algo:
+        type: string
+        description: ID of algorithm that should be used.
+      executions:
+        type: array
+        items:
+          type: object
+          properties:
+            data:
+              type: string
+              description: ID of dataset that should be used.
+            mode:
+              type: string
+              description: Execution job mode.
+              enum:
+                - federated
+                - centralized
+                - distributed
+  StartExecutionsRes:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of created execution.
+        error:
+          type: string
+          description: Error message if execution creation failed.
+  Executions:
+    type: array
+    items:
+      $ref: "#/definitions/Execution"
+  Execution:
+    type: object
+    properties:
+      state:
+        type: string
+        description: State of the execution.
+        enum:
+          - executing
+          - done
+      algo:
+        type: string
+        description: ID of algorithm that should be used.
+      data:
+        type: string
+        description: ID of dataset that should be used.
+      mode:
+        type: string
+        description: Execution job mode.
+        enum:
+          - federated
+          - centralized
+          - distributed
+  ExecutionId:
+    name: executionId
+    description: Unique execution identifier.
+    in: path
+    type: string
+    minimum: 1
+    required: true
