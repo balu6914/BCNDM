@@ -1,10 +1,10 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
-import { BalanceService } from '../balance.service';
-import { Balance } from '../../../common/interfaces/balance.interface';
+import { BalanceService } from 'app/shared/balance/balance.service';
+import { Balance } from 'app/common/interfaces/balance.interface';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { MitasPipe } from '../../../common/pipes/converter.pipe';
+import { MitasPipe } from 'app/common/pipes/converter.pipe';
 
 @Component({
   selector: 'dpc-balance-withdraw',

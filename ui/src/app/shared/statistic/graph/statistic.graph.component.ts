@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { Chart } from 'chart.js';
-import { WalletBalanceStatisticPipe } from '../../../common/pipes/balance.income.pipe';
+import { WalletBalanceStatisticPipe } from 'app/common/pipes/balance.income.pipe';
 import * as moment from 'moment';
 @Component({
   selector: 'dpc-statistic-graph',

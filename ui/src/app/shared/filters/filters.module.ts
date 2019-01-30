@@ -5,8 +5,8 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { NgxSelectModule } from 'ngx-select-ex';
-import { AppBootstrapModule } from '../../app-bootstrap/app-bootstrap.module';
-import { CommonAppModule } from '../../common/common.module';
+import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+import { CommonAppModule } from 'app/common/common.module';
 import { SidebarFiltersComponent } from './sidebar-filters/sidebar.filters.component';
 
 
