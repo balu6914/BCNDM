@@ -144,9 +144,6 @@ definitions:
           - centralized
           - distributed
   ExecutionId:
-    name: executionId
     description: Unique execution identifier.
-    in: path
     type: string
     minimum: 1
-    required: true
