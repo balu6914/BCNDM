@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"datapace"
 	"datapace/auth"
 	"datapace/auth/api"
@@ -13,6 +12,7 @@ import (
 	"datapace/auth/transactions"
 	log "datapace/logger"
 	transactionsapi "datapace/transactions/api/grpc"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
