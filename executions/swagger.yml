@@ -54,11 +54,10 @@ paths:
         - executions
       parameters:
         - $ref: "#/parameters/Authorization"
-        - name: executionId
+        - in: path
+          name: executionId
           description: Execution identifier.
-          in: path
-          schema:
-            $ref: "#/definitions/ExecutionId"
+          type: string
           required: true
       responses:
         200:
@@ -143,7 +142,3 @@ definitions:
           - federated
           - centralized
           - distributed
-  ExecutionId:
-    description: Unique execution identifier.
-    type: string
-    minimum: 1
