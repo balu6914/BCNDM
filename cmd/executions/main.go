@@ -1,23 +1,23 @@
 package main
 
 import (
-	"datapace"
-	"datapace/executions"
-	"datapace/executions/api"
-	"datapace/executions/mongo"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	authapi "datapace/auth/api/grpc"
-	log "datapace/logger"
-
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	mgo "gopkg.in/mgo.v2"
+
+	"datapace"
+	authapi "datapace/auth/api/grpc"
+	"datapace/executions"
+	"datapace/executions/api"
+	"datapace/executions/mongo"
+	log "datapace/logger"
 )
 
 const (
