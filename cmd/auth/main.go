@@ -1,17 +1,6 @@
 package main
 
 import (
-	"datapace"
-	"datapace/auth"
-	"datapace/auth/api"
-	grpcapi "datapace/auth/api/grpc"
-	httpapi "datapace/auth/api/http"
-	"datapace/auth/bcrypt"
-	"datapace/auth/jwt"
-	"datapace/auth/mongo"
-	"datapace/auth/transactions"
-	log "datapace/logger"
-	transactionsapi "datapace/transactions/api/grpc"
 	"fmt"
 	"net"
 	"net/http"
@@ -23,6 +12,18 @@ import (
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	mgo "gopkg.in/mgo.v2"
+
+	"datapace"
+	"datapace/auth"
+	"datapace/auth/api"
+	grpcapi "datapace/auth/api/grpc"
+	httpapi "datapace/auth/api/http"
+	"datapace/auth/bcrypt"
+	"datapace/auth/jwt"
+	"datapace/auth/mongo"
+	"datapace/auth/transactions"
+	log "datapace/logger"
+	transactionsapi "datapace/transactions/api/grpc"
 )
 
 const (
