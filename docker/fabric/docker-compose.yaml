@@ -58,12 +58,12 @@ services:
   # Fabric tools
   cli:
     container_name: cli
-    image: hyperledger/fabric-tools:x86_64-1.1.0
+    image: hyperledger/fabric-tools:1.4
     tty: true
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_LOGGING_LEVEL=DEBUG
+      - FABRIC_LOGGING_SPEC=DEBUG
       - CORE_PEER_ID=cli
       # peer0 from Org1 is the default for this CLI container
       - CORE_PEER_ADDRESS=peer0.org1.datapace.com:7051

@@ -3,7 +3,7 @@ version: '2'
 services:
   ca-base:
       container_name: fabric-ca-server
-      image: hyperledger/fabric-ca:x86_64-1.1.0
+      image: hyperledger/fabric-ca:1.4
       ports:
          - "7054:7054"
       environment:

@@ -16,7 +16,7 @@ Make sure that you have all Fabric prerequisites and development tools installed
 ```
 go get github.com/hyperledger/fabric
 cd $GOPATH/src/github.com/hyperledger/fabric
-git checkout v1.2.0
+git checkout release-1.4
 make -j 16 cryptogen
 make -j 16 configtxgen
 cp build/bin/* $GOBIN
@@ -29,7 +29,7 @@ Now you should be able to use tools globally, for example:
 ```
 $ cryptogen version
 cryptogen:
- Version: 1.1.0
+ Version: 1.4
  Go version: go1.10.1
  OS/Arch: linux/amd64
 ```

@@ -34,7 +34,7 @@ We need four required hyperledger images.
 [fabric-ccenv](https://hub.docker.com/r/hyperledger/fabric-ccenv/tags/)
 
 ***NOTE:*** On docker hub, images are not tagged as latest, so you need to go on [dockerhub hyperledger repository](https://hub.docker.com/u/hyperledger/ ) find those 4 images (they are linked above) and check the latest version tag.
-***Currently its x86_64-1.1.0-alpha and we will use this tag.***
+***Currently its 1.4 and we will use this tag.***
 
 Next, Change the image tag in docker-compose-simple.yaml
 
@@ -42,10 +42,10 @@ Open the file and  for each service edit image tag like this:
 
 | Before        | After
 | ------------- |:-------------:|
-| image: hyperledger/fabric-orderer      | image: hyperledger/fabric-peer:x86_64-1.1.0-alpha |
-| image:  hyperledger/fabric-peer     | image: hyperledger/fabric-peer:x86_64-1.1.0-alpha      |
-| image: hyperledger/fabric-tools  | image: hyperledger/fabric-tools:x86_64-1.1.0-alpha      |
-| image: hyperledger/fabric-ccenv | image: hyperledger/fabric-ccenv:x86_64-1.1.0-alpha |
+| image: hyperledger/fabric-orderer      | image: hyperledger/fabric-peer:1.4 |
+| image:  hyperledger/fabric-peer     | image: hyperledger/fabric-peer:1.4      |
+| image: hyperledger/fabric-tools  | image: hyperledger/fabric-tools:1.4      |
+| image: hyperledger/fabric-ccenv | image: hyperledger/fabric-ccenv:1.4 |
 
 
 Save the file and exit.
@@ -118,7 +118,7 @@ Install our chaincode executing following command:
 
 ```peer chaincode install -p chaincodedev/chaincode/sacc -n mycc -v 0```
 
-Next, we must initialize our chaincode 
+Next, we must initialize our chaincode
 
 ```peer chaincode instantiate -n mycc -v 0 -c '{"Args":["a","10"]}' -C myc```
 
