@@ -2,6 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
+	mgo "gopkg.in/mgo.v2"
+
 	"datapace"
 	"datapace/auth"
 	"datapace/auth/api"
@@ -13,16 +24,6 @@ import (
 	"datapace/auth/transactions"
 	log "datapace/logger"
 	transactionsapi "datapace/transactions/api/grpc"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
-	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/grpc"
-	mgo "gopkg.in/mgo.v2"
 )
 
 const (

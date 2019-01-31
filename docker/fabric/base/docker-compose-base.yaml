@@ -58,10 +58,10 @@ services:
     environment:
        - FABRIC_CA_SERVER_CA_NAME=ca.org1.datapace.com
        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.datapace.com-cert.pem
-       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2b671f08f4665172746026d9332f4edb679c530ff6d26983c79519bb12b1086a_sk
+       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d75d6e4134e5807d282017bd7f44283a704b1fc64b6c88a1fed51ac9cb2abd58_sk
        - FABRIC_CA_SERVER_TLS_ENABLED=false
        - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.datapace.com-cert.pem
-       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2b671f08f4665172746026d9332f4edb679c530ff6d26983c79519bb12b1086a_sk
+       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d75d6e4134e5807d282017bd7f44283a704b1fc64b6c88a1fed51ac9cb2abd58_sk
        - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
        - FABRIC_CA_SERVER_DB_TYPE=postgres
        - FABRIC_CA_SERVER_DB_DATASOURCE=host=fabric-ca-pgsql port=5432 user=postgres password=postgres dbname=fabric_ca sslmode=disable
