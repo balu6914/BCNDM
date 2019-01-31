@@ -2,7 +2,9 @@
   <div class="map-wrapper">
       <div class="map"
            leaflet
+           leafletDraw
            [leafletOptions]="options"
+           [leafletDrawOptions]="drawOptions"
            (leafletMapReady)="onMapReady($event)"
            (leafletMapMoveEnd)="onMapMoveEnd($event)"
            (leafletMouseMove)="onMapMouseMove($event)"

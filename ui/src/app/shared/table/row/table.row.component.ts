@@ -11,7 +11,7 @@ import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
 import { Stream, Subscription } from 'app/common/interfaces';
 import { TasPipe } from 'app/common/pipes/converter.pipe';
-import { TableType } from '../table';
+import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 
@@ -34,6 +34,7 @@ export class TableRowComponent implements OnInit {
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
+  @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -132,7 +133,7 @@ export class TableRowComponent implements OnInit {
         price:      row.price,
       },
     };
-    // Open DashboardSellAddComponent Modal
+    // Open DashboardBuyAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 
@@ -155,4 +156,7 @@ export class TableRowComponent implements OnInit {
     this.rowSelected.emit(row);
   }
 
+  onCheckboxChanged(row: Stream) {
+    this.checkboxChangedEvt.emit(row);
+  }
 }

@@ -120,6 +120,14 @@ $topbar-height-mobile: 60px;
         background-position: 0 calc(100% - 2px);
       }
     }
+    &--access {
+      background-image: url(#{$asset-path}/img/icons/access.svg);
+      width: 16px;
+    }
+    &--ai {
+      background-image: url(#{$asset-path}/img/icons/ai.svg);
+      width: 16px;
+    }
   }
 
   @include media-breakpoint-down(sm) {

@@ -19,7 +19,7 @@ cd $GOPATH/src/github.com/hyperledger/fabric
 git checkout release-1.4
 make -j 16 cryptogen
 make -j 16 configtxgen
-cp build/bin/* $GOBIN
+cp .build/bin/* $GOBIN
 ```
 
 Make sure that `$GOBIN` is in your `PATH`.

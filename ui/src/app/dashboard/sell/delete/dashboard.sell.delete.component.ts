@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap';
-import { StreamService } from '../../../common/services/stream.service';
+import { StreamService } from 'app/common/services/stream.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({

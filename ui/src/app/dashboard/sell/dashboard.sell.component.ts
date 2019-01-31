@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { AuthService } from '../../auth/services/auth.service';
-import { Query } from '../../common/interfaces/query.interface';
-import { StreamService } from '../../common/services/stream.service';
-import { MapComponent } from '../../shared/map/leaflet/map.leaflet.component';
-import { Table, TableType } from '../../shared/table/table';
+import { AuthService } from 'app/auth/services/auth.service';
+import { Query } from 'app/common/interfaces/query.interface';
+import { StreamService } from 'app/common/services/stream.service';
+import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
+import { Table, TableType } from 'app/shared/table/table';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
-import { User } from '../../common/interfaces/user.interface';
+import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
-
+import { MitasPipe } from 'app/common/pipes/converter.pipe';
 @Component({
   providers: [MapComponent],
   selector: 'dpc-dashboard-sell',
@@ -34,6 +34,7 @@ export class DashboardSellComponent implements OnInit {
     private AuthService: AuthService,
     private modalService: BsModalService,
     public alertService: AlertService,
+    public mitasPipe: MitasPipe,
   ) {
   }
 
@@ -53,7 +54,7 @@ export class DashboardSellComponent implements OnInit {
     // Config table
     this.table.title = 'Streams';
     this.table.tableType = TableType.Sell;
-    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price', ''];
     this.table.hasDetails = true;
 
     this.map.viewChanged.subscribe(
@@ -127,6 +128,8 @@ export class DashboardSellComponent implements OnInit {
   }
 
   onFiltersChange(filters: any) {
+    filters.minPrice = this.mitasPipe.transform(filters.minPrice);
+    filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
     this.fetchStreams();
   }

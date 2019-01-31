@@ -2,16 +2,16 @@
     <div class="mdl-cell mdl-cell--12-col text-center">
         <h4>
             {{contract.stream.name}}
-           <i *ngIf="contract.signed && !contract.expiered" class="material-icons" title="Signed">lock</i>
-           <i *ngIf="!contract.signed && !contract.expiered" class="material-icons" title="Waiting for a signature">lock_open</i>
-           <i *ngIf="contract.expiered" class="material-icons" title="Contract Expiered">error_outline</i>
+           <i *ngIf="contract.signed && !contract.expired" class="material-icons" title="Signed">lock</i>
+           <i *ngIf="!contract.signed && !contract.expired" class="material-icons" title="Waiting for a signature">lock_open</i>
+           <i *ngIf="contract.expired" class="material-icons" title="Contract expired">error_outline</i>
        </h4>
     </div>
     <div class="mdl-cell mdl-cell--6-col">
         <h5>Created {{contract.creationDate |  date: 'MMM d, y'}}</h5>
     </div>
     <div class="mdl-cell mdl-cell--6-col">
-        <h5>Expiering {{contract.exparationDate |  date: 'MMM d, y'}}</h5>
+        <h5>Expiring {{contract.exparationDate |  date: 'MMM d, y'}}</h5>
     </div>
     <div class="mdl-cell mdl-cell--6-col">
         <h5>Price per hour <strong>{{contract.stream.price | tas}} TAS</strong></h5>
@@ -22,21 +22,21 @@
     <br>
     <br>
 
-    <div *ngIf="contract.expiered" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
-        <h3  class="mdl-cell mdl-cell--12-col text-center">This contract EXPIERED on {{contract.exparationDate |  date: 'MMM d, y'}}</h3>
+    <div *ngIf="contract.expired" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
+        <h3  class="mdl-cell mdl-cell--12-col text-center">This contract expired on {{contract.exparationDate |  date: 'MMM d, y'}}</h3>
     </div>
 
-    <div *ngIf="!contract.signed && !contract.expiered" class="mdl-cell mdl-cell--12-col text-center">
+    <div *ngIf="!contract.signed && !contract.expired" class="mdl-cell mdl-cell--12-col text-center">
         <a class="sign-btn mdl-button mdl-js-button mdl-button--accent">
             <!-- <mdl-icon class="material-icons">edit</mdl-icon>SIGN CONTRACT -->
         </a>
     </div>
 
-    <div *ngIf="!contract.expiered && contract.signed" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
+    <div *ngIf="!contract.expired && contract.signed" class="mdl-cell mdl-cell--12-col text-center contract-sign-note">
         <h3  class="mdl-cell mdl-cell--12-col text-center">This contract is ACTIVE until {{contract.exparationDate |  date: 'MMM d, y'}}</h3>
     </div>
 
-    <div  class="mdl-cell mdl-cell--12-col text-center contract-sign-note" *ngIf="!contract.expiered && !contract.signed">
+    <div  class="mdl-cell mdl-cell--12-col text-center contract-sign-note" *ngIf="!contract.expired && !contract.signed">
         <p>
             <strong>NOTE: By Signing this contract, you are accepting the offer and all conditions under this contract</strong>
             <br>

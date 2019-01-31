@@ -44,6 +44,19 @@
     </td>
   </div>
 </tr>
+<tr *ngIf="rowType === types.Access">
+  <td>{{ row.partner_id }}</td>
+  <td nowrap>
+    <div *ngIf="row.signed" class="status-wrapper">
+      <span class="status-icon status-icon--signed"></span>
+      <span class="status-icon__text">Signed</span>
+    </div>
+    <div *ngIf="!row.signed" class="status-wrapper">
+      <span class="status-icon status-icon--waiting"></span>
+      <span class="status-icon__text">Waiting for a signature</span>
+    </div>
+  </td>
+</tr>
 <tr *ngIf="rowType === types.Buy || rowType === types.Sell" [ngClass]="{'table-active': row.mapId == rowMarked}">
   <td (click)="selectRow(row)">
     <span class="table-link-arrow">
@@ -69,4 +82,14 @@
       </a>
     </div>
   </td>
+</tr>
+<tr *ngIf="rowType === types.Ai">
+  <td (click)="selectRow(row)">
+    <span class="table-link-arrow">
+      {{row.name}}
+    </span>
+  </td>
+  <td>{{row.type}}</td>
+  <td>{{row.price | tas}} TAS</td>
+  <input type="checkbox" (change)="onCheckboxChanged(row)"/>
 </tr>

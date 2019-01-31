@@ -2,12 +2,12 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { Stream } from '../../../common/interfaces/stream.interface';
-import { TasPipe } from '../../../common/pipes/converter.pipe';
-import { TableType } from '../table';
-import { DashboardSellEditComponent } from '../../../dashboard/sell/edit';
-import { DashboardSellDeleteComponent } from '../../../dashboard/sell/delete';
-import { DashboardBuyAddComponent } from '../../../dashboard/buy/add';
+import { Stream } from 'app/common/interfaces/stream.interface';
+import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { TableType } from 'app/shared/table/table';
+import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
+import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
+import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 
 @Component({
   selector: 'dpc-table-row-details',
@@ -93,7 +93,7 @@ export class TableRowDetailsComponent implements OnInit {
         price: this.stream.price,
       },
     };
-    // Open DashboardSellAddComponent Modal
+    // Open DashboardBuyAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
   }
 

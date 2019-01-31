@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ISubscription } from 'rxjs/Subscription';
 
-import { AuthService } from '../../auth/services/auth.service';
-import { BalanceService } from '../../shared/balance/balance.service';
-import { Balance } from '../../common/interfaces/balance.interface';
+import { AuthService } from 'app/auth/services/auth.service';
+import { BalanceService } from 'app/shared/balance/balance.service';
+import { Balance } from 'app/common/interfaces/balance.interface';
 
 @Component({
   selector: 'dpc-header-component',
@@ -59,7 +59,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.balanceSubscription = this.balanceService.get().subscribe(
         (result: any) => {
           this.balance.amount = result.balance;
-          //TODO remove this Mock of fiatAmount when we add this info on API side
+          // TODO remove this Mock of fiatAmount when we add this info on API side
           this.balance.fiatAmount = this.balance.amount;
           // Publish new balance data to balance message buss
           this.balanceService.changed(this.balance);

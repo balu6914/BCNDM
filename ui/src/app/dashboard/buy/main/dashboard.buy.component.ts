@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AuthService } from '../../../auth/services/auth.service';
-import { Query } from '../../../common/interfaces/query.interface';
-import { StreamService } from '../../../common/services/stream.service';
-import { Table, TableType } from '../../../shared/table/table';
+import { AuthService } from 'app/auth/services/auth.service';
+import { Query } from 'app/common/interfaces/query.interface';
+import { StreamService } from 'app/common/services/stream.service';
+import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 import { TableComponent } from 'app/shared/table/main/table.component';
+import { MitasPipe } from 'app/common/pipes/converter.pipe';
 
 @Component({
   selector: 'dpc-dashboard-buy',
@@ -27,12 +28,13 @@ export class DashboardBuyComponent implements OnInit {
     private AuthService: AuthService,
     public streamService: StreamService,
     public alertService: AlertService,
+    public mitasPipe: MitasPipe,
   ) { }
 
   ngOnInit() {
     this.table.title = 'Streams';
     this.table.tableType = TableType.Buy;
-    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price'];
+    this.table.headers = ['Stream Name', 'Stream Type', 'Stream Price', ''];
     this.table.hasDetails = true;
 
     // Fetch current User
@@ -72,6 +74,8 @@ export class DashboardBuyComponent implements OnInit {
   }
 
   onFiltersChange(filters: any) {
+    filters.minPrice = this.mitasPipe.transform(filters.minPrice);
+    filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
     this.fetchStreams();
   }
