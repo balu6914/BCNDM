@@ -122,17 +122,11 @@ $topbar-height-mobile: 60px;
     }
     &--access {
       background-image: url(#{$asset-path}/img/icons/access.svg);
-      :hover > &,
-      #{$d}__link--selected & {
-        background-position: 0 calc(100% - 2px);
-      }
+      width: 16px;
     }
     &--ai {
       background-image: url(#{$asset-path}/img/icons/ai.svg);
-      :hover > &,
-      #{$d}__link--selected & {
-        background-position: 0 calc(100% - 2px);
-      }
+      width: 16px;
     }
   }
 
