@@ -10,6 +10,7 @@ import { Query } from 'app/common/interfaces/query.interface';
 export class SidebarFiltersComponent {
     _opened = false;
     form: FormGroup;
+    submitted = false;
 
     @Output()
     // Emit event when we successfully buy more token , to get updated balance.
@@ -26,12 +27,12 @@ export class SidebarFiltersComponent {
        );
 
        this.form = formBuilder.group({
-         name: [''],
-         streamType: [''],
-         minPrice: [0, Number],
-         maxPrice: [1000000, Number]
+         name:  ['', [ Validators.maxLength(32)]],
+         streamType: ['', [ Validators.maxLength(32)]],
+         minPrice: ['', [ Validators.min(0.000001)]],
+         maxPrice: ['', [ Validators.max(1000000)]]
        });
-    }
+    } 
 
     _toggleSidebar() {
       this._opened = !this._opened;
@@ -43,9 +44,10 @@ export class SidebarFiltersComponent {
     }
 
     onSubmit() {
-      if (this.form.valid) {
-        this.filtersUpdate.emit(this.form.value);
-      }
+    this.submitted = true;
+    if (this.form.valid) {
+       this.filtersUpdate.emit(this.form.value);
+       }
     }
 
 }
