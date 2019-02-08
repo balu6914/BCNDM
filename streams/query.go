@@ -34,6 +34,7 @@ type Query struct {
 	Page       uint64
 	Limit      uint64
 	Coords     [][]float64
+	Partners   []string
 	Owner      string  `kind:"id" db:"owner"`
 	Name       string  `kind:"plain" db:"name"`
 	StreamType string  `kind:"plain" db:"type"`
@@ -107,8 +108,7 @@ func genQuery(qType reflect.Type, qVal reflect.Value) bson.M {
 	return query
 }
 
-// GenQuery extracts a database query
-// from query parameters.
+// GenQuery extracts a database query from query parameters.
 func GenQuery(q *Query) *bson.M {
 	v := reflect.ValueOf(q).Elem()
 	t := reflect.TypeOf(*q)
@@ -119,6 +119,9 @@ func GenQuery(q *Query) *bson.M {
 				"$polygon": q.Coords,
 			},
 		}
+	}
+	query["owner"] = bson.M{
+		"$in": q.Partners,
 	}
 
 	return &query
