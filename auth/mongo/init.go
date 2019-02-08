@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	dbName          = "datapace-auth"
-	usersCollection = "users"
+	dbName                   = "datapace-auth"
+	usersCollection          = "users"
+	accessRequestsCollection = "access-requests"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error

@@ -15,6 +15,7 @@ var _ datapace.AuthServiceServer = (*grpcServer)(nil)
 type grpcServer struct {
 	identify kitgrpc.Handler
 	email    kitgrpc.Handler
+	partners kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
@@ -27,11 +28,21 @@ func NewServer(svc auth.Service) datapace.AuthServiceServer {
 
 	email := kitgrpc.NewServer(
 		emailEndpoint(svc),
-		decodeEmailRequest,
+		decodeIdentifyRequest,
 		encodeEmailResponse,
 	)
 
-	return &grpcServer{identify, email}
+	partners := kitgrpc.NewServer(
+		partnersEndpoint(svc),
+		decodePartnersRequest,
+		encodePartnersResponse,
+	)
+
+	return &grpcServer{
+		identify: identify,
+		email:    email,
+		partners: partners,
+	}
 }
 
 func (s *grpcServer) Identify(ctx context.Context, token *datapace.Token) (*datapace.UserID, error) {
@@ -50,6 +61,15 @@ func (s *grpcServer) Email(ctx context.Context, id *datapace.Token) (*datapace.U
 	return res.(*datapace.UserEmail), nil
 }
 
+func (s *grpcServer) Partners(ctx context.Context, id *datapace.UserID) (*datapace.PartnersList, error) {
+	_, res, err := s.partners.ServeGRPC(ctx, id)
+	if err != nil {
+		return nil, encodeError(err)
+	}
+
+	return res.(*datapace.PartnersList), nil
+}
+
 func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*datapace.Token)
 	return identityReq{req.GetValue()}, nil
@@ -60,14 +80,19 @@ func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}
 	return &datapace.UserID{Value: res.id}, encodeError(res.err)
 }
 
-func decodeEmailRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.Token)
-	return identityReq{req.GetValue()}, nil
-}
-
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(emailRes)
 	return &datapace.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
+}
+
+func decodePartnersRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*datapace.UserID)
+	return identityReq{req.GetValue()}, nil
+}
+
+func encodePartnersResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
+	res := grpcRes.(partnersRes)
+	return &datapace.PartnersList{Value: res.partners}, encodeError(res.err)
 }
 
 func encodeError(err error) error {

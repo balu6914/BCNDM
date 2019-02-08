@@ -8,11 +8,11 @@ import (
 
 const (
 	// Pending represenets pending state of access request.
-	Pending = "pending"
+	Pending State = "pending"
 	// Approved represents accepted state of access request.
-	Approved = "approved"
+	Approved State = "approved"
 	// Revoked represents revoked state of access request.
-	Revoked = "revoked"
+	Revoked State = "revoked"
 )
 
 var (

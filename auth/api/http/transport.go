@@ -2,11 +2,11 @@ package http
 
 import (
 	"context"
+	"datapace"
+	"datapace/auth"
 	"encoding/json"
 	"errors"
 	"io"
-	"datapace"
-	"datapace/auth"
 	"net/http"
 
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -45,6 +45,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
+	r.Get("/users/all", kithttp.NewServer(
+		listEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
@@ -53,8 +60,43 @@ func MakeHandler(svc auth.Service) http.Handler {
 	))
 
 	r.Put("/users/password", kithttp.NewServer(
-		updatepasswordEndpoint(svc),
+		updatePasswordEndpoint(svc),
 		decodePasswordUpdate,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Post("/access-requests", kithttp.NewServer(
+		requestAccessEndpoint(svc),
+		decodeRequestAccess,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Put("/access-requests/:id/approve", kithttp.NewServer(
+		approveAccessEndpoint(svc),
+		decodeApproveAccess,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Put("/access-requests/:id/reject", kithttp.NewServer(
+		rejectAccessEndpoint(svc),
+		decodeRejectAccess,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/access-requests/sent", kithttp.NewServer(
+		listSentRequestsEndpoint(svc),
+		decodeListAccessRequests,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/access-requests/received", kithttp.NewServer(
+		listReceivedRequestsEndpoint(svc),
+		decodeListAccessRequests,
 		encodeResponse,
 		opts...,
 	))
@@ -122,6 +164,65 @@ func decodePasswordUpdate(_ context.Context, r *http.Request) (interface{}, erro
 	}
 
 	req.key = r.Header.Get("Authorization")
+
+	return req, nil
+}
+
+func decodeRequestAccess(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	var req requestAccessReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.key = r.Header.Get("Authorization")
+
+	return req, nil
+}
+
+func decodeApproveAccess(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	req := approveAccessReq{
+		key: r.Header.Get("Authorization"),
+		id:  bone.GetValue(r, "id"),
+	}
+
+	return req, nil
+}
+
+func decodeRejectAccess(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	req := rejectAccessReq{
+		key: r.Header.Get("Authorization"),
+		id:  bone.GetValue(r, "id"),
+	}
+
+	return req, nil
+}
+
+func decodeListAccessRequests(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	vals := bone.GetQuery(r, "state")
+	if len(vals) != 1 {
+		return nil, auth.ErrMalformedEntity
+	}
+
+	req := listAccessRequestsReq{
+		key:   r.Header.Get("Authorization"),
+		state: auth.State(vals[0]),
+	}
 
 	return req, nil
 }

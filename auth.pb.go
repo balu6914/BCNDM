@@ -3,13 +3,12 @@
 
 package datapace
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -21,10 +20,10 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Token struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -34,16 +33,17 @@ func (m *Token) Reset()         { *m = Token{} }
 func (m *Token) String() string { return proto.CompactTextString(m) }
 func (*Token) ProtoMessage()    {}
 func (*Token) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_55ec3bd2f31fa862, []int{0}
+	return fileDescriptor_8bbd6f3875b0e874, []int{0}
 }
+
 func (m *Token) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Token.Unmarshal(m, b)
 }
 func (m *Token) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Token.Marshal(b, m, deterministic)
 }
-func (dst *Token) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Token.Merge(dst, src)
+func (m *Token) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Token.Merge(m, src)
 }
 func (m *Token) XXX_Size() int {
 	return xxx_messageInfo_Token.Size(m)
@@ -62,7 +62,7 @@ func (m *Token) GetValue() string {
 }
 
 type UserID struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -72,16 +72,17 @@ func (m *UserID) Reset()         { *m = UserID{} }
 func (m *UserID) String() string { return proto.CompactTextString(m) }
 func (*UserID) ProtoMessage()    {}
 func (*UserID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_55ec3bd2f31fa862, []int{1}
+	return fileDescriptor_8bbd6f3875b0e874, []int{1}
 }
+
 func (m *UserID) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserID.Unmarshal(m, b)
 }
 func (m *UserID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserID.Marshal(b, m, deterministic)
 }
-func (dst *UserID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserID.Merge(dst, src)
+func (m *UserID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserID.Merge(m, src)
 }
 func (m *UserID) XXX_Size() int {
 	return xxx_messageInfo_UserID.Size(m)
@@ -100,8 +101,8 @@ func (m *UserID) GetValue() string {
 }
 
 type UserEmail struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
-	ContactEmail         string   `protobuf:"bytes,2,opt,name=contactEmail" json:"contactEmail,omitempty"`
+	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	ContactEmail         string   `protobuf:"bytes,2,opt,name=contactEmail,proto3" json:"contactEmail,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -111,16 +112,17 @@ func (m *UserEmail) Reset()         { *m = UserEmail{} }
 func (m *UserEmail) String() string { return proto.CompactTextString(m) }
 func (*UserEmail) ProtoMessage()    {}
 func (*UserEmail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_auth_55ec3bd2f31fa862, []int{2}
+	return fileDescriptor_8bbd6f3875b0e874, []int{2}
 }
+
 func (m *UserEmail) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserEmail.Unmarshal(m, b)
 }
 func (m *UserEmail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserEmail.Marshal(b, m, deterministic)
 }
-func (dst *UserEmail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserEmail.Merge(dst, src)
+func (m *UserEmail) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserEmail.Merge(m, src)
 }
 func (m *UserEmail) XXX_Size() int {
 	return xxx_messageInfo_UserEmail.Size(m)
@@ -145,10 +147,71 @@ func (m *UserEmail) GetContactEmail() string {
 	return ""
 }
 
+type PartnersList struct {
+	Value                []string `protobuf:"bytes,1,rep,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PartnersList) Reset()         { *m = PartnersList{} }
+func (m *PartnersList) String() string { return proto.CompactTextString(m) }
+func (*PartnersList) ProtoMessage()    {}
+func (*PartnersList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{3}
+}
+
+func (m *PartnersList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PartnersList.Unmarshal(m, b)
+}
+func (m *PartnersList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PartnersList.Marshal(b, m, deterministic)
+}
+func (m *PartnersList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartnersList.Merge(m, src)
+}
+func (m *PartnersList) XXX_Size() int {
+	return xxx_messageInfo_PartnersList.Size(m)
+}
+func (m *PartnersList) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartnersList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartnersList proto.InternalMessageInfo
+
+func (m *PartnersList) GetValue() []string {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Token)(nil), "datapace.Token")
 	proto.RegisterType((*UserID)(nil), "datapace.UserID")
 	proto.RegisterType((*UserEmail)(nil), "datapace.UserEmail")
+	proto.RegisterType((*PartnersList)(nil), "datapace.PartnersList")
+}
+
+func init() { proto.RegisterFile("auth.proto", fileDescriptor_8bbd6f3875b0e874) }
+
+var fileDescriptor_8bbd6f3875b0e874 = []byte{
+	// 226 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
+	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x48, 0x49, 0x2c, 0x49, 0x2c, 0x48, 0x4c, 0x4e,
+	0x55, 0x92, 0xe5, 0x62, 0x0d, 0xc9, 0xcf, 0x4e, 0xcd, 0x13, 0x12, 0xe1, 0x62, 0x2d, 0x4b, 0xcc,
+	0x29, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x82, 0x70, 0x94, 0xe4, 0xb8, 0xd8, 0x42,
+	0x8b, 0x53, 0x8b, 0x3c, 0x5d, 0x70, 0xc8, 0xbb, 0x72, 0x71, 0x82, 0xe4, 0x5d, 0x73, 0x13, 0x33,
+	0x73, 0x40, 0x4a, 0x52, 0x41, 0x0c, 0x98, 0x12, 0x30, 0x47, 0x48, 0x89, 0x8b, 0x27, 0x39, 0x3f,
+	0xaf, 0x24, 0x31, 0xb9, 0x04, 0xac, 0x4a, 0x82, 0x09, 0x2c, 0x89, 0x22, 0xa6, 0xa4, 0xc2, 0xc5,
+	0x13, 0x90, 0x58, 0x54, 0x92, 0x97, 0x5a, 0x54, 0xec, 0x93, 0x59, 0x5c, 0x82, 0x6c, 0x19, 0x33,
+	0xdc, 0x32, 0xa3, 0xe5, 0x8c, 0x5c, 0xdc, 0x8e, 0xa5, 0x25, 0x19, 0xc1, 0xa9, 0x45, 0x65, 0x99,
+	0xc9, 0xa9, 0x42, 0xfa, 0x5c, 0x1c, 0x9e, 0x29, 0xa9, 0x79, 0x25, 0x99, 0x69, 0x95, 0x42, 0xfc,
+	0x7a, 0x30, 0x2f, 0xe9, 0x81, 0xfd, 0x23, 0x25, 0x80, 0x10, 0x80, 0xf8, 0x40, 0x89, 0x41, 0x48,
+	0x9f, 0x8b, 0x15, 0xe2, 0x52, 0x0c, 0xd5, 0xc2, 0xa8, 0xaa, 0x21, 0xae, 0x62, 0x10, 0x32, 0xe3,
+	0xe2, 0x80, 0xb9, 0x4b, 0x08, 0xc3, 0x40, 0x29, 0x31, 0x84, 0x08, 0xb2, 0xeb, 0x95, 0x18, 0x92,
+	0xd8, 0xc0, 0xc1, 0x6c, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xb6, 0x2d, 0xd5, 0xb2, 0x74, 0x01,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -165,6 +228,7 @@ const _ = grpc.SupportPackageIsVersion4
 type AuthServiceClient interface {
 	Identify(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserID, error)
 	Email(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserEmail, error)
+	Partners(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*PartnersList, error)
 }
 
 type authServiceClient struct {
@@ -193,10 +257,20 @@ func (c *authServiceClient) Email(ctx context.Context, in *Token, opts ...grpc.C
 	return out, nil
 }
 
+func (c *authServiceClient) Partners(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*PartnersList, error) {
+	out := new(PartnersList)
+	err := c.cc.Invoke(ctx, "/datapace.AuthService/Partners", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 type AuthServiceServer interface {
 	Identify(context.Context, *Token) (*UserID, error)
 	Email(context.Context, *Token) (*UserEmail, error)
+	Partners(context.Context, *UserID) (*PartnersList, error)
 }
 
 func RegisterAuthServiceServer(s *grpc.Server, srv AuthServiceServer) {
@@ -239,6 +313,24 @@ func _AuthService_Email_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_Partners_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Partners(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datapace.AuthService/Partners",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Partners(ctx, req.(*UserID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _AuthService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "datapace.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
@@ -251,25 +343,11 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "Email",
 			Handler:    _AuthService_Email_Handler,
 		},
+		{
+			MethodName: "Partners",
+			Handler:    _AuthService_Partners_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "auth.proto",
-}
-
-func init() { proto.RegisterFile("auth.proto", fileDescriptor_auth_55ec3bd2f31fa862) }
-
-var fileDescriptor_auth_55ec3bd2f31fa862 = []byte{
-	// 187 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
-	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xc8, 0xcd, 0xcf, 0x4b, 0x2d, 0x49, 0x2c, 0x4e,
-	0x54, 0x92, 0xe5, 0x62, 0x0d, 0xc9, 0xcf, 0x4e, 0xcd, 0x13, 0x12, 0xe1, 0x62, 0x2d, 0x4b, 0xcc,
-	0x29, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x82, 0x70, 0x94, 0xe4, 0xb8, 0xd8, 0x42,
-	0x8b, 0x53, 0x8b, 0x3c, 0x5d, 0x70, 0xc8, 0xbb, 0x72, 0x71, 0x82, 0xe4, 0x5d, 0x73, 0x13, 0x33,
-	0x73, 0x40, 0x4a, 0x52, 0x41, 0x0c, 0x98, 0x12, 0x30, 0x47, 0x48, 0x89, 0x8b, 0x27, 0x39, 0x3f,
-	0xaf, 0x24, 0x31, 0xb9, 0x04, 0xac, 0x4a, 0x82, 0x09, 0x2c, 0x89, 0x22, 0x66, 0x94, 0xcf, 0xc5,
-	0xed, 0x58, 0x5a, 0x92, 0x11, 0x9c, 0x5a, 0x54, 0x96, 0x99, 0x9c, 0x2a, 0xa4, 0xcf, 0xc5, 0xe1,
-	0x99, 0x92, 0x9a, 0x57, 0x92, 0x99, 0x56, 0x29, 0xc4, 0xaf, 0x07, 0x73, 0xab, 0x1e, 0xd8, 0xa1,
-	0x52, 0x02, 0x08, 0x01, 0x88, 0xd3, 0x94, 0x18, 0x84, 0xf4, 0xb9, 0x58, 0x21, 0x4e, 0xc0, 0x50,
-	0x2d, 0x8c, 0xaa, 0x1a, 0xac, 0x4a, 0x89, 0x21, 0x89, 0x0d, 0x1c, 0x0e, 0xc6, 0x80, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x17, 0x0f, 0x4d, 0x89, 0x15, 0x01, 0x00, 0x00,
 }
