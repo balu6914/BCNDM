@@ -6,7 +6,7 @@ import { AuthService } from 'app/auth/services/auth.service';
 import { Query } from 'app/common/interfaces/query.interface';
 import { StreamService } from 'app/common/services/stream.service';
 import { Table, TableType } from 'app/shared/table/table';
-import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.component';
+import { DashboardAiExecuteComponent } from 'app/dashboard/ai/execute/dashboard.ai.execute.component';
 import { User } from 'app/common/interfaces/user.interface';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
