@@ -1,6 +1,6 @@
 <tr *ngIf="rowType === types.Dashboard">
   <td>{{ row.stream_name }}</td>
-  <td nowrap>{{ row.stream_price | tas}}</td>
+  <td nowrap>{{ row.stream_price | dpc}}</td>
   <td nowrap>{{ row.start_date| date }}</td>
   <td nowrap>{{ row.end_date | date }}</td>
   <td nowrap>
@@ -15,7 +15,7 @@
   <td>{{ row.type }}</td>
   <td nowrap>{{ row.start_date| date }}</td>
   <div class="value" [ngClass]="row.type === 'Income' ? 'value--plus' : 'value--minus'">
-    <td nowrap>{{row.stream_price | tas | subscriptionType:row.type}}</td>
+    <td nowrap>{{row.stream_price | dpc | subscriptionType:row.type}}</td>
   </div>
 </tr>
 <tr *ngIf="rowType === types.Contract">
@@ -64,7 +64,7 @@
     </span>
   </td>
   <td>{{row.type}}</td>
-  <td>{{row.price | tas}} TAS</td>
+  <td>{{row.price | dpc}} DPC</td>
   <td *ngIf="rowType === types.Buy" class="table--right-aligned">
     <div class="action-wrapper">
       <a class="action action--color-1" (click)="openModalSubscription(row)">
@@ -83,13 +83,28 @@
     </div>
   </td>
 </tr>
+
 <tr *ngIf="rowType === types.Ai">
   <td (click)="selectRow(row)">
     <span class="table-link-arrow">
       {{row.name}}
     </span>
   </td>
-  <td>{{row.type}}</td>
-  <td>{{row.price | tas}} TAS</td>
-  <input type="checkbox" (change)="onCheckboxChanged(row)"/>
+  <td> {{row.type}} </td>
+  <td> {{row.price | dpc}} DPC </td>
+  <td>
+    <input type="checkbox" (change)="onCheckboxChanged(row)"/>
+  </td>
+</tr>
+
+<tr *ngIf="rowType === types.Executions">
+  <td (click)="selectRow(row)">
+    <span class="table-link-arrow">
+      {{row.id}}
+    </span>
+  </td>
+  <td>{{row.mode}}</td>
+  <td>{{row.algo}}</td>
+  <td>{{row.data}}</td>
+  <td>{{row.state}}</td>
 </tr>

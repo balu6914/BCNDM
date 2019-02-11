@@ -3,12 +3,13 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 // Pipes
-import { MitasPipe, SubscriptionTypePipe, TasPipe } from './pipes/converter.pipe';
+import { MidpcPipe, SubscriptionTypePipe, DpcPipe } from './pipes/converter.pipe';
 import { WalletBalanceStatisticPipe } from './pipes/balance.income.pipe';
 // services
 import { StreamService } from './services/stream.service';
 import { SubscriptionService } from './services/subscription.service';
 import { UserService } from './services/user.service';
+import { ExecutionsService } from './services/executions.service';
 
 @NgModule({
   imports: [
@@ -19,23 +20,24 @@ import { UserService } from './services/user.service';
   ],
   declarations: [
     // Pipes
-    TasPipe,
-    MitasPipe,
+    DpcPipe,
+    MidpcPipe,
     SubscriptionTypePipe,
     WalletBalanceStatisticPipe,
   ],
   providers: [
-    TasPipe,
-    MitasPipe,
+    DpcPipe,
+    MidpcPipe,
     SubscriptionTypePipe,
     WalletBalanceStatisticPipe,
     StreamService,
     SubscriptionService,
     UserService,
+    ExecutionsService,
   ],
   exports: [
-    TasPipe,
-    MitasPipe,
+    DpcPipe,
+    MidpcPipe,
     SubscriptionTypePipe,
     WalletBalanceStatisticPipe,
   ]

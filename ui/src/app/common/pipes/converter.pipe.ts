@@ -1,23 +1,23 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-// TAS to miTAS coefficient (1 TAS = 10^6 miTAS)
-const tasToMitasCoef = Math.pow(10, 6);
+// DPC to miDPC coefficient (1 DPC = 10^6 miDPC)
+const dpcToMidpcCoef = Math.pow(10, 6);
 
-@Pipe({name: 'mitas'})
-export class MitasPipe implements PipeTransform {
+@Pipe({name: 'mipdc'})
+export class MidpcPipe implements PipeTransform {
   transform(value: any): any {
-      // Convert TAS to miTAS
-      const mitas = parseFloat(value) * tasToMitasCoef;
-      return mitas;
+      // Convert DPC to miDPC
+      const mipdc = parseFloat(value) * dpcToMidpcCoef;
+      return mipdc;
   }
 }
 
-@Pipe({name: 'tas'})
-export class TasPipe implements PipeTransform {
+@Pipe({name: 'dpc'})
+export class DpcPipe implements PipeTransform {
   transform(value: any): any {
-      // Convert miTAS to TAS
-      const tas = parseInt(value) / tasToMitasCoef;
-      return tas.toString();
+      // Convert miDPC to DPC
+      const dpc = parseInt(value) / dpcToMidpcCoef;
+      return dpc.toString();
   }
 }
 

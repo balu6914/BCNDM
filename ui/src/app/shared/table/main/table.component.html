@@ -62,6 +62,12 @@
                 <div *ngIf="table.tableType === types.Wallet">
                   <p class="lead no-content">There are currently no transactions for you.</p>
                 </div>
+                <div *ngIf="table.tableType === types.Ai">
+                  <p class="lead no-content">There are currently no datasets for you.</p>
+                </div>
+                <div *ngIf="table.tableType === types.Executions">
+                  <p class="lead no-content">There are currently no started executions.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -69,7 +75,7 @@
       </div>
       <!-- Back side -->
       <dpc-table-row-details class="back tp-box__side tp-box__back"
-                             [stream]="selectedRow"
+                             [row]="selectedRow"
                              [rowType]="table.tableType"
                              (backClicked)="flip = 'inactive'"
                              (deleteEvt)="rowDeleted($event)"

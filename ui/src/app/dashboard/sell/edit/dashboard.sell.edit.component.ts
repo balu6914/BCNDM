@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
 import { StreamService } from 'app/common/services/stream.service';
 import { Stream } from 'app/common/interfaces/stream.interface';
-import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
 
@@ -21,7 +21,7 @@ export class DashboardSellEditComponent implements OnInit {
   @Output() streamEdited: EventEmitter<any> = new EventEmitter();
   constructor(
     private streamService: StreamService,
-    private mitasPipe: MitasPipe,
+    private midpcPipe: MidpcPipe,
     private formBuilder: FormBuilder,
     public modalEditStream: BsModalRef,
     public alertService: AlertService,
@@ -56,7 +56,7 @@ export class DashboardSellEditComponent implements OnInit {
         description: this.form.value.description,
         snippet: this.form.value.snippet,
         url: this.form.value.url,
-        price: this.mitasPipe.transform(this.form.value.price),
+        price: this.midpcPipe.transform(this.form.value.price),
         location: {
           'type': 'Point',
           'coordinates': [

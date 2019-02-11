@@ -1,8 +1,8 @@
-<div class="box" *ngIf="stream">
+<div class="box" *ngIf="row">
   <div class="box__header">
     <p class="box__title">
       <span (click)="close()" class="box__title-link box__title--arrow-left js-flip-card-close">
-        {{stream.name}}
+        {{row.name}}
       </span>
     </p>
     <!-- Action buttons -->
@@ -21,7 +21,8 @@
       </a>
     </div>
   </div>
-  <div class="box__content">
+  <!-- Details -->
+  <div *ngIf="rowType !== types.Executions" class="box__content">
     <div class="row">
       <div class="col-sm-4 col-md-12">
         <div class="row">
@@ -30,7 +31,7 @@
               Stream Type
             </div>
             <div class="stream__text">
-              {{stream.type}}
+              {{row.type}}
             </div>
           </div>
           <div class="col-sm-6">
@@ -38,7 +39,7 @@
               Tokens per hour
             </div>
             <div class="stream__text">
-              {{stream.price | tas}} TAS
+              {{row.price | dpc}} DPC
             </div>
           </div>
         </div>
@@ -48,15 +49,15 @@
               Description
             </div>
             <div class="stream__text">
-              {{stream.description}}
+              {{row.description}}
             </div>
           </div>
           <div class="col-sm-6">
             <div class="stream__title">
               Latitude, Longitude
             </div>
-            <div class="stream__text" *ngIf="stream && stream.location && stream.location.coordinates">
-              {{stream.location.coordinates[1]}}, {{stream.location.coordinates[0]}}
+            <div class="stream__text" *ngIf="row && row.location && row.location.coordinates">
+              {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
             </div>
           </div>
         </div>
@@ -67,7 +68,60 @@
             Example reading(s)
           </div>
           <div class="stream-data__text">
-            <pre class="stream-data__pre">{{stream.snippet}}</pre>
+            <pre class="stream-data__pre">{{row.snippet}}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Executions Details -->
+  <div *ngIf="rowType === types.Executions" class="box__content">
+    <div class="row">
+      <div class="col-sm-4 col-md-12">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="stream__title">
+              ID
+            </div>
+            <div class="stream__text">
+              {{row.id}}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="stream__title">
+              Algorithm
+            </div>
+            <div class="stream__text">
+              {{row.algo}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="stream__title">
+              Dataset
+            </div>
+            <div class="stream__text">
+              {{row.data}}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="stream__title">
+              Mode
+            </div>
+            <div class="stream__text">
+              {{row.mode}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-8 col-md-12">
+        <div class="stream-data">
+          <div class="stream-data__title">
+            Example reading(s)
+          </div>
+          <div class="stream-data__text">
+            <pre class="stream-data__pre">{{row.snippet}}</pre>
           </div>
         </div>
       </div>

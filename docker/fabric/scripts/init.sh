@@ -13,7 +13,7 @@ CHANNEL_ID=myc
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
 TOKEN_CHAIN_VER=1.0
-TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"DPC\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
 
 FEE_CHAIN_ID=fee
 FEE_CHAIN_PATH=github.com/chaincode/system-fee
@@ -112,7 +112,7 @@ peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN
 
 sleep 5
 
-# Init/provision system with TAS
+# Init/provision system with DPC
 peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
 # Init/provision system with system fee

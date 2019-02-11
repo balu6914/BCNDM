@@ -3,7 +3,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { Stream } from 'app/common/interfaces/stream.interface';
-import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
@@ -19,7 +19,7 @@ export class TableRowDetailsComponent implements OnInit {
   types = TableType;
   bsModalRef: BsModalRef;
 
-  @Input() stream: any;
+  @Input() row: any;
   @Input() rowType: TableType;
   @Output() backClicked = new EventEmitter<String>();
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
@@ -27,7 +27,7 @@ export class TableRowDetailsComponent implements OnInit {
 
   constructor(
     private modalService: BsModalService,
-    private tasPipe: TasPipe,
+    private dpcPipe: DpcPipe,
 
   ) {}
 
@@ -42,16 +42,16 @@ export class TableRowDetailsComponent implements OnInit {
     // Parameters editData and streamID are used in DashboardSellEditComponent
     const initialState = {
       editData: {
-        name:        this.stream.name,
-        type:        this.stream.type,
-        description: this.stream.description,
-        url:         this.stream.url,
-        price:       this.tasPipe.transform(this.stream.price),
-        long:        this.stream.location.coordinates[0],
-        lat:         this.stream.location.coordinates[1],
-        snippet:     this.stream.snippet,
+        name:        this.row.name,
+        type:        this.row.type,
+        description: this.row.description,
+        url:         this.row.url,
+        price:       this.dpcPipe.transform(this.row.price),
+        long:        this.row.location.coordinates[0],
+        lat:         this.row.location.coordinates[1],
+        snippet:     this.row.snippet,
       },
-      streamID: this.stream.id,
+      streamID: this.row.id,
     };
     // Open DashboardSellEditComponent as Modal
     this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
@@ -66,11 +66,11 @@ export class TableRowDetailsComponent implements OnInit {
     // Parameter stream is used in DashboardSellDeleteComponent
     const initialState = {
       stream: {
-        id:          this.stream.id,
-        name:        this.stream.name,
-        type:        this.stream.type,
-        description: this.stream.description,
-        price:       this.tasPipe.transform(this.stream.price),
+        id:          this.row.id,
+        name:        this.row.name,
+        type:        this.row.type,
+        description: this.row.description,
+        price:       this.dpcPipe.transform(this.row.price),
       },
     };
 
@@ -88,9 +88,9 @@ export class TableRowDetailsComponent implements OnInit {
     // Parameter stream is set on modal component
     const initialState = {
       stream: {
-        id:    this.stream.id,
-        name:  this.stream.name,
-        price: this.stream.price,
+        id:    this.row.id,
+        name:  this.row.name,
+        price: this.row.price,
       },
     };
     // Open DashboardBuyAddComponent Modal

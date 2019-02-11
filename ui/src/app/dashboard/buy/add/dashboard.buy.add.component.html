@@ -15,12 +15,12 @@
         </div>
         <div class="col-9">
           <div class="modal__ratio">
-            {{stream.price | tas}} TAS
+            {{stream.price | dpc}} DPC
           </div>
-          <form class="form-inline float-right buy-tas needs-validation" [formGroup]="form" novalidate>
+          <form class="form-inline float-right buy-dpc needs-validation" [formGroup]="form" novalidate>
             <div class="form-group">
               <label for="hours" class="form-label mr-2">Subscription hours</label>
-              <input type="number" formControlName="hours" class="form-control buy-tas__input">
+              <input type="number" formControlName="hours" class="form-control buy-dpc__input">
             </div>
           </form>
         </div>
@@ -34,7 +34,7 @@
       </div>
       <div class="col-9 col-sm-7">
         <div class="modal__summary">
-          {{((stream.price * form.value.hours) | tas)}} TAS
+          {{((stream.price * form.value.hours) | dpc)}} DPC
         </div>
       </div>
     </div>

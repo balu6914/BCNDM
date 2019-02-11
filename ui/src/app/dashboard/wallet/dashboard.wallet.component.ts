@@ -6,7 +6,7 @@ import { Subscription } from 'app/common/interfaces';
 import { StreamsType, StreamSection } from 'app/shared/table/table-tabbed/section.streams';
 import { SubscriptionService } from 'app/common/services/subscription.service';
 import { StreamService } from 'app/common/services/stream.service';
-import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TableType } from 'app/shared/table/table';
 
@@ -35,7 +35,7 @@ export class DashboardWalletComponent implements OnInit {
     private authService: AuthService,
     private subscriptionService: SubscriptionService,
     private streamService: StreamService,
-    private tasPipe: TasPipe,
+    private dpcPipe: DpcPipe,
 
   ) { }
 

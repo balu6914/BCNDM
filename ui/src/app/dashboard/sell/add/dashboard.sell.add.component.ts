@@ -4,7 +4,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
 import { BsModalRef } from 'ngx-bootstrap';
 import { BigQuery, Stream } from 'app/common/interfaces/stream.interface';
-import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 import { StreamService } from 'app/common/services/stream.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class DashboardSellAddComponent implements OnInit {
   streamCreated: EventEmitter<any> = new EventEmitter();
   constructor(
     private streamService: StreamService,
-    private mitasPipe: MitasPipe,
+    private midpcPipe: MidpcPipe,
     private formBuilder: FormBuilder,
     public modalAddStream: BsModalRef,
     public alertService: AlertService
@@ -104,7 +104,7 @@ export class DashboardSellAddComponent implements OnInit {
         name: this.form.get('name').value,
         type: this.form.get('type').value,
         description: this.form.get('description').value,
-        price: this.mitasPipe.transform(this.form.get('price').value),
+        price: this.midpcPipe.transform(this.form.get('price').value),
         snippet: this.form.get('snippet').value,
         location: {
           type: 'Point',

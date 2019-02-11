@@ -1,4 +1,4 @@
-import { Stream, Subscription, Contract, Access } from 'app/common/interfaces';
+import { Stream, Subscription, Contract, Access, Execution } from 'app/common/interfaces';
 import { Page } from 'app/common/interfaces/page.interface';
 
 export enum TableType {
@@ -9,12 +9,13 @@ export enum TableType {
   Dashboard,
   Wallet,
   Ai,
+  Executions,
 }
 
 export class Table {
   title: string;
   headers: string[];
-  page: Page<Stream | Subscription | Contract | Access>;
+  page: Page<Stream | Subscription | Contract | Access | Execution>;
   tableType: TableType;
   hasDetails: Boolean = false;
 
