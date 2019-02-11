@@ -91,7 +91,11 @@ export class DashboardSellComponent implements OnInit {
           this.alertService.success(`CSV successfully uploaded`);
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          if (err.status === 400) {
+            this.alertService.error(`Error with CSV file format`);
+          } else {
+            this.alertService.error(`Status: ${err} - ${err.statusText}`);
+          }
         }
       );
     }
