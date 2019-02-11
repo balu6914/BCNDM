@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // AI routes
 import { DashboardAiRoutingModule } from './dashboard.ai.routes';
 // AI components
-import { DashboardAiComponent } from './dashboard.ai.component';
+import { DashboardAiComponent } from './main/dashboard.ai.component';
 import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.component';
 
 import { CommonAppModule } from 'app/common/common.module';

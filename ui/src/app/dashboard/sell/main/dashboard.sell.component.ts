@@ -6,7 +6,7 @@ import { Query } from 'app/common/interfaces/query.interface';
 import { StreamService } from 'app/common/services/stream.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 import { Table, TableType } from 'app/shared/table/table';
-import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
+import { DashboardSellAddComponent } from 'app/dashboard/sell/add/dashboard.sell.add.component';
 import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';

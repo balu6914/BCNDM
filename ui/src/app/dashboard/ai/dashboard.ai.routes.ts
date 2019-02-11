@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
 
-import { DashboardAiComponent } from './dashboard.ai.component';
+import { DashboardAiComponent } from './main/dashboard.ai.component';
 import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.component';
 import { AuthGuardService as AuthGuard } from 'app/auth/guardians/auth.guardian';
 

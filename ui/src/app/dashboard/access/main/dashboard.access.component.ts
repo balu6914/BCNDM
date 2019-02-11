@@ -7,7 +7,7 @@ import { Access } from 'app/common/interfaces/access.interface';
 import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { Page } from 'app/common/interfaces/page.interface';
-import { DashboardAccessAddComponent } from './add/';
+import { DashboardAccessAddComponent } from 'app/dashboard/access/add/dashboard.access.add.component';
 
 @Component({
   selector: 'dpc-dashboard-access-list',
