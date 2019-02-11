@@ -9,7 +9,7 @@ import { Table, TableType } from 'app/shared/table/table';
 import { DashboardSellAddComponent } from './add/dashboard.sell.add.component';
 import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
-import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 @Component({
   providers: [MapComponent],
   selector: 'dpc-dashboard-sell',
@@ -34,7 +34,7 @@ export class DashboardSellComponent implements OnInit {
     private AuthService: AuthService,
     private modalService: BsModalService,
     public alertService: AlertService,
-    public mitasPipe: MitasPipe,
+    public midpcPipe: MidpcPipe,
   ) {
   }
 
@@ -128,8 +128,8 @@ export class DashboardSellComponent implements OnInit {
   }
 
   onFiltersChange(filters: any) {
-    filters.minPrice = this.mitasPipe.transform(filters.minPrice);
-    filters.maxPrice = this.mitasPipe.transform(filters.maxPrice);
+    filters.minPrice = this.midpcPipe.transform(filters.minPrice);
+    filters.maxPrice = this.midpcPipe.transform(filters.maxPrice);
     Object.assign(this.query, filters);
     this.fetchStreams();
   }

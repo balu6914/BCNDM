@@ -64,7 +64,7 @@
           <input type="text" formControlName="price" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.price.errors }" />
           <div *ngIf="submitted && form.controls.price.errors" class="invalid-feedback">
             <div *ngIf="form.controls.price.errors.required">Price is riquired.</div>
-            <div *ngIf="form.controls.price.errors.pattern">Price must be between 0.00000001 and 1000 TAS.</div>
+            <div *ngIf="form.controls.price.errors.pattern">Price must be between 0.00000001 and 1000 DPC.</div>
           </div>
         </div>
       </div>

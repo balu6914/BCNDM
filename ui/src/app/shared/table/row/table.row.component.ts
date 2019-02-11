@@ -10,7 +10,7 @@ import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
 import { Stream, Subscription } from 'app/common/interfaces';
-import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
@@ -39,7 +39,7 @@ export class TableRowComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private modalService: BsModalService,
-    private tasPipe: TasPipe,
+    private dpcPipe: DpcPipe,
     private alertService: AlertService
   ) { }
 
@@ -79,7 +79,7 @@ export class TableRowComponent implements OnInit {
         type:        row.type,
         description: row.description,
         url:         row.url,
-        price:       this.tasPipe.transform(row.price),
+        price:       this.dpcPipe.transform(row.price),
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
         snippet: row.snippet,
@@ -103,7 +103,7 @@ export class TableRowComponent implements OnInit {
         name:        row.name,
         type:        row.type,
         description: row.description,
-        price:       this.tasPipe.transform(row.price),
+        price:       this.dpcPipe.transform(row.price),
       },
     };
     // Open DashboardSellDeleteComponent as Modal

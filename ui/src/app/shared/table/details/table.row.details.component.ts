@@ -3,7 +3,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { Stream } from 'app/common/interfaces/stream.interface';
-import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
@@ -27,7 +27,7 @@ export class TableRowDetailsComponent implements OnInit {
 
   constructor(
     private modalService: BsModalService,
-    private tasPipe: TasPipe,
+    private dpcPipe: DpcPipe,
 
   ) {}
 
@@ -46,7 +46,7 @@ export class TableRowDetailsComponent implements OnInit {
         type:        this.row.type,
         description: this.row.description,
         url:         this.row.url,
-        price:       this.tasPipe.transform(this.row.price),
+        price:       this.dpcPipe.transform(this.row.price),
         long:        this.row.location.coordinates[0],
         lat:         this.row.location.coordinates[1],
         snippet:     this.row.snippet,
@@ -70,7 +70,7 @@ export class TableRowDetailsComponent implements OnInit {
         name:        this.row.name,
         type:        this.row.type,
         description: this.row.description,
-        price:       this.tasPipe.transform(this.row.price),
+        price:       this.dpcPipe.transform(this.row.price),
       },
     };
 

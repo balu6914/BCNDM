@@ -69,7 +69,7 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
           caretSize: 0,
           callbacks: {
             label: function(tooltipItem, data) {
-              return `${tooltipItem.yLabel} TAS on ${moment(tooltipItem.xLabel).format('MMM, D')}`
+              return `${tooltipItem.yLabel} DPC on ${moment(tooltipItem.xLabel).format('MMM, D')}`
             },
             title: function(tooltipItem, data) {
               return;
@@ -100,7 +100,7 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
             display: true,
             afterTickToLabelConversion: function(q) {
               for (var tick in q.ticks) {
-                let newLabel = q.ticks[tick] + " TAS ";
+                let newLabel = q.ticks[tick] + " DPC ";
                 q.ticks[tick] = newLabel;
               }
             },

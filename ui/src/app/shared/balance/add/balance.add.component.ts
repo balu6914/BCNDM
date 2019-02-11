@@ -4,7 +4,7 @@ import { BsModalRef } from 'ngx-bootstrap';
 import { BalanceService } from 'app/shared/balance/balance.service';
 import { Balance } from 'app/common/interfaces/balance.interface';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 
 @Component({
   selector: 'dpc-balance-add',
@@ -23,7 +23,7 @@ export class BalanceAddComponent implements OnInit {
     public  modalAddTokens: BsModalRef,
     private balanceService: BalanceService,
     private formBuilder: FormBuilder,
-    private mitasPipe: MitasPipe,
+    private midpcPipe: MidpcPipe,
     public  alertService: AlertService,
   ) { }
 
@@ -38,14 +38,14 @@ export class BalanceAddComponent implements OnInit {
     this.errorMsg = null;
     if (isValid) {
       this.processing = true;
-      // Convert to mTAS
-      const toMiTasAmount =  {
-        amount: this.mitasPipe.transform(form.amount),
+      // Convert to miDPC
+      const toMidpcAmount =  {
+        amount: this.midpcPipe.transform(form.amount),
       };
-      this.balanceService.buy(toMiTasAmount).subscribe(
+      this.balanceService.buy(toMidpcAmount).subscribe(
         response => {
           this.balanceUpdate.emit('update');
-          this.alertService.success(` You successfully transfer ${this.form.value.amount} TAS to your account`);
+          this.alertService.success(` You successfully transfer ${this.form.value.amount} DPC to your account`);
         },
         err => {
           this.processing = false;
