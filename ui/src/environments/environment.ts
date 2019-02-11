@@ -11,5 +11,5 @@ export const environment = {
   API_STREAMS: '/streams/streams',
   API_TOKENS: '/transactions/tokens',
   API_CONTRACTS: '/transactions/contracts',
-  API_EXECUTIONS: '/executions'
+  API_EXECUTIONS: '/executions/executions'
 };
