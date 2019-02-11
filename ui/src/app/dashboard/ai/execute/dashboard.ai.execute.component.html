@@ -12,13 +12,22 @@
         <div class="col-sm-4 col-md-12">
           <div class="row">
             <div class="col-sm-6">
-              <div class="stream__text">
+              <div class="stream__title">
                 Algorithm
               </div>
             </div>
             <div class="col-sm-6">
-              <div class="stream__text">
+              <div class="stream__title">
                 Datasets
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div *ngFor="let algo of algos">
+                <div class="stream__text">
+                  {{ algo.name }}
+                </div>
               </div>
             </div>
             <div class="col-sm-6">
@@ -28,12 +37,20 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class="row">
             <div class="col-sm-6">
-              <div *ngFor="let algo of algos">
-                <div class="stream__text">
-                  {{ algo.name }}
-                </div>
+              <div class="stream__title">
+                Execution mode
               </div>
+            </div>
+            <div class="col-sm-6">
+              <select (change)="selectMode($event.target.value)"
+                      [(ngModel)]="selected">
+                <option value="federated">federated</option>
+                <option value="centralized">centralized</option>
+                <option value="distributed">distributed</option>
+              </select>
             </div>
           </div>
         </div>

@@ -83,13 +83,28 @@
     </div>
   </td>
 </tr>
+
 <tr *ngIf="rowType === types.Ai">
   <td (click)="selectRow(row)">
     <span class="table-link-arrow">
       {{row.name}}
     </span>
   </td>
-  <td>{{row.type}}</td>
-  <td>{{row.price | tas}} TAS</td>
-  <input type="checkbox" (change)="onCheckboxChanged(row)"/>
+  <td> {{row.type}} </td>
+  <td> {{row.price | tas}} TAS </td>
+  <td>
+    <input type="checkbox" (change)="onCheckboxChanged(row)"/>
+  </td>
+</tr>
+
+<tr *ngIf="rowType === types.Executions">
+  <td (click)="selectRow(row)">
+    <span class="table-link-arrow">
+      {{row.id}}
+    </span>
+  </td>
+  <td>{{row.mode}}</td>
+  <td>{{row.algo}}</td>
+  <td>{{row.data}}</td>
+  <td>{{row.state}}</td>
 </tr>

@@ -5,5 +5,6 @@ export const environment = {
   API_SUBSCRIPTIONS: '/subscriptions/subscriptions',
   API_STREAMS: '/streams/streams',
   API_TOKENS: '/transactions/tokens',
-  API_CONTRACTS: '/transactions/contracts'
+  API_CONTRACTS: '/transactions/contracts',
+  API_EXECUTIONS: '/executions'
 };

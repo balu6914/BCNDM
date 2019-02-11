@@ -5,6 +5,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { Query } from 'app/common/interfaces/query.interface';
 import { StreamService } from 'app/common/services/stream.service';
+import { ExecutionsService } from 'app/common/services/executions.service';
 import { Table, TableType } from 'app/shared/table/table';
 import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.component';
 import { User } from 'app/common/interfaces/user.interface';
@@ -20,6 +21,7 @@ export class DashboardAiComponent implements OnInit {
   user: User;
   tableStreams: Table = new Table();
   tableAlgos: Table = new Table();
+  tableExecutions: Table = new Table();
   query = new Query();
   checkedStreams = [];
   checkedAlgos = [];
@@ -30,29 +32,21 @@ export class DashboardAiComponent implements OnInit {
   @ViewChild('tableAlgosComponent')
   private tableAlgosComponent: TableComponent;
 
+  @ViewChild('tableExecutionComponent')
+  private tableExecutionComponent: TableComponent;
+
   constructor(
     private modalService: BsModalService,
     private streamService: StreamService,
     private authService: AuthService,
+    private executionsService: ExecutionsService,
     public alertService: AlertService,
   ) {
   }
 
   ngOnInit() {
-    // Fetch current User
-    this.authService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
-        this.query.owner = this.user.id;
-        this.fetchStreams();
-      },
-      err => {
-        console.log(err);
-      }
-    );
-
     // Config tableStreams
-    this.tableStreams.title = 'Data Sets';
+    this.tableStreams.title = 'Datasets';
     this.tableStreams.tableType = TableType.Ai;
     this.tableStreams.headers = ['Name', 'Type', 'Price', ''];
     this.tableStreams.hasDetails = true;
@@ -63,6 +57,24 @@ export class DashboardAiComponent implements OnInit {
     this.tableAlgos.headers = ['Name', 'Type', 'Price', ''];
     this.tableAlgos.hasDetails = true;
 
+    // Config tableStreams
+    this.tableExecutions.title = 'Jobs Queue';
+    this.tableExecutions.tableType = TableType.Executions;
+    this.tableExecutions.headers = ['ID', 'Mode', 'Algo', 'Data', 'State'];
+    this.tableExecutions.hasDetails = true;
+
+    // Fetch current User
+    this.authService.getCurrentUser().subscribe(
+      data => {
+        this.user = data;
+        this.query.owner = this.user.id;
+        this.fetchStreams();
+        this.fetchExecutions();
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   private fetchStreams() {
@@ -71,12 +83,11 @@ export class DashboardAiComponent implements OnInit {
       (result: any) => {
         const tempStreams = Object.assign({}, this.tableStreams);
         tempStreams.page = result;
-
         // Set tableStreams content
         this.tableStreams = tempStreams;
       },
       err => {
-        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
       });
 
       this.query.streamType = 'Algorithm';
@@ -89,8 +100,24 @@ export class DashboardAiComponent implements OnInit {
           this.tableAlgos = tempAlgos;
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
         });
+  }
+
+  fetchExecutions() {
+    this.executionsService.getExecutions().subscribe(
+      (result: any) => {
+        this.tableExecutions.page = {
+          page: 0,
+          total: 5,
+          limit: 50,
+          content: result.executions,
+        };
+      },
+      err => {
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+      }
+    );
   }
 
   onPageChange(page: number) {
@@ -108,10 +135,9 @@ export class DashboardAiComponent implements OnInit {
     this.modalService.show(DashboardAiExecuteComponent, { initialState })
       .content.executionStarted.subscribe(
         response => {
-          console.log(response);
+          this.fetchExecutions();
         },
         err => {
-          console.log(err);
         }
       );
     }
