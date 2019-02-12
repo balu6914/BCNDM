@@ -19,6 +19,9 @@
           <p class="box__title">
             Discover data streams
           </p>
+            <button class="btn btn-primary btn-padding-lg btn-xs-full" (click)="onBuyClick()">
+	     Buy All Streams
+            </button>
         </div>
         <dpc-map-leaflet #map [streamList]="table.page.content" (hoverMarker)="onHoverMarker($event)">
         </dpc-map-leaflet>

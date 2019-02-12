@@ -7,6 +7,9 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 import { TableComponent } from 'app/shared/table/main/table.component';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap';
+import { DashboardBuyGroupComponent } from 'app/dashboard/buy/group/dashboard.buy.group.component';
 
 @Component({
   selector: 'dpc-dashboard-buy',
@@ -28,6 +31,7 @@ export class DashboardBuyComponent implements OnInit {
     private AuthService: AuthService,
     public streamService: StreamService,
     public alertService: AlertService,
+    private modalService: BsModalService,
     public midpcPipe: MidpcPipe,
   ) { }
 
@@ -73,6 +77,13 @@ export class DashboardBuyComponent implements OnInit {
     this.fetchStreams();
   }
 
+  onBuyClick(){     
+    const initialState = {
+      streamsList: this.table.page.content,
+    };
+    this.modalService.show(DashboardBuyGroupComponent, { initialState });
+  }
+  
   onFiltersChange(filters: any) {
     filters.minPrice = this.midpcPipe.transform(filters.minPrice);
     filters.maxPrice = this.midpcPipe.transform(filters.maxPrice);
