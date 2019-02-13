@@ -88,13 +88,15 @@ type Service interface {
 }
 
 type streamService struct {
-	streams StreamRepository
+	streams       StreamRepository
+	accessControl AccessControl
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(streams StreamRepository) Service {
+func NewService(streams StreamRepository, accessControl AccessControl) Service {
 	return streamService{
-		streams: streams,
+		streams:       streams,
+		accessControl: accessControl,
 	}
 }
 
@@ -171,6 +173,14 @@ func (ss streamService) AddBulkStreams(streams []Stream) error {
 }
 
 func (ss streamService) SearchStreams(owner string, query Query) (Page, error) {
+	partners, err := ss.accessControl.Partners(owner)
+	if err != nil {
+		return Page{}, err
+	}
+	partners = append(partners, owner)
+
+	query.Partners = partners
+
 	p, err := ss.streams.Search(query)
 	if err != nil {
 		return p, err
@@ -198,6 +208,23 @@ func (ss streamService) ViewStream(id, owner string) (Stream, error) {
 	s, err := ss.streams.One(id)
 	if err != nil {
 		return s, err
+	}
+
+	partners, err := ss.accessControl.Partners(owner)
+	if err != nil {
+		return Stream{}, err
+	}
+	partners = append(partners, owner)
+
+	in := false
+	for _, partner := range partners {
+		if s.Owner == partner {
+			in = true
+			break
+		}
+	}
+	if !in {
+		return Stream{}, ErrNotFound
 	}
 
 	if s.Owner != owner {

@@ -1,11 +1,11 @@
 package mongo_test
 
 import (
-	"fmt"
-	"math/rand"
 	log "datapace/logger"
 	"datapace/streams"
 	"datapace/streams/mongo"
+	"fmt"
+	"math/rand"
 	"os"
 	"testing"
 
@@ -65,6 +65,7 @@ func TestSearch(t *testing.T) {
 	db.DB(testDB).DropDatabase()
 	repo := mongo.New(db)
 
+	partners := []string{}
 	all := []streams.Stream{}
 	for i := 0; i < searchSize; i++ {
 		s := stream()
@@ -72,6 +73,7 @@ func TestSearch(t *testing.T) {
 		require.Nil(t, err, "Repo should save streams.")
 		s.ID = bson.ObjectIdHex(id)
 		all = append(all, s)
+		partners = append(partners, s.Owner)
 	}
 	// Specify two special Streams to match different
 	// types of query and different result sets.
@@ -84,14 +86,15 @@ func TestSearch(t *testing.T) {
 	s1.Type = "different type"
 	id, _ := repo.Save(s1)
 	s1.ID = bson.ObjectIdHex(id)
-	all = append(all, s1)
 
 	s2 := stream()
 	s2.Price = s2Price
 	s2.Owner = bson.NewObjectId().Hex()
 	id, _ = repo.Save(s2)
 	s2.ID = bson.ObjectIdHex(id)
-	all = append(all, s2)
+
+	all = append(all, s1, s2)
+	partners = append(partners, s1.Owner, s2.Owner)
 
 	val, _ := db.DB(testDB).C(collection).Count()
 	total := uint64(val)
@@ -105,7 +108,8 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams with query with only the limit specified",
 			query: streams.Query{
-				Limit: limit,
+				Limit:    limit,
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -116,8 +120,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams reset too big offest to default value silently",
 			query: streams.Query{
-				Limit: limit,
-				Page:  uint64(total + maxPage),
+				Limit:    limit,
+				Page:     uint64(total + maxPage),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Page:    maxPage,
@@ -134,6 +139,7 @@ func TestSearch(t *testing.T) {
 			query: streams.Query{
 				Limit:    limit,
 				MinPrice: pointer(s1Price + 1),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -146,6 +152,7 @@ func TestSearch(t *testing.T) {
 			query: streams.Query{
 				Limit:    limit,
 				MaxPrice: pointer(s2Price),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -160,6 +167,7 @@ func TestSearch(t *testing.T) {
 				Limit:    limit,
 				MinPrice: pointer(s1Price),
 				MaxPrice: pointer(s2Price + 1),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -170,8 +178,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams by owner",
 			query: streams.Query{
-				Limit: limit,
-				Owner: s2.Owner,
+				Limit:    limit,
+				Owner:    s2.Owner,
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -182,8 +191,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams by name",
 			query: streams.Query{
-				Limit: limit,
-				Name:  s1.Name,
+				Limit:    limit,
+				Name:     s1.Name,
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -194,8 +204,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams by name partial",
 			query: streams.Query{
-				Limit: limit,
-				Name:  "str",
+				Limit:    limit,
+				Name:     "str",
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -208,6 +219,7 @@ func TestSearch(t *testing.T) {
 			query: streams.Query{
 				Limit:      limit,
 				StreamType: s1.Type,
+				Partners:   partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -218,8 +230,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams by owner other than provided",
 			query: streams.Query{
-				Limit: limit,
-				Owner: fmt.Sprintf("-%s", s2.Owner),
+				Limit:    limit,
+				Owner:    fmt.Sprintf("-%s", s2.Owner),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -230,8 +243,9 @@ func TestSearch(t *testing.T) {
 		{
 			desc: "search streams by name other than provided",
 			query: streams.Query{
-				Limit: limit,
-				Name:  fmt.Sprintf("-%s", s2.Type[:3]),
+				Limit:    limit,
+				Name:     fmt.Sprintf("-%s", s2.Type[:3]),
+				Partners: partners,
 			},
 			page: streams.Page{
 				Limit:   limit,
@@ -244,6 +258,7 @@ func TestSearch(t *testing.T) {
 			query: streams.Query{
 				Limit:      limit,
 				StreamType: fmt.Sprintf("-%s", s1.Type),
+				Partners:   partners,
 			},
 			page: streams.Page{
 				Limit:   limit,

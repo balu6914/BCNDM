@@ -1,13 +1,13 @@
 package http_test
 
 import (
+	"datapace/auth"
+	httpapi "datapace/auth/api/http"
+	"datapace/auth/mocks"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"datapace/auth"
-	httpapi "datapace/auth/api/http"
-	"datapace/auth/mocks"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -37,8 +37,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
+	accessRequests := mocks.NewAccessRequestRepository()
 
-	return auth.New(repo, hasher, idp, ts)
+	return auth.New(repo, hasher, idp, ts, accessRequests)
 }
 
 func newServer(svc auth.Service) *httptest.Server {

@@ -1,6 +1,10 @@
 package http
 
-import "net/http"
+import (
+	"datapace/auth"
+	"fmt"
+	"net/http"
+)
 
 const contentType = "application/json"
 
@@ -58,8 +62,8 @@ func (res updateRes) empty() bool {
 
 type viewRes struct {
 	ID           string `json:"id"`
-	Email        string `json:"email"`
-	ContactEmail string `json:"contact_email"`
+	Email        string `json:"email,omitempty"`
+	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
 }
@@ -73,5 +77,90 @@ func (res viewRes) headers() map[string]string {
 }
 
 func (res viewRes) empty() bool {
+	return false
+}
+
+type listRes struct {
+	Users []viewRes `json:"users"`
+}
+
+func (res listRes) code() int {
+	return http.StatusOK
+}
+
+func (res listRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res listRes) empty() bool {
+	return false
+}
+
+type requestAccessRes struct {
+	id string
+}
+
+func (res requestAccessRes) code() int {
+	return http.StatusCreated
+}
+
+func (res requestAccessRes) headers() map[string]string {
+	return map[string]string{
+		"Location": fmt.Sprintf("/access-requests/%s", res.id),
+	}
+}
+
+func (res requestAccessRes) empty() bool {
+	return true
+}
+
+type approveAccessRes struct{}
+
+func (res approveAccessRes) code() int {
+	return http.StatusOK
+}
+
+func (res approveAccessRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res approveAccessRes) empty() bool {
+	return true
+}
+
+type rejectAccessRes struct{}
+
+func (res rejectAccessRes) code() int {
+	return http.StatusOK
+}
+
+func (res rejectAccessRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res rejectAccessRes) empty() bool {
+	return true
+}
+
+type viewAccessRequestRes struct {
+	ID       string     `json:"id"`
+	Sender   string     `json:"sender"`
+	Receiver string     `json:"receiver"`
+	State    auth.State `json:"state"`
+}
+
+type listAccessRequestsRes struct {
+	Requests []viewAccessRequestRes
+}
+
+func (res listAccessRequestsRes) code() int {
+	return http.StatusOK
+}
+
+func (res listAccessRequestsRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res listAccessRequestsRes) empty() bool {
 	return false
 }

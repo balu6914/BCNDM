@@ -11,6 +11,13 @@ type authorization struct {
 	users []string
 }
 
+// NewAuth returns mock auth service.
+func NewAuth(users []string) streams.Authorization {
+	return authorization{
+		users: users,
+	}
+}
+
 func (a authorization) Authorize(r *http.Request) (string, error) {
 	key := r.Header.Get("Authorization")
 	for _, id := range a.users {
@@ -23,11 +30,4 @@ func (a authorization) Authorize(r *http.Request) (string, error) {
 
 func (a authorization) Email(token string) (datapace.UserEmail, error) {
 	return datapace.UserEmail{}, nil
-}
-
-// NewAuth returns mock auth service.
-func NewAuth(users []string) streams.Authorization {
-	return authorization{
-		users: users,
-	}
 }

@@ -83,3 +83,7 @@ func (urm *userRepositoryMock) Remove(id string) error {
 	delete(urm.users, id)
 	return nil
 }
+
+func (urm *userRepositoryMock) List() ([]auth.User, error) {
+	return nil, nil
+}
