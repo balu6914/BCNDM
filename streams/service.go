@@ -177,6 +177,7 @@ func (ss streamService) SearchStreams(owner string, query Query) (Page, error) {
 	if err != nil {
 		return Page{}, err
 	}
+	partners = append(partners, owner)
 
 	query.Partners = partners
 
@@ -207,6 +208,23 @@ func (ss streamService) ViewStream(id, owner string) (Stream, error) {
 	s, err := ss.streams.One(id)
 	if err != nil {
 		return s, err
+	}
+
+	partners, err := ss.accessControl.Partners(owner)
+	if err != nil {
+		return Stream{}, err
+	}
+	partners = append(partners, owner)
+
+	in := false
+	for _, partner := range partners {
+		if s.Owner == partner {
+			in = true
+			break
+		}
+	}
+	if !in {
+		return Stream{}, ErrNotFound
 	}
 
 	if s.Owner != owner {

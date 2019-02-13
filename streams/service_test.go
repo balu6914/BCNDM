@@ -65,9 +65,11 @@ func stream() streams.Stream {
 	}
 }
 
-func newService() streams.Service {
+func newService(partners ...string) streams.Service {
 	repo := mocks.NewStreamRepository()
-	return streams.NewService(repo)
+	ac := mocks.NewAccessControl(partners)
+
+	return streams.NewService(repo, ac)
 }
 
 func pointer(val uint64) *uint64 {
@@ -394,7 +396,7 @@ func TestFullViewStream(t *testing.T) {
 
 func TestViewStream(t *testing.T) {
 	s := stream()
-	svc := newService()
+	svc := newService(s.Owner)
 	svc.AddStream(s)
 
 	cases := []struct {

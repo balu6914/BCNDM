@@ -120,9 +120,22 @@ func GenQuery(q *Query) *bson.M {
 			},
 		}
 	}
-	query["owner"] = bson.M{
-		"$in": q.Partners,
+
+	ownerQuery := []bson.M{
+		bson.M{
+			"owner": bson.M{
+				"$in": q.Partners,
+			},
+		},
 	}
+
+	if _, ok := query["owner"]; ok {
+		ownerQuery = append(ownerQuery, bson.M{
+			"owner": query["owner"],
+		})
+		delete(query, "owner")
+	}
+	query["$and"] = ownerQuery
 
 	return &query
 }
