@@ -58,10 +58,8 @@ cd $GOPATH/src/github.com/chaincode/token
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -72,10 +70,8 @@ cd $GOPATH/src/github.com/chaincode/system-fee
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -86,10 +82,8 @@ cd $GOPATH/src/github.com/chaincode/contracts
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -100,10 +94,8 @@ cd $GOPATH/src/github.com/chaincode/access-requests
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
