@@ -87,7 +87,7 @@ func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, e
 
 func decodePartnersRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*datapace.UserID)
-	return identityReq{req.GetValue()}, nil
+	return partnersReq{req.GetValue()}, nil
 }
 
 func encodePartnersResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {

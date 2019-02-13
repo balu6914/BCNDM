@@ -41,7 +41,7 @@ func NewClient(conn *grpc.ClientConn) datapace.AuthServiceClient {
 		conn,
 		"datapace.AuthService",
 		"Partners",
-		encodeIdentifyRequest,
+		encodePartnersRequest,
 		decodePartnersResponse,
 		datapace.PartnersList{},
 	).Endpoint()
@@ -96,6 +96,11 @@ func decodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}
 func decodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*datapace.UserEmail)
 	return emailRes{res.GetEmail(), res.GetContactEmail(), nil}, nil
+}
+
+func encodePartnersRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(partnersReq)
+	return &datapace.UserID{Value: req.id}, nil
 }
 
 func decodePartnersResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {

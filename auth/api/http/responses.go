@@ -2,6 +2,7 @@ package http
 
 import (
 	"datapace/auth"
+	"fmt"
 	"net/http"
 )
 
@@ -105,7 +106,7 @@ func (res requestAccessRes) code() int {
 
 func (res requestAccessRes) headers() map[string]string {
 	return map[string]string{
-		"Location": res.id,
+		"Location": fmt.Sprintf("/access-requests/%s", res.id),
 	}
 }
 

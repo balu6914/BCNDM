@@ -94,7 +94,11 @@ func (repo accessRequestRepository) ApproveAccessRequest(receiver, id string) er
 	defer session.Close()
 	collection := session.DB(dbName).C(accessRequestsCollection)
 
-	q := bson.M{"_id": id, "receiver": receiver, "state": auth.Pending}
+	if !bson.IsObjectIdHex(id) {
+		return auth.ErrMalformedEntity
+	}
+
+	q := bson.M{"_id": bson.ObjectIdHex(id), "receiver": receiver, "state": auth.Pending}
 	u := bson.M{"$set": bson.M{"state": auth.Approved}}
 	if err := collection.Update(q, u); err != nil {
 		if err == mgo.ErrNotFound {
@@ -111,7 +115,11 @@ func (repo accessRequestRepository) RejectAccessRequest(receiver, id string) err
 	defer session.Close()
 	collection := session.DB(dbName).C(accessRequestsCollection)
 
-	q := bson.M{"_id": id, "receiver": receiver, "state": auth.Pending}
+	if !bson.IsObjectIdHex(id) {
+		return auth.ErrMalformedEntity
+	}
+
+	q := bson.M{"_id": bson.ObjectIdHex(id), "receiver": receiver, "state": auth.Pending}
 	u := bson.M{"$set": bson.M{"state": auth.Revoked}}
 	if err := collection.Update(q, u); err != nil {
 		if err == mgo.ErrNotFound {

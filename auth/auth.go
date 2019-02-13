@@ -114,6 +114,10 @@ func (as *authService) List(key string) ([]User, error) {
 }
 
 func (as *authService) RequestAccess(key, partner string) (string, error) {
+	if _, err := as.users.OneByID(partner); err != nil {
+		return "", ErrNotFound
+	}
+
 	id, err := as.idp.Identity(key)
 	if err != nil {
 		return "", ErrUnauthorizedAccess

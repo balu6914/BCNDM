@@ -1,9 +1,9 @@
 package mongo_test
 
 import (
-	"fmt"
 	"datapace/auth/mongo"
 	log "datapace/logger"
+	"fmt"
 	"os"
 	"testing"
 
