@@ -95,6 +95,7 @@
   version = "v3.2.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/docker"
   packages = [
     "api/types",
@@ -108,6 +109,7 @@
     "api/types/swarm",
     "api/types/swarm/runtime",
     "api/types/versions",
+    "errdefs",
     "opts",
     "pkg/fileutils",
     "pkg/homedir",
@@ -119,7 +121,7 @@
     "pkg/stdcopy",
     "pkg/system"
   ]
-  revision = "a422774e593b33bd287d9890544ad9e09b380d8c"
+  revision = "680095405094e61218bdfaa8d53c1f70e00f5113"
 
 [[projects]]
   name = "github.com/docker/go-connections"
@@ -132,6 +134,12 @@
   packages = ["."]
   revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
   version = "v0.3.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/docker/libnetwork"
+  packages = ["ipamutils"]
+  revision = "d8d4c8cf03d7d036a76d5470553cd8753e522a99"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -277,17 +285,16 @@
     "protos/peer",
     "protos/utils"
   ]
-  revision = "d24243729e6ab9b8c263306892a2539b2a8a9990"
-  version = "v1.2.0-rc1"
+  revision = "cae2ad4456914adffcb07b1ca873e9624ce8f8b3"
+  version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/hyperledger/fabric-amcl"
   packages = [
     "amcl",
     "amcl/FP256BN"
   ]
-  revision = "5ccba6eab8d6b39aa2cdd88db202bba0e25da5d7"
+  revision = "31cc24e414990009f09ab4d4d9a85eb94d17ac31"
 
 [[projects]]
   name = "github.com/hyperledger/fabric-sdk-go"
@@ -822,6 +829,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8d5bf060e1a59a6a01c4e8a5071a61b52999346fc38dbe2396270ff30ec7404d"
+  inputs-digest = "a6fe493f8ca7dcea4c72ea5f7c4112f6d90604aa109ba900c556b8be35d7b9be"
   solver-name = "gps-cdcl"
   solver-version = 1

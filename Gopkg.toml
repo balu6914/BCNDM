@@ -44,7 +44,15 @@
 
 [[override]]
   name = "github.com/docker/docker"
-  revision = "a422774e593b33bd287d9890544ad9e09b380d8c"
+  branch = "master"
+
+[[override]]
+  name = "github.com/docker/libnetwork"
+  branch = "master"
+
+[[override]]
+  name = "github.com/hyperledger/fabric-amcl"
+  revision = "31cc24e414990009f09ab4d4d9a85eb94d17ac31"
 
 [[constraint]]
   name = "github.com/hyperledger/fabric-sdk-go"
@@ -52,7 +60,7 @@
 
 [[constraint]]
   name = "github.com/hyperledger/fabric"
-  version = "=v1.2.0-rc1"
+  version = "=v1.2.0"
 
 [prune]
   go-tests = true
