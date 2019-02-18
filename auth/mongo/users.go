@@ -126,9 +126,14 @@ func (ur *userRepository) List() ([]auth.User, error) {
 	defer session.Close()
 	collection := session.DB(dbName).C(usersCollection)
 
-	users := []auth.User{}
-	if err := collection.Find(nil).All(&users); err != nil {
+	mu := []mongoUser{}
+	if err := collection.Find(nil).All(&mu); err != nil {
 		return nil, err
+	}
+
+	users := []auth.User{}
+	for _, u := range mu {
+		users = append(users, u.toUser())
 	}
 
 	return users, nil
