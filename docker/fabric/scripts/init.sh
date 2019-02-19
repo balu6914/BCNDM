@@ -3,7 +3,7 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH=./artifacts/myc.tx
+CHANNEL_PATH=./artifacts/myc.txn
 CHANNEL_BLOCK=myc.block
 
 ORDERER_URL=orderer.datapace.com:7050
@@ -45,14 +45,18 @@ MSG_DONE="
 
 # first we create the channel against the specified configuration in myc.tx
 # this call returns a channel configuration block - myc.block - to the CLI container
+echo "step 0"
 
 peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --cafile $CERT_PATH
+
+echo "step 1"
 
 # now we will join the channel and start the chain with myc.block serving as the
 # channel's first block (i.e. the genesis block)
 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
 
 sleep 5
+echo "step 3"
 
 cd $GOPATH/src/github.com/chaincode/token
 # Install govendor tool
@@ -107,8 +111,11 @@ govendor fetch github.com/hyperledger/fabric/protos/msp
 
 cd $LOCATION
 
+echo "step 4"
 # Install chaincode
 peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN_PATH
+
+echo "step 5"
 
 sleep 5
 
