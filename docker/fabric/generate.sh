@@ -13,9 +13,9 @@ CRYPTO_CONF_DIR=config/crypto-config
 FABRIC_CFG_PATH=config/fabric
 GENESIS_BLOCK_PATH=docker/fabric/artifacts/genesis.block
 GENESIS_BLOCK_PROFILE=DatapaceOrdererGenesis
-CH_OUTPUT_PATH=docker/fabric/artifacts/myc.tx
+CH_OUTPUT_PATH=docker/fabric/artifacts/datapace_channel.tx
 CH_PROFILE=DatapaceChannel
-CH_ID=myc
+CH_ID=datapace_channel
 
 BASE_COMPOSE_FILE=docker/fabric/base/docker-compose-base.yaml
 

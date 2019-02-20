@@ -61,7 +61,7 @@ client:
 # [Optional]. But most apps would have this section so that channel objects can be constructed based on the content below.
 # If one of your application is creating channels, you might not use this
 channels:
-  myc:
+  datapace_channel:
     # orderers:
     #   - orderer.datapace.com
     #

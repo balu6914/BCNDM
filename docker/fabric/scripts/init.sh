@@ -3,12 +3,12 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH=./artifacts/myc.tx
-CHANNEL_BLOCK=myc.block
+CHANNEL_PATH=./artifacts/datapace_channel.tx
+CHANNEL_BLOCK=datapace_channel.block
 
 ORDERER_URL=orderer.datapace.com:7050
 
-CHANNEL_ID=myc
+CHANNEL_ID=datapace_channel
 
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
@@ -40,18 +40,18 @@ MSG_DONE="
 #################################################################
 "
 
-# We use a pre-generated orderer.block and channel transaction artifact (myc.tx),
+# We use a pre-generated orderer.block and channel transaction artifact (datapace_channel.tx),
 # both of which are created using the configtxgen tool
 
-# first we create the channel against the specified configuration in myc.tx
-# this call returns a channel configuration block - myc.block - to the CLI container
+# first we create the channel against the specified configuration in datapace_channel.tx
+# this call returns a channel configuration block - datapace_channel.block - to the CLI container
 echo "step 0"
 
 peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --cafile $CERT_PATH
 
 echo "step 1"
 
-# now we will join the channel and start the chain with myc.block serving as the
+# now we will join the channel and start the chain with datapace_channel.block serving as the
 # channel's first block (i.e. the genesis block)
 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
 
