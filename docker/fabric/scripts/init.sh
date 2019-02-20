@@ -3,7 +3,7 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH=./artifacts/myc.txn
+CHANNEL_PATH=./artifacts/myc.tx
 CHANNEL_BLOCK=myc.block
 
 ORDERER_URL=orderer.datapace.com:7050
