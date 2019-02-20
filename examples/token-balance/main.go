@@ -13,7 +13,7 @@ func main() {
 		OrgAdmin:    "admin",
 		OrgName:     "Org1",
 		ConfigFile:  "../../config/fabric/config.yaml",
-		ChannelID:   "datapace_channel",
+		ChannelID:   "datapace",
 		ChaincodeID: "token",
 	}
 

@@ -12,7 +12,7 @@ func main() {
 		OrgAdmin:   "admin",
 		OrgName:    "org1",
 		ConfigFile: "../../config/fabric/config.yaml",
-		ChannelID:  "datapace_channel",
+		ChannelID:  "datapace",
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties

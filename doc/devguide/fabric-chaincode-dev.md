@@ -104,7 +104,7 @@ Compile the chaincode
 
 Now run the chaincode by executing the following command:
 
-```CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=datapace_channelc:0 ./sacc```
+```CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=datapacec:0 ./sacc```
 
 
 Great! From now on, our chaincode is running on the peer but its not yet installed, lets try to install it and actually interact with it using fabric cli tools.
@@ -116,23 +116,23 @@ Open a new terminal window, Terminal 2 (its required to stay opened) and exec to
 From now on, we are in ***cli*** container created by fabric-tools image.
 Install our chaincode executing following command:
 
-```peer chaincode install -p chaincodedev/chaincode/sacc -n datapace_channelc -v 0```
+```peer chaincode install -p chaincodedev/chaincode/sacc -n datapacec -v 0```
 
 Next, we must initialize our chaincode
 
-```peer chaincode instantiate -n datapace_channelc -v 0 -c '{"Args":["a","10"]}' -C datapace_channel```
+```peer chaincode instantiate -n datapacec -v 0 -c '{"Args":["a","10"]}' -C datapace```
 
 ***NOTE:***  This chaincode is awailable in cli container because of ***parent chaincode folder*** (its mounted to docker container using volume option so its available in all containers). Its important to remember this, because when you write your own custom chaincode you just need to copy it to fabric-samples/chaincode and it will be automatically available (don't forget to restart docker composition when you copy new chaincode) in all docker containers, so you can install/test you chaincode.
 
 Now issue an invoke the chaincode to change the value of “a” to “20” executing following command:
 
-```peer chaincode invoke -n datapace_channelc -c '{"Args":["set", "a", "20"]}' -C datapace_channel```
+```peer chaincode invoke -n datapacec -c '{"Args":["set", "a", "20"]}' -C datapace```
 
 
 Finally, quer your chaincode. We should get  a value of 20 as a result, executing following command:
 
 
-```peer chaincode query -n datapace_channelc -c '{"Args":["query","a"]}' -C datapace_channel```
+```peer chaincode query -n datapacec -c '{"Args":["query","a"]}' -C datapace```
 
 
 You will see response “Query Result: 20 ”
