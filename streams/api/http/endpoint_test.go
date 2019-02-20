@@ -2,14 +2,14 @@ package http_test
 
 import (
 	"bytes"
+	"datapace/streams"
+	httpapi "datapace/streams/api/http"
+	"datapace/streams/mocks"
 	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
 	"mime/multipart"
-	"datapace/streams"
-	httpapi "datapace/streams/api/http"
-	"datapace/streams/mocks"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -95,7 +95,9 @@ func (tr testRequest) make() (*http.Response, error) {
 
 func newService() streams.Service {
 	repo := mocks.NewStreamRepository()
-	return streams.NewService(repo)
+	ac := mocks.NewAccessControl([]string{})
+
+	return streams.NewService(repo, ac)
 }
 
 func newServer(svc streams.Service) *httptest.Server {

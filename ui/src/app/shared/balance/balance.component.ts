@@ -7,7 +7,7 @@ import { Balance } from 'app/common/interfaces/balance.interface';
 import { BalanceService } from './balance.service';
 import { BalanceAddComponent } from './add/balance.add.component';
 import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component';
-import { MitasPipe } from 'app/common/pipes/converter.pipe';
+import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 import { AuthService } from 'app/auth/services/auth.service';
 
 @Component({
@@ -25,7 +25,7 @@ export class BalanceComponent implements OnInit {
     private authService: AuthService,
     private modalService: BsModalService,
     private balanceService: BalanceService,
-    private mitasPipe: MitasPipe,
+    private midpcPipe: MidpcPipe,
   ) {}
 
     // Open BUY tokens dialog

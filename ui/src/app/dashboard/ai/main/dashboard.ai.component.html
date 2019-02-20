@@ -1,0 +1,43 @@
+<div class="page-wrapper animated fadeIn">
+  <div class="page-header">
+    <div class="page-header-xs--map">
+      <h1 class="page-title">
+        AI
+      </h1>
+    </div>
+    <div class="action-buttons">
+      <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media"
+                (click)="modalNewExecution()" [disabled]="!checkedStreams.length || !checkedAlgos.length">
+          <span class="btn-media__icon btn-media__icon--add"></span>
+          Execute
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <div class="row row-grow">
+    <div class="col-lg-6">
+      <dpc-table #tableAlgosComponent
+                 [table]="tableAlgos"
+                 (pageChanged)="onPageChange($event)"
+                 (checkboxChangedEvt)="onAlgoSelected($event)">
+      </dpc-table>
+    </div>
+    <div class="col-lg-6">
+      <dpc-table #tableStreamsComponent
+                 [table]="tableStreams"
+                 (pageChanged)="onPageChange($event)"
+                 (checkboxChangedEvt)="onStreamSelected($event)">
+      </dpc-table>
+    </div>
+  </div>
+  <div class="row row-grow">
+    <div class="col-lg-12">
+      <dpc-table #tableExecutionComponent
+                 [table]="tableExecutions"
+                 (pageChanged)="onPageChange($event)">
+      </dpc-table>
+    </div>
+  </div>
+</div>

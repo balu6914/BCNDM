@@ -121,6 +121,24 @@ func (ur *userRepository) Remove(id string) error {
 	return nil
 }
 
+func (ur *userRepository) List() ([]auth.User, error) {
+	session := ur.db.Copy()
+	defer session.Close()
+	collection := session.DB(dbName).C(usersCollection)
+
+	mu := []mongoUser{}
+	if err := collection.Find(nil).All(&mu); err != nil {
+		return nil, err
+	}
+
+	users := []auth.User{}
+	for _, u := range mu {
+		users = append(users, u.toUser())
+	}
+
+	return users, nil
+}
+
 type mongoUser struct {
 	Email        string        `bson:"email,omitempty"`
 	Password     string        `bson:"password,omitempty"`

@@ -2,6 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
+	mgo "gopkg.in/mgo.v2"
+
 	"datapace"
 	"datapace/auth"
 	"datapace/auth/api"
@@ -13,16 +24,6 @@ import (
 	"datapace/auth/transactions"
 	log "datapace/logger"
 	transactionsapi "datapace/transactions/api/grpc"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
-	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/grpc"
-	mgo "gopkg.in/mgo.v2"
 )
 
 const (
@@ -136,11 +137,12 @@ func newGRPCConn(transactionsURL string, logger log.Logger) *grpc.ClientConn {
 
 func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, logger log.Logger) auth.Service {
 	users := mongo.NewUserRepository(ms)
+	accessControl := mongo.NewAccessRequestRepository(ms)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
 
-	svc := auth.New(users, hasher, idp, ts)
+	svc := auth.New(users, hasher, idp, ts, accessControl)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

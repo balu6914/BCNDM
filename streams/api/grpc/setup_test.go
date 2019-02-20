@@ -1,11 +1,11 @@
 package grpc_test
 
 import (
-	"fmt"
 	"datapace"
 	"datapace/streams"
 	grpcapi "datapace/streams/api/grpc"
 	"datapace/streams/mocks"
+	"fmt"
 	"net"
 	"os"
 	"testing"
@@ -39,6 +39,7 @@ func startServer() {
 
 func newService() streams.Service {
 	repo := mocks.NewStreamRepository()
+	ac := mocks.NewAccessControl([]string{})
 
-	return streams.NewService(repo)
+	return streams.NewService(repo, ac)
 }

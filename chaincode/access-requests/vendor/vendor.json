@@ -11,8 +11,8 @@
 		{
 			"checksumSHA1": "ZzWCzHsWRI/LAxhZYUMqVcIAsZQ=",
 			"path": "github.com/hyperledger/fabric/protos/msp",
-			"revision": "64c51fcc13127ff16d2ddf59f4007b250ab1883c",
-			"revisionTime": "2019-02-12T02:06:50Z"
+			"revision": "8fed4973e93bfadbc20f515221d012d98a4e4808",
+			"revisionTime": "2019-01-30T15:02:50Z"
 		}
 	],
 	"rootPath": "github.com/chaincode/access-requests"

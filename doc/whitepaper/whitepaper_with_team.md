@@ -43,7 +43,7 @@ can be used to sell or buy any type of data, independently of it's type or prove
 Datapace is distributed and decentralized system based on blockchain.
 Blockchain technology is used for several important purposes in Datapace system:
 
-- To enable tokenization of value (i.e. provide TAS token) and token economy
+- To enable tokenization of value (i.e. provide DPC token) and token economy
 - To insure data integrity (i.e. to store data hashes and guarantee that data is not tampered with)
 - To enable Smart Contract capabilities
 - To provide network security via PBFT consensus and immutability and
@@ -69,9 +69,9 @@ Based on this we can identify following stakeholders of Datapace system:
 ## Data Buyers
 Data buyers are organizations and individuals that are interested in buying the data. They log into the system and browse the data streams offered for sell, as one would browse items on eBay or Amazon marketplace.
 
-Data streams are offered under certain price and can are purchased for TAS tokens.
+Data streams are offered under certain price and can are purchased for DPC tokens.
 
-Data buyer must have a sufficient amount of TAS tokens in his wallet in order to purchase the data. Once data is purchased, data buyer obtains a proxied HTTP URL from which he can consume the data. This URL is unique and temporary - it expires after the lease period for which data was payed for.
+Data buyer must have a sufficient amount of DPC tokens in his wallet in order to purchase the data. Once data is purchased, data buyer obtains a proxied HTTP URL from which he can consume the data. This URL is unique and temporary - it expires after the lease period for which data was payed for.
 
 ## Data Sellers
 Data sellers are organizations or individuals that offer the data for sell.
@@ -82,10 +82,10 @@ Additionally, data seller can provide geolocation data of the stream source, so 
 
 Data sellers should provide valid data sources. In order to guarantee the validity of the data, Datapace employs several mechanisms - like seller reputation rating and verified IoT gateway HW provisioning, which will be explained in dedicated chapter.
 
-Data sellers obtain TAS tokens in their wallet when the stream that they offered is purchased.
+Data sellers obtain DPC tokens in their wallet when the stream that they offered is purchased.
 
 ## Validators
-Validators are the entities that participate in network infrastructure, i.e. in block validation. Validators are rewarded for their work in TAS tokens.
+Validators are the entities that participate in network infrastructure, i.e. in block validation. Validators are rewarded for their work in DPC tokens.
 
 Because in the phase 1 Datapace is based on private PBFT blockchain, set of validators must be known up-front. Datapace consortium will allow adherence of new members under strict contractual agreements.
 
@@ -187,7 +187,7 @@ Tendermint is very performant PBFT consensus algorithm - it supports thousands o
 \label{fig:arch}
 \end{figure}
 
-Interoperability is extremely important, as it will enable TAS token to natively flow from Datapace private blockchain into other blockchains connected to the Cosmos hub, thus opening potential for TAS exchange to other crypto-currencies, and vice versa. This will influence token economy and raise the value of the TAS token. Additionally, developed token economy would allow _Proof-of-Stake_ consensus to be applied on the top of the Datapace-Tendermint system and allow opening Datapace validator set participation to the wide public.
+Interoperability is extremely important, as it will enable DPC token to natively flow from Datapace private blockchain into other blockchains connected to the Cosmos hub, thus opening potential for DPC exchange to other crypto-currencies, and vice versa. This will influence token economy and raise the value of the DPC token. Additionally, developed token economy would allow _Proof-of-Stake_ consensus to be applied on the top of the Datapace-Tendermint system and allow opening Datapace validator set participation to the wide public.
 
 Scalability is also important, although, as a consequence of the wise technology choices, Datapace system is already very performant. But "Interent of Blockchains" will enable additional scaling od Datapace chains through sharding[@shard] using Cosmos zones.
 
@@ -211,9 +211,9 @@ Scalability is also important, although, as a consequence of the wise technology
   \node[draw, minimum width=3cm, minimum height=1cm, anchor=center, text width=2cm, align=center, below of=E, yshift=-1cm] (C) {Custom Blockchain};
 
   % draw the paths and and print some Text below/above the graph
-  \path (COS) edge[-] node[anchor=north,above]{TAS} (M1);
-  \path (COS) edge[-] node[anchor=north,above]{TAS} (M2);
-  \path (COS) edge[-] node[anchor=north,above]{TAS} (M3);
+  \path (COS) edge[-] node[anchor=north,above]{DPC} (M1);
+  \path (COS) edge[-] node[anchor=north,above]{DPC} (M2);
+  \path (COS) edge[-] node[anchor=north,above]{DPC} (M3);
 
   \path (COS) edge[-] node[anchor=north,above]{BTC} (B);
   \path (COS) edge[-] node[anchor=north,above]{ETH} (E);
@@ -228,7 +228,7 @@ Scalability is also important, although, as a consequence of the wise technology
 
 As mentioned before, blockchain technology is used for several important purposes in Datapace system:
 
-- **TAS token**: TAS token is native token of value in Datapace system and is necessary for system operation and functioning. It will be explained in details in a dedicated chapter.
+- **DPC token**: DPC token is native token of value in Datapace system and is necessary for system operation and functioning. It will be explained in details in a dedicated chapter.
 - **Data integrity**: Leveraging on BigchainDB digital asset features, as well as native digital asset querying, Datapace implements mechanism that insures integrity of the data that flows through the system by taking it's digital fingerprint (cryptographic hash) and stores it in to the immutable blockchain database. This way system assures that critical data has not been tampered with. In the context of OTA firmware updates of safety-critical IoT devices or tamper-proof checking of already running software on such a systems (for example a braking system of a self-driving vehicule) this form of data security becomes quintessential.
 - **Smart Contract**: Smart Contracts define a complex set of conditions under which data is exchanged. They are important part of Datapace system, and will be explained in detail in a dedicated chapter.
 - **Network security (via PBFT consensus)**:  In order to protect valuable digital assets and network infrastructure in the era of ever-increasing security threats[^2], Datapace builds a decentralized network based on Byzantine fault-tolerant state and data replication algorithm. This way system can tolerate up to 1/3 malicious-acting nodes and assure network functioning under cyber-attack. Additionally, blockchain-structured data assure immutability and anti-tampering characteristics. Applying _Proof-of-Validated-Source_ and _Proof-of-Stake_ consensus, network is adding an additional layer of protection, incentivizing nodes to behave honestly and punishing badly behaving nodes. Based on these important features and technologies, Datapace builds high-security network that is capable to fully protect digital assets and insure secure protection of value exchanged through Datapace marketplace.
@@ -273,7 +273,7 @@ BigchainDB        & Blockchain (Distributed Ledger). Provides token as a form of
 Tendermint        & Provides PBFT consensus algorithm and P2P machine state replication. Adds security to Datapace blockchain (BigchainDB network). Facilitates Cosmos integration.     \\
 \midrule
 
-Cosmos            & Provides TAS token interchangeability. Provides Datapace blockchain scalability through sharding. Provides interoperability with other blockchain networks - like Ethereum or Bitcoin.      \\
+Cosmos            & Provides DPC token interchangeability. Provides Datapace blockchain scalability through sharding. Provides interoperability with other blockchain networks - like Ethereum or Bitcoin.      \\
 \midrule
 
 Mainflux          & Provides IoT platform as a service. Enables IoT sensor and gateway connectivity and management. Provides IoT messaging, real-time and persisted data. \\
@@ -295,7 +295,7 @@ Datapace installs these sensors in cooperation with network and telecom partners
 
 Datapace partners that install and deploy this equipment will have an advantage on the marketplace, as their data sources will be marked as "trusted and verified".
 
-Moreover, since these partners made an economic investment and also entered in partnership with Datapace through various legal contractual agreements, they are allowed to run a validating node and participate in _Proof-of-Verified-Source_ network consensus. Validators are rewarded for their work with TAS tokens.
+Moreover, since these partners made an economic investment and also entered in partnership with Datapace through various legal contractual agreements, they are allowed to run a validating node and participate in _Proof-of-Verified-Source_ network consensus. Validators are rewarded for their work with DPC tokens.
 
 ## Implementation
 Datapace sensors are attached to Datapace gateways and edge computers, or directly connected to the IoT platform.
@@ -332,12 +332,12 @@ Datapace provides IoT platform to monitor and manage IoT network and gather the 
 
 An additional benefit of enabling data connection via Datapace IoT platform is that users that choose this option can add various data processing and analytic services offered by Datapace system. Additionally, they can apply ML and AI insights to their data prior to offering them for sell, which would significantly augment the data price.
 
-# TAS Token
-TAS token is utility token of Datapace system. It is used to assure fair and secure functioning of the system, as well as to enable token economy on the Datapace data market.
+# DPC Token
+DPC token is utility token of Datapace system. It is used to assure fair and secure functioning of the system, as well as to enable token economy on the Datapace data market.
 
-Primary purpose of the token will be to fuel the system - it will be used to tokenize the value of digital assets (i.e. data) and facilitate their exchange. Equally, once the token economy is developed, TAS token will have a purpose in enabling the consensus mechanism based on _Proof-of-Stake_.
+Primary purpose of the token will be to fuel the system - it will be used to tokenize the value of digital assets (i.e. data) and facilitate their exchange. Equally, once the token economy is developed, DPC token will have a purpose in enabling the consensus mechanism based on _Proof-of-Stake_.
 
-Data sellers will use TAS token as a representation of value of their digital data streams that are offered on the marketplace. Buyers will use TAS token to exchange it for selected data - they will transfer their TAS tokens to data sellers and obtain their digital assets in return.
+Data sellers will use DPC token as a representation of value of their digital data streams that are offered on the marketplace. Buyers will use DPC token to exchange it for selected data - they will transfer their DPC tokens to data sellers and obtain their digital assets in return.
 
 # Proof-of-Verified-Source and Proof-of-Stake
 Datapace system employs two types of proof schemes that allow data providers and network participants to prove the data origin and quality as well as to enforce
@@ -353,10 +353,10 @@ Because a company or an operator that purchases the equipment has to invest mone
 Moreover, possibility to have _Verified Data Source_ badge listed next to the data sources offered by these companies is an additional incentive for them to purchase the specialized sensors and other equipment.
 
 ## Proof-of-Stake
-Once TAS token economy is developed, a _Proof-of-Stake_ consensus algorithm will be applied in order to additionally incentivise companies and individuals that run validator nodes and help secure the network.
+Once DPC token economy is developed, a _Proof-of-Stake_ consensus algorithm will be applied in order to additionally incentivise companies and individuals that run validator nodes and help secure the network.
 
 _Proof-of-Stake_ will equaly be used to enforce honest behavior of data sellers,
-because they will have to invest a monetary deposit (in form of TAS tokens).
+because they will have to invest a monetary deposit (in form of DPC tokens).
 In case of malicious behavior (wrong data delivered, or data not delivered at all)
 deposit will be withdrawn by the system and bad actor will be punished.
 
@@ -383,19 +383,19 @@ Besides data, a marketplace based on the blockchain can allow economy of at leas
 ## Storage
 Companies like **Storj**[@storj] or **Sia**[@sia] announced projects that strive to enable decentralized cloud. With low prices that would be a consequence of tokenized storage capacity offered by the various users in exchange of tokens, these companies can become a real competitors of SW giants in the cloud bussiness space - like Amazon or Google.
 
-Datapace plans to integrate and maintain permissioned distributed file-system through wich Datapace users will be capable to offer and rent their storage space in exchange for TAS tokens.
+Datapace plans to integrate and maintain permissioned distributed file-system through wich Datapace users will be capable to offer and rent their storage space in exchange for DPC tokens.
 
 ## Computing
 Projects like **Golem**[@golem] or **SONM**[@sonm] are working on decentralizing the computing power.
 
-Based this ideas, but also on the ideas presented by **Blue Horizon** project from IBM [@bhz], Datapace plans to enable Docker container based decentralized platform for deploying arbitrary software on the computing infrastructure offered and rented by Datapace users in exchange of TAS tokens.
+Based this ideas, but also on the ideas presented by **Blue Horizon** project from IBM [@bhz], Datapace plans to enable Docker container based decentralized platform for deploying arbitrary software on the computing infrastructure offered and rented by Datapace users in exchange of DPC tokens.
 
 # Conclusion
 Based on many reports[^mck], we can be sure of one thing: there is gold in the mountains of data. A way is needed to mine all this gold - a platform is needed to monetize all this data. Datapace is a an enabler that will unlock this huge potential.
 
-Datapace builds decentralized marketplace based on blockchain, that is secure and scalable. It enables new token economy - TAS token will be used as an utility token of Datapace system, and will be used to enable fair and secure functioning of the system as well to enable trading facilities.
+Datapace builds decentralized marketplace based on blockchain, that is secure and scalable. It enables new token economy - DPC token will be used as an utility token of Datapace system, and will be used to enable fair and secure functioning of the system as well to enable trading facilities.
 
-Datapace builds whole environment needed for quick adoption of the system: UI, wallet, API and SDKs. This will lower adoption barriers and lead to the higher popularity of the system, which will in turn incentivise the economy based on TAS token.
+Datapace builds whole environment needed for quick adoption of the system: UI, wallet, API and SDKs. This will lower adoption barriers and lead to the higher popularity of the system, which will in turn incentivise the economy based on DPC token.
 
 Due to unique positioning, Datapace provides specialized senor hardware, and employing various patent-pending techniques assures that data sources are verified. Moreover, through specific AI and machine learning algorithms, Datapace system assures that all data streams can be unified in format and prepared for easy consummation. This brings clear advantage of Datapace comparing to all existing competition.
 
@@ -441,6 +441,6 @@ Facebook: <https://www.facebook.com/datapace>
 
 # Acknowledgments {-}
 This work is the cumulative effort of multiple individuals within the Datapace team, and would not
-have been possible without the help, comments, and review of the collaborators and advisors of Datapace. Drasko Draskovic ad George Saleh wrote the original Datapace whitepaper in 2017, laying the groundwork for this work. Nikola Marcetic developed ideas related to the Datapace decentralized protocol and implemented original temporary proxying scheme. Janko Isidorovic contributed ideas related to TAS token economy and integration with Mainflux IoT platform. Manuel imperiale, Darko Draskovic and Sasa Klopanovic improved the protocol, designed TAS token wallet and added geofencing capabilities. We also thank all of our collaborators and advisors for useful conversations; in particular Ilia Zelenikin and Dejan Novakovic.
+have been possible without the help, comments, and review of the collaborators and advisors of Datapace. Drasko Draskovic ad George Saleh wrote the original Datapace whitepaper in 2017, laying the groundwork for this work. Nikola Marcetic developed ideas related to the Datapace decentralized protocol and implemented original temporary proxying scheme. Janko Isidorovic contributed ideas related to DPC token economy and integration with Mainflux IoT platform. Manuel imperiale, Darko Draskovic and Sasa Klopanovic improved the protocol, designed DPC token wallet and added geofencing capabilities. We also thank all of our collaborators and advisors for useful conversations; in particular Ilia Zelenikin and Dejan Novakovic.
 
 # References

@@ -152,6 +152,37 @@ services:
     networks:
       - datapace-net
 
+  ###
+  # Executions DB
+  ###
+  datapace-executions-db:
+    image: mongo:latest
+    container_name: datapace-executions-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./executions-data:/data/db
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+  ###
+  # Executions serivce
+  ###
+  datapace-executions:
+    image: datapace/executions:latest
+    container_name: datapace-executions
+    depends_on:
+      - datapace-executions-db
+      - datapace-streams
+    ports:
+      - 8088:8088
+    environment:
+      - DATAPACE_EXECUTIONS_HTTP_PORT=8088
+      - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+    networks:
+      - datapace-net
+
   datapace-proxy:
     image: datapace/proxy:latest
     container_name: datapace-proxy
@@ -200,6 +231,7 @@ services:
       - datapace-auth
       - datapace-transactions
       - datapace-streams
+      - datapace-executions
       - datapace-ui
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf

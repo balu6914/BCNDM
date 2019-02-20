@@ -71,7 +71,7 @@ LmQ6Yvctwv0WEeTCLAuRSmPZL9+hNzX+
 
 var td = tokenData{
 	Name:        "DatapaceToken",
-	Symbol:      "TAS",
+	Symbol:      "DPC",
 	Decimals:    8,
 	TotalSupply: 1000,
 }

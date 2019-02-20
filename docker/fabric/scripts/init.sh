@@ -13,7 +13,7 @@ CHANNEL_ID=myc
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
 TOKEN_CHAIN_VER=1.0
-TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"TAS\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+TOKEN_CHAIN_INIT_FN='{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"DPC\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
 
 FEE_CHAIN_ID=fee
 FEE_CHAIN_PATH=github.com/chaincode/system-fee
@@ -62,10 +62,8 @@ cd $GOPATH/src/github.com/chaincode/token
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -76,10 +74,8 @@ cd $GOPATH/src/github.com/chaincode/system-fee
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -90,10 +86,8 @@ cd $GOPATH/src/github.com/chaincode/contracts
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -104,10 +98,8 @@ cd $GOPATH/src/github.com/chaincode/access-requests
 # Install govendor tool
 go get -u github.com/kardianos/govendor
 
-govendor init
-
 # Fetch deps
-govendor fetch github.com/hyperledger/fabric/protos/msp
+govendor sync
 
 cd $LOCATION
 
@@ -119,7 +111,7 @@ echo "step 5"
 
 sleep 5
 
-# Init/provision system with TAS
+# Init/provision system with DPC
 peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 
 # Init/provision system with system fee

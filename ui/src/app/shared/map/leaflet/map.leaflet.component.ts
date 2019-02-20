@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
-import { TasPipe } from 'app/common/pipes/converter.pipe';
+import { DpcPipe } from 'app/common/pipes/converter.pipe';
 
 import * as L from 'leaflet';
 
@@ -48,7 +48,7 @@ export class MapComponent implements OnChanges {
   @Output() viewChanged: EventEmitter<any> = new EventEmitter();
   @Output() hoverMarker: EventEmitter<any> = new EventEmitter();
   constructor(
-    private tasPipe: TasPipe,
+    private dpcPipe: DpcPipe,
   ) {
   }
 
@@ -174,7 +174,7 @@ export class MapComponent implements OnChanges {
           <p class="map-tooltip__subtitle"> ${stream.type} </p>
           <p class="map-tooltip__stake">
             Stake: <span class="map-tooltip__stake-amount">
-            ${this.tasPipe.transform(stream.price)} TAS
+            ${this.dpcPipe.transform(stream.price)} DPC
           </span>
           </p>
         </div>

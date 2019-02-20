@@ -35,3 +35,23 @@ func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 		return emailRes{u.Email, u.ContactEmail, nil}, nil
 	}
 }
+
+func partnersEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(partnersReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		partners, err := svc.ListPartners(req.id)
+		if err != nil {
+			return partnersRes{}, err
+		}
+
+		res := partnersRes{
+			partners: partners,
+		}
+
+		return res, nil
+	}
+}

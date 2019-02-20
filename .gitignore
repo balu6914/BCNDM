@@ -10,6 +10,7 @@ streams-data/
 subscriptions-data/
 transactions-data/
 proxy-data/
+executions-data/
 
 # System Files
 .DS_Store
