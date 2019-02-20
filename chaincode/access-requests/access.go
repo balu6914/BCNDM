@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-)
+import "github.com/hyperledger/fabric/core/chaincode/shim"
 
 const indexAccess = "cn~access"
 
@@ -31,7 +29,7 @@ func (ac accessChaincode) RequestAccess(stub shim.ChaincodeStubInterface, receiv
 		return ErrGettingState
 	}
 
-	if val != nil && string(val) != Revoked {
+	if val != nil && State(val) != Revoked {
 		return ErrConflict
 	}
 
@@ -62,7 +60,7 @@ func (ac accessChaincode) ApproveAccess(stub shim.ChaincodeStubInterface, reques
 		return ErrNotFound
 	}
 
-	if string(val) != Pending {
+	if State(val) != Pending {
 		return ErrInvalidStateTransition
 	}
 
@@ -93,7 +91,7 @@ func (ac accessChaincode) RevokeAccess(stub shim.ChaincodeStubInterface, request
 		return ErrNotFound
 	}
 
-	if string(val) != Approved {
+	if State(val) != Approved && State(val) != Pending {
 		return ErrInvalidStateTransition
 	}
 

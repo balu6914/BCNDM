@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
-import { DashboardAccessComponent } from './dashboard.access.component';
+import { DashboardAccessComponent } from './main/dashboard.access.component';
 import { DashboardAccessAddComponent } from './add/dashboard.access.add.component';
 import { AuthGuardService as AuthGuard } from 'app/auth/guardians/auth.guardian';
 

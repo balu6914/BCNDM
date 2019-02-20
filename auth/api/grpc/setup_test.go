@@ -1,11 +1,11 @@
 package grpc_test
 
 import (
-	"fmt"
 	"datapace"
 	"datapace/auth"
 	grpcapi "datapace/auth/api/grpc"
 	"datapace/auth/mocks"
+	"fmt"
 	"net"
 	"os"
 	"testing"
@@ -29,8 +29,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
+	accessRequests := mocks.NewAccessRequestRepository()
 
-	return auth.New(repo, hasher, idp, ts)
+	return auth.New(repo, hasher, idp, ts, accessRequests)
 }
 
 func startGRPCServer(svc auth.Service, port int) {

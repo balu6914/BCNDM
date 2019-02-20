@@ -37,3 +37,7 @@ func (svc authClientMock) Email(_ context.Context, in *datapace.Token, opts ...g
 
 	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 }
+
+func (svc authClientMock) Partners(_ context.Context, id *datapace.UserID, _ ...grpc.CallOption) (*datapace.PartnersList, error) {
+	return &datapace.PartnersList{Value: []string{}}, nil
+}

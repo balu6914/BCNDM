@@ -5,6 +5,7 @@ package datapace;
 service AuthService {
     rpc Identify(Token) returns (UserID) {}
     rpc Email(Token) returns (UserEmail) {}
+    rpc Partners(UserID) returns (PartnersList) {}
 }
 
 message Token {
@@ -18,4 +19,8 @@ message UserID {
 message UserEmail {
     string email = 1;
     string contactEmail = 2;
+}
+
+message PartnersList {
+    repeated string value = 1;
 }

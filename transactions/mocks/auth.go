@@ -38,3 +38,7 @@ func (mac *mockAuthClient) Identify(_ context.Context, token *datapace.Token, _ 
 func (mac *mockAuthClient) Email(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserEmail, error) {
 	return &datapace.UserEmail{Email: "", ContactEmail: ""}, nil
 }
+
+func (mac *mockAuthClient) Partners(_ context.Context, id *datapace.UserID, _ ...grpc.CallOption) (*datapace.PartnersList, error) {
+	return &datapace.PartnersList{Value: []string{}}, nil
+}

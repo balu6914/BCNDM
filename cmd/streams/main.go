@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"datapace"
 	authapi "datapace/auth/api/grpc"
 	log "datapace/logger"
@@ -10,12 +9,15 @@ import (
 	grpcapi "datapace/streams/api/grpc"
 	httpapi "datapace/streams/api/http"
 	"datapace/streams/mongo"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"datapace/streams/access"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -126,7 +128,9 @@ func connectToAuthService(authAddr string, logger log.Logger) *grpc.ClientConn {
 
 func newServices(ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) (streams.Service, streams.Authorization) {
 	repo := mongo.New(ms)
-	svc := streams.NewService(repo)
+	a := authapi.NewClient(conn)
+	accessControl := access.New(a)
+	svc := streams.NewService(repo, accessControl)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,
@@ -143,7 +147,6 @@ func newServices(ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) (str
 			Help:      "Total duration of requests in microseconds.",
 		}, []string{"method"}),
 	)
-	a := authapi.NewClient(conn)
 	auth := streams.NewAuthorization(a, logger)
 
 	return svc, auth

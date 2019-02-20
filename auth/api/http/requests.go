@@ -122,3 +122,73 @@ func (req updatePasswordReq) validate() error {
 	return nil
 
 }
+
+type requestAccessReq struct {
+	key      string
+	Receiver string `json:"receiver"`
+}
+
+func (req requestAccessReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.Receiver == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type approveAccessReq struct {
+	key string
+	id  string
+}
+
+func (req approveAccessReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.id == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type rejectAccessReq struct {
+	key string
+	id  string
+}
+
+func (req rejectAccessReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.id == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type listAccessRequestsReq struct {
+	key   string
+	state auth.State
+}
+
+func (req listAccessRequestsReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.state != auth.Pending &&
+		req.state != auth.Approved &&
+		req.state != auth.Revoked {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}

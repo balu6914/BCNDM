@@ -10,3 +10,8 @@ type emailRes struct {
 	contactEmail string
 	err          error
 }
+
+type partnersRes struct {
+	partners []string
+	err      error
+}

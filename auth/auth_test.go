@@ -1,9 +1,9 @@
 package auth_test
 
 import (
-	"fmt"
 	"datapace/auth"
 	"datapace/auth/mocks"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,8 +25,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
+	accessRequests := mocks.NewAccessRequestRepository()
 
-	return auth.New(users, hasher, idp, ts)
+	return auth.New(users, hasher, idp, ts, accessRequests)
 }
 
 func TestRegister(t *testing.T) {
