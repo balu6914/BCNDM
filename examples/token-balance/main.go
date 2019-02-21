@@ -11,7 +11,7 @@ func main() {
 
 	fSetup := blockchain.FabricSetup{
 		OrgAdmin:    "admin",
-		OrgName:     "Org1",
+		OrgName:     "DatapaceOrg",
 		ConfigFile:  "../../config/fabric/config.yaml",
 		ChannelID:   "datapace",
 		ChaincodeID: "token",

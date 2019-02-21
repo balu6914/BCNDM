@@ -77,23 +77,23 @@ Organizations:
               Rule: "OR('OrdererMSP.admin')"
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
-    - &Org1
+    - &DatapaceOrg
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org1MSP
+        Name: DatapaceOrgMSP
         # ID to load the MSP definition as
-        ID: Org1MSP
+        ID: DatapaceOrgMSP
         MSPDir: ../crypto-config/peerOrganizations/org1.datapace.com/msp
-        Policies:  &Org1Policies
+        Policies:  &DatapaceOrgPolicies
           Readers:
               Type: Signature
-              Rule: "OR('Org1MSP.member')"
+              Rule: "OR('DatapaceOrgMSP.member')"
           Writers:
               Type: Signature
-              Rule: "OR('Org1MSP.member')"
+              Rule: "OR('DatapaceOrgMSP.member')"
           Admins:
               Type: Signature
-              Rule: "OR('Org1MSP.admin')"
+              Rule: "OR('DatapaceOrgMSP.admin')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -279,9 +279,9 @@ Application: &ApplicationDefaults
       Admins:
           Type: ImplicitMeta
           Rule: "MAJORITY Admins"
-      Org1MemberPolicy:
+      DatapaceOrgMemberPolicy:
           Type: Signature
-          Rule: "OR('Org1MSP.member')"
+          Rule: "OR('DatapaceOrgMSP.member')"
 
   # Capabilities describes the application level capabilities, see the
   # dedicated Capabilities section elsewhere in this file for a full
@@ -300,29 +300,34 @@ Application: &ApplicationDefaults
 Profiles:
 
     DatapaceOrdererGenesis:
-        <<: *ChannelDefaults
+        Capabilities:
+          <<: *ChannelCapabilities
         Orderer:
             <<: *OrdererDefaults
             Organizations:
             - <<: *OrdererOrg
-              Policies:
-                <<: *OrdererOrgPolicies
-                Admins:
-                    Type: Signature
-                    Rule: "OR('OrdererMSP.admin')"
+            Capabilities:
+              <<: *OrdererCapabilities
+            Policies:
+              <<: *OrdererOrgPolicies
+              Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
         Consortiums:
             DatapaceConsortium:
                 Organizations:
-                - <<: *Org1
+                - <<: *DatapaceOrg
                   Policies:
-                      <<: *Org1Policies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('Org1MSP.admin')"
+                    <<: *DatapaceOrgPolicies
+                    Admins:
+                      Type: Signature
+                      Rule: "OR('DatapaceOrgMSP.admin')"
 
     DatapaceChannel:
         Consortium: DatapaceConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Org1
+                - *DatapaceOrg
+            Capabilities:
+              <<: *ApplicationCapabilities

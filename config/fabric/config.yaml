@@ -11,7 +11,7 @@ version: 2
 # The client section used by GO SDK.
 client:
   # Which organization does this application instance belong to? The value must be the name of an org
-  organization: Org1
+  organization: DatapaceOrg
   logging:
     level: debug
 
@@ -29,7 +29,7 @@ client:
     timeout:
       connection: 3s
       response: 5s
-  localMspId: Org1MSP
+  localMspId: DatapaceOrgMSP
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
@@ -90,7 +90,7 @@ channels:
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: Org1MSP
+    mspid: DatapaceOrgMSP
     cryptoPath: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp"
     peers:
       - peer0.org1.datapace.com
