@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <h5 class="modal-title">Buy Streams</h5>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="modalBuyGroupStream.hide()">
+  <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+    <table class="table" >
+      <thead>
+        <tr>
+          <th scope="col">Stream Name</th>
+          <th scope="col">Stream Type</th>
+          <th scope="col">Stream Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stream of this.streamsList">
+          <td>{{stream.name}}</td>
+          <td>{{stream.type}}</td>
+          <td>{{stream.price | dpc}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="modal-section-border">
+      <div class="row">
+        <div class="col-3">
+          <div class="modal__subtitle">
+            Tokens per hour
+          </div>
+        </div>
+        <div class="col-9">
+          <form class="form-inline float-right buy-tas needs-validation" [formGroup]="form" novalidate>
+            <div class="form-group">
+              <label for="hours" class="form-label mr-2">Subscription hours</label>
+              <input type="number" formControlName="hours" class="form-control buy-tas__input">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3 col-sm-5">
+        <div class="modal__subtitle">
+          Subscription charge
+        </div>
+      </div>
+      <div class="col-9 col-sm-7">
+        <div class="modal__summary">
+          {{((totalSum * form.value.hours) | dpc)}} DPC
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-padding-lg btn-xs-full" (click)="onBuyAllClick()">Buy All</button> 
+  </div>
+</div>

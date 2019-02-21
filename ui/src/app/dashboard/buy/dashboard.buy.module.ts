@@ -10,7 +10,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { DashboardBuyAddComponent } from './add';
 // Buy routes
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
-
+import { DashboardBuyGroupComponent } from './group';
 
 @NgModule({
   imports: [
@@ -25,9 +25,11 @@ import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
   declarations: [
     DashboardBuyComponent,
     DashboardBuyAddComponent,
+    DashboardBuyGroupComponent,
   ],
   entryComponents: [
     DashboardBuyAddComponent,
+    DashboardBuyGroupComponent,
   ],
 })
 export class DashboardBuyModule { }
