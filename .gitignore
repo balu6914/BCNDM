@@ -11,6 +11,9 @@ subscriptions-data/
 transactions-data/
 proxy-data/
 executions-data/
+access-control-data/
+datapace-service-kvs/
+datapace-service-msp/
 
 # System Files
 .DS_Store
