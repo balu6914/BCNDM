@@ -15,6 +15,10 @@ export class UserService {
     return this.http.get<User>(`${environment.API_AUTH}`);
   }
 
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.API_AUTH}/all`);
+  }
+
   addUser(data): Observable<User> {
     return this.http.post<User>(`${environment.API_AUTH}`, data);
   }
@@ -22,9 +26,11 @@ export class UserService {
   removeUser(id: string) {
     return this.http.delete(`${environment.API_AUTH}`);
   }
+
   updateUser(data): Observable<User> {
     return this.http.put<User>(`${environment.API_AUTH}`, data);
   }
+
   updatePassword(data): Observable<User> {
     return this.http.put<User>(`${environment.API_AUTH}/password`, data);
   }

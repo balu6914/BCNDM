@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -15,23 +15,38 @@ export class AccessService {
     private http: HttpClient,
   ) { }
 
-  create(data: any) {
-    return this.http.post(`${environment.API_CONTRACTS}`, data);
+  requestAccess(data: any) {
+    return this.http.post(`${environment.API_AUTH_ACCESS}`, data);
   }
 
-  sign(data: any) {
-    return this.http.patch(`${environment.API_CONTRACTS}/sign`, data);
-  }
-
-  get(query: any): Observable<Page<Access>>  {
+  getAccessSent(state: string) {
     let params = new HttpParams();
-    params = params.set('owner', query.isOwner.toString());
-    params = params.set('partner', query.isPartner.toString());
-    params = params.set('page', query.page.toString());
-
-    return this.http.get<Page<Access>>(`${environment.API_CONTRACTS}`, {
-      params: params
+    params = params.set('state', state);
+    return this.http.get(`${environment.API_AUTH_ACCESS}/sent`, {
+      params: params,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
     });
+  }
+
+  getAccessReceived(state: string) {
+    let params = new HttpParams();
+    params = params.set('state', state);
+    return this.http.get(`${environment.API_AUTH_ACCESS}/received`, {
+      params: params,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    });
+  }
+
+  approveAccessRequest(requestID: string) {
+    return this.http.put(`${environment.API_AUTH_ACCESS}/${requestID}/approve`, {});
+  }
+
+  rejectAccessRequest(requestID: string) {
+    return this.http.put(`${environment.API_AUTH_ACCESS}/${requestID}/reject`, {});
   }
 
 }

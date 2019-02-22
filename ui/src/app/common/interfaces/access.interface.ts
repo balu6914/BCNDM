@@ -1,6 +1,8 @@
 export class Access {
   constructor(
-    public partner_id: string,
-    public signed: boolean,
+    public receiver: string,
+    public state: string,
+    public origin: string,
+    public id?: string,
   ) { }
 }

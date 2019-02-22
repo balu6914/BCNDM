@@ -8,7 +8,6 @@ import { DashboardAccessRoutingModule } from './dashboard.access.routes';
 import { DashboardAccessComponent } from './main/dashboard.access.component';
 import { DashboardAccessDetailsComponent } from './access-details/dashboard.access.details.component';
 import { DashboardAccessAddComponent } from './add/dashboard.access.add.component';
-import { DashboardAccessSignComponent } from './sign/dashboard.access.sign.component';
 import { DashboardAccessHelpComponent } from './help/dashboard.access.help.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
@@ -30,11 +29,9 @@ import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
     DashboardAccessAddComponent,
     DashboardAccessDetailsComponent,
     DashboardAccessHelpComponent,
-    DashboardAccessSignComponent,
   ],
   entryComponents: [
     DashboardAccessAddComponent,
-    DashboardAccessSignComponent,
   ]
 })
 export class DashboardAccessModule { }

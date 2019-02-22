@@ -13,7 +13,7 @@ import { Stream, Subscription } from 'app/common/interfaces';
 import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-
+import { Access } from 'app/common/interfaces/access.interface';
 
 @Component({
   selector: 'dpc-table-row',
@@ -35,6 +35,8 @@ export class TableRowComponent implements OnInit {
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
+  @Output() accessApproved: EventEmitter<any> = new EventEmitter();
+  @Output() accessRejected: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -158,5 +160,13 @@ export class TableRowComponent implements OnInit {
 
   onCheckboxChanged(row: Stream) {
     this.checkboxChangedEvt.emit(row);
+  }
+
+  approveAccess(row: Access) {
+    this.accessApproved.emit(row);
+  }
+
+  rejectAccess(row: Access) {
+    this.accessRejected.emit(row);
   }
 }

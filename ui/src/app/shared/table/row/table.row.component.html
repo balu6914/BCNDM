@@ -45,15 +45,26 @@
   </div>
 </tr>
 <tr *ngIf="rowType === types.Access">
-  <td>{{ row.partner_id }}</td>
+  <td>{{ row.receiver }}</td>
+  <td>{{ row.origin }}</td>
   <td nowrap>
-    <div *ngIf="row.signed" class="status-wrapper">
+    <div *ngIf="row.state == 'approved'" class="status-wrapper">
       <span class="status-icon status-icon--signed"></span>
-      <span class="status-icon__text">Signed</span>
+      <span class="status-icon__text">Access approved</span>
     </div>
-    <div *ngIf="!row.signed" class="status-wrapper">
+    <div *ngIf="row.state == 'pending'" class="status-wrapper">
       <span class="status-icon status-icon--waiting"></span>
-      <span class="status-icon__text">Waiting for a signature</span>
+      <span class="status-icon__text">Access pending</span>
+    </div>
+    <div *ngIf="row.state == 'rejected'" class="status-wrapper">
+      <span class="status-icon status-icon--expired"></span>
+      <span class="status-icon__text">Access revoked</span>
+    </div>
+  </td>
+  <td>
+    <div *ngIf="row.state == 'pending' && row.origin == 'received'" class="status-wrapper">
+      <a type="button" (click)="approveAccess(row)" class="btn btn-primary-alt btn-sm">Approve</a>
+      <a type="button" (click)="rejectAccess(row)" class="btn btn-primary-alt btn-sm">Reject</a>
     </div>
   </td>
 </tr>

@@ -1,36 +1,27 @@
 <!-- Create Access -->
 <div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title" id="newAccessLabel">New access</h5>
+    <h5 class="modal-title" id="newAccessLabel">New Access</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalNewAccess.hide()">
     <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
     <div class="container-fluid">
-      <form class="needs-validation" [formGroup]="form" novalidate>
-        <div formArrayName="parties"
-          *ngFor="let partner of form.get('parties').controls; let i = index;">
-          <div class="form-group row" [formGroupName]="i">
-            <label class="col-sm-4 col-form-label">Partner*</label>
-            <div class="col-sm-5">
-              <select formControlName="partner" class="form-control selectpicker"
-                      [ngClass]="{ 'is-invalid': submitted && form.controls.parties.controls[i].controls.partner.errors }">
-                <option *ngFor="let user of usersName">
-                    {{user}}
-                </option>
-                <option value="" disabled selected hidden>Select a User</option>
-              </select>
-              <div *ngIf="submitted && form.controls.parties.controls[i].controls.partner.errors" class="invalid-feedback">
-                <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.required">Partner ID is required.</div>
-                <div *ngIf="form.controls.parties.controls[i].controls.partner.errors.ownerID">Partner ID cannot be your own ID.</div>
-              </div>
-            </div>
-            <div *ngIf="i == 0">
-              <button (click)="onAddPartner()" class="btn btn-primary">+</button>
-            </div>
-            <div *ngIf="i != 0">
-              <button (click)="onDeletePartner(i)" class="btn btn-danger btn-responsive">-</button>
+      <form class="needs-validation" [formGroup]="form">
+        <div class="form-group row">
+          <label class="col-sm-4 col-form-label">Receiver*</label>
+          <div class="col-sm-5">
+            <select formControlName="receiver" class="form-control selectpicker"
+                    [ngClass]="{ 'is-invalid': submitted && form.controls.receiver.errors }">
+              <option value="" disabled selected hidden>Select a Receiver</option>
+              <option *ngFor="let user of users" [ngValue]="user">
+                  {{ user.first_name }} {{ user.last_name }}
+              </option>
+            </select>
+            <div *ngIf="submitted && form.controls.receiver.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.receiver.errors.required">Receiver is required.</div>
+              <div *ngIf="form.controls.receiver.errors.ownerID">Receiver cannot be yourself.</div>
             </div>
           </div>
         </div>
@@ -38,6 +29,6 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Create contact</button>
+    <button type="button" (click)="onSubmit()" class="btn btn-primary btn-padding-lg btn-xs-full">Create Request</button>
   </div>
 </div>
