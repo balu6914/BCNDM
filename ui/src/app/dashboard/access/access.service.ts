@@ -16,37 +16,31 @@ export class AccessService {
   ) { }
 
   requestAccess(data: any) {
-    return this.http.post(`${environment.API_AUTH_ACCESS}`, data);
+    return this.http.post(`${environment.API_ACCESS_CONTROL}`, data);
   }
 
   getAccessSent(state: string) {
     let params = new HttpParams();
     params = params.set('state', state);
-    return this.http.get(`${environment.API_AUTH_ACCESS}/sent`, {
-      params: params,
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
+    return this.http.get(`${environment.API_ACCESS_CONTROL}/sent`, {
+      params: params
     });
   }
 
   getAccessReceived(state: string) {
     let params = new HttpParams();
     params = params.set('state', state);
-    return this.http.get(`${environment.API_AUTH_ACCESS}/received`, {
-      params: params,
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
+    return this.http.get(`${environment.API_ACCESS_CONTROL}/received`, {
+      params: params
     });
   }
 
   approveAccessRequest(requestID: string) {
-    return this.http.put(`${environment.API_AUTH_ACCESS}/${requestID}/approve`, {});
+    return this.http.put(`${environment.API_ACCESS_CONTROL}/${requestID}/approve`, {});
   }
 
   rejectAccessRequest(requestID: string) {
-    return this.http.put(`${environment.API_AUTH_ACCESS}/${requestID}/reject`, {});
+    return this.http.put(`${environment.API_ACCESS_CONTROL}/${requestID}/reject`, {});
   }
 
 }

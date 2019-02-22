@@ -96,9 +96,15 @@ export class DashboardAccessComponent implements OnInit {
     // modify receiver field to show name instead of ID
     requests.forEach( req => {
       const index = this.users.findIndex(
-        user => req.receiver === user.id
+        user => {
+          if (origin === 'sent') {
+            return req.receiver === user.id;
+          } else {
+            return req.sender === user.id;
+          }
+        }
       );
-      req.receiver = `${this.users[index].first_name} ${this.users[index].last_name}`;
+      req.partner = `${this.users[index].first_name} ${this.users[index].last_name}`;
       // Set origin
       req.origin = origin;
       temp.page.content.push(req);

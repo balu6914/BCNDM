@@ -52,7 +52,7 @@ export class DashboardAccessAddComponent implements OnInit {
       data => {
         this.user = data;
         // Fetch all registered users
-        this.userService.getAllUsers().subscribe(
+        this.userService.getNonPartners().subscribe(
           (result: any) => {
             this.users = result.users;
           },
