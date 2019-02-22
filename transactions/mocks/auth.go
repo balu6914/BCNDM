@@ -5,6 +5,7 @@ import (
 	"datapace"
 	"sync"
 
+	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,7 +23,7 @@ func NewAuthClient(users map[string]string) datapace.AuthServiceClient {
 	return &mockAuthClient{users: users, mutex: &sync.Mutex{}}
 }
 
-func (mac *mockAuthClient) Identify(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserID, error) {
+func (mac *mockAuthClient) Identify(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.ID, error) {
 	mac.mutex.Lock()
 	defer mac.mutex.Unlock()
 
@@ -32,13 +33,13 @@ func (mac *mockAuthClient) Identify(_ context.Context, token *datapace.Token, _ 
 		return nil, status.Error(codes.Unauthenticated, "failed to identify user from key")
 	}
 
-	return &datapace.UserID{Value: id}, nil
+	return &datapace.ID{Value: id}, nil
 }
 
 func (mac *mockAuthClient) Email(_ context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserEmail, error) {
 	return &datapace.UserEmail{Email: "", ContactEmail: ""}, nil
 }
 
-func (mac *mockAuthClient) Partners(_ context.Context, id *datapace.UserID, _ ...grpc.CallOption) (*datapace.PartnersList, error) {
-	return &datapace.PartnersList{Value: []string{}}, nil
+func (mac *mockAuthClient) Exists(_ context.Context, id *datapace.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
 }

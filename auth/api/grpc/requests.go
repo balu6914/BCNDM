@@ -14,11 +14,11 @@ func (req identityReq) validate() error {
 	return nil
 }
 
-type partnersReq struct {
+type existsReq struct {
 	id string
 }
 
-func (req partnersReq) validate() error {
+func (req existsReq) validate() error {
 	if req.id == "" {
 		return auth.ErrMalformedEntity
 	}

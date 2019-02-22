@@ -2,6 +2,7 @@ package main
 
 import (
 	"datapace"
+	accessapi "datapace/access-control/api/grpc"
 	authapi "datapace/auth/api/grpc"
 	log "datapace/logger"
 	"datapace/streams"
@@ -26,21 +27,23 @@ import (
 )
 
 const (
-	envHTTPPort = "DATAPACE_STREAMS_HTTP_PORT"
-	envGRPCPort = "DATAPACE_STREAMS_GRPC_PORT"
-	envDBURL    = "DATAPACE_STREAMS_DB_URL"
-	envDBName   = "DATAPACE_STREAMS_DB_NAME"
-	envDBUser   = "DATAPACE_STREAMS_DB_USER"
-	envDBPass   = "DATAPACE_STREAMS_DB_PASS"
-	envAuthURL  = "DATAPACE_AUTH_URL"
+	envHTTPPort  = "DATAPACE_STREAMS_HTTP_PORT"
+	envGRPCPort  = "DATAPACE_STREAMS_GRPC_PORT"
+	envDBURL     = "DATAPACE_STREAMS_DB_URL"
+	envDBName    = "DATAPACE_STREAMS_DB_NAME"
+	envDBUser    = "DATAPACE_STREAMS_DB_USER"
+	envDBPass    = "DATAPACE_STREAMS_DB_PASS"
+	envAuthURL   = "DATAPACE_AUTH_URL"
+	envAccessURL = "DATAPACE_ACCESS_CONTROL_URL"
 
-	defHTTPPort = "8080"
-	defGRPCPort = "8081"
-	defDBURL    = "0.0.0.0"
-	defDBName   = "streams"
-	defDBUser   = ""
-	defDBPass   = ""
-	defAuthURL  = "localhost:8081"
+	defHTTPPort  = "8080"
+	defGRPCPort  = "8081"
+	defDBURL     = "0.0.0.0"
+	defDBName    = "streams"
+	defDBUser    = ""
+	defDBPass    = ""
+	defAuthURL   = "localhost:8081"
+	defAccessURL = "localhost:8081"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -56,6 +59,7 @@ type config struct {
 	DBConnectTimeout int
 	DBSocketTimeout  int
 	AuthURL          string
+	AccessURL        string
 }
 
 func main() {
@@ -64,8 +68,9 @@ func main() {
 	ms := connectToDB(cfg, logger)
 	defer ms.Close()
 
-	conn := connectToAuthService(cfg.AuthURL, logger)
-	svc, auth := newServices(ms, conn, logger)
+	authConn := connectToGRPCService(cfg.AuthURL, logger)
+	accessConn := connectToGRPCService(cfg.AccessURL, logger)
+	svc, auth := newServices(ms, authConn, accessConn, logger)
 
 	errs := make(chan error, 2)
 	go startHTTPServer(svc, auth, cfg.HTTPPort, logger, errs)
@@ -93,6 +98,7 @@ func loadConfig() config {
 		DBConnectTimeout: dbConnectTimeout,
 		DBSocketTimeout:  dbSocketTimeout,
 		AuthURL:          datapace.Env(envAuthURL, defAuthURL),
+		AccessURL:        datapace.Env(envAccessURL, defAccessURL),
 	}
 }
 
@@ -117,19 +123,19 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func connectToAuthService(authAddr string, logger log.Logger) *grpc.ClientConn {
-	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())
+func connectToGRPCService(addr string, logger log.Logger) *grpc.ClientConn {
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to connect to auth service: %s", err))
+		logger.Error(fmt.Sprintf("Failed to connect to gRPC service on address %s: %s", addr, err))
 		os.Exit(1)
 	}
 	return conn
 }
 
-func newServices(ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) (streams.Service, streams.Authorization) {
+func newServices(ms *mgo.Session, authConn *grpc.ClientConn, accessConn *grpc.ClientConn, logger log.Logger) (streams.Service, streams.Authorization) {
 	repo := mongo.New(ms)
-	a := authapi.NewClient(conn)
-	accessControl := access.New(a)
+	acc := accessapi.NewClient(accessConn)
+	accessControl := access.New(acc)
 	svc := streams.NewService(repo, accessControl)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
@@ -147,7 +153,8 @@ func newServices(ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) (str
 			Help:      "Total duration of requests in microseconds.",
 		}, []string{"method"}),
 	)
-	auth := streams.NewAuthorization(a, logger)
+	auc := authapi.NewClient(authConn)
+	auth := streams.NewAuthorization(auc, logger)
 
 	return svc, auth
 }

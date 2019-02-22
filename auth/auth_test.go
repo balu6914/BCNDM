@@ -25,9 +25,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
-	accessRequests := mocks.NewAccessRequestRepository()
+	ac := mocks.NewAccessControl()
 
-	return auth.New(users, hasher, idp, ts, accessRequests)
+	return auth.New(users, hasher, idp, ts, ac)
 }
 
 func TestRegister(t *testing.T) {

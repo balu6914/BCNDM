@@ -11,7 +11,6 @@ type emailRes struct {
 	err          error
 }
 
-type partnersRes struct {
-	partners []string
-	err      error
+type existsRes struct {
+	err error
 }

@@ -29,9 +29,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
-	accessRequests := mocks.NewAccessRequestRepository()
+	ac := mocks.NewAccessControl()
 
-	return auth.New(repo, hasher, idp, ts, accessRequests)
+	return auth.New(repo, hasher, idp, ts, ac)
 }
 
 func startGRPCServer(svc auth.Service, port int) {
