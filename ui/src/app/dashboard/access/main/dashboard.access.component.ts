@@ -96,9 +96,15 @@ export class DashboardAccessComponent implements OnInit {
     // modify receiver field to show name instead of ID
     requests.forEach( req => {
       const index = this.users.findIndex(
-        user => req.receiver === user.id
+        user => {
+          if (origin === 'sent') {
+            return req.receiver === user.id;
+          } else {
+            return req.sender === user.id;
+          }
+        }
       );
-      req.receiver = `${this.users[index].first_name} ${this.users[index].last_name}`;
+      req.partner = `${this.users[index].first_name} ${this.users[index].last_name}`;
       // Set origin
       req.origin = origin;
       temp.page.content.push(req);
@@ -151,14 +157,14 @@ export class DashboardAccessComponent implements OnInit {
       );
     }
 
-    onAccessRejected(row: Access) {
-      this.accessService.rejectAccessRequest(row.id).subscribe(
+    onAccessRevoked(row: Access) {
+      this.accessService.revokeAccessRequest(row.id).subscribe(
         (resp: any) => {
           const index = this.table.page.content.findIndex(
             (access: Access) => row.id === access.id
           );
           const rowToUpdate = <Access> this.table.page.content[index];
-           rowToUpdate.state = 'rejected';
+          rowToUpdate.state = 'revoked';
         },
         err => {
           this.alertService.error(`Error: ${err.status} - ${err.statusText}`);

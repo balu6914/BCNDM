@@ -29,6 +29,6 @@ type UserRepository interface {
 	// Removes user by its unique identifier.
 	Remove(string) error
 
-	// List all users in the system.
-	List() ([]User, error)
+	// List all users that are not in the specified list.
+	AllExcept([]string) ([]User, error)
 }

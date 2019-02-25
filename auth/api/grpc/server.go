@@ -6,6 +6,7 @@ import (
 	"datapace/auth"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -15,7 +16,7 @@ var _ datapace.AuthServiceServer = (*grpcServer)(nil)
 type grpcServer struct {
 	identify kitgrpc.Handler
 	email    kitgrpc.Handler
-	partners kitgrpc.Handler
+	exists   kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
@@ -32,25 +33,25 @@ func NewServer(svc auth.Service) datapace.AuthServiceServer {
 		encodeEmailResponse,
 	)
 
-	partners := kitgrpc.NewServer(
-		partnersEndpoint(svc),
-		decodePartnersRequest,
-		encodePartnersResponse,
+	exists := kitgrpc.NewServer(
+		existsEndpoint(svc),
+		decodeExistsRequest,
+		encodeExistsResponse,
 	)
 
 	return &grpcServer{
 		identify: identify,
 		email:    email,
-		partners: partners,
+		exists:   exists,
 	}
 }
 
-func (s *grpcServer) Identify(ctx context.Context, token *datapace.Token) (*datapace.UserID, error) {
+func (s *grpcServer) Identify(ctx context.Context, token *datapace.Token) (*datapace.ID, error) {
 	_, res, err := s.identify.ServeGRPC(ctx, token)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	return res.(*datapace.UserID), nil
+	return res.(*datapace.ID), nil
 }
 
 func (s *grpcServer) Email(ctx context.Context, id *datapace.Token) (*datapace.UserEmail, error) {
@@ -61,13 +62,12 @@ func (s *grpcServer) Email(ctx context.Context, id *datapace.Token) (*datapace.U
 	return res.(*datapace.UserEmail), nil
 }
 
-func (s *grpcServer) Partners(ctx context.Context, id *datapace.UserID) (*datapace.PartnersList, error) {
-	_, res, err := s.partners.ServeGRPC(ctx, id)
+func (s *grpcServer) Exists(ctx context.Context, id *datapace.ID) (*empty.Empty, error) {
+	_, res, err := s.exists.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-
-	return res.(*datapace.PartnersList), nil
+	return res.(*empty.Empty), nil
 }
 
 func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
@@ -77,7 +77,7 @@ func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{},
 
 func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(identityRes)
-	return &datapace.UserID{Value: res.id}, encodeError(res.err)
+	return &datapace.ID{Value: res.id}, encodeError(res.err)
 }
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
@@ -85,14 +85,14 @@ func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, e
 	return &datapace.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
 }
 
-func decodePartnersRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.UserID)
-	return partnersReq{req.GetValue()}, nil
+func decodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*datapace.ID)
+	return existsReq{req.GetValue()}, nil
 }
 
-func encodePartnersResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
-	res := grpcRes.(partnersRes)
-	return &datapace.PartnersList{Value: res.partners}, encodeError(res.err)
+func encodeExistsResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
+	res := grpcRes.(existsRes)
+	return &empty.Empty{}, encodeError(res.err)
 }
 
 func encodeError(err error) error {

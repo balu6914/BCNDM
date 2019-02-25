@@ -19,6 +19,10 @@ export class UserService {
     return this.http.get<User[]>(`${environment.API_AUTH}/all`);
   }
 
+  getNonPartners(): Observable<User[]> {
+      return this.http.get<User[]>(`${environment.API_AUTH}/non-partners`);
+  }
+
   addUser(data): Observable<User> {
     return this.http.post<User>(`${environment.API_AUTH}`, data);
   }

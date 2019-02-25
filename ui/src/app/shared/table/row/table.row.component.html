@@ -45,7 +45,7 @@
   </div>
 </tr>
 <tr *ngIf="rowType === types.Access">
-  <td>{{ row.receiver }}</td>
+  <td>{{ row.partner }}</td>
   <td>{{ row.origin }}</td>
   <td nowrap>
     <div *ngIf="row.state == 'approved'" class="status-wrapper">
@@ -56,7 +56,7 @@
       <span class="status-icon status-icon--waiting"></span>
       <span class="status-icon__text">Access pending</span>
     </div>
-    <div *ngIf="row.state == 'rejected'" class="status-wrapper">
+    <div *ngIf="row.state == 'revoked'" class="status-wrapper">
       <span class="status-icon status-icon--expired"></span>
       <span class="status-icon__text">Access revoked</span>
     </div>
@@ -64,7 +64,7 @@
   <td>
     <div *ngIf="row.state == 'pending' && row.origin == 'received'" class="status-wrapper">
       <a type="button" (click)="approveAccess(row)" class="btn btn-primary-alt btn-sm">Approve</a>
-      <a type="button" (click)="rejectAccess(row)" class="btn btn-primary-alt btn-sm">Reject</a>
+      <a type="button" (click)="revokeAccess(row)" class="btn btn-primary-alt btn-sm">Reject</a>
     </div>
   </td>
 </tr>

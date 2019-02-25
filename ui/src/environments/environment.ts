@@ -7,7 +7,7 @@ export const environment = {
   production: false,
   API_AUTH : '/auth/users',
   API_AUTH_TOKENS: '/auth/tokens',
-  API_AUTH_ACCESS: '/auth/access-requests',
+  API_ACCESS_CONTROL: '/access-control/access-requests',
   API_SUBSCRIPTIONS: '/subscriptions/subscriptions',
   API_STREAMS: '/streams/streams',
   API_TOKENS: '/transactions/tokens',
