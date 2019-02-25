@@ -1,7 +1,7 @@
 # Access Control
 
 Access control service provides an HTTP API for controlling access to streams.
-Through this API clients are able request, fetch, approve and reject access
+Through this API clients are able request, fetch, approve and revoke access
 requests.
 
 ## Configuration

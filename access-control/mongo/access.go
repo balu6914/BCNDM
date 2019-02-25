@@ -145,7 +145,7 @@ func (repo accessRequestRepository) Approve(receiver, id string) error {
 	return nil
 }
 
-func (repo accessRequestRepository) Reject(receiver, id string) error {
+func (repo accessRequestRepository) Revoke(receiver, id string) error {
 	session := repo.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(collection)

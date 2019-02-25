@@ -97,9 +97,9 @@ func (lm *loggingMiddleware) ApproveAccessRequest(key, id string) (err error) {
 	return lm.svc.ApproveAccessRequest(key, id)
 }
 
-func (lm *loggingMiddleware) RejectAccessRequest(key, id string) (err error) {
+func (lm *loggingMiddleware) RevokeAccessRequest(key, id string) (err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method reject_access_request for key %s and access request %s and took %s to complete", key, id, time.Since(begin))
+		message := fmt.Sprintf("Method revoke_access_request for key %s and access request %s and took %s to complete", key, id, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -107,5 +107,5 @@ func (lm *loggingMiddleware) RejectAccessRequest(key, id string) (err error) {
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.RejectAccessRequest(key, id)
+	return lm.svc.RevokeAccessRequest(key, id)
 }

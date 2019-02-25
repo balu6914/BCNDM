@@ -36,7 +36,7 @@ export class TableRowComponent implements OnInit {
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
   @Output() accessApproved: EventEmitter<any> = new EventEmitter();
-  @Output() accessRejected: EventEmitter<any> = new EventEmitter();
+  @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -166,7 +166,7 @@ export class TableRowComponent implements OnInit {
     this.accessApproved.emit(row);
   }
 
-  rejectAccess(row: Access) {
-    this.accessRejected.emit(row);
+  revokeAccess(row: Access) {
+    this.accessRevoked.emit(row);
   }
 }

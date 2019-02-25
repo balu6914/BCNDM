@@ -44,18 +44,18 @@ func approveAccessEndpoint(svc access.Service) endpoint.Endpoint {
 	}
 }
 
-func rejectAccessEndpoint(svc access.Service) endpoint.Endpoint {
+func revokeAccessEndpoint(svc access.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(rejectAccessReq)
+		req := request.(revokeAccessReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		if err := svc.RejectAccessRequest(req.key, req.id); err != nil {
+		if err := svc.RevokeAccessRequest(req.key, req.id); err != nil {
 			return nil, err
 		}
 
-		res := rejectAccessRes{}
+		res := revokeAccessRes{}
 		return res, nil
 	}
 }

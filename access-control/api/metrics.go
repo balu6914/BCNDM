@@ -79,11 +79,11 @@ func (ms *metricsMiddleware) ApproveAccessRequest(key, id string) error {
 	return ms.svc.ApproveAccessRequest(key, id)
 }
 
-func (ms *metricsMiddleware) RejectAccessRequest(key, id string) error {
+func (ms *metricsMiddleware) RevokeAccessRequest(key, id string) error {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "reject_access_request").Add(1)
-		ms.latency.With("method", "reject_access_request").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "revoke_access_request").Add(1)
+		ms.latency.With("method", "revoke_access_request").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.RejectAccessRequest(key, id)
+	return ms.svc.RevokeAccessRequest(key, id)
 }

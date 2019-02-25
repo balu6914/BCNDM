@@ -37,8 +37,8 @@ type RequestRepository interface {
 	// Approve updates status of access request to approved.
 	Approve(string, string) error
 
-	// Reject updates status of access request to rejected.
-	Reject(string, string) error
+	// Revoke updates status of access request to revoked.
+	Revoke(string, string) error
 
 	// One finds and returns access request by it's id.
 	One(string) (Request, error)
@@ -53,6 +53,6 @@ type RequestLedger interface {
 	// Approve updates status of access request to approved.
 	Approve(string, string) error
 
-	// Reject updates status of access request to rejected.
-	Reject(string, string) error
+	// Revoke updates status of access request to revoked.
+	Revoke(string, string) error
 }

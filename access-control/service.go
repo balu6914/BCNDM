@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	// ErrConflict indicates that sent access request already exists and is not
-	// rejected.
+	// revoked.
 	ErrConflict = errors.New("request already sent")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
@@ -43,8 +43,8 @@ type Service interface {
 	// ApproveAccessRequest updates status of access request to approved.
 	ApproveAccessRequest(string, string) error
 
-	// RejectAccessRequest updates status of access request to rejected.
-	RejectAccessRequest(string, string) error
+	// RevokeAccessRequest updates status of access request to revoked.
+	RevokeAccessRequest(string, string) error
 }
 
 var _ Service = (*accessControlService)(nil)
@@ -153,7 +153,7 @@ func (acs accessControlService) ApproveAccessRequest(key, id string) error {
 	return acs.repo.Approve(uid, id)
 }
 
-func (acs accessControlService) RejectAccessRequest(key, id string) error {
+func (acs accessControlService) RevokeAccessRequest(key, id string) error {
 	uid, err := acs.auth.Identify(key)
 	if err != nil {
 		return ErrUnauthorizedAccess
@@ -164,9 +164,9 @@ func (acs accessControlService) RejectAccessRequest(key, id string) error {
 		return err
 	}
 
-	if err := acs.ledger.Reject(uid, req.Sender); err != nil {
+	if err := acs.ledger.Revoke(uid, req.Sender); err != nil {
 		return err
 	}
 
-	return acs.repo.Reject(uid, id)
+	return acs.repo.Revoke(uid, id)
 }

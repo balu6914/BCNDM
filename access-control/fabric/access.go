@@ -110,10 +110,10 @@ func (arl accessRequestLedger) Approve(approver, sender string) error {
 	return nil
 }
 
-func (arl accessRequestLedger) Reject(rejecter, sender string) error {
+func (arl accessRequestLedger) Revoke(revoker, sender string) error {
 	ctx := arl.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(rejecter),
+		fabsdk.WithUser(revoker),
 		fabsdk.WithOrg(arl.org),
 	)
 

@@ -39,9 +39,9 @@ func MakeHandler(svc access.Service) http.Handler {
 		opts...,
 	))
 
-	r.Put("/access-requests/:id/reject", kithttp.NewServer(
-		rejectAccessEndpoint(svc),
-		decodeRejectAccess,
+	r.Put("/access-requests/:id/revoke", kithttp.NewServer(
+		revokeAccessEndpoint(svc),
+		decodeRevokeAccess,
 		encodeResponse,
 		opts...,
 	))
@@ -90,8 +90,8 @@ func decodeApproveAccess(_ context.Context, r *http.Request) (interface{}, error
 	return req, nil
 }
 
-func decodeRejectAccess(_ context.Context, r *http.Request) (interface{}, error) {
-	req := rejectAccessReq{
+func decodeRevokeAccess(_ context.Context, r *http.Request) (interface{}, error) {
+	req := revokeAccessReq{
 		key: r.Header.Get("Authorization"),
 		id:  bone.GetValue(r, "id"),
 	}

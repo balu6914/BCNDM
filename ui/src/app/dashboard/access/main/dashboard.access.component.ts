@@ -157,14 +157,14 @@ export class DashboardAccessComponent implements OnInit {
       );
     }
 
-    onAccessRejected(row: Access) {
-      this.accessService.rejectAccessRequest(row.id).subscribe(
+    onAccessRevoked(row: Access) {
+      this.accessService.revokeAccessRequest(row.id).subscribe(
         (resp: any) => {
           const index = this.table.page.content.findIndex(
             (access: Access) => row.id === access.id
           );
           const rowToUpdate = <Access> this.table.page.content[index];
-           rowToUpdate.state = 'rejected';
+          rowToUpdate.state = 'revoked';
         },
         err => {
           this.alertService.error(`Error: ${err.status} - ${err.statusText}`);

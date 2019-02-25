@@ -46,17 +46,17 @@ func (res approveAccessRes) empty() bool {
 	return true
 }
 
-type rejectAccessRes struct{}
+type revokeAccessRes struct{}
 
-func (res rejectAccessRes) code() int {
+func (res revokeAccessRes) code() int {
 	return http.StatusOK
 }
 
-func (res rejectAccessRes) headers() map[string]string {
+func (res revokeAccessRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res rejectAccessRes) empty() bool {
+func (res revokeAccessRes) empty() bool {
 	return true
 }
 

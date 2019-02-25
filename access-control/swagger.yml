@@ -110,9 +110,9 @@ paths:
           description: Access request with specified ID doesn't exist.
         500:
           $ref: "#/responses/ServiceError"
-  /access-requests/{id}/reject:
+  /access-requests/{id}/revoke:
     put:
-      summary: Rejects received access request.
+      summary: Revokes received access request.
       description: Change pending access request state to revoked.
       tags:
         - access-request
@@ -125,7 +125,7 @@ paths:
           required: true
       responses:
         200:
-          description: Successfully rejected access request.
+          description: Successfully revoked access request.
         403:
           description: Missing or invalid access token provided.
         404:

@@ -39,8 +39,8 @@ export class AccessService {
     return this.http.put(`${environment.API_ACCESS_CONTROL}/${requestID}/approve`, {});
   }
 
-  rejectAccessRequest(requestID: string) {
-    return this.http.put(`${environment.API_ACCESS_CONTROL}/${requestID}/reject`, {});
+  revokeAccessRequest(requestID: string) {
+    return this.http.put(`${environment.API_ACCESS_CONTROL}/${requestID}/revoke`, {});
   }
 
 }

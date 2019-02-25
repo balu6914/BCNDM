@@ -43,12 +43,12 @@ func (req approveAccessReq) validate() error {
 	return nil
 }
 
-type rejectAccessReq struct {
+type revokeAccessReq struct {
 	key string
 	id  string
 }
 
-func (req rejectAccessReq) validate() error {
+func (req revokeAccessReq) validate() error {
 	if req.key == "" {
 		return auth.ErrUnauthorizedAccess
 	}
