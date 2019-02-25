@@ -27,7 +27,7 @@ export class DashboardBuyGroupComponent implements OnInit {
   private subscriptionService: SubscriptionService,
   private formBuilder: FormBuilder,
   private alertService: AlertService,
-  public modalSubscription: BsModalRef,
+  public modalBuyGroupStream: BsModalRef,
   private balanceService: BalanceService,
   ) {
     this.form = this.formBuilder.group({
