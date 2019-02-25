@@ -84,6 +84,6 @@ func (urm *userRepositoryMock) Remove(id string) error {
 	return nil
 }
 
-func (urm *userRepositoryMock) List() ([]auth.User, error) {
+func (urm *userRepositoryMock) AllExcept([]string) ([]auth.User, error) {
 	return nil, nil
 }

@@ -3,21 +3,21 @@ package auth
 var _ Service = (*authService)(nil)
 
 type authService struct {
-	users    UserRepository
-	hasher   Hasher
-	idp      IdentityProvider
-	ts       TransactionsService
-	accesses AccessRequestRepository
+	users  UserRepository
+	hasher Hasher
+	idp    IdentityProvider
+	ts     TransactionsService
+	access AccessControl
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, accesses AccessRequestRepository) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl) Service {
 	return &authService{
-		users:    users,
-		hasher:   hasher,
-		idp:      idp,
-		ts:       ts,
-		accesses: accesses,
+		users:  users,
+		hasher: hasher,
+		idp:    idp,
+		ts:     ts,
+		access: access,
 	}
 }
 
@@ -105,75 +105,38 @@ func (as *authService) View(key string) (User, error) {
 	return user, nil
 }
 
-func (as *authService) List(key string) ([]User, error) {
+func (as *authService) ListUsers(key string) ([]User, error) {
 	if _, err := as.idp.Identity(key); err != nil {
 		return nil, ErrUnauthorizedAccess
 	}
 
-	return as.users.List()
-}
-
-func (as *authService) RequestAccess(key, partner string) (string, error) {
-	if _, err := as.users.OneByID(partner); err != nil {
-		return "", ErrNotFound
-	}
-
-	id, err := as.idp.Identity(key)
+	users, err := as.users.AllExcept([]string{})
 	if err != nil {
-		return "", ErrUnauthorizedAccess
+		return []User{}, err
 	}
 
-	return as.accesses.RequestAccess(id, partner)
+	return users, nil
 }
 
-func (as *authService) ListSentAccessRequests(key string, state State) ([]AccessRequest, error) {
+func (as *authService) ListNonPartners(key string) ([]User, error) {
 	id, err := as.idp.Identity(key)
 	if err != nil {
 		return nil, ErrUnauthorizedAccess
 	}
 
-	return as.accesses.ListSentAccessRequests(id, state)
-}
-
-func (as *authService) ListReceivedAccessRequests(key string, state State) ([]AccessRequest, error) {
-	id, err := as.idp.Identity(key)
+	plist, err := as.access.PotentialPartners(id)
 	if err != nil {
-		return nil, ErrUnauthorizedAccess
+		return []User{}, err
 	}
 
-	return as.accesses.ListReceivedAccessRequests(id, state)
-}
+	plist = append(plist, id)
 
-func (as *authService) ListPartners(id string) ([]string, error) {
-	requests, err := as.accesses.ListSentAccessRequests(id, Approved)
+	users, err := as.users.AllExcept(plist)
 	if err != nil {
-		return nil, err
+		return []User{}, err
 	}
 
-	partners := []string{}
-	for _, req := range requests {
-		partners = append(partners, req.Receiver)
-	}
-
-	return partners, nil
-}
-
-func (as *authService) ApproveAccessRequest(key, id string) error {
-	uid, err := as.idp.Identity(key)
-	if err != nil {
-		return ErrUnauthorizedAccess
-	}
-
-	return as.accesses.ApproveAccessRequest(uid, id)
-}
-
-func (as *authService) RejectAccessRequest(key, id string) error {
-	uid, err := as.idp.Identity(key)
-	if err != nil {
-		return ErrUnauthorizedAccess
-	}
-
-	return as.accesses.RejectAccessRequest(uid, id)
+	return users, nil
 }
 
 func (as *authService) Identify(key string) (string, error) {
@@ -183,4 +146,12 @@ func (as *authService) Identify(key string) (string, error) {
 	}
 
 	return id, nil
+}
+
+func (as *authService) Exists(id string) error {
+	if _, err := as.users.OneByID(id); err != nil {
+		return ErrNotFound
+	}
+
+	return nil
 }

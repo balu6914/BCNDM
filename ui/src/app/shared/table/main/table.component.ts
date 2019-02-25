@@ -38,7 +38,7 @@ export class TableComponent {
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
   @Output() accessApproved: EventEmitter<any> = new EventEmitter();
-  @Output() accessRejected: EventEmitter<any> = new EventEmitter();
+  @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
 
   constructor() { }
 
@@ -116,8 +116,8 @@ export class TableComponent {
     this.accessApproved.emit(row);
   }
 
-  onAccessRejected(row: Access) {
-    this.accessRejected.emit(row);
+  onAccessRevoked(row: Access) {
+    this.accessRevoked.emit(row);
   }
 
 }

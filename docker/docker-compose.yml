@@ -31,6 +31,7 @@ services:
     environment:
       - DATAPACE_AUTH_DB_URL=datapace-auth-db
       - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
+      - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - DATAPACE_AUTH_SECRET=datapace
     networks:
       - datapace-net
@@ -71,6 +72,8 @@ services:
       - DATAPACE_CONFIG=/config
     volumes:
       - ../config:/config
+      - ./datapace-service-kvs:/tmp/datapace-service-kvs
+      - ./datapace-service-msp:/tmp/datapace-service-msp
     networks:
       # Link to datapace fabric net
       - fabric_datapace-bc-net
@@ -96,6 +99,8 @@ services:
     container_name: datapace-streams
     depends_on:
       - datapace-streams-db
+      - datapace-auth
+      - datapace-access-control
     ports:
       - 8084:8084
     expose:
@@ -106,6 +111,7 @@ services:
       - DATAPACE_STREAMS_DB_URL=datapace-streams-db
       - DATAPACE_STREAMS_DB_NAME=streams
       - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
     volumes:
       - ../config/big-query:/big-query
@@ -173,6 +179,7 @@ services:
     container_name: datapace-executions
     depends_on:
       - datapace-executions-db
+      - datapace-auth
       - datapace-streams
     ports:
       - 8088:8088
@@ -181,6 +188,49 @@ services:
       - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
       - DATAPACE_AUTH_URL=datapace-auth:8081
     networks:
+      - datapace-net
+
+  ###
+  # Access Control DB
+  ###
+  datapace-access-control-db:
+    image: mongo:latest
+    container_name: datapace-access-control-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./access-control-data:/data/db
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+  ###
+  # Access Control service
+  ###
+  datapace-access-control:
+    image: datapace/access-control
+    container_name: datapace-access-control
+    restart: on-failure
+    depends_on:
+      - datapace-access-control-db
+      - datapace-auth
+    ports:
+      - 8090:8090
+    expose:
+      - 8091
+    environment:
+      - DATAPACE_ACCESS_CONTROL_HTTP_PORT=8090
+      - DATAPACE_ACCESS_CONTROL_GRPC_PORT=8091
+      - DATAPACE_ACCESS_CONTROL_DB_URL=datapace-access-control-db
+      - DATAPACE_ACCESS_CONTROL_FABRIC_ADMIN=Admin@org1.datapace.com
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_CONFIG=/config
+    volumes:
+      - ../config:/config
+      - ./datapace-service-kvs:/tmp/datapace-service-kvs
+      - ./datapace-service-msp:/tmp/datapace-service-msp
+    networks:
+      # Link to datapace fabric net
+      - fabric_datapace-bc-net
       - datapace-net
 
   datapace-proxy:

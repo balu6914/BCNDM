@@ -14,15 +14,16 @@ The service is configured using the environment variables presented in the
 following table. Note that any unset variables will be replaced with their
 default values.
 
-| Variable                   | Description                              | Default        |
-|----------------------------|------------------------------------------|----------------|
-| DATAPACE_STREAMS_HTTP_PORT | Stream service HTTP port                 | 8080           |
-| DATAPACE_STREAMS_GRPC_PORT | Stream service gRPC port                 | 8081           |
-| DATAPACE_STREAMS_DB_URL    | List of database cluster URLs            | 0.0.0.0        |
-| DATAPACE_STREAMS_DB_NAME   | Name of the database used by the service | streams        |
-| DATAPACE_STREAMS_DB_USER   | Database user                            |                |
-| DATAPACE_STREAMS_DB_PASS   | Database password                        |                |
-| DATAPACE_AUTH_URL          | Auth service gRPC URL                    | localhost:8081 |
+| Variable                    | Description                              | Default        |
+|-----------------------------|------------------------------------------|----------------|
+| DATAPACE_STREAMS_HTTP_PORT  | Stream service HTTP port                 | 8080           |
+| DATAPACE_STREAMS_GRPC_PORT  | Stream service gRPC port                 | 8081           |
+| DATAPACE_STREAMS_DB_URL     | List of database cluster URLs            | 0.0.0.0        |
+| DATAPACE_STREAMS_DB_NAME    | Name of the database used by the service | streams        |
+| DATAPACE_STREAMS_DB_USER    | Database user                            |                |
+| DATAPACE_STREAMS_DB_PASS    | Database password                        |                |
+| DATAPACE_AUTH_URL           | Auth service gRPC URL                    | localhost:8081 |
+| DATAPACE_ACCESS_CONTROL_URL | Access Control service gRPC URL          | localhost:8081 |
 
 ## Deployment
 
@@ -41,7 +42,7 @@ make streams
 make install
 
 # set the environment variables and run the service
-DATAPACE_STREAMS_HTTP_PORT=[Service HTTP port] DATAPACE_STREAMS_GRPC_PORT=[Service gRPC port] DATAPACE_STREAMS_DB_URL=[List of database cluster URLs] DATAPACE_STREAMS_DB_NAME=[Name of the database used by the service] DATAPACE_STREAMS_DB_USER=[Database user] DATAPACE_STREAMS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] $GOBIN/datapace-streams
+DATAPACE_STREAMS_HTTP_PORT=[Service HTTP port] DATAPACE_STREAMS_GRPC_PORT=[Service gRPC port] DATAPACE_STREAMS_DB_URL=[List of database cluster URLs] DATAPACE_STREAMS_DB_NAME=[Name of the database used by the service] DATAPACE_STREAMS_DB_USER=[Database user] DATAPACE_STREAMS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] DATAPACE_ACCESS_CONTROL_URL=[Access Control service gRPC URL] $GOBIN/datapace-streams
 ```
 
 Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.

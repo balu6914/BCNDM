@@ -2,9 +2,9 @@ package grpc_test
 
 import (
 	"context"
-	"fmt"
 	"datapace"
 	grpcapi "datapace/transactions/api/grpc"
+	"fmt"
 	"testing"
 	"time"
 

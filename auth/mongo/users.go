@@ -121,13 +121,23 @@ func (ur *userRepository) Remove(id string) error {
 	return nil
 }
 
-func (ur *userRepository) List() ([]auth.User, error) {
+func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 	session := ur.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(usersCollection)
 
+	ids := []bson.ObjectId{}
+	for _, user := range plist {
+		ids = append(ids, bson.ObjectIdHex(user))
+	}
+
+	q := bson.M{
+		"_id": bson.M{
+			"$nin": ids,
+		},
+	}
 	mu := []mongoUser{}
-	if err := collection.Find(nil).All(&mu); err != nil {
+	if err := collection.Find(q).All(&mu); err != nil {
 		return nil, err
 	}
 

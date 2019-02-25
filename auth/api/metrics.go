@@ -71,67 +71,22 @@ func (ms *metricsMiddleware) View(key string) (auth.User, error) {
 	return ms.svc.View(key)
 }
 
-func (ms *metricsMiddleware) List(key string) ([]auth.User, error) {
+func (ms *metricsMiddleware) ListUsers(key string) ([]auth.User, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "list").Add(1)
-		ms.latency.With("method", "list").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "list_users").Add(1)
+		ms.latency.With("method", "list_users").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.List(key)
+	return ms.svc.ListUsers(key)
 }
 
-func (ms *metricsMiddleware) RequestAccess(key, partner string) (string, error) {
+func (ms *metricsMiddleware) ListNonPartners(key string) ([]auth.User, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "request_access").Add(1)
-		ms.latency.With("method", "request_access").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "list_non_partners").Add(1)
+		ms.latency.With("method", "list_non_partners").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.RequestAccess(key, partner)
-}
-
-func (ms *metricsMiddleware) ListSentAccessRequests(key string, state auth.State) ([]auth.AccessRequest, error) {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "list_sent_access_requests").Add(1)
-		ms.latency.With("method", "list_sent_access_requests").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.ListSentAccessRequests(key, state)
-}
-
-func (ms *metricsMiddleware) ListReceivedAccessRequests(key string, state auth.State) ([]auth.AccessRequest, error) {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "list_received_access_requests").Add(1)
-		ms.latency.With("method", "list_received_access_requests").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.ListReceivedAccessRequests(key, state)
-}
-
-func (ms *metricsMiddleware) ListPartners(id string) ([]string, error) {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "list_partners").Add(1)
-		ms.latency.With("method", "list_partners").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.ListPartners(id)
-}
-
-func (ms *metricsMiddleware) ApproveAccessRequest(key, id string) error {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "approve_access_request").Add(1)
-		ms.latency.With("method", "approve_access_request").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.ApproveAccessRequest(key, id)
-}
-
-func (ms *metricsMiddleware) RejectAccessRequest(key, id string) error {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "reject_access_request").Add(1)
-		ms.latency.With("method", "reject_access_request").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.svc.RejectAccessRequest(key, id)
+	return ms.svc.ListNonPartners(key)
 }
 
 func (ms *metricsMiddleware) Identify(key string) (string, error) {
@@ -141,4 +96,13 @@ func (ms *metricsMiddleware) Identify(key string) (string, error) {
 	}(time.Now())
 
 	return ms.svc.Identify(key)
+}
+
+func (ms *metricsMiddleware) Exists(id string) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "exists").Add(1)
+		ms.latency.With("method", "exists").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.Exists(id)
 }

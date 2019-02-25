@@ -2,31 +2,15 @@ package mocks
 
 import "datapace/auth"
 
-var _ auth.AccessRequestRepository = (*accessRequestRepoMock)(nil)
+var _ auth.AccessControl = (*accessControlMock)(nil)
 
-type accessRequestRepoMock struct{}
+type accessControlMock struct{}
 
-// NewAccessRequestRepository returns mock instance of access request repository.
-func NewAccessRequestRepository() auth.AccessRequestRepository {
-	return accessRequestRepoMock{}
+// NewAccessControl returns mock implementation of access control.
+func NewAccessControl() auth.AccessControl {
+	return accessControlMock{}
 }
 
-func (repo accessRequestRepoMock) RequestAccess(string, string) (string, error) {
-	return "", nil
-}
-
-func (repo accessRequestRepoMock) ListSentAccessRequests(string, auth.State) ([]auth.AccessRequest, error) {
+func (acm accessControlMock) PotentialPartners(string) ([]string, error) {
 	return nil, nil
-}
-
-func (repo accessRequestRepoMock) ListReceivedAccessRequests(string, auth.State) ([]auth.AccessRequest, error) {
-	return nil, nil
-}
-
-func (repo accessRequestRepoMock) ApproveAccessRequest(string, string) error {
-	return nil
-}
-
-func (repo accessRequestRepoMock) RejectAccessRequest(string, string) error {
-	return nil
 }

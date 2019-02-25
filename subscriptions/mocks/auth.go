@@ -5,6 +5,7 @@ import (
 
 	"datapace"
 
+	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,9 +23,9 @@ func NewAuthClient(tokens map[string]string, emails map[string]string) datapace.
 	return &authClientMock{tokens, emails}
 }
 
-func (svc authClientMock) Identify(_ context.Context, in *datapace.Token, opts ...grpc.CallOption) (*datapace.UserID, error) {
+func (svc authClientMock) Identify(_ context.Context, in *datapace.Token, opts ...grpc.CallOption) (*datapace.ID, error) {
 	if id, ok := svc.tokens[in.Value]; ok {
-		return &datapace.UserID{Value: id}, nil
+		return &datapace.ID{Value: id}, nil
 	}
 
 	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
@@ -38,6 +39,6 @@ func (svc authClientMock) Email(_ context.Context, in *datapace.Token, opts ...g
 	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 }
 
-func (svc authClientMock) Partners(_ context.Context, id *datapace.UserID, _ ...grpc.CallOption) (*datapace.PartnersList, error) {
-	return &datapace.PartnersList{Value: []string{}}, nil
+func (svc authClientMock) Exists(_ context.Context, id *datapace.ID, opts ...grpc.CallOption) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
 }

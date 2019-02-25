@@ -1,0 +1,175 @@
+swagger: "2.0"
+info:
+  title: Go Access Control service
+  description: HTTP API for access control.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /access-requests:
+    post:
+      summary: Creating and sending access request
+      description: |
+        Creates new access request and send it to specified receiver.
+      tags:
+        - access-request
+      parameters:
+        - name: access-request
+          description: Create access request data with user receiver.
+          in: body
+          schema:
+            $ref: "#/definitions/RequestAccessReq"
+          required: true
+      responses:
+        201:
+          description: Access request created and sent.
+        400:
+          description: |
+            Failed due to malformed JSON or invalid access request format.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /access-requests/sent:
+    get:
+      summary: Fetch access requests that user sent.
+      description: Fetch access requests that user already sent.
+      tags:
+        - access-request
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: state
+          description: |
+            Search for sent access requests with specified state.
+          in: query
+          type: string
+          enum:
+            - pending
+            - approved
+            - revoked
+      responses:
+        200:
+          description: Access requests retrieved.
+          schema:
+            $ref: "#/definitions/AccessRequestsRes"
+        400:
+          description: Invalid state value.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /access-requests/received:
+    get:
+      summary: Fetch access requests that user received.
+      description: Fetch access requests that user already received.
+      tags:
+        - access-request
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: state
+          description: |
+            Search for received access requests with specified state.
+          in: query
+          type: string
+          enum:
+            - pending
+            - approved
+            - revoked
+      responses:
+        200:
+          description: Access requests retrieved.
+          schema:
+            $ref: "#/definitions/AccessRequestsRes"
+        400:
+          description: Invalid state value.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /access-requests/{id}/approve:
+    put:
+      summary: Approves received access request.
+      description: Change pending access request state to approved.
+      tags:
+        - access-request
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: Access request ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Successfully approved access request.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Access request with specified ID doesn't exist.
+        500:
+          $ref: "#/responses/ServiceError"
+  /access-requests/{id}/revoke:
+    put:
+      summary: Revokes received access request.
+      description: Change pending access request state to revoked.
+      tags:
+        - access-request
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: Access request ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Successfully revoked access request.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Access request with specified ID doesn't exist.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  RequestAccessReq:
+    type: object
+    properties:
+      receiver:
+        type: string
+        description: ID of user that should receive access request.
+  AccessRequestsRes:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Access request ID.
+        sender:
+          type: string
+          description: ID of the user that sent access request.
+        receiver:
+          type: string
+          description: ID of the user that received access request.
+        state:
+          type: string
+          description: State of the access request.
+          enum:
+            - pending
+            - approved
+            - revoked
