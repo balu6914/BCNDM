@@ -13,9 +13,10 @@ CRYPTO_CONF_DIR=config/crypto-config
 FABRIC_CFG_PATH=config/fabric
 GENESIS_BLOCK_PATH=docker/fabric/artifacts/genesis.block
 GENESIS_BLOCK_PROFILE=DatapaceOrdererGenesis
-CH_OUTPUT_PATH=docker/fabric/artifacts/datapace.tx
+CH_OUTPUT_PATH=docker/fabric/artifacts/datapacechannel.tx
 CH_PROFILE=DatapaceChannel
-CH_ID=datapace
+CHSYS_ID=datapacesyschannel
+CH_ID=datapacechannel
 
 BASE_COMPOSE_FILE=docker/fabric/base/docker-compose-base.yaml
 
@@ -38,7 +39,7 @@ cryptogen generate --config=$CRYPTO_CONF_PATH --output=$CRYPTO_CONF_DIR
 # Network artifacts
 ###
 echo "### Generating network artifacts"
-FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputBlock $GENESIS_BLOCK_PATH -profile $GENESIS_BLOCK_PROFILE -channelID $CH_ID
+FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputBlock $GENESIS_BLOCK_PATH -profile $GENESIS_BLOCK_PROFILE -channelID $CHSYS_ID
 FABRIC_CFG_PATH=$FABRIC_CFG_PATH configtxgen -outputCreateChannelTx $CH_OUTPUT_PATH -profile $CH_PROFILE -channelID $CH_ID
 
 ###

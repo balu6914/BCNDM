@@ -3,12 +3,12 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH=./artifacts/datapace.tx
-CHANNEL_BLOCK=datapace.block
+CHANNEL_PATH=./artifacts/datapacechannel.tx
+CHANNEL_BLOCK=./artifacts/genesis.block
 
 ORDERER_URL=orderer.datapace.com:7050
 
-CHANNEL_ID=datapace
+CHANNEL_ID=datapacechannel
 
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token

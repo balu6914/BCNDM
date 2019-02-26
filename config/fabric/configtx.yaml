@@ -21,7 +21,7 @@ Capabilities:
     # Channel capabilities apply to both the orderers and the peers and must be
     # supported by both.  Set the value of the capability to true to require it.
     Global: &ChannelCapabilities
-        V1_3: true
+        #V1_3: true
         # (V1_2 not defined in fabric)
         # Note: older ones are superceded, e.g. V1_3 capabilities include V1_1.
         # Thus, those like V1_1 need not be set if V1_3 or later is set true.
@@ -279,9 +279,6 @@ Application: &ApplicationDefaults
       Admins:
           Type: ImplicitMeta
           Rule: "MAJORITY Admins"
-      DatapaceOrgMemberPolicy:
-          Type: Signature
-          Rule: "OR('DatapaceOrgMSP.member')"
 
   # Capabilities describes the application level capabilities, see the
   # dedicated Capabilities section elsewhere in this file for a full
@@ -312,7 +309,7 @@ Profiles:
               <<: *OrdererOrgPolicies
               Admins:
                 Type: Signature
-                Rule: "OR('OrdererMSP.admin')"
+                Rule: "OR('DatapaceOrgMSP.admin')"
         Consortiums:
             DatapaceConsortium:
                 Organizations:
