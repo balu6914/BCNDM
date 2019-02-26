@@ -73,7 +73,7 @@ func (repo accessRequestRepository) ListSent(sender string, state access.State) 
 	defer session.Close()
 	collection := session.DB(dbName).C(collection)
 
-	q := bson.M{"sender": sender, "state": state}
+	q := bson.M{"sender": sender}
 	if state != access.State("") {
 		q["state"] = state
 	}
