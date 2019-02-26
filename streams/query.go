@@ -121,21 +121,33 @@ func GenQuery(q *Query) *bson.M {
 		}
 	}
 
-	ownerQuery := []bson.M{
+	query["$or"] = []bson.M{
 		bson.M{
-			"owner": bson.M{
-				"$in": q.Partners,
+			"visibility": Public,
+		},
+		bson.M{
+			"$and": []bson.M{
+				bson.M{
+					"visibility": Protected,
+				},
+				bson.M{
+					"owner": bson.M{
+						"$in": q.Partners,
+					},
+				},
+			},
+		},
+		bson.M{
+			"$and": []bson.M{
+				bson.M{
+					"visibility": Private,
+				},
+				bson.M{
+					"owner": q.Partners[len(q.Partners)-1],
+				},
 			},
 		},
 	}
-
-	if _, ok := query["owner"]; ok {
-		ownerQuery = append(ownerQuery, bson.M{
-			"owner": query["owner"],
-		})
-		delete(query, "owner")
-	}
-	query["$and"] = ownerQuery
 
 	return &query
 }

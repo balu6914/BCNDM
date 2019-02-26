@@ -33,6 +33,7 @@ export class DashboardSellAddComponent implements OnInit {
     const floatValidator = Validators.pattern(floatRegEx);
     const urlValidator = Validators.pattern(urlRegEx);
     this.form = this.formBuilder.group({
+      visibility: ['', [Validators.required]],
       name: ['', [Validators.required, Validators.maxLength(32)]],
       type: ['', [Validators.required, Validators.maxLength(32)]],
       description: ['', [Validators.required, Validators.maxLength(256)]],
@@ -101,6 +102,7 @@ export class DashboardSellAddComponent implements OnInit {
 
     if (this.form.valid) {
       const stream: Stream = {
+        visibility: this.form.get('visibility').value,
         name: this.form.get('name').value,
         type: this.form.get('type').value,
         description: this.form.get('description').value,

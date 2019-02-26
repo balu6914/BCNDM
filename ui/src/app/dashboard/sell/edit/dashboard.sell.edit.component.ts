@@ -30,6 +30,7 @@ export class DashboardSellEditComponent implements OnInit {
     const urlValidator = Validators.pattern(urlRegEx);
 
     this.form = this.formBuilder.group({
+      'visibility':  ['', [Validators.required]],
       'name':        ['', [Validators.required, Validators.maxLength(32)]],
       'type':        ['', [Validators.required, Validators.maxLength(32)]],
       'description': ['', [Validators.required, Validators.maxLength(256)]],
@@ -51,6 +52,7 @@ export class DashboardSellEditComponent implements OnInit {
 
     if (this.form.valid) {
       const stream: Stream = {
+        visibility: this.form.value.visibility,
         name: this.form.value.name,
         type: this.form.value.type,
         description: this.form.value.description,

@@ -45,6 +45,7 @@ func genStream() streams.Stream {
 	counter++
 	return streams.Stream{
 		ID:          bson.NewObjectId(),
+		Visibility:  streams.Public,
 		Name:        "name",
 		Type:        "type",
 		Description: "description",

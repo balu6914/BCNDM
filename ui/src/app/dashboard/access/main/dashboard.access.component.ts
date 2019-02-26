@@ -72,7 +72,7 @@ export class DashboardAccessComponent implements OnInit {
 
   fetchAccessRequests() {
     // access requests sent
-    this.accessService.getAccessSent('pending').subscribe(
+    this.accessService.getAllAccessSent().subscribe(
       (resp: any) => {
         this.reqsToTable(resp.Requests, 'sent');
       },
@@ -81,7 +81,7 @@ export class DashboardAccessComponent implements OnInit {
       }
     );
     // access requests received
-    this.accessService.getAccessReceived('pending').subscribe(
+    this.accessService.getAllAccessReceived().subscribe(
       (resp: any) => {
         this.reqsToTable(resp.Requests, 'received');
       },
@@ -124,9 +124,9 @@ export class DashboardAccessComponent implements OnInit {
     // Show DashboardAccessAddComponent as Modal
     this.modalService.show(DashboardAccessAddComponent)
       .content.accessCreated.subscribe(
-        response => {
-          const row: Access = {
-            receiver: response.receiver.first_name,
+        resp => {
+          const row: any = {
+            partner: `${resp.receiver.first_name} ${resp.receiver.last_name}`,
             state: 'pending',
             origin: 'sent',
           };

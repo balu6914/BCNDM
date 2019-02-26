@@ -185,6 +185,7 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 	}
 
 	ret := &streams.Stream{
+		Visibility:  streams.Visibility(record[keys["visibility"]]),
 		Name:        record[keys["name"]],
 		Type:        record[keys["type"]],
 		Description: record[keys["description"]],

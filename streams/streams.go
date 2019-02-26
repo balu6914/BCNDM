@@ -7,6 +7,18 @@ import (
 
 var _ Service = (*streamService)(nil)
 
+const (
+	// Public streams are visible for all users
+	Public Visibility = "public"
+	// Protected streams are visibible for users with access
+	Protected Visibility = "protected"
+	// Private streams are only visible to owner
+	Private Visibility = "private"
+)
+
+// Visibility of streams
+type Visibility string
+
 // Location represents Stream location to enable geo
 // search streams. Official MongoDB docs could be found here
 // http://docs.mongoengine.org/guide/querying.html#geo-queries
@@ -41,6 +53,7 @@ func (bq BigQuery) Validate() bool {
 type Stream struct {
 	Owner       string        `bson:"owner,omitempty" json:"owner,omitempty"`
 	ID          bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
+	Visibility  Visibility    `bson:"visibility,omitempty" json:"visibility,omitempty"`
 	Name        string        `bson:"name,omitempty" json:"name,omitempty"`
 	Type        string        `bson:"type,omitempty" json:"type,omitempty"`
 	Description string        `bson:"description,omitempty" json:"description,omitempty"`
@@ -81,7 +94,8 @@ func (s *Stream) Validate() error {
 		(len(s.Snippet) > maxSnippetLength) ||
 		s.Price <= minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
-		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude {
+		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude ||
+		s.Visibility != Public && s.Visibility != Protected && s.Visibility != Private {
 		return ErrMalformedData
 	}
 

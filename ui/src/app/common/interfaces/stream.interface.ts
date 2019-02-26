@@ -10,6 +10,7 @@ export class BigQuery {
 
 export class Stream {
   constructor(
+    public visibility: string,
     public name: string,
     public type: string,
     public description: string,

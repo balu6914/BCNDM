@@ -19,17 +19,19 @@ export class AccessService {
     return this.http.post(`${environment.API_ACCESS_CONTROL}`, data);
   }
 
-  getAccessSent(state: string) {
+  getAllAccessSent() {
+    // TODO: Use this query params as 'pending', 'approved' or 'revoked'
     let params = new HttpParams();
-    params = params.set('state', state);
+    params = params.set('state', '');
     return this.http.get(`${environment.API_ACCESS_CONTROL}/sent`, {
       params: params
     });
   }
 
-  getAccessReceived(state: string) {
+  getAllAccessReceived() {
+    // TODO: Use this query params as 'pending', 'approved' or 'revoked'
     let params = new HttpParams();
-    params = params.set('state', state);
+    params = params.set('state', '');
     return this.http.get(`${environment.API_ACCESS_CONTROL}/received`, {
       params: params
     });

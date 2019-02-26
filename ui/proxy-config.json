@@ -13,11 +13,11 @@
       "^/auth": ""
     }
   },
-  "/auth/access-requests/*": {
-    "target": "http://localhost:8080",
+  "/access-control/access-requests/*": {
+    "target": "http://localhost:8090",
     "secure": false,
     "pathRewrite": {
-      "^/auth": ""
+      "^/access-control": ""
     }
   },
   "/transactions/tokens/*": {

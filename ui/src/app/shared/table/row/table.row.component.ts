@@ -77,6 +77,7 @@ export class TableRowComponent implements OnInit {
     // Parameters editData and streamID are used in DashboardSellEditComponent
     const initialState = {
       editData: {
+        visibility:  row.visibility,
         name:        row.name,
         type:        row.type,
         description: row.description,
@@ -84,7 +85,7 @@ export class TableRowComponent implements OnInit {
         price:       this.dpcPipe.transform(row.price),
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
-        snippet: row.snippet,
+        snippet:     row.snippet,
       },
       streamID: row.id,
     };
