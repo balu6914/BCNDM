@@ -2,13 +2,13 @@ package api_test
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
 	"datapace"
 	"datapace/subscriptions"
 	httpapi "datapace/subscriptions/api"
 	"datapace/subscriptions/mocks"
+	"encoding/json"
+	"fmt"
+	"io"
 	"strings"
 
 	"net/http"
@@ -40,6 +40,7 @@ var (
 		StreamURL: streamURL,
 		Hours:     hours,
 	}
+	subs = []subscriptions.Subscription{sub,}
 )
 
 func newService() subscriptions.Service {
@@ -68,7 +69,7 @@ type testRequest struct {
 }
 
 func (tr testRequest) make() (*http.Response, error) {
-	jm, _ := json.Marshal(sub)
+	jm, _ := json.Marshal(subs)
 	msg := bytes.NewBuffer([]byte(jm))
 
 	req, err := http.NewRequest(tr.method, tr.url, msg)
@@ -96,7 +97,7 @@ func TestCreateSubscription(t *testing.T) {
 	ss := newServer(svc, ac)
 	defer ss.Close()
 
-	body := toJSON(sub)
+	body := toJSON(subs)
 
 	cases := []struct {
 		desc        string
@@ -110,7 +111,7 @@ func TestCreateSubscription(t *testing.T) {
 			auth:        token,
 			contentType: contentType,
 			body:        body,
-			status:      http.StatusCreated,
+			status:      http.StatusMultiStatus,
 		},
 		{
 			desc:        "create subscriptions with invalid credentials",

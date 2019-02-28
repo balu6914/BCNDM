@@ -22,7 +22,7 @@ func LoggingMiddleware(svc subscriptions.Service, logger log.Logger) subscriptio
 
 func (lm *loggingMiddleware) AddSubscription(userID, userToken string, sub subscriptions.Subscription) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method add_subscription for user %s took %s to complete", userID, time.Since(begin))
+		message := fmt.Sprintf("Method add_subscription for user %s and stream %s took %s to complete", userID, sub.StreamID, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return

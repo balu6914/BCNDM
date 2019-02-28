@@ -31,33 +31,44 @@ export class DashboardBuyAddComponent {
     });
   }
 
+  getBalance() {
+    this.balanceService.get().subscribe(
+      (result: any) => {
+        this.balance.amount = result.balance;
+        this.balance.fiatAmount = this.balance.amount;
+        this.balanceService.changed(this.balance);
+      },
+      err => {
+        console.error("Error fetching user balance ", err)
+      });
+  }
+
   onSubmit() {
     if (this.form.invalid) {
       this.modalSubscription.hide();
       this.alertService.error('Please subscribe for at least one hour.');
       return;
     }
-    const subsReq = {
+    const subsReq = [{
       hours: this.form.value.hours,
       stream_id: this.stream.id,
-    };
-    const streamName = this.stream.name;
+    }];
 
     // Send subscription request
     this.subscriptionService.add(subsReq).subscribe(
-      response => {
+      (response: any) => {
         this.modalSubscription.hide();
-        // Fetch new user balance and publish new balance value to message buss
-        this.balanceService.get().subscribe(
-        (result: any) => {
-          this.balance.amount = result.balance;
-          this.balance.fiatAmount = this.balance.amount;
-          this.balanceService.changed(this.balance);
-          this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours.`);
-        },
-        err => {
-          this.alertService.error(`Error fetching user balance ${err}`);
+        //Display the results
+        response.Responses.forEach(resp => {
+          if (resp.errorMessage == null) {
+            this.alertService.success(`You now have access to ${resp.subscriptionID} for ${subsReq[0].hours} hours.`);
+          }
+          else {
+            this.alertService.error(`Error trying to subscribe to Stream ${resp.streamID} due to ${resp.errorMessage}.`);
+          }
         });
+        // Fetch new user balance and publish new balance value to message buss
+        this.getBalance()
       },
       err => {
         this.modalSubscription.hide();
