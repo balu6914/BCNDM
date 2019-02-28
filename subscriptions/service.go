@@ -2,9 +2,9 @@ package subscriptions
 
 import (
 	"context"
+	"datapace"
 	"errors"
 	"fmt"
-	"datapace"
 	"net/http"
 	"strings"
 	"time"
@@ -225,7 +225,7 @@ func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, clien
 }
 
 func (ss subscriptionsService) createBQ(url *string, token string, stream Stream, client *bigquery.Client, expire time.Time) (*bigquery.Dataset, error) {
-	email, err := ss.auth.Email(context.Background(), &monetasa.Token{Value: token})
+	email, err := ss.auth.Email(context.Background(), &datapace.Token{Value: token})
 	if err != nil {
 		return nil, err
 	}
