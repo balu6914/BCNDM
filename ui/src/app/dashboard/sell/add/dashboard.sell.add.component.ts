@@ -74,7 +74,7 @@ export class DashboardSellAddComponent implements OnInit {
   }
 
   changeExt() {
-    this.bqTouched = true;
+    this.bqTouched = !this.bqTouched;
     if (!this.bqMail) {
       return;
     }
