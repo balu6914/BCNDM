@@ -46,13 +46,14 @@ export class DashboardBuyAddComponent {
     // Send subscription request
     this.subscriptionService.add(subsReq).subscribe(
       response => {
+        this.modalSubscription.hide();
         // Fetch new user balance and publish new balance value to message buss
         this.balanceService.get().subscribe(
         (result: any) => {
           this.balance.amount = result.balance;
           this.balance.fiatAmount = this.balance.amount;
           this.balanceService.changed(this.balance);
-          this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours`);
+          this.alertService.success(`You now have access to ${this.stream.name} stream in next ${subsReq.hours} hours.`);
         },
         err => {
           this.alertService.error(`Error fetching user balance ${err}`);
@@ -66,7 +67,5 @@ export class DashboardBuyAddComponent {
           this.alertService.error(`Something went wrong. Please try again later.`);
         }
       });
-
-    this.modalSubscription.hide();
   }
 }

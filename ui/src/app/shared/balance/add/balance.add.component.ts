@@ -44,16 +44,16 @@ export class BalanceAddComponent implements OnInit {
       };
       this.balanceService.buy(toMidpcAmount).subscribe(
         response => {
+          this.modalAddTokens.hide();
           this.balanceUpdate.emit('update');
           this.alertService.success(` You successfully transfer ${this.form.value.amount} DPC to your account`);
         },
         err => {
+          this.modalAddTokens.hide();
           this.processing = false;
           this.alertService.error(`Something went wrong. Please try again later.`);
         }
       );
     }
-
-    this.modalAddTokens.hide();
   }
 }
