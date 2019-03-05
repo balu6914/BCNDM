@@ -156,6 +156,9 @@ type mongoUser struct {
 	ID           bson.ObjectId `bson:"_id,omitempty"`
 	FirstName    string        `bson:"first_name,omitempty"`
 	LastName     string        `bson:"last_name,omitempty"`
+	Company      string        `bson:"company,omitempty"`
+	Address      string        `bson:"address,omitempty"`
+	Phone        string        `bson:"phone,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -167,6 +170,9 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 			ID:           bson.NewObjectId(),
 			FirstName:    user.FirstName,
 			LastName:     user.LastName,
+			Company:      user.Company,
+			Address:      user.Address,
+			Phone:        user.Phone,
 		}, nil
 	}
 
@@ -182,6 +188,9 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		ID:           id,
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
 	}, nil
 }
 
@@ -193,5 +202,8 @@ func (user mongoUser) toUser() auth.User {
 		ID:           user.ID.Hex(),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
 	}
 }

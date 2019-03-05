@@ -64,6 +64,9 @@ type viewRes struct {
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
 }
 
 func (res viewRes) code() int {

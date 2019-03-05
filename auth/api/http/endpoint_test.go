@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"datapace/auth"
+	"datapace/auth/aes"
 	httpapi "datapace/auth/api/http"
 	"datapace/auth/mocks"
 	"encoding/json"
@@ -22,6 +23,7 @@ const (
 	email        = "john.doe@email.com"
 	contactEmail = "john.doe@email.com"
 	invalid      = "invalid"
+	aesKey       = "AES256Key-32CharactersForTesting"
 )
 
 var user = auth.User{
@@ -30,6 +32,9 @@ var user = auth.User{
 	Password:  "password",
 	FirstName: "Joe",
 	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
 }
 
 func newService() auth.Service {
@@ -38,8 +43,9 @@ func newService() auth.Service {
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
+	cipher := aes.NewCipher([]byte(aesKey))
 
-	return auth.New(repo, hasher, idp, ts, ac)
+	return auth.New(repo, hasher, idp, ts, ac, cipher)
 }
 
 func newServer(svc auth.Service) *httptest.Server {

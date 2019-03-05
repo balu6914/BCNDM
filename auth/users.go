@@ -9,6 +9,9 @@ type User struct {
 	ID           string
 	FirstName    string
 	LastName     string
+	Company      string
+	Address      string
+	Phone        string
 }
 
 // UserRepository specifies an account persistence API.

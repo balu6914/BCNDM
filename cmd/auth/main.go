@@ -17,6 +17,7 @@ import (
 	accessapi "datapace/access-control/api/grpc"
 	"datapace/auth"
 	"datapace/auth/access"
+	"datapace/auth/aes"
 	"datapace/auth/api"
 	grpcapi "datapace/auth/api/grpc"
 	httpapi "datapace/auth/api/http"
@@ -38,6 +39,7 @@ const (
 	envTransactionsURL  = "DATAPACE_TRANSACTIONS_URL"
 	envAccessControlURL = "DATAPACE_ACCESS_CONTROL_URL"
 	envSecret           = "DATAPACE_AUTH_SECRET"
+	envEncryptionKey    = "DATAPACE_ENCRYPTION_KEY"
 
 	defHTTPPort         = "8080"
 	defGRPCPort         = "8081"
@@ -48,6 +50,7 @@ const (
 	defTransactionsURL  = "localhost:8081"
 	defAccessControlURL = "localhost:8081"
 	defSecret           = "datapace"
+	defEncryptionKey    = "AES256Key-32Characters1234567890"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -65,6 +68,7 @@ type config struct {
 	transactionsURL  string
 	accessControlURL string
 	secret           string
+	encryptionKey    string
 }
 
 func main() {
@@ -115,6 +119,7 @@ func loadConfig() config {
 		transactionsURL:  datapace.Env(envTransactionsURL, defTransactionsURL),
 		accessControlURL: datapace.Env(envAccessControlURL, defAccessControlURL),
 		secret:           datapace.Env(envSecret, defSecret),
+		encryptionKey:    datapace.Env(envEncryptionKey, defEncryptionKey),
 	}
 }
 
@@ -151,8 +156,9 @@ func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClie
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
+	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
 
-	svc := auth.New(users, hasher, idp, ts, ac)
+	svc := auth.New(users, hasher, idp, ts, ac, cipher)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,
