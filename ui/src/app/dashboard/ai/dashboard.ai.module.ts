@@ -11,6 +11,7 @@ import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.comp
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+import { DashboardAiAddComponent } from './add';
 
 @NgModule({
   imports: [
@@ -26,9 +27,11 @@ import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
   declarations: [
     DashboardAiComponent,
     DashboardAiExecuteComponent,
+    DashboardAiAddComponent,
   ],
   entryComponents: [
     DashboardAiExecuteComponent,
+    DashboardAiAddComponent,
   ],
 })
 export class DashboardAiModule { }
