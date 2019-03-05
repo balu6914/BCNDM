@@ -1244,6 +1244,8 @@ body {
 }
 
 .box-grow {
+  overflow-y: scroll;
+  scrollbar-width: 8px;
 
   ::-webkit-scrollbar {
     width: 8px;
