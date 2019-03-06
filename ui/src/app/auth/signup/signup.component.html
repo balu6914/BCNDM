@@ -46,6 +46,7 @@
           <input type="text" formControlName="first_name" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.first_name.errors }"/>
           <div *ngIf="submitted && form.controls.first_name.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.first_name.errors.required">First name must be provided.</div>
             <div *ngIf="form.controls.first_name.errors.maxlength">The maximum length is 16 characters.</div>
           </div>
         </div>
@@ -56,6 +57,7 @@
           <input type="text" formControlName="last_name" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.last_name.errors }"/>
           <div *ngIf="submitted && form.controls.last_name.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.last_name.errors.required">Last name must be provided.</div>
             <div *ngIf="form.controls.last_name.errors.maxlength">The maximum length is 16 characters.</div>
           </div>
         </div>
