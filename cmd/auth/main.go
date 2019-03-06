@@ -151,14 +151,14 @@ func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {
 }
 
 func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, asc datapace.AccessServiceClient, logger log.Logger) auth.Service {
-	users := mongo.NewUserRepository(ms)
+	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
+	users := mongo.NewUserRepository(ms, cipher)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
-	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
 
-	svc := auth.New(users, hasher, idp, ts, ac, cipher)
+	svc := auth.New(users, hasher, idp, ts, ac)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

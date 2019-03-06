@@ -86,10 +86,6 @@ func (cipher aesCipher) Decrypt(user auth.User) (auth.User, error) {
 func decrypt(cipherText string, gcm c.AEAD) (string, error) {
 	nonceSize := gcm.NonceSize()
 
-	if len(cipherText) < nonceSize {
-		return "", auth.ErrDecrypt
-	}
-
 	bytes, err := base64.StdEncoding.DecodeString(cipherText)
 	if err != nil {
 		return "", err

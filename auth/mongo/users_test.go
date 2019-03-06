@@ -1,9 +1,10 @@
 package mongo_test
 
 import (
-	"fmt"
 	"datapace/auth"
+	"datapace/auth/aes"
 	"datapace/auth/mongo"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,12 +12,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const invalid = "invalid"
+const (
+	invalid = "invalid"
+	aesKey  = "AES256Key-32CharactersForTesting"
+)
 
 var db *mgo.Session
 
 func TestSave(t *testing.T) {
-	repo := mongo.NewUserRepository(db)
+	cipher := aes.NewCipher([]byte(aesKey))
+	repo := mongo.NewUserRepository(db, cipher)
 	user := auth.User{
 		Email:        "john.doe@email.com",
 		ContactEmail: "john.doe@email.com",
@@ -54,7 +59,8 @@ func TestSave(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	repo := mongo.NewUserRepository(db)
+	cipher := aes.NewCipher([]byte(aesKey))
+	repo := mongo.NewUserRepository(db, cipher)
 
 	user := auth.User{
 		Email:        "john.doe1@email.com",
@@ -113,7 +119,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestOneByID(t *testing.T) {
-	repo := mongo.NewUserRepository(db)
+	cipher := aes.NewCipher([]byte(aesKey))
+	repo := mongo.NewUserRepository(db, cipher)
 
 	user := auth.User{
 		Email:     "john.doe4@email.com",
@@ -154,7 +161,8 @@ func TestOneByID(t *testing.T) {
 }
 
 func TestOneByEmail(t *testing.T) {
-	repo := mongo.NewUserRepository(db)
+	cipher := aes.NewCipher([]byte(aesKey))
+	repo := mongo.NewUserRepository(db, cipher)
 
 	user := auth.User{
 		Email:     "john.doe5@email.com",
@@ -190,7 +198,8 @@ func TestOneByEmail(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	repo := mongo.NewUserRepository(db)
+	cipher := aes.NewCipher([]byte(aesKey))
+	repo := mongo.NewUserRepository(db, cipher)
 
 	user := auth.User{
 		Email:        "john.doe6@email.com",

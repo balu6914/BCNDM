@@ -10,16 +10,25 @@ import (
 var _ auth.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
-	db *mgo.Session
+	db     *mgo.Session
+	cipher auth.Cipher
 }
 
 // NewUserRepository instantiates a Mongo implementation of user
 // repository.
-func NewUserRepository(db *mgo.Session) auth.UserRepository {
-	return &userRepository{db}
+func NewUserRepository(db *mgo.Session, cipher auth.Cipher) auth.UserRepository {
+	return &userRepository{
+		db:     db,
+		cipher: cipher,
+	}
 }
 
 func (ur *userRepository) Save(user auth.User) (string, error) {
+	var err error
+	if user, err = ur.cipher.Encrypt(user); err != nil {
+		return "", err
+	}
+
 	mu, err := toMongoUser(user)
 	if err != nil {
 		return "", err
@@ -40,6 +49,11 @@ func (ur *userRepository) Save(user auth.User) (string, error) {
 }
 
 func (ur *userRepository) Update(user auth.User) error {
+	var err error
+	if user, err = ur.cipher.Encrypt(user); err != nil {
+		return err
+	}
+
 	mu, err := toMongoUser(user)
 	if err != nil {
 		return err
@@ -81,7 +95,7 @@ func (ur *userRepository) OneByID(id string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return mu.toUser(), nil
+	return ur.cipher.Decrypt(mu.toUser())
 }
 
 func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
@@ -97,7 +111,7 @@ func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return mu.toUser(), nil
+	return ur.cipher.Decrypt(mu.toUser())
 }
 
 func (ur *userRepository) Remove(id string) error {

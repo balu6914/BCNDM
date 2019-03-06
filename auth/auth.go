@@ -8,18 +8,16 @@ type authService struct {
 	idp    IdentityProvider
 	ts     TransactionsService
 	access AccessControl
-	cipher Cipher
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl, cipher Cipher) Service {
+func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl) Service {
 	return &authService{
 		users:  users,
 		hasher: hasher,
 		idp:    idp,
 		ts:     ts,
 		access: access,
-		cipher: cipher,
 	}
 }
 
@@ -30,10 +28,6 @@ func (as *authService) Register(user User) error {
 	}
 
 	user.Password = hash
-	user, err = as.cipher.Encrypt(user)
-	if err != nil {
-		return ErrEncrypt
-	}
 
 	id, err := as.users.Save(user)
 	if err != nil {
@@ -69,11 +63,6 @@ func (as *authService) Update(key string, user User) error {
 
 	user.ID = id
 
-	user, err = as.cipher.Encrypt(user)
-	if err != nil {
-		return ErrEncrypt
-	}
-
 	return as.users.Update(user)
 }
 
@@ -100,11 +89,6 @@ func (as *authService) UpdatePassword(key string, old string, user User) error {
 	}
 	user.Password = hash
 
-	user, err = as.cipher.Encrypt(user)
-	if err != nil {
-		return ErrEncrypt
-	}
-
 	return as.users.Update(user)
 }
 
@@ -119,11 +103,6 @@ func (as *authService) View(key string) (User, error) {
 		return User{}, ErrUnauthorizedAccess
 	}
 
-	user, err = as.cipher.Decrypt(user)
-	if err != nil {
-		return User{}, ErrDecrypt
-	}
-
 	return user, nil
 }
 
@@ -135,13 +114,6 @@ func (as *authService) ListUsers(key string) ([]User, error) {
 	users, err := as.users.AllExcept([]string{})
 	if err != nil {
 		return []User{}, err
-	}
-
-	for i, u := range users {
-		users[i], err = as.cipher.Decrypt(u)
-		if err != nil {
-			return []User{}, ErrDecrypt
-		}
 	}
 
 	return users, nil
@@ -163,13 +135,6 @@ func (as *authService) ListNonPartners(key string) ([]User, error) {
 	users, err := as.users.AllExcept(plist)
 	if err != nil {
 		return []User{}, err
-	}
-
-	for i, u := range users {
-		users[i], err = as.cipher.Decrypt(u)
-		if err != nil {
-			return []User{}, ErrDecrypt
-		}
 	}
 
 	return users, nil

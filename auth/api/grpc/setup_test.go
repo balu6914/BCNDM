@@ -3,7 +3,6 @@ package grpc_test
 import (
 	"datapace"
 	"datapace/auth"
-	"datapace/auth/aes"
 	grpcapi "datapace/auth/api/grpc"
 	"datapace/auth/mocks"
 	"fmt"
@@ -14,10 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	port   = 8081
-	aesKey = "AES256Key-32CharactersForTesting"
-)
+const port = 8081
 
 var svc auth.Service
 
@@ -34,9 +30,8 @@ func newService() auth.Service {
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
-	cipher := aes.NewCipher([]byte(aesKey))
 
-	return auth.New(repo, hasher, idp, ts, ac, cipher)
+	return auth.New(repo, hasher, idp, ts, ac)
 }
 
 func startGRPCServer(svc auth.Service, port int) {

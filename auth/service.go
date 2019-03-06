@@ -20,12 +20,6 @@ var (
 
 	// ErrFetchingBalance indicates failure while fetching users balance.
 	ErrFetchingBalance = errors.New("failed to fetch balance")
-
-	// ErrEncrypt indicates failure while encrytping private user data.
-	ErrEncrypt = errors.New("failed to encrypt user data")
-
-	// ErrDecrypt indicates failure while encrytping private user data.
-	ErrDecrypt = errors.New("failed to decrypt user data")
 )
 
 // Service specifies an API that must be fullfiled by the domain service

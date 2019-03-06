@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"datapace/auth"
-	"datapace/auth/aes"
 	"datapace/auth/mocks"
 	"fmt"
 	"testing"
@@ -10,10 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	wrong  string = "wrong-value"
-	aesKey        = "AES256Key-32CharactersForTesting"
-)
+const wrong string = "wrong-value"
 
 var user = auth.User{
 	Email:        "user@example.com",
@@ -33,9 +29,8 @@ func newService() auth.Service {
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
-	cipher := aes.NewCipher([]byte(aesKey))
 
-	return auth.New(users, hasher, idp, ts, ac, cipher)
+	return auth.New(users, hasher, idp, ts, ac)
 }
 
 func TestRegister(t *testing.T) {
