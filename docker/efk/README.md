@@ -17,3 +17,4 @@ docker-compose up
 Make sure that this is up and running before starting blockchain or datapace dApp
 
 Update .env files with the eternal IP of the instance
+
