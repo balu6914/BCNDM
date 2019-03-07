@@ -71,14 +71,28 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="col-sm-8 col-md-12">
-        <div class="stream-data">
-          <div class="stream-data__title">
-            Example reading(s)
+        <div class="row">
+          <div class="col-sm-8 col-md-12">
+            <div class="stream-data">
+              <div class="stream-data__title">
+                Example reading(s)
+              </div>
+              <div class="stream-data__text">
+                <pre class="stream-data__pre">{{row.snippet}}</pre>
+              </div>
+            </div>
           </div>
-          <div class="stream-data__text">
-            <pre class="stream-data__pre">{{row.snippet}}</pre>
+        </div>
+        <div *ngIf="rowType === types.Ai" class="row">
+          <div class="col-sm-8 col-md-12">
+            <div class="stream-data">
+              <div class="stream-data__title">
+                Metadata
+              </div>
+              <div class="stream-data__text">
+                <pre class="stream-data__pre">{{row.metadata | json}}</pre>
+              </div>
+            </div>
           </div>
         </div>
       </div>

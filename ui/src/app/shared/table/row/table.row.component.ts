@@ -6,6 +6,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
+import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
@@ -86,16 +87,29 @@ export class TableRowComponent implements OnInit {
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
         snippet:     row.snippet,
+        metadata:    JSON.stringify(row.metadata),
       },
       streamID: row.id,
+      ownerID:  row.owner,
     };
-    // Open DashboardSellEditComponent as Modal
-    this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
-      .content.streamEdited.subscribe(
-        stream => {
-          this.editEvt.emit(stream);
-        }
-      );
+
+    if (row.type === 'Algorithm' || row.type === 'Dataset') {
+      // Open DashboardSellEditComponent as Modal
+      this.bsModalRef = this.modalService.show(DashboardAiEditComponent, {initialState})
+        .content.streamEdited.subscribe(
+          stream => {
+            this.editEvt.emit(stream);
+          }
+        );
+    } else {
+      // Open DashboardSellEditComponent as Modal
+      this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
+        .content.streamEdited.subscribe(
+          stream => {
+            this.editEvt.emit(stream);
+          }
+        );
+    }
   }
 
   openModalDelete(row: any) {

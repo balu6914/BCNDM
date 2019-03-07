@@ -11,6 +11,7 @@ import (
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
+	"gopkg.in/mgo.v2/bson"
 
 	"datapace"
 	"datapace/streams"
@@ -184,6 +185,13 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 		return nil, err
 	}
 
+	// Convert Metadata from string to bson.M if present
+	data := []byte(record[keys["metadata"]])
+	metadata := bson.M{}
+	if len(data) != 0 {
+		json.Unmarshal(data, &metadata)
+	}
+
 	ret := &streams.Stream{
 		Visibility:  streams.Visibility(record[keys["visibility"]]),
 		Name:        record[keys["name"]],
@@ -195,7 +203,8 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL: record[keys["url"]],
+		URL:      record[keys["url"]],
+		Metadata: metadata,
 	}
 	return ret, nil
 }

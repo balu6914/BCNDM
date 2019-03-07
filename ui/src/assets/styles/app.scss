@@ -931,6 +931,7 @@ margin-bottom: 1rem;
 &__text {
   background-color: #F0F4F9;
   padding: 1rem;
+  margin-bottom: 1rem;
 }
 &__pre {
   font-size: $font-size-base;
@@ -1170,7 +1171,7 @@ body {
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 71px;) // minus topbar height
+  min-height: calc(100vh - 1rem;) // minus topbar height
 }
 .row-grow {
   flex-grow: 1;
@@ -1243,10 +1244,12 @@ body {
   }
 }
 
-.box-grow {
-  overflow-y: scroll;
-  scrollbar-width: 8px;
+.box__content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
+.box-grow {
   ::-webkit-scrollbar {
     width: 8px;
   }

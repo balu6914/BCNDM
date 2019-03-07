@@ -16,6 +16,7 @@ export class DashboardAiAddComponent implements OnInit {
   form: FormGroup;
   submitted = false;
   streamType = '';
+  ownerID: any;
 
   @Output()
   aiStreamCreated: EventEmitter<any> = new EventEmitter();
@@ -30,64 +31,63 @@ export class DashboardAiAddComponent implements OnInit {
   ngOnInit() {
     const floatValidator = Validators.pattern(floatRegEx);
     const urlValidator = Validators.pattern(urlRegEx);
-    this.form = this.formBuilder.group({
-      visibility: ['', [Validators.required]],
-      name: ['', [Validators.required, Validators.maxLength(32)]],
-      description: ['', [Validators.required, Validators.maxLength(256)]],
-      snippet: ['', [Validators.maxLength(256)]],
-      url: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
-      price: ['', [Validators.required, Validators.maxLength(9), floatValidator]],
-      lat: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(11),
-          floatValidator,
-          Validators.min(-90),
-          Validators.max(90)
-        ]
-      ],
-      long: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(12),
-          floatValidator,
-          Validators.min(-180),
-          Validators.max(180)
-        ]
-      ],
-    });
+    this.form = this.formBuilder.group(
+      {
+        visibility:  ['', [Validators.required]],
+        name:        ['', [Validators.required, Validators.maxLength(32)]],
+        description: ['', [Validators.required, Validators.maxLength(256)]],
+        url:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+        price:       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
+        lat:         ['', [Validators.required, Validators.maxLength(11), Validators.min(-90), Validators.max(90), floatValidator]],
+        long:        ['', [Validators.required, Validators.maxLength(12), Validators.min(-180), Validators.max(180), floatValidator]],
+        snippet:     ['', [Validators.maxLength(2048)]],
+        metadata:    ['', [Validators.maxLength(2048)]],
+      },
+      {
+        validator: this.metadataValidator,
+      },
+    );
   }
 
+  metadataValidator(fg: FormGroup) {
+    try {
+      JSON.parse(fg.value.metadata);
+    } catch (e) {
+      fg.controls.metadata.setErrors({'invalid': true});
+      return;
+    }
+
+    return null;
+  }
 
   onSubmit() {
     this.submitted = true;
 
     if (this.form.valid) {
       const stream: Stream = {
-        visibility: this.form.get('visibility').value,
-        name: this.form.get('name').value,
+        visibility: this.form.value.visibility,
+        name: this.form.value.name,
         type: this.streamType,
-        description: this.form.get('description').value,
-        url: this.form.get('url').value,
-        price: this.midpcPipe.transform(this.form.get('price').value),
-        snippet: this.form.get('snippet').value,
+        description: this.form.value.description,
+        snippet: this.form.value.snippet,
+        url: this.form.value.url,
+        price: this.midpcPipe.transform(this.form.value.price),
         location: {
-          type: 'Point',
-          coordinates: [
-            parseFloat(this.form.get('long').value),
-            parseFloat(this.form.get('lat').value)
+          'type': 'Point',
+          'coordinates': [
+            parseFloat(this.form.value.long),
+            parseFloat(this.form.value.lat)
           ]
         },
-        external: false,
+        metadata: JSON.parse(this.form.value.metadata),
       };
 
       // Send addStream request
       this.streamService.addStream(stream).subscribe(
         res => {
-          // Add ID from http response to stream
+          // Set this parameters to configure table rows
           stream.id = res['id'];
+          stream.owner = this.ownerID;
           this.aiStreamCreated.emit(stream);
           this.alertService.success(`${this.streamType} successfully added!`);
         },

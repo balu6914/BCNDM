@@ -44,13 +44,13 @@ export class DashboardAiComponent implements OnInit {
     // Config tableDatasets
     this.tableDatasets.title = 'Datasets';
     this.tableDatasets.tableType = TableType.Ai;
-    this.tableDatasets.headers = ['Name', 'Type', 'Price', ''];
+    this.tableDatasets.headers = [' Name', ' Type', ' Price', '', ''];
     this.tableDatasets.hasDetails = true;
 
     // Config tableAlgorithms
     this.tableAlgorithms.title = 'Algorithms';
     this.tableAlgorithms.tableType = TableType.Ai;
-    this.tableAlgorithms.headers = ['Name', 'Type', 'Price', ''];
+    this.tableAlgorithms.headers = [' Name', ' Type', ' Price', '', ''];
     this.tableAlgorithms.hasDetails = true;
 
     // Config tableExecutions
@@ -204,7 +204,8 @@ export class DashboardAiComponent implements OnInit {
 
     openModalAdd(type: String) {
       const initialState = {
-        streamType: type
+        streamType: type,
+        ownerID: this.user.id,
       };
 
       // Show DashboardAilAddComponent as Modal

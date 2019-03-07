@@ -43,11 +43,11 @@
         </div>
       </div>
       <div class="form-group row">
-        <label class="col-sm-4 col-form-label">Snippet*</label>
+        <label class="col-sm-4 col-form-label">Snippet</label>
         <div class="col-sm-8">
           <textarea type="text" formControlName="snippet" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }"></textarea>
           <div *ngIf="submitted && form.controls.snippet.erors" class="invalid-feedback">
-            <div *ngIf="form.controls.snippet.errors.maxlength">The maximum length is 256 characters.</div>
+            <div *ngIf="form.controls.snippet.errors.maxlength">The maximum length is 2048 characters.</div>
           </div>
         </div>
       </div>
@@ -95,6 +95,16 @@
               decimals.</div>
             <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between
               -180 and 180.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Metadata</label>
+        <div class="col-sm-8">
+          <textarea type="text" formControlName="metadata" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.metadata.errors }"></textarea>
+          <div *ngIf="submitted && form.controls.metadata.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.metadata.errors.maxlength">The maximum length is 2048 characters.</div>
+            <div *ngIf="form.controls.metadata.errors.invalid">Metadata must be a JSON.</div>
           </div>
         </div>
       </div>

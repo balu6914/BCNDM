@@ -63,6 +63,7 @@ type Stream struct {
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
 	External    bool          `bson:"external" json:"external,omitempty"`
 	BQ          BigQuery      `bson:"big_query,omitempty" json:"bq,omitempty"`
+	Metadata    bson.M        `bson:"metadata,omitempty" json:"metadata,omitempty"`
 }
 
 // Page represents paged result for list response.
@@ -84,6 +85,7 @@ const (
 	maxLongitude         = 180
 	minLatitude          = -90
 	maxLatitude          = 90
+	maxMetadataLength    = 2048
 )
 
 // Validate returns an error if stream representation is invalid.
@@ -95,6 +97,7 @@ func (s *Stream) Validate() error {
 		s.Price <= minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
 		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude ||
+		// // TODO: Add Metadata length validation
 		s.Visibility != Public && s.Visibility != Protected && s.Visibility != Private {
 		return ErrMalformedData
 	}

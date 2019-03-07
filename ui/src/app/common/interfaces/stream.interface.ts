@@ -21,6 +21,7 @@ export class Stream {
     public owner?: string,
     public id?: string,
     public external?: boolean,
-    public bq?: BigQuery
+    public bq?: BigQuery,
+    public metadata?: object
   ) { }
 }

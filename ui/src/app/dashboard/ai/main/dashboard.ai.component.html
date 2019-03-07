@@ -31,13 +31,13 @@
   </div>
 
   <div class="row row-grow">
-    <div class="col-lg-6">
+    <div class="col-lg-6 order-1 order-sm-2">
       <dpc-table [table]="tableAlgorithms"
                  (pageChanged)="onPageChange($event)"
                  (checkboxChangedEvt)="onAlgoSelected($event)">
       </dpc-table>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-6 order-1 order-sm-2">
       <dpc-table [table]="tableDatasets"
                  (pageChanged)="onPageChange($event)"
                  (checkboxChangedEvt)="onDataSelected($event)">

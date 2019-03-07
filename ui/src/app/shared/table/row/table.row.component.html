@@ -68,7 +68,7 @@
     </div>
   </td>
 </tr>
-<tr *ngIf="rowType === types.Buy || rowType === types.Sell" [ngClass]="{'table-active': row.mapId == rowMarked}">
+<tr *ngIf="rowType === types.Buy || rowType === types.Sell || rowType === types.Ai" [ngClass]="{'table-active': row.mapId && row.mapId == rowMarked}">
   <td (click)="selectRow(row)">
     <span class="table-link-arrow">
       {{row.name}}
@@ -83,8 +83,11 @@
       </a>
     </div>
   </td>
-  <td *ngIf="rowType === types.Sell" nowrap class="table--right-aligned">
-    <div class="action-wrapper">
+  <td *ngIf="rowType === types.Ai">
+    <input type="checkbox" (change)="onCheckboxChanged(row)"/>
+  </td>
+  <td>
+    <div class="action-wrapper" *ngIf="rowType === types.Sell || rowType === types.Ai && user.id === row.owner" nowrap class="table--right-aligned">
       <a class="action action--color-1" (click)="openModalEdit(row)">
         <span class="action__icon action--edit"></span>
       </a>
@@ -92,17 +95,6 @@
         <span class="action__icon action--delete"></span>
       </a>
     </div>
-  </td>
-</tr>
-
-<tr *ngIf="rowType === types.Ai">
-  <td (click)="selectRow(row)">
-    <span class="table-link-arrow">{{ row.name }}</span>
-  </td>
-  <td>{{ row.type }}</td>
-  <td>{{ row.price | dpc }} DPC</td>
-  <td>
-    <input type="checkbox" (change)="onCheckboxChanged(row)"/>
   </td>
 </tr>
 
