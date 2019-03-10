@@ -69,6 +69,20 @@ In order to build backend microservices (i.e. Datapace dApp) you will need to ma
 ```
 make dockers
 ```
+### Logging
+For production centralized logging run the following command:
+
+```
+make logging
+```
+
+This will start EFK looging dockers
+This is a shorthand for:
+
+```
+docker-compose -f docker/efk/docker-compose.yml up
+```
+
 
 ### Blockchain
 Be sure that you generated all necessary crypto-material (as described in aforementioned `docker` [README](docker/README.md)):
@@ -92,6 +106,12 @@ This is a shorthand for:
 ./docker/fabric/run.sh
 ```
 
+For production centralized logging run the following command:
+```
+make runlogbc
+```
+Important note make sure the file `docker/fabric/.env` is containg the correct IP of the logging server
+
 ### Blockchain Explorer
 Once blockchain network is up and running, you can start Hyperledger Explorer with:
 
@@ -114,6 +134,15 @@ which is a shorthand for:
 ```
 docker-compose -f docker/docker-compose.yml up
 ```
+
+For production centralized logging run the following command:
+
+```
+make runlogdapp
+```
+
+Important note make sure the file `docker/fabric/.env` is containg the correct IP of the logging server
+
 
 UI will be available at [http://localhost:4200](http://localhost:4200)
 
