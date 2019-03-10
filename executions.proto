@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package datapace;
+
+import "google/protobuf/empty.proto";
+
+service ExecutionsService {
+    rpc CreateAlgorithm(Algorithm) returns (google.protobuf.Empty) {}
+    rpc CreateDataset(Dataset) returns (google.protobuf.Empty) {}
+}
+
+message Algorithm {
+    string id = 1;
+    string name = 2;
+    string path =3;
+    string modelToken = 4;
+    string modelName = 5;
+}
+
+message Dataset {
+    string id = 1;
+    string path = 2;
+}

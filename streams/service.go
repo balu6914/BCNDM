@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"cloud.google.com/go/bigquery"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/api/googleapi"
@@ -90,13 +92,15 @@ type Service interface {
 type streamService struct {
 	streams       StreamRepository
 	accessControl AccessControl
+	ai            AIService
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(streams StreamRepository, accessControl AccessControl) Service {
+func NewService(streams StreamRepository, accessControl AccessControl, ai AIService) Service {
 	return streamService{
 		streams:       streams,
 		accessControl: accessControl,
+		ai:            ai,
 	}
 }
 
@@ -104,7 +108,27 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 	if stream.External {
 		return ss.addBqStream(stream)
 	}
-	return ss.streams.Save(stream)
+
+	id, err := ss.streams.Save(stream)
+	if err != nil {
+		return "", err
+	}
+
+	stream.ID = bson.ObjectIdHex(id)
+
+	if stream.Type == "Dataset" {
+		if err := ss.ai.CreateDataset(stream); err != nil {
+			return "", err
+		}
+	}
+
+	if stream.Type == "Algorithm" {
+		if err := ss.ai.CreateAlgorithm(stream); err != nil {
+			return "", err
+		}
+	}
+
+	return id, nil
 }
 
 func (ss streamService) checkAccess(owner string, access []*bigquery.AccessEntry) error {

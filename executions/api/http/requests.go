@@ -1,4 +1,4 @@
-package api
+package http
 
 import "datapace/executions"
 
@@ -7,12 +7,19 @@ type apiReq interface {
 }
 
 type executionReq struct {
-	Data string             `json:"data"`
-	Mode executions.JobMode `json:"mode"`
+	Data                     string             `json:"data"`
+	AdditionalLocalJobArgs   []string           `json:"local_args"`
+	Type                     string             `json:"type"`
+	GlobalTimeout            uint64             `json:"global_timeout"`
+	LocalTimeout             uint64             `json:"local_timeout"`
+	AdditionalPreprocessArgs []string           `json:"preprocess_args"`
+	Mode                     executions.JobMode `json:"mode"`
+	AdditionalGlobalJobArgs  []string           `json:"global_args"`
+	AdditionalFiles          []string           `json:"files"`
 }
 
 func (req executionReq) validate() error {
-	if req.Data == "" {
+	if req.Data == "" || req.Type == "" {
 		return executions.ErrMalformedData
 	}
 

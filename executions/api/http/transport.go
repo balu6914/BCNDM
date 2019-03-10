@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"context"
@@ -37,6 +37,13 @@ func MakeHandler(svc executions.Service, ac datapace.AuthServiceClient) http.Han
 	r.Post("/executions", kithttp.NewServer(
 		startExecutionEndpoint(svc),
 		decodeStartExecutionRequest,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/executions/:id/result", kithttp.NewServer(
+		resultEndpoint(svc),
+		decodeViewRequest,
 		encodeResponse,
 		opts...,
 	))

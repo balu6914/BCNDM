@@ -3,12 +3,14 @@ package mongo
 import (
 	"time"
 
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 )
 
 const (
-	dbName     = "datapace-executions"
-	collection = "executions"
+	dbName         = "datapace-executions"
+	execCollection = "executions"
+	algoCollection = "algorithms"
+	dataCollection = "datasets"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error

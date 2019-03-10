@@ -97,8 +97,9 @@ func (tr testRequest) make() (*http.Response, error) {
 func newService() streams.Service {
 	repo := mocks.NewStreamRepository()
 	ac := mocks.NewAccessControl([]string{})
+	ai := mocks.NewAIService()
 
-	return streams.NewService(repo, ac)
+	return streams.NewService(repo, ac, ai)
 }
 
 func newServer(svc streams.Service) *httptest.Server {

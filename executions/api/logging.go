@@ -19,10 +19,10 @@ func LoggingMiddleware(svc executions.Service, logger log.Logger) executions.Ser
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm loggingMiddleware) Start(owner, algo, data string, mode executions.JobMode) (id string, err error) {
+func (lm loggingMiddleware) Start(exec executions.Execution) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method start for owner %s, algo %s, data %s and mode %s took %s to complete",
-			owner, algo, data, mode, time.Since(begin))
+		message := fmt.Sprintf("Method start for owner %s, algo %s, data %s and mode %s with id %s took %s to complete",
+			exec.Owner, exec.Algo, exec.Data, exec.Mode, id, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -30,20 +30,20 @@ func (lm loggingMiddleware) Start(owner, algo, data string, mode executions.JobM
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.Start(owner, algo, data, mode)
+	return lm.svc.Start(exec)
 }
 
-func (lm loggingMiddleware) Finish(id string) (err error) {
+func (lm loggingMiddleware) Result(owner, id string) (result map[string]interface{}, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method finish for execution %s took %s to complete", id, time.Since(begin))
+		message := fmt.Sprintf("Method result for owner %s and execution %s took %s to complete", owner, id, time.Since(begin))
 		if err != nil {
-			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s", message, err))
 			return
 		}
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.Finish(id)
+	return lm.svc.Result(owner, id)
 }
 
 func (lm loggingMiddleware) Execution(owner, id string) (exec executions.Execution, err error) {
@@ -70,4 +70,30 @@ func (lm loggingMiddleware) List(owner string) (execs []executions.Execution, er
 	}(time.Now())
 
 	return lm.svc.List(owner)
+}
+
+func (lm loggingMiddleware) CreateAlgorithm(algo executions.Algorithm) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method create_algorithm for algorithm %s took %s to complete", algo.ID, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.CreateAlgorithm(algo)
+}
+
+func (lm loggingMiddleware) CreateDataset(data executions.Dataset) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method create_dataset for dataset %s took %s to complete", data.ID, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.CreateDataset(data)
 }
