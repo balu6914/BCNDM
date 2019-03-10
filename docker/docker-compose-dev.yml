@@ -1,0 +1,302 @@
+# Copyright (c) 2018 Datapace
+version: "2"
+
+services:
+  ###
+  # Auth DB
+  ###
+  datapace-auth-db:
+    image: mongo:latest
+    container_name: datapace-auth-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./auth-data:/data/db
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+  ###
+  # Auth service
+  ###
+  datapace-auth:
+    image: datapace/auth
+    container_name: datapace-auth
+    restart: on-failure
+    depends_on:
+      - datapace-auth-db
+    ports:
+      - "8080:8080"
+    expose:
+      - "8081"
+    environment:
+      - DATAPACE_AUTH_DB_URL=datapace-auth-db
+      - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
+      - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
+      - DATAPACE_AUTH_SECRET=datapace
+    networks:
+      - datapace-net
+
+  ###
+  # Transactions DB
+  ###
+  datapace-transactions-db:
+    image: mongo:latest
+    container_name: datapace-transactions-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./transactions-data:/data/db
+    networks:
+      - datapace-net
+
+  ###
+  # Transactions service
+  ###
+  datapace-transactions:
+    image: datapace/transactions
+    container_name: datapace-transactions
+    restart: on-failure
+    depends_on:
+      - datapace-auth
+      - datapace-transactions-db
+    ports:
+      - "8082:8082"
+    expose:
+      - "8083"
+    environment:
+      - DATAPACE_TRANSACTIONS_HTTP_PORT=8082
+      - DATAPACE_TRANSACTIONS_GRPC_PORT=8083
+      - DATAPACE_TRANSACTIONS_DB_URL=datapace-transactions-db
+      - DATAPACE_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.datapace.com
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_STREAMS_URL=datapace-streams:8085
+      - DATAPACE_CONFIG=/config
+    volumes:
+      - ../config:/config
+      - ./datapace-service-kvs:/tmp/datapace-service-kvs
+      - ./datapace-service-msp:/tmp/datapace-service-msp
+    networks:
+      # Link to datapace fabric net
+      - fabric_datapace-bc-net
+      - datapace-net
+
+  ###
+  # Streams DB
+  ###
+  datapace-streams-db:
+    image: mongo:latest
+    container_name: datapace-streams-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./streams-data:/data/db
+    networks:
+      - datapace-net
+
+  ###
+  # Streams service
+  ###
+  datapace-streams:
+    image: datapace/streams:latest
+    container_name: datapace-streams
+    depends_on:
+      - datapace-streams-db
+      - datapace-auth
+      - datapace-access-control
+    ports:
+      - 8084:8084
+    expose:
+      - 8085
+    environment:
+      - DATAPACE_STREAMS_HTTP_PORT=8084
+      - DATAPACE_STREAMS_GRPC_PORT=8085
+      - DATAPACE_STREAMS_DB_URL=datapace-streams-db
+      - DATAPACE_STREAMS_DB_NAME=streams
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
+      - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+    volumes:
+      - ../config/big-query:/big-query
+    networks:
+      - datapace-net
+
+  ###
+  # Subscriptions DB
+  ###
+  datapace-subscriptions-db:
+    image: mongo:latest
+    container_name: datapace-subscriptions-db
+    command: --smallfiles --nojournal
+    ports:
+      - 27017:27017
+    volumes:
+      - ./subscriptions-data:/data/db
+    networks:
+      - datapace-net
+
+  ###
+  # Subscriptions service
+  ###
+  datapace-subscriptions:
+    image: datapace/subscriptions:latest
+    container_name: datapace-subscriptions
+    depends_on:
+      - datapace-subscriptions-db
+      - datapace-streams
+      - datapace-proxy
+    ports:
+      - 8086:8086
+    environment:
+      - DATAPACE_SUBSCRIPTIONS_PORT=8086
+      - DATAPACE_SUBSCRIPTIONS_DB_URL=datapace-subscriptions-db
+      - DATAPACE_SUBSCRIPTIONS_DB_NAME=subscriptions
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_STREAMS_URL=datapace-streams:8085
+      - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
+      - DATAPACE_PROXY_URL=http://datapace-proxy:8085
+      - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+    volumes:
+      - ../config/big-query:/big-query
+    networks:
+      - datapace-net
+
+  ###
+  # Executions DB
+  ###
+  datapace-executions-db:
+    image: mongo:latest
+    container_name: datapace-executions-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./executions-data:/data/db
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+  ###
+  # Executions serivce
+  ###
+  datapace-executions:
+    image: datapace/executions:latest
+    container_name: datapace-executions
+    depends_on:
+      - datapace-executions-db
+      - datapace-auth
+      - datapace-streams
+    ports:
+      - 8088:8088
+    environment:
+      - DATAPACE_EXECUTIONS_HTTP_PORT=8088
+      - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+    networks:
+      - datapace-net
+
+  ###
+  # Access Control DB
+  ###
+  datapace-access-control-db:
+    image: mongo:latest
+    container_name: datapace-access-control-db
+    command: --smallfiles --nojournal
+    volumes:
+      - ./access-control-data:/data/db
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+  ###
+  # Access Control service
+  ###
+  datapace-access-control:
+    image: datapace/access-control
+    container_name: datapace-access-control
+    restart: on-failure
+    depends_on:
+      - datapace-access-control-db
+      - datapace-auth
+    ports:
+      - 8090:8090
+    expose:
+      - 8091
+    environment:
+      - DATAPACE_ACCESS_CONTROL_HTTP_PORT=8090
+      - DATAPACE_ACCESS_CONTROL_GRPC_PORT=8091
+      - DATAPACE_ACCESS_CONTROL_DB_URL=datapace-access-control-db
+      - DATAPACE_ACCESS_CONTROL_FABRIC_ADMIN=Admin@org1.datapace.com
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_CONFIG=/config
+    volumes:
+      - ../config:/config
+      - ./datapace-service-kvs:/tmp/datapace-service-kvs
+      - ./datapace-service-msp:/tmp/datapace-service-msp
+    networks:
+      # Link to datapace fabric net
+      - fabric_datapace-bc-net
+      - datapace-net
+
+  datapace-proxy:
+    image: datapace/proxy:latest
+    container_name: datapace-proxy
+    environment:
+      - REDIS_URL=redis://datapace-proxy-db:6379
+      - PUBLIC_URL=https://stream3.datapace.io
+      - NODE_ENV=development
+    depends_on:
+      - datapace-proxy-db
+    ports:
+      - "8087:8081"
+    restart: on-failure
+    networks:
+      - datapace-net
+
+  datapace-proxy-db:
+    image: redis:latest
+    container_name: datapace-proxy-db
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./proxy-data:/data
+    networks:
+      - datapace-net
+
+  ###
+  # Datapace UI
+  ###
+  datapace-ui:
+    image: datapace/ui
+    container_name: datapace-ui
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    networks:
+      - datapace-net
+  ###
+  # Nginx
+  ###
+  nginx:
+    image: nginx:alpine
+    container_name: datapace-nginx
+    restart: on-failure
+    depends_on:
+      - datapace-auth
+      - datapace-transactions
+      - datapace-streams
+      - datapace-executions
+      - datapace-ui
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl/certs/datapace.crt:/etc/ssl/certs/datapace.crt
+      - ./ssl/certs/datapace.key:/etc/ssl/private/datapace.key
+      - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-net
+
+networks:
+  fabric_datapace-bc-net:
+    external: true
+  datapace-net:
+    driver: bridge
