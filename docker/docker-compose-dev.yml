@@ -101,6 +101,7 @@ services:
       - datapace-streams-db
       - datapace-auth
       - datapace-access-control
+      - datapace-executions
     ports:
       - 8084:8084
     expose:
@@ -111,6 +112,7 @@ services:
       - DATAPACE_STREAMS_DB_URL=datapace-streams-db
       - DATAPACE_STREAMS_DB_NAME=streams
       - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_EXECUTIONS_URL=datapace-executions:8089
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
     volumes:
@@ -180,13 +182,20 @@ services:
     depends_on:
       - datapace-executions-db
       - datapace-auth
-      - datapace-streams
     ports:
       - 8088:8088
+    expose:
+      - 8089
     environment:
       - DATAPACE_EXECUTIONS_HTTP_PORT=8088
+      - DATAPACE_EXECUTIONS_GRPC_PORT=8089
       - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
       - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_WWH_CATALOG_URL=http://host.docker.internal:31222 # instead of localhost place docker host IP
+      - DATAPACE_WWH_DAEMON_URL=http://host.docker.internal:32222 # same here (check it with docker exec -it datapace-executions route)
+      - DATAPACE_WWH_TOKEN=v61rSpnp89
+      - DATAPACE_WWH_USERNAME=admin1
+      - DATAPACE_WWH_PASSWORD=password01
     networks:
       - datapace-net
 
@@ -238,7 +247,7 @@ services:
     container_name: datapace-proxy
     environment:
       - REDIS_URL=redis://datapace-proxy-db:6379
-      - PUBLIC_URL=https://stream3.datapace.io
+      - PUBLIC_URL=http://localhost:8087
       - NODE_ENV=development
     depends_on:
       - datapace-proxy-db
