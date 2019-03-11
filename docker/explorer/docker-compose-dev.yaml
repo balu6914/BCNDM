@@ -17,11 +17,6 @@ services:
       - ../explorer/artifacts/updatepg.sql:/docker-entrypoint-initdb.d/updatepg.sql
     networks:
       - explorer-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   explorer:
     image: datapace/hyperledger-explorer
@@ -36,11 +31,6 @@ services:
       - "9090:8080"
     networks:
       - explorer-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
     depends_on:
       - explorer-db
 
