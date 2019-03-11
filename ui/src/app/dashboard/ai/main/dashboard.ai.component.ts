@@ -15,6 +15,7 @@ import { SubscriptionService } from 'app/common/services/subscription.service';
 import { Page } from 'app/common/interfaces/page.interface';
 import { Subscription } from 'app/common/interfaces/subscription.interface';
 import { DashboardAiAddComponent } from 'app/dashboard/ai/add/dashboard.ai.add.component';
+import { Execution } from 'app/common/interfaces/execution.interface';
 
 @Component({
   selector: 'dpc-dashboard-ai',
@@ -144,12 +145,22 @@ export class DashboardAiComponent implements OnInit {
   fetchExecutions() {
     this.executionsService.getExecutions().subscribe(
       (result: any) => {
-        this.tableExecutions.page = {
-          page: 0,
-          total: 5,
-          limit: 50,
-          content: result.executions,
-        };
+        const firstExec: any = result.executions[0];
+        this.executionsService.getExecutionResult(firstExec.id).subscribe(
+          (res: any) => {
+            firstExec.results = res.result;
+            result.executions[0] = firstExec;
+            this.tableExecutions.page = {
+              page: 0,
+              total: 5,
+              limit: 50,
+              content: result.executions,
+            };
+          },
+          err => {
+            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          }
+        );
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);

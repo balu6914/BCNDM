@@ -13,6 +13,7 @@ export class Execution {
     public model_token: string,
     public model_name: string,
     public state: string,
+    public results: Object,
   ) { }
 }
 
