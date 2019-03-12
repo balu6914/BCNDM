@@ -160,10 +160,10 @@ export class DashboardAiComponent implements OnInit {
     );
   }
 
-  fetchExecutionResult(exxecution: Execution) {
-    this.executionsService.getExecutionResult(exxecution.id).subscribe(
+  fetchExecutionResult(execution: Execution) {
+    this.executionsService.getExecutionResult(execution.id).subscribe(
       (execResult: any) => {
-        exxecution.result = JSON.stringify(execResult.result);
+        execution.result = JSON.stringify(execResult.result);
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
