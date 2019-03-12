@@ -96,7 +96,7 @@ make crypto
 If all crypto-material is generated, then blockchain network can be started with:
 
 ```
-make runbc
+make runbcdev
 ```
 
 This is a shorthand for:
@@ -108,7 +108,7 @@ This is a shorthand for:
 
 For production centralized logging run the following command:
 ```
-make runlogbc
+make runbc
 ```
 Important note make sure the file `docker/fabric/.env` is containg the correct IP of the logging server
 
@@ -116,10 +116,16 @@ Important note make sure the file `docker/fabric/.env` is containg the correct I
 Once blockchain network is up and running, you can start Hyperledger Explorer with:
 
 ```
-make runexplorer
+make runexplorerdev
 ```
 
 > Hyperledger Explorer docker image will be built previously when `make` (or `make dockers`) is called.
+
+For production centralized logging run the following command:
+```
+make runexplorer
+```
+Important note make sure the file `docker/explorer/.env` is containg the correct IP of the logging server
 
 
 ### Datapace dApp
@@ -127,7 +133,7 @@ make runexplorer
 #### Docker
 In another terminal run:
 ```
-make rundapp
+make rundappdev
 ```
 
 which is a shorthand for:
@@ -138,7 +144,7 @@ docker-compose -f docker/docker-compose.yml up
 For production centralized logging run the following command:
 
 ```
-make runlogdapp
+make rundapp
 ```
 
 Important note make sure the file `docker/fabric/.env` is containg the correct IP of the logging server
