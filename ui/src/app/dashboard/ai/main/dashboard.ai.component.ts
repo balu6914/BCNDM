@@ -45,19 +45,19 @@ export class DashboardAiComponent implements OnInit {
     // Config tableDatasets
     this.tableDatasets.title = 'Datasets';
     this.tableDatasets.tableType = TableType.Ai;
-    this.tableDatasets.headers = [' Name', ' Type', ' Price', '', ''];
+    this.tableDatasets.headers = [' Name', ' Type', ' Price', 'Execute', ''];
     this.tableDatasets.hasDetails = true;
 
     // Config tableAlgorithms
     this.tableAlgorithms.title = 'Algorithms';
     this.tableAlgorithms.tableType = TableType.Ai;
-    this.tableAlgorithms.headers = [' Name', ' Type', ' Price', '', ''];
+    this.tableAlgorithms.headers = [' Name', ' Type', ' Price', 'Execute', ''];
     this.tableAlgorithms.hasDetails = true;
 
     // Config tableExecutions
     this.tableExecutions.title = 'Jobs Queue';
     this.tableExecutions.tableType = TableType.Executions;
-    this.tableExecutions.headers = ['ID', 'Mode', 'Algo', 'Data', 'State'];
+    this.tableExecutions.headers = ['ID', 'Mode', 'Algo', 'Data', 'State', 'Result'];
     this.tableExecutions.hasDetails = true;
 
     // Fetch current User
@@ -77,8 +77,8 @@ export class DashboardAiComponent implements OnInit {
   setDatasetsTable(page: any) {
     const tempDatas = Object.assign({}, this.tableDatasets);
     // Concat Page fields
-    tempDatas.page.total = tempDatas.page.limit + page.limit;
-    tempDatas.page.total = tempDatas.page.total + page.total;
+    tempDatas.page.total = page.limit;
+    tempDatas.page.total = page.total;
     tempDatas.page.content.push(...page.content);
     // Set tableDatasets content
     this.tableDatasets = tempDatas;
@@ -87,8 +87,8 @@ export class DashboardAiComponent implements OnInit {
   setAlgorithmsTable(page: any) {
     const tempAlgos = Object.assign({}, this.tableAlgorithms);
     // Concat Page fields
-    tempAlgos.page.total = tempAlgos.page.limit + page.limit;
-    tempAlgos.page.total = tempAlgos.page.total + page.total;
+    tempAlgos.page.total = page.limit;
+    tempAlgos.page.total = page.total;
     tempAlgos.page.content.push(...page.content);
     // Set tableDatasets content
     this.tableAlgorithms = tempAlgos;
@@ -144,23 +144,26 @@ export class DashboardAiComponent implements OnInit {
 
   fetchExecutions() {
     this.executionsService.getExecutions().subscribe(
-      (result: any) => {
-        const firstExec: any = result.executions[0];
-        this.executionsService.getExecutionResult(firstExec.id).subscribe(
-          (res: any) => {
-            firstExec.results = res.result;
-            result.executions[0] = firstExec;
-            this.tableExecutions.page = {
-              page: 0,
-              total: 5,
-              limit: 50,
-              content: result.executions,
-            };
-          },
-          err => {
-            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-          }
-        );
+      (execResp: any) => {
+        if (execResp.executions) {
+          this.tableExecutions.page = {
+            page: 0,
+            limit: 5,
+            total: execResp.executions.length,
+            content: execResp.executions,
+          };
+        }
+      },
+      err => {
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+      }
+    );
+  }
+
+  fetchExecutionResult(exxecution: Execution) {
+    this.executionsService.getExecutionResult(exxecution.id).subscribe(
+      (execResult: any) => {
+        exxecution.result = JSON.stringify(execResult.result);
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
