@@ -105,7 +105,7 @@ export class TableRowComponent implements OnInit {
   }
 
   openModalEditAi(row: any) {
-    // Parameters editData and streamID are used in DashboardSellEditComponent
+    // editData, streamID and ownerID are used in DashboardAiEditComponent
     const initialState = {
       editData: {
         visibility:  row.visibility,
@@ -123,7 +123,7 @@ export class TableRowComponent implements OnInit {
       ownerID:  row.owner,
     };
 
-    // Open DashboardSellEditComponent as Modal
+    // Open DashboardAiEditComponent as Modal
     this.bsModalRef = this.modalService.show(DashboardAiEditComponent, {initialState})
       .content.streamEdited.subscribe(
         stream => {
