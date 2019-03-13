@@ -86,7 +86,17 @@ func TestRegister(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	data := toJSON(user)
+	data := toJSON(testRegisterReq{
+		Email:        user.Email,
+		Password:     user.Password,
+		ContactEmail: user.ContactEmail,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
+	})
+
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
 		Email:     invalid,
@@ -519,4 +529,15 @@ type testUpdateReq struct {
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`
+}
+
+type testRegisterReq struct {
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
 }
