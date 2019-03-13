@@ -38,11 +38,11 @@ func (req registerReq) validate() error {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.FirstName != "" && len(req.FirstName) > maxNameLength {
+	if req.FirstName == "" || len(req.FirstName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.LastName != "" && len(req.LastName) > maxNameLength {
+	if req.LastName == "" || len(req.LastName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
