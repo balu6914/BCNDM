@@ -36,15 +36,27 @@ export class DashboardAiExecuteComponent implements OnInit {
   execute() {
     this.streams.forEach ( (stream, i) => {
       const executionReq: ExecutionReq = {
-        data: stream.name,
-        mode: this.selectedMode,
+        data: stream.id,
+        // TODO: Make this fields configurable.
+        local_args: ['--isShuffle', '--nEstimators', '100',
+        '--oobScore', '--maxFeatures', '0.3', '--minSamplesLeaf',
+        '20', '--minSamplesSplit', '4', '--criterion', 'gini',
+        '--classWeight', 'balanced', '--bootstrap', '--nJobs', '4',
+        '--randomState', '0'],
+        type: 'ITERATIVE',
+        global_timeout: 3000000,
+        local_timeout: 1000000,
+        preprocess_args: [],
+        mode: 'FEDERATED',
+        global_args: [],
+        files: [],
       };
       this.executionReqList.push(executionReq);
     });
 
     this.algos.forEach( algo => {
       const startExecutionReq: StartExecutionReq = {
-        algo: algo.name,
+        algo: algo.id,
         executions: this.executionReqList,
       };
       this.startExecutionReqList.push(startExecutionReq);

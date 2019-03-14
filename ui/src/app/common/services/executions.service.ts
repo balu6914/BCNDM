@@ -23,4 +23,8 @@ export class ExecutionsService {
   getExecution(id: string): Observable<Execution> {
     return this.http.get<Execution>(`${environment.API_EXECUTIONS}/${id}`);
   }
+
+  getExecutionResult(id: string) {
+    return this.http.get(`${environment.API_EXECUTIONS}/${id}/result`);
+  }
 }

@@ -4,6 +4,7 @@ import { Table, TableType } from 'app/shared/table/table';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { TableRowComponent } from 'app/shared/table/row/table.row.component';
 import { Access } from 'app/common/interfaces/access.interface';
+import { Execution } from 'app/common/interfaces/execution.interface';
 
 @Component({
   selector: 'dpc-table',
@@ -39,6 +40,7 @@ export class TableComponent {
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
   @Output() accessApproved: EventEmitter<any> = new EventEmitter();
   @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
+  @Output() fetchExecResult: EventEmitter<any> = new EventEmitter();
 
   constructor() { }
 
@@ -120,4 +122,7 @@ export class TableComponent {
     this.accessRevoked.emit(row);
   }
 
+  onFetchExecResult(row: Execution) {
+    this.fetchExecResult.emit(row);
+  }
 }

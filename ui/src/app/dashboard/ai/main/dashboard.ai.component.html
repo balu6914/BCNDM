@@ -47,7 +47,8 @@
   <div class="row row-grow">
     <div class="col-lg-12">
       <dpc-table [table]="tableExecutions"
-                 (pageChanged)="onPageChange($event)">
+                 (pageChanged)="onPageChange($event)"
+                 (fetchExecResult)="fetchExecutionResult($event)">
       </dpc-table>
     </div>
   </div>
