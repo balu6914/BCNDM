@@ -6,5 +6,8 @@ export class User {
     public contact_email: string,
     public first_name: string,
     public last_name: string,
+    public company: string,
+    public address: string,
+    public phone: string,
   ) { }
 }

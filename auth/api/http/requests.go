@@ -26,6 +26,9 @@ const (
 	minPasswordLength = 8
 	maxPasswordLength = 32
 	maxNameLength     = 32
+	maxCompanyLength  = 32
+	maxPhoneLength    = 32
+	maxAddressLength  = 128
 )
 
 func (req registerReq) validate() error {
@@ -43,6 +46,18 @@ func (req registerReq) validate() error {
 	}
 
 	if req.LastName == "" || len(req.LastName) > maxNameLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Company == "" || len(req.Company) > maxCompanyLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Phone == "" || len(req.Phone) > maxPhoneLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Address == "" || len(req.Address) > maxAddressLength {
 		return auth.ErrMalformedEntity
 	}
 

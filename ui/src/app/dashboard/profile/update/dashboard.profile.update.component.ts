@@ -27,13 +27,19 @@ export class DashboardProfileUpdateComponent implements OnInit {
   ngOnInit() {
     this.form = this.fb.group({
       contact_email: ['', [Validators.required, Validators.email]],
-      first_name: ['', [Validators.maxLength(16)]],
-      last_name: ['', [Validators.maxLength(16)]]
+      first_name: ['', [Validators.required, Validators.maxLength(32)]],
+      last_name: ['', [Validators.required, Validators.maxLength(32)]],
+      phone: ['', [Validators.required, Validators.maxLength(32)]],
+      address: ['', [Validators.required, Validators.maxLength(128)]],
+      company: ['', [Validators.required, Validators.maxLength(32)]]
     });
     this.form.setValue({
       contact_email: this.user.contact_email || '',
       first_name: this.user.first_name || '',
-      last_name: this.user.last_name || ''
+      last_name: this.user.last_name || '',
+      phone: this.user.phone || '',
+      address: this.user.address || '',
+      company: this.user.company || ''
     });
   }
 
@@ -45,6 +51,9 @@ export class DashboardProfileUpdateComponent implements OnInit {
         contact_email: this.form.value.contact_email,
         first_name: this.form.value.first_name,
         last_name: this.form.value.last_name,
+        phone: this.form.value.phone,
+        address: this.form.value.address,
+        company: this.form.value.company
       };
       this.userService.updateUser(user).subscribe(
         response => {
