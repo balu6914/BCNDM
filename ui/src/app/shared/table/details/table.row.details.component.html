@@ -101,9 +101,9 @@
   <!-- Executions Details -->
   <div *ngIf="rowType === types.Executions" class="box__content">
     <div class="row">
-      <div class="col-sm-4 col-md-12">
+      <div class="col-sm-12">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               ID
             </div>
@@ -111,7 +111,7 @@
               {{row.id}}
             </div>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-3">
             <div class="stream__title">
               Algorithm
             </div>
@@ -119,9 +119,7 @@
               {{row.algo}}
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               Dataset
             </div>
@@ -129,7 +127,7 @@
               {{row.data}}
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               Mode
             </div>
@@ -139,13 +137,13 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-8 col-md-12">
+      <div class="col-sm-12">
         <div class="stream-data">
           <div class="stream-data__title">
-            Example reading(s)
+            Results
           </div>
           <div class="stream-data__text">
-            <pre class="stream-data__pre">{{row.snippet}}</pre>
+            {{row.result}}
           </div>
         </div>
       </div>

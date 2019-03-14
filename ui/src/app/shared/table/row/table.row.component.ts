@@ -15,6 +15,7 @@ import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { Access } from 'app/common/interfaces/access.interface';
+import { Execution } from 'app/common/interfaces/execution.interface';
 
 @Component({
   selector: 'dpc-table-row',
@@ -27,6 +28,7 @@ export class TableRowComponent implements OnInit {
   types = TableType;
   bsModalRef: BsModalRef;
   currentDate: string;
+  execFetched = false;
 
   @Input() row: any;
   @Input() rowType: TableType;
@@ -38,6 +40,7 @@ export class TableRowComponent implements OnInit {
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
   @Output() accessApproved: EventEmitter<any> = new EventEmitter();
   @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
+  @Output() fetchExecResult: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -87,29 +90,46 @@ export class TableRowComponent implements OnInit {
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
         snippet:     row.snippet,
+      },
+      streamID: row.id,
+      ownerID:  row.owner,
+    };
+
+    // Open DashboardSellEditComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
+      .content.streamEdited.subscribe(
+        stream => {
+          this.editEvt.emit(stream);
+        }
+      );
+  }
+
+  openModalEditAi(row: any) {
+    // editData, streamID and ownerID are used in DashboardAiEditComponent
+    const initialState = {
+      editData: {
+        visibility:  row.visibility,
+        name:        row.name,
+        type:        row.type,
+        description: row.description,
+        url:         row.url,
+        price:       this.dpcPipe.transform(row.price),
+        long:        row.location.coordinates[0],
+        lat:         row.location.coordinates[1],
+        snippet:     row.snippet,
         metadata:    JSON.stringify(row.metadata),
       },
       streamID: row.id,
       ownerID:  row.owner,
     };
 
-    if (row.type === 'Algorithm' || row.type === 'Dataset') {
-      // Open DashboardSellEditComponent as Modal
-      this.bsModalRef = this.modalService.show(DashboardAiEditComponent, {initialState})
-        .content.streamEdited.subscribe(
-          stream => {
-            this.editEvt.emit(stream);
-          }
-        );
-    } else {
-      // Open DashboardSellEditComponent as Modal
-      this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
-        .content.streamEdited.subscribe(
-          stream => {
-            this.editEvt.emit(stream);
-          }
-        );
-    }
+    // Open DashboardAiEditComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAiEditComponent, {initialState})
+      .content.streamEdited.subscribe(
+        stream => {
+          this.editEvt.emit(stream);
+        }
+      );
   }
 
   openModalDelete(row: any) {
@@ -183,5 +203,10 @@ export class TableRowComponent implements OnInit {
 
   revokeAccess(row: Access) {
     this.accessRevoked.emit(row);
+  }
+
+  onFetchExecResult(row: Execution) {
+    this.execFetched = true;
+    this.fetchExecResult.emit(row);
   }
 }
