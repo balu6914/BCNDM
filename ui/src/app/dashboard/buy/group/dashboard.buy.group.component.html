@@ -29,13 +29,18 @@
             Tokens per hour
           </div>
         </div>
-        <div class="col-9">
-          <form class="form-inline float-right buy-tas needs-validation" [formGroup]="form" novalidate>
-            <div class="form-group">
-              <label for="hours" class="form-label mr-2">Subscription hours</label>
-              <input type="number" formControlName="hours" class="form-control buy-tas__input">
-            </div>
-          </form>
+        <div class="col-sm-8">
+          <div class="form-group row">
+            <form class="form-inline float-right buy-tas needs-validation" [formGroup]="form" novalidate>
+              <div class="col-sm-4">
+                <input type="number" formControlName="hours" class="form-control" [ngClass]="{ 'is-invalid': form.controls.hours.errors }" />
+                <div *ngIf="form.controls.hours.errors" class="invalid-feedback">
+                  <div *ngIf="form.controls.hours.errors.required">At least one hour.</div>
+                  <div *ngIf="form.controls.hours.errors.insufficientFunds">Insufficient Funds.</div>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -51,6 +56,6 @@
         </div>
       </div>
     </div>
-    <button class="btn btn-primary btn-padding-lg btn-xs-full" (click)="onBuyAllClick()">Buy All</button> 
+    <button class="btn btn-primary btn-padding-lg btn-xs-full" (click)="onBuyAllClick()">Buy All</button>
   </div>
 </div>

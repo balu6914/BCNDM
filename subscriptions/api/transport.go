@@ -109,17 +109,20 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 		return nil, err
 	}
 
-	sub := subscriptions.Subscription{}
-	if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
+	subs := []subscriptions.Subscription{}
+
+	if err := json.NewDecoder(r.Body).Decode(&subs); err != nil {
 		return nil, err
 	}
 
-	sub.UserID = userID
+	for i := range subs {
+		subs[i].UserID = userID
+	}
 
-	req := addSubReq{
+	req := addSubsReq{
 		UserID:       userID,
 		UserToken:    r.Header.Get("Authorization"),
-		Subscription: sub,
+		Subscriptions: subs,
 	}
 
 	return req, nil

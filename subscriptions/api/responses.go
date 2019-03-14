@@ -12,20 +12,25 @@ type apiRes interface {
 	headers() map[string]string
 	empty() bool
 }
-
-type addSubRes struct {
-	ID string `json:"id"`
+type addSubResp struct {
+	StreamID       string `json:"streamID,omitempty"`
+	SubscriptionID string `json:"subscriptionID,omitempty"`
+	ErrorMessage   string `json:"errorMessage,omitempty"`
 }
 
-func (res addSubRes) headers() map[string]string {
+type addSubsRes struct {
+	Responses []addSubResp
+}
+
+func (res addSubsRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res addSubRes) code() int {
-	return http.StatusCreated
+func (res addSubsRes) code() int {
+	return http.StatusMultiStatus
 }
 
-func (res addSubRes) empty() bool {
+func (res addSubsRes) empty() bool {
 	return false
 }
 

@@ -16,53 +16,97 @@ import { StreamService } from 'app/common/services/stream.service';
   styleUrls: ['./dashboard.buy.group.component.scss']
 })
 export class DashboardBuyGroupComponent implements OnInit {
-   form: FormGroup;
-   streamsList= [];
-   totalSum: number;
-   balance = new Balance();
-  
+  form: FormGroup;
+  streamsList = [];
+  totalSum: number;
+  balance = new Balance();
+
   @Output()
   streamCreated: EventEmitter<any> = new EventEmitter();
   constructor(
-  private subscriptionService: SubscriptionService,
-  private formBuilder: FormBuilder,
-  private alertService: AlertService,
-  public modalBuyGroupStream: BsModalRef,
-  private balanceService: BalanceService,
+    private subscriptionService: SubscriptionService,
+    private formBuilder: FormBuilder,
+    private alertService: AlertService,
+    public modalBuyGroupStream: BsModalRef,
+    private balanceService: BalanceService,
   ) {
-    this.form = this.formBuilder.group({
-      hours: ['', [Validators.required, Validators.min(1)]]
-    });
   }
 
   ngOnInit() {
+    this.getBalance();
     let sum = 0;
 
-    this.streamsList.forEach( stream => {
-       sum += stream.price;
+    this.streamsList.forEach(stream => {
+      sum += stream.price;
     })
     this.totalSum = sum;
+
+    this.form = this.formBuilder.group({
+      hours: ['', [Validators.required, Validators.min(1)]]
+    },
+      {
+        validator: this.hoursValidator.bind(this)
+      });
   }
- 
-  onBuyAllClick(){
-    if (this.form.invalid) {
-      this.alertService.error('Please subscribe for at least one hour.');
-      return;
+
+  getBalance() {
+    this.balanceService.get().subscribe(
+      (result: any) => {
+        this.balance.amount = result.balance;
+        this.balance.fiatAmount = this.balance.amount;
+        this.balanceService.changed(this.balance);
+      },
+      err => {
+        console.error("Error fetching user balance ", err)
+      });
+  }
+
+  hoursValidator(fg: FormGroup) {
+    if (this.balance.amount < this.totalSum * fg.get('hours').value) {
+      fg.controls.hours.setErrors({ 'insufficientFunds': true });
     }
-   
-    let myRequests = []
+    else {
+      return null;
+    }
+  }
 
-    this.streamsList.forEach( stream => {
+  onBuyAllClick() {
+    if (this.form.valid) {
 
-      const subsReq = {
-        hours: this.form.value.hours,
-        stream_id: stream.id,
-      };
+      let myRequests = []
 
-      myRequests.push(this.subscriptionService.add(subsReq));
-    });
+      this.streamsList.forEach(stream => {
+        const subsReq = {
+          hours: this.form.value.hours,
+          stream_id: stream.id,
+        };
 
-    console.log("Streams to buy:",myRequests);
-    // TODO: Send the HTTP Request to the backend
+        myRequests.push(subsReq);
+      });
+
+      // Send subscription request
+      this.subscriptionService.add(myRequests).subscribe(
+        (response: any) => {
+          this.modalBuyGroupStream.hide();
+          //Display the results
+          response.Responses.forEach(resp => {
+            if (resp.errorMessage == null) {
+              this.alertService.success(`You now have access to ${resp.subscriptionID} for ${myRequests[0].hours} hours.`);
+            }
+            else {
+              this.alertService.error(`Error trying to subscribe to Stream ${resp.streamID} due to ${resp.errorMessage}.`);
+            }
+          });
+          // Fetch new user balance and publish new balance value to message bus
+          this.getBalance();
+        },
+        err => {
+          if (err.status === 402) {
+            this.alertService.error(`No enough funds.`);
+          } else {
+            this.alertService.error(`Something went wrong. Please try again later.`);
+          }
+        });
+    }
   }
 }
