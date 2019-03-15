@@ -41,24 +41,57 @@
         </div>
       </div>
       <div class="form-group row">
-        <label class="col-sm-3 col-form-label">First name</label>
+        <label class="col-sm-3 col-form-label">First name*</label>
         <div class="col-sm-9">
           <input type="text" formControlName="first_name" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.first_name.errors }"/>
           <div *ngIf="submitted && form.controls.first_name.errors" class="invalid-feedback">
             <div *ngIf="form.controls.first_name.errors.required">First name must be provided.</div>
-            <div *ngIf="form.controls.first_name.errors.maxlength">The maximum length is 16 characters.</div>
+            <div *ngIf="form.controls.first_name.errors.maxlength">The maximum length is 32 characters.</div>
           </div>
         </div>
       </div>
       <div class="form-group row">
-        <label class="col-sm-3 col-form-label">Last name</label>
+        <label class="col-sm-3 col-form-label">Last name*</label>
         <div class="col-sm-9">
           <input type="text" formControlName="last_name" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.last_name.errors }"/>
           <div *ngIf="submitted && form.controls.last_name.errors" class="invalid-feedback">
             <div *ngIf="form.controls.last_name.errors.required">Last name must be provided.</div>
-            <div *ngIf="form.controls.last_name.errors.maxlength">The maximum length is 16 characters.</div>
+            <div *ngIf="form.controls.last_name.errors.maxlength">The maximum length is 32 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Company*</label>
+        <div class="col-sm-9">
+          <input type="text" formControlName="company" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.company.errors }"/>
+          <div *ngIf="submitted && form.controls.company.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.company.errors.required">Company must be provided.</div>
+            <div *ngIf="form.controls.company.errors.maxlength">The maximum length is 32 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Address*</label>
+        <div class="col-sm-9">
+          <input type="text" formControlName="address" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.address.errors }"/>
+          <div *ngIf="submitted && form.controls.address.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.address.errors.required">Address must be provided.</div>
+            <div *ngIf="form.controls.address.errors.maxlength">The maximum length is 128 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Phone*</label>
+        <div class="col-sm-9">
+          <input type="text" formControlName="phone" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.phone.errors }"/>
+          <div *ngIf="submitted && form.controls.phone.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.phone.errors.required">Phone must be provided.</div>
+            <div *ngIf="form.controls.phone.errors.maxlength">The maximum length is 32 characters.</div>
           </div>
         </div>
       </div>
