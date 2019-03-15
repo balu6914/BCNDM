@@ -145,6 +145,26 @@ export class DashboardAiComponent implements OnInit {
   fetchExecutions() {
     this.executionsService.getExecutions().subscribe(
       (execResp: any) => {
+        execResp.executions.forEach( exec => {
+          // TODO: Add Algorithm and Dataset names in Execution structure
+          this.streamService.getStream(exec.algo).subscribe(
+            (stream: Stream) => {
+              exec.algo = stream.name;
+            },
+            err => {
+              this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+            }
+          );
+          this.streamService.getStream(exec.data).subscribe(
+            (stream: Stream) => {
+              exec.data = stream.name;
+            },
+            err => {
+              this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+            }
+          );
+        });
+
         if (execResp.executions) {
           this.tableExecutions.page = {
             page: 0,
