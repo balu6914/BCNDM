@@ -38,6 +38,7 @@ export class DashboardSellAddComponent implements OnInit {
       type: ['', [Validators.required, Validators.maxLength(32)]],
       description: ['', [Validators.required, Validators.maxLength(256)]],
       url: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      terms: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
       price: ['', [Validators.required, Validators.maxLength(9), floatValidator]],
       lat: [
         '',
@@ -115,7 +116,8 @@ export class DashboardSellAddComponent implements OnInit {
             parseFloat(this.form.get('lat').value)
           ]
         },
-        external: this.external
+        external: this.external,
+        terms: this.form.get('terms').value,
       };
       if (this.external) {
         stream.bq = new BigQuery(

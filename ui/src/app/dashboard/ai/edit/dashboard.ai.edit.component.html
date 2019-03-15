@@ -61,7 +61,7 @@
           <input type="text" formControlName="url" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.url.errors }" />
           <div *ngIf="submitted && form.controls.url.errors" class="invalid-feedback">
-            <div *ngIf="form.controls.url.errors.required">URL is riquired.</div>
+            <div *ngIf="form.controls.url.errors.required">URL is required.</div>
             <div *ngIf="form.controls.url.errors.maxlength">The maximum length is 2048 characters.</div>
             <div *ngIf="form.controls.url.errors.pattern">Invalid URL.</div>
           </div>
@@ -73,7 +73,7 @@
           <input type="text"formControlName="price" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.price.errors }" />
           <div *ngIf="submitted && form.controls.price.errors" class="invalid-feedback">
-            <div *ngIf="form.controls.price.errors.required">Price is riquired.</div>
+            <div *ngIf="form.controls.price.errors.required">Price is required.</div>
             <div *ngIf="form.controls.price.errors.pattern">Price must be between 0.00000001 and 1000 DPC.</div>
           </div>
         </div>
@@ -84,7 +84,7 @@
           <input formControlName="lat" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.lat.errors }">
           <div *ngIf="submitted && form.controls.lat.errors" class="invalid-feedback">
-            <div *ngIf="form.controls.lat.errors.required">Latitude is riquired.</div>
+            <div *ngIf="form.controls.lat.errors.required">Latitude is required.</div>
             <div *ngIf="form.controls.lat.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
             <div *ngIf="form.controls.lat.errors.min || form.controls.lat.errors.max">Latitude value must be between -90 and 90.</div>
           </div>
@@ -96,9 +96,20 @@
           <input formControlName="long" class="form-control"
                  [ngClass]="{ 'is-invalid': submitted && form.controls.long.errors }">
           <div *ngIf="submitted && form.controls.long.errors" class="invalid-feedback">
-            <div *ngIf="form.controls.long.errors.required">Longitude is riquired.</div>
+            <div *ngIf="form.controls.long.errors.required">Longitude is required.</div>
             <div *ngIf="form.controls.long.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
             <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between -180 and 180.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Terms URL*</label>
+        <div class="col-sm-8">
+          <input type="text" formControlName="terms" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.terms.errors }" />
+          <div *ngIf="submitted && form.controls.terms.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.terms.errors.required">Terms URL is required.</div>
+            <div *ngIf="form.controls.terms.errors.maxlength">The maximum length is 2048 characters.</div>
+            <div *ngIf="form.controls.terms.errors.pattern">Invalid URL.</div>
           </div>
         </div>
       </div>

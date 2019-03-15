@@ -65,6 +65,7 @@ func genStream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
+		Terms: fmt.Sprintf("https://myStream%d.com", counter),
 	}
 }
 
