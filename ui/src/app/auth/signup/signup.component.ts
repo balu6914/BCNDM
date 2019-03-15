@@ -36,7 +36,10 @@ export class SignupComponent {
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
       confirm: [''],
       first_name: ['', [Validators.required, Validators.maxLength(32)]],
-      last_name: ['', [Validators.required, Validators.maxLength(32)]]
+      last_name: ['', [Validators.required, Validators.maxLength(32)]],
+      company: ['', [Validators.required, Validators.maxLength(32)]],
+      address: ['', [Validators.required, Validators.maxLength(128)]],
+      phone: ['', [Validators.required, Validators.maxLength(32)]]
     },
       {
         validator: this.passwordMatchValidator
@@ -65,6 +68,9 @@ export class SignupComponent {
         password: this.form.value.password,
         first_name: this.form.value.first_name,
         last_name: this.form.value.last_name,
+        company: this.form.value.company,
+        address: this.form.value.address,
+        phone: this.form.value.phone,
       }
       this.UserService.addUser(user).subscribe(
         response => {
