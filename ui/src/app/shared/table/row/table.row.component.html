@@ -91,7 +91,7 @@
   <td *ngIf="rowType === types.Ai">
     <input type="checkbox" (change)="onCheckboxChanged(row)"/>
   </td>
-  <td>
+  <td td *ngIf="rowType !== types.Buy">
     <div class="action-wrapper" *ngIf="rowType === types.Sell" nowrap class="table--right-aligned">
       <a class="action action--color-1" (click)="openModalEdit(row)">
         <span class="action__icon action--edit"></span>
