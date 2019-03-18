@@ -164,11 +164,7 @@ export class TableRowComponent implements OnInit {
     }
     // Parameter stream is set on modal component
     const initialState = {
-      stream: {
-        id:         row.id,
-        name:       row.name,
-        price:      row.price,
-      },
+      stream: row,
     };
     // Open DashboardBuyAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
