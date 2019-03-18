@@ -37,6 +37,7 @@ export class DashboardAiEditComponent implements OnInit {
         name:        ['', [Validators.required, Validators.maxLength(32)]],
         description: ['', [Validators.required, Validators.maxLength(256)]],
         url:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+        terms:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
         price:       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
         lat:         ['', [Validators.required, Validators.maxLength(11), Validators.min(-90), Validators.max(90), floatValidator]],
         long:        ['', [Validators.required, Validators.maxLength(12), Validators.min(-180), Validators.max(180), floatValidator]],
@@ -77,6 +78,7 @@ export class DashboardAiEditComponent implements OnInit {
         description: this.form.value.description,
         snippet: this.form.value.snippet,
         url: this.form.value.url,
+        terms: this.form.value.terms,
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
           'type': 'Point',

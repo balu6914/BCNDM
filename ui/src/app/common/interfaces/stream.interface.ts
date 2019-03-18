@@ -17,6 +17,7 @@ export class Stream {
     public price: number,
     public location: object,
     public url?: string,
+    public terms?: string,
     public snippet?: string,
     public owner?: string,
     public id?: string,

@@ -35,6 +35,7 @@ export class DashboardSellEditComponent implements OnInit {
       'type':        ['', [Validators.required, Validators.maxLength(32)]],
       'description': ['', [Validators.required, Validators.maxLength(256)]],
       'url':         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      'terms':         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
       'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
       'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
       'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
@@ -65,7 +66,8 @@ export class DashboardSellEditComponent implements OnInit {
             parseFloat(this.form.value.long),
             parseFloat(this.form.value.lat)
           ]
-        }
+        },
+        terms: this.form.value.terms,
       };
 
       // Send addStream request

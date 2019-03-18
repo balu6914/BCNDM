@@ -61,6 +61,7 @@ type Stream struct {
 	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
 	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
+	Terms       string        `bson:"terms,omitempty" json:"terms,omitempty"`
 	External    bool          `bson:"external" json:"external,omitempty"`
 	BQ          BigQuery      `bson:"big_query,omitempty" json:"bq,omitempty"`
 	Metadata    bson.M        `bson:"metadata,omitempty" json:"metadata,omitempty"`
@@ -103,6 +104,10 @@ func (s *Stream) Validate() error {
 	}
 
 	if !s.External && (!govalidator.IsURL(s.URL) || len(s.URL) > maxURLLength) {
+		return ErrMalformedData
+	}
+
+	if !s.External && (!govalidator.IsURL(s.Terms) || len(s.Terms) > maxURLLength) {
 		return ErrMalformedData
 	}
 

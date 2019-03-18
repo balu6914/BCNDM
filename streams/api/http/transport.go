@@ -25,7 +25,7 @@ const (
 var (
 	authService    streams.Authorization
 	locationPoints = [4][2]string{{"x0", "y0"}, {"x1", "y1"}, {"x2", "y2"}, {"x3", "y3"}}
-	fields         = []string{"name", "type", "description", "snippet", "price", "longitude", "latitude", "url"}
+	fields         = []string{"name", "type", "description", "snippet", "price", "longitude", "latitude", "url", "terms"}
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
@@ -204,6 +204,7 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 			Coordinates: [2]float64{longitude, latitude},
 		},
 		URL:      record[keys["url"]],
+		Terms:    record[keys["terms"]],
 		Metadata: metadata,
 	}
 	return ret, nil
