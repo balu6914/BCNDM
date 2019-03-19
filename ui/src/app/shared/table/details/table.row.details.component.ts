@@ -50,6 +50,7 @@ export class TableRowDetailsComponent implements OnInit {
         long:        this.row.location.coordinates[0],
         lat:         this.row.location.coordinates[1],
         snippet:     this.row.snippet,
+        terms:       this.row.terms,
       },
       streamID: this.row.id,
     };
