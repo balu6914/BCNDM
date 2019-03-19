@@ -75,6 +75,10 @@ func New(db *mgo.Session) streams.StreamRepository {
 			Name: "metadatas",
 			Key:  []string{"metadata"},
 		},
+		mgo.Index{
+			Name: "terms",
+			Key:  []string{"terms"},
+		},
 	}
 	for _, idx := range indices {
 		c.EnsureIndex(idx)
