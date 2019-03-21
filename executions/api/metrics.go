@@ -78,3 +78,12 @@ func (mm metricsMiddleware) CreateDataset(data executions.Dataset) error {
 
 	return mm.svc.CreateDataset(data)
 }
+
+func (mm metricsMiddleware) ProcessEvents() error {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "process_events").Add(1)
+		mm.latency.With("method", "process_events").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.ProcessEvents()
+}

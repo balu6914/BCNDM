@@ -10,12 +10,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
-	jsonCT       = "application/json"
-	relationship = "Relationship"
-	attribute    = "Attribute"
+	jsonCT          = "application/json"
+	relationship    = "Relationship"
+	attribute       = "Attribute"
+	stompTerminator = "\u0000"
+	stompID         = "0"
+	stompTopic      = "/executionDetails"
 )
 
 var _ executions.AIService = (*aiService)(nil)
@@ -70,7 +76,7 @@ func (as aiService) CreateDataset(ds executions.Dataset) error {
 }
 
 func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, data executions.Dataset) (string, error) {
-	url := fmt.Sprintf("%s/daemon/exec/execute", as.daemonURL)
+	url := fmt.Sprintf("http://%s/daemon/exec/execute", as.daemonURL)
 	er := executeReq{
 		token:                    as.token,
 		MetaResources:            []string{fmt.Sprintf("%s-mr", data.ID)},
@@ -97,30 +103,8 @@ func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, 
 	return string(res), nil
 }
 
-func (as aiService) IsDone(token string) (executions.State, error) {
-	url := fmt.Sprintf("%s/daemon/exec/isDone/%s", as.daemonURL, token)
-	req := tokenReq{
-		token: as.token,
-	}
-	res, err := sendRequest(http.MethodGet, url, req)
-	if err != nil {
-		return executions.Executing, err
-	}
-
-	done, err := strconv.ParseBool(string(res))
-	if err != nil {
-		return executions.Executing, err
-	}
-
-	if !done {
-		return executions.Executing, nil
-	}
-
-	return executions.Done, nil
-}
-
 func (as aiService) Result(token string) (map[string]interface{}, error) {
-	url := fmt.Sprintf("%s/daemon/exec/getResults/%s", as.daemonURL, token)
+	url := fmt.Sprintf("http://%s/daemon/exec/getResults/%s", as.daemonURL, token)
 	req := tokenReq{
 		token: as.token,
 	}
@@ -146,6 +130,29 @@ func (as aiService) Result(token string) (map[string]interface{}, error) {
 	}
 
 	return result[0], nil
+}
+
+func (as aiService) Events() (chan executions.Event, error) {
+	url := fmt.Sprintf("ws://%s/daemon/socket", as.daemonURL)
+	c, _, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	connectPayload := fmt.Sprintf("CONNECT\n\n%s", stompTerminator)
+	if err := c.WriteMessage(websocket.TextMessage, []byte(connectPayload)); err != nil {
+		return nil, err
+	}
+
+	subPayload := fmt.Sprintf("SUBSCRIBE\nid:%s\ndestination:%s\n\n%s", stompID, stompTopic, stompTerminator)
+	if err := c.WriteMessage(websocket.TextMessage, []byte(subPayload)); err != nil {
+		return nil, err
+	}
+
+	ch := make(chan executions.Event)
+	go readEvents(c, ch)
+
+	return ch, nil
 }
 
 func (as aiService) createExecution(id string) error {
@@ -303,4 +310,40 @@ func sendRequest(method, url string, r request) ([]byte, error) {
 	}
 
 	return data, err
+}
+
+func readEvents(c *websocket.Conn, ch chan executions.Event) {
+	for {
+		_, msg, err := c.ReadMessage()
+		if err != nil {
+			continue
+		}
+
+		lines := strings.Split(string(msg), "\n")
+		if len(lines) < 1 || lines[0] != "MESSAGE" {
+			continue
+		}
+
+		content := strings.Split(string(msg), "\n\n")
+		if len(content) < 2 {
+			continue
+		}
+
+		body := strings.Trim(content[1], "\x00")
+
+		var res event
+		if err := json.Unmarshal([]byte(body), &res); err != nil {
+			continue
+		}
+
+		ch <- executions.Event{
+			Token:  res.Token,
+			Status: res.Status,
+		}
+	}
+}
+
+type event struct {
+	Token  string           `json:"token"`
+	Status executions.State `json:"status"`
 }

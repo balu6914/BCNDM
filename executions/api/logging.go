@@ -97,3 +97,16 @@ func (lm loggingMiddleware) CreateDataset(data executions.Dataset) (err error) {
 
 	return lm.svc.CreateDataset(data)
 }
+
+func (lm loggingMiddleware) ProcessEvents() (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method process_events took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.ProcessEvents()
+}

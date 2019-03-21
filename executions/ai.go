@@ -11,9 +11,16 @@ type AIService interface {
 	// Start creates new execution and starts it.
 	Start(Execution, Algorithm, Dataset) (string, error)
 
-	// IsDone checks if execution has finished.
-	IsDone(string) (State, error)
-
 	// Result returns execution result if execution has finished.
 	Result(string) (map[string]interface{}, error)
+
+	// Events tracks events that are comming from AI system and send then
+	// to the returned channel.
+	Events() (chan Event, error)
+}
+
+// Event contains data that is received from event channel.
+type Event struct {
+	Token  string
+	Status State
 }

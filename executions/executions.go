@@ -1,10 +1,12 @@
 package executions
 
 const (
-	// Executing represents execution in progress state.
-	Executing State = "executing"
-	// Done reprents finished execution state.
-	Done State = "done"
+	// InProgress represents execution in progress state.
+	InProgress State = "In progress"
+	// Failed reprents unsuccessfully finished execution state.
+	Failed State = "Failed"
+	// Succeeded reprents successfully finished execution state.
+	Succeeded State = "Succeeded"
 )
 
 // State represents execution state.
@@ -48,8 +50,8 @@ type ExecutionRepository interface {
 	// UpdateToken sets existing execution token.
 	UpdateToken(string, string) error
 
-	// Finish marks existing execution as done.
-	Finish(string) error
+	// UpdateState updates current execution state.
+	UpdateState(string, State) error
 
 	// Execution finds and returns execution by owner and id.
 	Execution(string, string) (Execution, error)

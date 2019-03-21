@@ -73,17 +73,13 @@ func (er executionRepository) UpdateToken(id, token string) error {
 	return nil
 }
 
-func (er executionRepository) Finish(id string) error {
+func (er executionRepository) UpdateState(token string, state executions.State) error {
 	s := er.db.Copy()
 	defer s.Close()
 
-	if !bson.IsObjectIdHex(id) {
-		return executions.ErrMalformedData
-	}
-
 	c := s.DB(dbName).C(execCollection)
-	u := bson.M{"$set": bson.M{"state": executions.Done}}
-	if err := c.UpdateId(bson.ObjectIdHex(id), u); err != nil {
+	u := bson.M{"$set": bson.M{"state": state}}
+	if err := c.Update(bson.M{"token": token}, u); err != nil {
 		if err == mgo.ErrNotFound {
 			return executions.ErrNotFound
 		}

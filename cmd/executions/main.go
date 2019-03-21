@@ -89,6 +89,12 @@ func main() {
 
 	errs := make(chan error, 2)
 
+	go func(errs chan error) {
+		if err := svc.ProcessEvents(); err != nil {
+			errs <- err
+		}
+	}(errs)
+
 	go startHTTPServer(svc, ac, cfg.httpPort, logger, errs)
 
 	go startGRPCServer(svc, cfg.grpcPort, logger, errs)

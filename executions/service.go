@@ -37,6 +37,9 @@ type Service interface {
 
 	// CreateDataset creates new dataset on external AI serivce.
 	CreateDataset(Dataset) error
+
+	// ProcessEvents processes state change events for algorithms and datasets.
+	ProcessEvents() error
 }
 
 var _ Service = (*executionsService)(nil)
@@ -69,6 +72,7 @@ func (es executionsService) Start(exec Execution) (string, error) {
 		return "", err
 	}
 
+	exec.State = InProgress
 	id, err := es.execs.Create(exec)
 	if err != nil {
 		return "", err
@@ -93,12 +97,7 @@ func (es executionsService) Result(owner, id string) (map[string]interface{}, er
 		return nil, err
 	}
 
-	state, err := es.ai.IsDone(exec.Token)
-	if err != nil {
-		return nil, err
-	}
-
-	if state != Done {
+	if exec.State == InProgress {
 		return nil, ErrNotFound
 	}
 
@@ -124,4 +123,19 @@ func (es executionsService) CreateDataset(dataset Dataset) error {
 
 	err := es.ai.CreateDataset(dataset)
 	return err
+}
+
+func (es executionsService) ProcessEvents() error {
+	ch, err := es.ai.Events()
+	if err != nil {
+		return err
+	}
+
+	for event := range ch {
+		if err := es.execs.UpdateState(event.Token, event.Status); err != nil {
+			continue
+		}
+	}
+
+	return nil
 }
