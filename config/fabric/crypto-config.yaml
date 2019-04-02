@@ -16,9 +16,9 @@ OrdererOrgs:
  # ------------------------------------------------------
 PeerOrgs:
 # -----------------------------------------------------
-# DatapaceOrg
+# Org1
 # ----------------------------------------------------
-- Name: DatapaceOrg
+- Name: Org1
   Domain: org1.datapace.com
   EnableNodeOUs: false
   Template:

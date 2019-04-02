@@ -34,7 +34,7 @@ func (bc *BcNetwork) Balance(name string) (b Balance, err error) {
 
 	balance, err := client.Query(channel.Request{
 		ChaincodeID: bc.Fabric.ChaincodeID,
-		Fcn:         "balance",
+		Fcn:         "balanceOf",
 		Args:        util.ToChaincodeArgs(string(balanceRqBytes))})
 
 	if err != nil {

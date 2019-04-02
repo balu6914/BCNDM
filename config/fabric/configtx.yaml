@@ -77,23 +77,23 @@ Organizations:
               Rule: "OR('OrdererMSP.admin')"
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
-    - &DatapaceOrg
+    - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: DatapaceOrgMSP
+        Name: Org1MSP
         # ID to load the MSP definition as
-        ID: DatapaceOrgMSP
+        ID: Org1MSP
         MSPDir: ../crypto-config/peerOrganizations/org1.datapace.com/msp
-        Policies:  &DatapaceOrgPolicies
+        Policies:  &Org1Policies
           Readers:
               Type: Signature
-              Rule: "OR('DatapaceOrgMSP.member')"
+              Rule: "OR('Org1MSP.member')"
           Writers:
               Type: Signature
-              Rule: "OR('DatapaceOrgMSP.member')"
+              Rule: "OR('Org1MSP.member')"
           Admins:
               Type: Signature
-              Rule: "OR('DatapaceOrgMSP.admin')"
+              Rule: "OR('Org1MSP.member')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -249,7 +249,7 @@ Application: &ApplicationDefaults
       #---Miscellanesous peer function to policy mapping for access control---#
 
       # ACL policy for invoking chaincodes on peer
-      peer/Propose: /Channel/Application/Writers
+      peer/Propose: /Channel/Application/Readers
 
       # ACL policy for chaincode to chaincode invocation
       peer/ChaincodeToChaincode: /Channel/Application/Readers
@@ -309,22 +309,22 @@ Profiles:
               <<: *OrdererOrgPolicies
               Admins:
                 Type: Signature
-                Rule: "OR('DatapaceOrgMSP.admin')"
+                Rule: "OR('Org1MSP.admin')"
         Consortiums:
             DatapaceConsortium:
                 Organizations:
-                - <<: *DatapaceOrg
+                - <<: *Org1
                   Policies:
-                    <<: *DatapaceOrgPolicies
+                    <<: *Org1Policies
                     Admins:
                       Type: Signature
-                      Rule: "OR('DatapaceOrgMSP.admin')"
+                      Rule: "OR('Org1MSP.admin')"
 
     DatapaceChannel:
         Consortium: DatapaceConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *DatapaceOrg
+                - *Org1
             Capabilities:
               <<: *ApplicationCapabilities

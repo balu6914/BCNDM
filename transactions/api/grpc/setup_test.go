@@ -1,11 +1,11 @@
 package grpc_test
 
 import (
-	"fmt"
 	"datapace"
 	"datapace/transactions"
 	grpcapi "datapace/transactions/api/grpc"
 	"datapace/transactions/mocks"
+	"fmt"
 	"net"
 	"os"
 	"testing"

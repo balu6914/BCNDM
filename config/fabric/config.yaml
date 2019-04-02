@@ -11,7 +11,7 @@ version: 2
 # The client section used by GO SDK.
 client:
   # Which organization does this application instance belong to? The value must be the name of an org
-  organization: DatapaceOrg
+  organization: Org1
   logging:
     level: debug
 
@@ -29,7 +29,7 @@ client:
     timeout:
       connection: 3s
       response: 5s
-  localMspId: DatapaceOrgMSP
+  localMspId: Org1MSP
 
   # Root of the MSP directories with keys and certs. The Membership Service Providers is component that aims to offer an abstraction of a membership operation architecture.
   cryptoconfig:
@@ -61,7 +61,7 @@ client:
 # [Optional]. But most apps would have this section so that channel objects can be constructed based on the content below.
 # If one of your application is creating channels, you might not use this
 channels:
-  datapace:
+  datapacechannel:
     # orderers:
     #   - orderer.datapace.com
     #
@@ -87,10 +87,28 @@ channels:
         # Default: true
         eventSource: true
 
+    # policies:
+    #   #[Optional] options for retrieving channel configuration blocks
+    #   queryChannelConfig:
+    #     #[Optional] min number of success responses (from targets/peers)
+    #     minResponses: 1
+    #     #[Optional] channel config will be retrieved for these number of random targets
+    #     maxTargets: 1
+    #     #[Optional] retry options for query config block
+    #     retryOpts:
+    #       #[Optional] number of retry attempts
+    #       attempts: 5
+    #       #[Optional] the back off interval for the first retry attempt
+    #       initialBackoff: 500ms
+    #       #[Optional] the maximum back off interval for any retry attempt
+    #       maxBackoff: 5s
+    #       #[Optional] he factor by which the initial back off period is exponentially incremented
+    #       backoffFactor: 2.0
+
 # List of participating organizations in this network
 organizations:
   org1:
-    mspid: DatapaceOrgMSP
+    mspid: Org1MSP
     cryptoPath: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp"
     peers:
       - peer0.org1.datapace.com
@@ -129,25 +147,29 @@ certificateAuthorities:
     # Change this according to your fabric-ca URL
     url: http://ca.org1.datapace.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
-    tlsCACerts:
-      # Comma-Separated list of paths
-      path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
     httpOptions:
       verify: false
     registrar:
       enrollId: Admin@org1.datapace.com
       enrollSecret: adminpw
     caName: ca.org1.datapace.com
+    tlsCACerts:
+    #   # Comma-Separated list of paths
+      path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
 
 entityMatchers:
- peer:
-  - pattern: (\w+).org1.datapace.(\w+)
-    urlSubstitutionExp: localhost:7051
-    eventUrlSubstitutionExp: localhost:7053
-    sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
-    mappedHost: local.peer0.org1.datapace.com
-orderer:
-  - pattern: (\w+).datapace.(\w+)
-    urlSubstitutionExp: localhost:7050
-    sslTargetOverrideUrlSubstitutionExp: orderer.datapace.com
-    mappedHost: orderer.datapace.com
+  peer:
+    - pattern: (\w+).org1.datapace.(\w+)
+      urlSubstitutionExp: localhost:7051
+      eventUrlSubstitutionExp: localhost:7053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
+      mappedHost: local.peer0.org1.datapace.com
+  orderer:
+    - pattern: (\w+).datapace.(\w+)
+      urlSubstitutionExp: localhost:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer.datapace.com
+      mappedHost: orderer.datapace.com
+  certificateAuthorities:
+    - pattern: (\w*).org1.datapace.com(\w*)
+      urlSubstitutionExp:
+      mappedHost: ca.org1.datapace.com

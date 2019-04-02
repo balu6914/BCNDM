@@ -18,19 +18,17 @@ package sw
 
 import (
 	"crypto/ecdsa"
-	"fmt"
-
-	"errors"
-	"math/big"
-
 	"crypto/hmac"
+	"errors"
+	"fmt"
+	"math/big"
 
 	"github.com/hyperledger/fabric/bccsp"
 )
 
 type ecdsaPublicKeyKeyDeriver struct{}
 
-func (kd *ecdsaPublicKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (dk bccsp.Key, err error) {
+func (kd *ecdsaPublicKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (bccsp.Key, error) {
 	// Validate opts
 	if opts == nil {
 		return nil, errors.New("Invalid opts parameter. It must not be nil.")
@@ -75,7 +73,7 @@ func (kd *ecdsaPublicKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpt
 
 type ecdsaPrivateKeyKeyDeriver struct{}
 
-func (kd *ecdsaPrivateKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (dk bccsp.Key, err error) {
+func (kd *ecdsaPrivateKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (bccsp.Key, error) {
 	// Validate opts
 	if opts == nil {
 		return nil, errors.New("Invalid opts parameter. It must not be nil.")
@@ -129,7 +127,7 @@ type aesPrivateKeyKeyDeriver struct {
 	conf *config
 }
 
-func (kd *aesPrivateKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (dk bccsp.Key, err error) {
+func (kd *aesPrivateKeyKeyDeriver) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (bccsp.Key, error) {
 	// Validate opts
 	if opts == nil {
 		return nil, errors.New("Invalid opts parameter. It must not be nil.")

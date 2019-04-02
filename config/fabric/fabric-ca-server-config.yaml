@@ -126,7 +126,7 @@ registry:
      - name: Admin@org1.datapace.com
        pass: adminpw
        type: client
-       affiliation: ""
+       affiliation: "org1"
        attrs:
           hf.Registrar.Roles: "peer,orderer,client,user"
           hf.Registrar.DelegateRoles: "peer,orderer,client,user"

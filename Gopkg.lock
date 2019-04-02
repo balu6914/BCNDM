@@ -155,8 +155,8 @@
     "internal/jsonmessage",
     "internal/term"
   ]
-  revision = "bcd4059882ad0ce568e55b899c16b0f1ee7dc4ae"
-  version = "v1.3.5"
+  revision = "1b33efcb40bef3494af8bc6a1f73600f37a3c9d1"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -236,6 +236,12 @@
   version = "v2.0.3"
 
 [[projects]]
+  name = "github.com/grpc-ecosystem/go-grpc-middleware"
+  packages = ["."]
+  revision = "c250d6563d4d4c20252cd865923440e829844f4e"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
@@ -257,22 +263,22 @@
   packages = [
     "bccsp",
     "bccsp/factory",
+    "bccsp/idemix",
+    "bccsp/idemix/bridge",
+    "bccsp/idemix/handlers",
     "bccsp/pkcs11",
     "bccsp/signer",
     "bccsp/sw",
     "bccsp/utils",
     "common/crypto",
     "common/flogging",
+    "common/flogging/fabenc",
     "common/ledger",
     "common/metadata",
+    "common/metrics",
     "common/util",
     "core/chaincode/platforms",
-    "core/chaincode/platforms/car",
     "core/chaincode/platforms/ccmetadata",
-    "core/chaincode/platforms/golang",
-    "core/chaincode/platforms/java",
-    "core/chaincode/platforms/node",
-    "core/chaincode/platforms/util",
     "core/chaincode/shim",
     "core/comm",
     "core/config",
@@ -281,12 +287,15 @@
     "msp",
     "protos/common",
     "protos/ledger/queryresult",
+    "protos/ledger/rwset",
+    "protos/ledger/rwset/kvrwset",
     "protos/msp",
     "protos/peer",
+    "protos/token",
     "protos/utils"
   ]
-  revision = "cae2ad4456914adffcb07b1ca873e9624ce8f8b3"
-  version = "v1.2.0"
+  revision = "d700b43476e803c864c48021e63a78543b60e17e"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/hyperledger/fabric-amcl"
@@ -423,12 +432,6 @@
   ]
   revision = "a906355f73d060d7bf95874a9e90dc17589edbb3"
   version = "v1.0.0-alpha4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/ijc/Gotty"
-  packages = ["."]
-  revision = "a8b993ba6abdb0e0c12b0125c603323a71c7790c"
 
 [[projects]]
   name = "github.com/konsorten/go-windows-terminal-sequences"
@@ -655,6 +658,32 @@
   version = "v0.19.0"
 
 [[projects]]
+  name = "go.uber.org/atomic"
+  packages = ["."]
+  revision = "1ea20fb1cbb1cc08cbd0d913a96dead89aa18289"
+  version = "v1.3.2"
+
+[[projects]]
+  name = "go.uber.org/multierr"
+  packages = ["."]
+  revision = "3c4937480c32f4c13a875a1829af76c98ca3d40a"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "go.uber.org/zap"
+  packages = [
+    ".",
+    "buffer",
+    "internal/bufferpool",
+    "internal/color",
+    "internal/exit",
+    "zapcore",
+    "zapgrpc"
+  ]
+  revision = "ff33455a0e382e8a81d14dd7c922020b6b5e7982"
+  version = "v1.9.1"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -829,6 +858,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a6fe493f8ca7dcea4c72ea5f7c4112f6d90604aa109ba900c556b8be35d7b9be"
+  inputs-digest = "e66597aa85c96a56441a68cd5e67be56e7177550fb27ac53f44ae471b2c8b957"
   solver-name = "gps-cdcl"
   solver-version = 1

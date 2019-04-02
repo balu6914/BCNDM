@@ -1,8 +1,8 @@
 {
   "network-config": {
     "org1": {
-      "name": "peerDatapaceOrg",
-      "mspid": "DatapaceOrgMSP",
+      "name": "peerOrg1",
+      "mspid": "Org1MSP",
       "peer1": {
           "requests": "grpcs://peer0.org1.datapace.com:7051",
           "events": "grpcs://peer0.org1.datapace.com:7053",

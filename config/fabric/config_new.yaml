@@ -1,0 +1,94 @@
+version: 1.0.0
+client:
+    organization: org1
+    logging:
+        level: debug
+    # Root of the MSP directories with keys and certs.
+    cryptoconfig:
+        path: '${DATAPACE_CONFIG}/crypto-config'
+    # Some SDKs support pluggable KV stores, the properties under "credentialStore"
+    credentialStore:
+        path: /tmp/datapace-service-kvs
+        cryptoStore:
+            path: /tmp/datapace-service-msp
+    BCCSP:
+        security:
+            enabled: true
+            default: 
+                provider: SW
+            hashAlgorithm: SHA2
+            softVerify: true
+            level: 256
+    tlsCerts:
+        systemCertPool: true
+        client:
+            key:  
+                path: '${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/User1@org1.datapace.com/tls/client.key'
+            cert: 
+                path: '${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/User1@org1.datapace.com/tls/client.crt'
+channels:
+    
+    datapacechannel:
+        orderers:
+            - orderer.datapace.com
+        peers:
+            peer0.org1.datapace.com: 
+                endorsingPeer: true
+                chaincodeQuery: true
+                ledgerQuery: true
+                eventSource: true
+organizations:
+    org1:
+        mspid: Org1MSP
+        cryptoPath: '${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp'
+        peers:
+            - peer0.org1.datapace.com
+        certificateAuthorities:
+            - ca.org1.datapace.com
+    ordererorg:
+        mspID: OrdererMSP
+        cryptoPath: '${DATAPACE_CONFIG}/crypto-config/ordererOrganizations/datapace.com/users/Admin@datapace.com/msp'
+orderers:
+    _default:
+        grpcOptions:
+            keep-alive-time: 0s
+            keep-alive-timeout: 20s
+            keep-alive-permit: false
+            fail-fast: false
+            allow-insecure: false
+    orderer.datapace.com:
+        url: 'orderer.datapace.com:7050'
+        grpcOptions: null
+        tlsCACerts:
+            path: '${DATAPACE_CONFIG}/crypto-config/ordererOrganizations/datapace.com/tlsca/tlsca.datapace.com-cert.pem'
+peers:
+    _default:
+        grpcOptions:
+            keep-alive-time: 0s
+            keep-alive-timeout: 20s
+            keep-alive-permit: false
+            fail-fast: false
+            allow-insecure: false
+    peer0.org1.datapace.com:
+        url: 'peer0.org1.datapace.com:7051'
+        tlsCACerts:
+            path: '${DATAPACE_CONFIG}/crypto-config/ordererOrganizations/datapace.com/tlsca/tlsca.datapace.com-cert.pem'
+certificateAuthorities:
+    ca.org1.datapace.com:
+        url: 'http://ca.org1.datapace.com:7054'
+        tlsCACerts:
+            path: '${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem'
+        httpOptions:
+            verify: false
+        registrar:
+            enrollId: Admin@org1.datapace.com
+            enrollSecret: adminpw
+        caName: ca.org1.datapace.com
+entityMatchers:
+    peer:
+        -
+            pattern: (\w+).org1.datapace.(\w+)
+            urlSubstitutionExp: 'peer0.org1.datapace.com:7051'
+            eventUrlSubstitutionExp: 'peer0.org1.datapace.com:7053'
+            sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
+            mappedHost: peer0.org1.datapace.com

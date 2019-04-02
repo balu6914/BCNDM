@@ -40,7 +40,7 @@ services:
       - CORE_PEER_ADDRESS=peer0.org1.datapace.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.datapace.com:7051
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.datapace.com:7051
-      - CORE_PEER_LOCALMSPID=DatapaceOrgMSP
+      - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_ADDRESSAUTODETECT=true
     volumes:
         - /var/run/:/host/var/run/
@@ -58,10 +58,10 @@ services:
     environment:
        - FABRIC_CA_SERVER_CA_NAME=ca.org1.datapace.com
        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.datapace.com-cert.pem
-       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5fa850f42224fa43dd44d92b887d72daa66c1b508bae2d4dba8a1b92aca635fb_sk
+       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/410faafb7507be80beaabc5b14e0b69f03c7d7b7df65d2acca1e0191edb44e13_sk
        - FABRIC_CA_SERVER_TLS_ENABLED=false
        - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.datapace.com-cert.pem
-       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5fa850f42224fa43dd44d92b887d72daa66c1b508bae2d4dba8a1b92aca635fb_sk
+       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/410faafb7507be80beaabc5b14e0b69f03c7d7b7df65d2acca1e0191edb44e13_sk
        - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
        - FABRIC_CA_SERVER_DB_TYPE=postgres
        - FABRIC_CA_SERVER_DB_DATASOURCE=host=fabric-ca-pgsql port=5432 user=postgres password=postgres dbname=fabric_ca sslmode=disable
