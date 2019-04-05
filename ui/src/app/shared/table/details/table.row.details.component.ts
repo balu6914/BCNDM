@@ -35,6 +35,7 @@ export class TableRowDetailsComponent implements OnInit {
   }
 
   close() {
+    console.log(this.row)
     this.backClicked.emit('trigger');
   }
 
@@ -47,9 +48,7 @@ export class TableRowDetailsComponent implements OnInit {
         description: this.row.description,
         url:         this.row.url,
         price:       this.dpcPipe.transform(this.row.price),
-        long:        this.row.location.coordinates[0],
-        lat:         this.row.location.coordinates[1],
-        snippet:     this.row.snippet,
+        long:        this.row.location.coordinates[0], lat:         this.row.location.coordinates[1], snippet:     this.row.snippet,
         terms:       this.row.terms,
       },
       streamID: this.row.id,

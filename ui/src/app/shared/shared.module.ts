@@ -6,6 +6,7 @@ import { MapModule } from './map/map.module';
 import { FiltersModule } from './filters/filters.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { StatisticModule } from './statistic/statistic.module';
+import { ExecutionResultModule } from './execution-result/execution-result.module';
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { StatisticModule } from './statistic/statistic.module';
     FiltersModule,
     AlertsModule,
     StatisticModule,
+    ExecutionResultModule,
   ],
 })
 export class SharedModule {}

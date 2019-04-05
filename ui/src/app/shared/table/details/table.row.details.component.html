@@ -147,12 +147,10 @@
       </div>
       <div class="col-sm-12">
         <div class="stream-data">
-          <div class="stream-data__title">
-            Results
-          </div>
-          <div class="stream-data__text">
-            {{row.result}}
-          </div>
+            <!-- Vizualize execution result -->
+            <div *ngIf="row && row.result">
+              <dpc-execution-result-graph [resultData]="row.result"></dpc-execution-result-graph>
+            </div>
         </div>
       </div>
     </div>
