@@ -3,23 +3,32 @@ package mongo
 import (
 	"datapace/auth"
 
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 var _ auth.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
-	db *mgo.Session
+	db     *mgo.Session
+	cipher auth.Cipher
 }
 
 // NewUserRepository instantiates a Mongo implementation of user
 // repository.
-func NewUserRepository(db *mgo.Session) auth.UserRepository {
-	return &userRepository{db}
+func NewUserRepository(db *mgo.Session, cipher auth.Cipher) auth.UserRepository {
+	return &userRepository{
+		db:     db,
+		cipher: cipher,
+	}
 }
 
 func (ur *userRepository) Save(user auth.User) (string, error) {
+	var err error
+	if user, err = ur.cipher.Encrypt(user); err != nil {
+		return "", err
+	}
+
 	mu, err := toMongoUser(user)
 	if err != nil {
 		return "", err
@@ -40,6 +49,11 @@ func (ur *userRepository) Save(user auth.User) (string, error) {
 }
 
 func (ur *userRepository) Update(user auth.User) error {
+	var err error
+	if user, err = ur.cipher.Encrypt(user); err != nil {
+		return err
+	}
+
 	mu, err := toMongoUser(user)
 	if err != nil {
 		return err
@@ -81,7 +95,7 @@ func (ur *userRepository) OneByID(id string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return mu.toUser(), nil
+	return ur.cipher.Decrypt(mu.toUser())
 }
 
 func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
@@ -97,7 +111,7 @@ func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return mu.toUser(), nil
+	return ur.cipher.Decrypt(mu.toUser())
 }
 
 func (ur *userRepository) Remove(id string) error {
@@ -121,13 +135,23 @@ func (ur *userRepository) Remove(id string) error {
 	return nil
 }
 
-func (ur *userRepository) List() ([]auth.User, error) {
+func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 	session := ur.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(usersCollection)
 
+	ids := []bson.ObjectId{}
+	for _, user := range plist {
+		ids = append(ids, bson.ObjectIdHex(user))
+	}
+
+	q := bson.M{
+		"_id": bson.M{
+			"$nin": ids,
+		},
+	}
 	mu := []mongoUser{}
-	if err := collection.Find(nil).All(&mu); err != nil {
+	if err := collection.Find(q).All(&mu); err != nil {
 		return nil, err
 	}
 
@@ -146,6 +170,9 @@ type mongoUser struct {
 	ID           bson.ObjectId `bson:"_id,omitempty"`
 	FirstName    string        `bson:"first_name,omitempty"`
 	LastName     string        `bson:"last_name,omitempty"`
+	Company      string        `bson:"company,omitempty"`
+	Address      string        `bson:"address,omitempty"`
+	Phone        string        `bson:"phone,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -157,6 +184,9 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 			ID:           bson.NewObjectId(),
 			FirstName:    user.FirstName,
 			LastName:     user.LastName,
+			Company:      user.Company,
+			Address:      user.Address,
+			Phone:        user.Phone,
 		}, nil
 	}
 
@@ -172,6 +202,9 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		ID:           id,
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
 	}, nil
 }
 
@@ -183,5 +216,8 @@ func (user mongoUser) toUser() auth.User {
 		ID:           user.ID.Hex(),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
 	}
 }

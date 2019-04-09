@@ -43,6 +43,7 @@ func randomString(n int) string {
 
 func stream() streams.Stream {
 	return streams.Stream{
+		Visibility:  streams.Public,
 		Owner:       bson.NewObjectId().Hex(),
 		ID:          bson.NewObjectId(),
 		Name:        "stream",

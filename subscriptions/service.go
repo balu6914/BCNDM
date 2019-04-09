@@ -2,9 +2,9 @@ package subscriptions
 
 import (
 	"context"
+	"datapace"
 	"errors"
 	"fmt"
-	"datapace"
 	"net/http"
 	"strings"
 	"time"
@@ -147,6 +147,114 @@ func (ss subscriptionsService) createTable(ds *bigquery.Dataset, stream Stream, 
 	return nil
 }
 
+func (ss subscriptionsService) createVewDataset(email, datasetID string, client *bigquery.Client) error {
+	ds := client.Dataset(datasetID)
+	ae := &bigquery.AccessEntry{
+		Role:       bigquery.ReaderRole,
+		EntityType: bigquery.UserEmailEntity,
+		Entity:     email,
+	}
+
+	meta := bigquery.DatasetMetadata{
+		Access: []*bigquery.AccessEntry{ae},
+	}
+
+	return ds.Create(context.Background(), &meta)
+}
+
+func (ss subscriptionsService) createView(datasetID, viewID string, stream Stream, expire time.Time, client *bigquery.Client) error {
+	q := fmt.Sprintf("SELECT %s FROM `%s.%s.%s`", stream.Fields, stream.Project, stream.Dataset, stream.Table)
+	t := client.Dataset(datasetID).Table(viewID)
+	tableMeta := bigquery.TableMetadata{
+		Name:           stream.Table,
+		ViewQuery:      q,
+		ExpirationTime: expire,
+	}
+
+	ctx := context.Background()
+	if err := t.Create(ctx, &tableMeta); err != nil {
+		client.Dataset(datasetID).Delete(ctx)
+		if e, ok := err.(*googleapi.Error); ok {
+			switch e.Code {
+			case http.StatusConflict:
+				return ErrConflict
+			case http.StatusBadRequest, http.StatusNotFound:
+				return ErrMalformedEntity
+			}
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, client *bigquery.Client) error {
+	ctx := context.Background()
+	ds := client.Dataset(srcID)
+	md, err := ds.Metadata(ctx)
+	if err != nil {
+		return err
+	}
+
+	mdUpdate := []*bigquery.AccessEntry{}
+	for _, v := range md.Access {
+		if v.View != nil {
+			_, err := client.Dataset(v.View.DatasetID).Table(v.View.TableID).Metadata(ctx)
+			// TODO Add error check and possibly much more complex handling.
+			if err == nil {
+				mdUpdate = append(mdUpdate, v)
+			}
+			continue
+		}
+		mdUpdate = append(mdUpdate, v)
+	}
+
+	t := client.Dataset(dstID).Table(tableID)
+	update := bigquery.DatasetMetadataToUpdate{
+		Access: append(mdUpdate, &bigquery.AccessEntry{
+			EntityType: bigquery.ViewEntity,
+			View:       t},
+		),
+	}
+
+	if _, err := ds.Update(ctx, update, md.ETag); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ss subscriptionsService) createBQ(url *string, token string, stream Stream, client *bigquery.Client, expire time.Time) (*bigquery.Dataset, error) {
+	email, err := ss.auth.Email(context.Background(), &datapace.Token{Value: token})
+	if err != nil {
+		return nil, err
+	}
+
+	gmail, err := ss.checkEmail(*email)
+	if err != nil {
+		return nil, err
+	}
+
+	id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
+	datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
+	viewID := fmt.Sprintf("%s_%s", stream.Table, id)
+	// Create dataset for authorized view.
+	if err := ss.createVewDataset(gmail, datasetID, client); err != nil {
+		return nil, err
+	}
+	// Create authorized view.
+	if err := ss.createView(datasetID, viewID, stream, expire, client); err != nil {
+		return nil, err
+	}
+	// Authorize view.
+	if err := ss.setViewAccess(stream.Dataset, datasetID, viewID, client); err != nil {
+		return nil, err
+	}
+
+	*url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, datasetID, viewID)
+	return client.Dataset(datasetID), nil
+}
+
 func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (string, error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
@@ -169,19 +277,10 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return "", err
 		}
 		defer client.Close()
-		id := strings.Replace(uuid.NewV4().String(), "-", "_", -1)
-		tableID := fmt.Sprintf("%s_%s", stream.Table, id)
-		datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
-		ds, err := ss.createDataset(client, token, datasetID, stream)
+		ds, err = ss.createBQ(&url, token, stream, client, sub.EndDate)
 		if err != nil {
 			return "", err
 		}
-		if err = ss.createTable(ds, stream, sub.EndDate, tableID); err != nil {
-			ds.Delete(context.Background())
-			return "", err
-		}
-
-		url = fmt.Sprintf("%s/%s:%s.%s", bqURL, stream.Project, ds.DatasetID, tableID)
 	}
 
 	hash, err := ss.proxy.Register(sub.Hours, url)

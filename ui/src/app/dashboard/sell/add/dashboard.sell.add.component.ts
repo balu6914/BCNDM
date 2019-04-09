@@ -33,10 +33,12 @@ export class DashboardSellAddComponent implements OnInit {
     const floatValidator = Validators.pattern(floatRegEx);
     const urlValidator = Validators.pattern(urlRegEx);
     this.form = this.formBuilder.group({
+      visibility: ['', [Validators.required]],
       name: ['', [Validators.required, Validators.maxLength(32)]],
       type: ['', [Validators.required, Validators.maxLength(32)]],
       description: ['', [Validators.required, Validators.maxLength(256)]],
       url: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      terms: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
       price: ['', [Validators.required, Validators.maxLength(9), floatValidator]],
       lat: [
         '',
@@ -73,7 +75,7 @@ export class DashboardSellAddComponent implements OnInit {
   }
 
   changeExt() {
-    this.bqTouched = true;
+    this.bqTouched = !this.bqTouched;
     if (!this.bqMail) {
       return;
     }
@@ -101,6 +103,7 @@ export class DashboardSellAddComponent implements OnInit {
 
     if (this.form.valid) {
       const stream: Stream = {
+        visibility: this.form.get('visibility').value,
         name: this.form.get('name').value,
         type: this.form.get('type').value,
         description: this.form.get('description').value,
@@ -113,7 +116,8 @@ export class DashboardSellAddComponent implements OnInit {
             parseFloat(this.form.get('lat').value)
           ]
         },
-        external: this.external
+        external: this.external,
+        terms: this.form.get('terms').value,
       };
       if (this.external) {
         stream.bq = new BigQuery(

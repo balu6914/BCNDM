@@ -2,10 +2,10 @@ package grpc_test
 
 import (
 	"context"
-	"fmt"
 	"datapace"
 	"datapace/streams"
 	grpcapi "datapace/streams/api/grpc"
+	"fmt"
 	"testing"
 	"time"
 

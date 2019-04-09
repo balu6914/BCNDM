@@ -30,6 +30,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			dataset:  stream.BQ.Dataset,
 			table:    stream.BQ.Table,
 			fields:   stream.BQ.Fields,
+			terms:    stream.Terms,
 		}
 
 		return res, nil

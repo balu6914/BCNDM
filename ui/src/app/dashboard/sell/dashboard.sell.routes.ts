@@ -12,16 +12,6 @@ const routes: Routes = [
         component: DashboardSellComponent ,
         canActivate: [AuthGuard]
     },
-    {
-        path: 'add',
-        component: DashboardSellAddComponent ,
-        canActivate: [AuthGuard],
-    },
-    {
-        path: 'edit/:id',
-        component: DashboardSellEditComponent ,
-        canActivate: [AuthGuard],
-    },
 ];
 
 @NgModule({

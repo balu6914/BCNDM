@@ -1,10 +1,10 @@
-name,type,description,snippet,price,longitude,latitude,url
-F8-67-05-4E-7F-15,Microphone,visualize cross-media initiatives,"{stream_id: idOfTheStream}",26667,117.015187,33.570769,http://hao124.com/est.png
-13-E1-87-3E-A5-9E,Microphone,matrix customized applications,"{id: ID, value: value, location: Paris}",47707,-51.5002318,-22.2756953,https://spiegel.de/in/lacus/curabitur/at/ipsum/acc.png
-23-B9-1C-87-5D-BF,Presense,matrix synergistic synergies,"{sensor_name: name}",7088,112.775101,-7.604976,https://github.com/justo/sit/amet/sapien/dignissimm.jsp
-AA-F3-22-CF-D4-1A,Microphone,seize strategic vortals,"{sensor_data: plain_data, snesor_temp:1C}",82925,112.4885,-8.0522,https://freewebs.com/suspendissee.jpg
-E5-A3-53-A6-AA-65,Presense,unleash end-to-end supply-chains,{sensor: sensorID},43033,136.236802,35.4660512,http://wsj.com/augue/vestibulum.js
-13-01-5B-D4-DA-DB,Temperature,enable transparent applications,"{id: id, name: name, type: type, style: style, value: value}",82146,-69.825743,18.496426,https://google.pl/urna.xml
-C8-C9-55-65-81-1C,Presense,envisioneer web-enabled web services,"{val: v1}",95390,42.2003001,55.5292,https://usa.gov/consequate.json
-21-FE-D3-24-F9-56,Presense,facilitate bleeding-edge paradigms,"generated valid value that's quoted",41650,35.9019775,33.8462304,http://prnewswire.com/velit.jsp
-BB-9E-5F-B8-D5-1A,Air Cuality,orchestrate proactive methodologies,,32245,-80.4273644,-0.6186619,http://ed.gov/ut/odio/cras/mi/pede.aspx
+visility,name,type,description,snippet,price,longitude,latitude,url,terms
+public,F8-67-05-4E-7F-15,Microphone,visualize cross-media initiatives,"{stream_id: idOfTheStream}",26667,117.015187,33.570769,http://hao124.com/est.png,www.datapaceconditions.com
+public,13-E1-87-3E-A5-9E,Microphone,matrix customized applications,"{id: ID, value: value, location: Paris}",47707,-51.5002318,-22.2756953,https://spiegel.de/in/lacus/curabitur/at/ipsum/acc.png,www.datapaceconditions.com
+public,23-B9-1C-87-5D-BF,Presense,matrix synergistic synergies,"{sensor_name: name}",7088,112.775101,-7.604976,https://github.com/justo/sit/amet/sapien/dignissimm.jsp,www.datapaceconditions.com
+public,AA-F3-22-CF-D4-1A,Microphone,seize strategic vortals,"{sensor_data: plain_data, snesor_temp:1C}",82925,112.4885,-8.0522,https://freewebs.com/suspendissee.jpg,www.datapaceconditions.com
+public,E5-A3-53-A6-AA-65,Presense,unleash end-to-end supply-chains,{sensor: sensorID},43033,136.236802,35.4660512,http://wsj.com/augue/vestibulum.js,www.datapaceconditions.com
+public,13-01-5B-D4-DA-DB,Temperature,enable transparent applications,"{id: id, name: name, type: type, style: style, value: value}",82146,-69.825743,18.496426,https://google.pl/urna.xml,www.datapaceconditions.com
+public,C8-C9-55-65-81-1C,Presense,envisioneer web-enabled web services,"{val: v1}",95390,42.2003001,55.5292,https://usa.gov/consequate.json,www.datapaceconditions.com
+public,21-FE-D3-24-F9-56,Presense,facilitate bleeding-edge paradigms,"generated valid value that's quoted",41650,35.9019775,33.8462304,http://prnewswire.com/velit.jsp,www.datapaceconditions.com
+public,BB-9E-5F-B8-D5-1A,Air Cuality,orchestrate proactive methodologies,,32245,-80.4273644,-0.6186619,http://ed.gov/ut/odio/cras/mi/pede.aspx,www.datapaceconditions.com

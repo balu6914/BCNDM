@@ -47,6 +47,10 @@ func New(db *mgo.Session) streams.StreamRepository {
 			Key:  []string{"owner"},
 		},
 		mgo.Index{
+			Name: "visibilities",
+			Key:  []string{"visibility"},
+		},
+		mgo.Index{
 			Name: "locations",
 			Key:  []string{"$2d:location.coordinates"},
 		},
@@ -66,6 +70,14 @@ func New(db *mgo.Session) streams.StreamRepository {
 		mgo.Index{
 			Name: "prices",
 			Key:  []string{"price"},
+		},
+		mgo.Index{
+			Name: "metadatas",
+			Key:  []string{"metadata"},
+		},
+		mgo.Index{
+			Name: "terms",
+			Key:  []string{"terms"},
 		},
 	}
 	for _, idx := range indices {

@@ -26,7 +26,9 @@
     <!-- Access table -->
     <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">
       <dpc-table [table]="table"
-                 (pageChanged)="onPageChange($event)">
+                 (pageChanged)="onPageChange($event)"
+                 (accessApproved)="onAccessApproved($event)"
+                 (accessRevoked)="onAccessRevoked($event)">
       </dpc-table>
     </div>
   </div>

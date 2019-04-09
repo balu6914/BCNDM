@@ -2,25 +2,20 @@ syntax = "proto3";
 
 package datapace;
 
+import "google/protobuf/empty.proto";
+import "common.proto";
+
 service AuthService {
-    rpc Identify(Token) returns (UserID) {}
+    rpc Identify(Token) returns (ID) {}
     rpc Email(Token) returns (UserEmail) {}
-    rpc Partners(UserID) returns (PartnersList) {}
+    rpc Exists(ID) returns (google.protobuf.Empty) {}
 }
 
 message Token {
     string value = 1;
 }
 
-message UserID {
-    string value = 1;
-}
-
 message UserEmail {
     string email = 1;
     string contactEmail = 2;
-}
-
-message PartnersList {
-    repeated string value = 1;
 }

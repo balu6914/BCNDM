@@ -30,6 +30,9 @@ var user = auth.User{
 	Password:  "password",
 	FirstName: "Joe",
 	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
 }
 
 func newService() auth.Service {
@@ -37,9 +40,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
-	accessRequests := mocks.NewAccessRequestRepository()
+	ac := mocks.NewAccessControl()
 
-	return auth.New(repo, hasher, idp, ts, accessRequests)
+	return auth.New(repo, hasher, idp, ts, ac)
 }
 
 func newServer(svc auth.Service) *httptest.Server {
@@ -83,7 +86,17 @@ func TestRegister(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	data := toJSON(user)
+	data := toJSON(testRegisterReq{
+		Email:        user.Email,
+		Password:     user.Password,
+		ContactEmail: user.ContactEmail,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Company:      user.Company,
+		Address:      user.Address,
+		Phone:        user.Phone,
+	})
+
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
 		Email:     invalid,
@@ -516,4 +529,15 @@ type testUpdateReq struct {
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`
+}
+
+type testRegisterReq struct {
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
 }

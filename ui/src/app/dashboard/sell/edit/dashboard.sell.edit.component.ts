@@ -30,14 +30,16 @@ export class DashboardSellEditComponent implements OnInit {
     const urlValidator = Validators.pattern(urlRegEx);
 
     this.form = this.formBuilder.group({
-      'name':        ['', [Validators.required, Validators.maxLength(32)]],
-      'type':        ['', [Validators.required, Validators.maxLength(32)]],
-      'description': ['', [Validators.required, Validators.maxLength(256)]],
-      'url':         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
-      'price':       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
-      'lat':         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
-      'long':        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
-      'snippet':     ['', [Validators.maxLength(256)]]
+      visibility:  ['', [Validators.required]],
+      name:        ['', [Validators.required, Validators.maxLength(32)]],
+      type:        ['', [Validators.required, Validators.maxLength(32)]],
+      description: ['', [Validators.required, Validators.maxLength(256)]],
+      url:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      terms:       ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      price:       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
+      lat:         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
+      long:        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
+      snippet:     ['', [Validators.maxLength(2048)]],
     });
   }
 
@@ -51,6 +53,7 @@ export class DashboardSellEditComponent implements OnInit {
 
     if (this.form.valid) {
       const stream: Stream = {
+        visibility: this.form.value.visibility,
         name: this.form.value.name,
         type: this.form.value.type,
         description: this.form.value.description,
@@ -63,7 +66,8 @@ export class DashboardSellEditComponent implements OnInit {
             parseFloat(this.form.value.long),
             parseFloat(this.form.value.lat)
           ]
-        }
+        },
+        terms: this.form.value.terms,
       };
 
       // Send addStream request
@@ -77,7 +81,6 @@ export class DashboardSellEditComponent implements OnInit {
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
-
       this.modalEditStream.hide();
     }
   }

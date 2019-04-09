@@ -7,6 +7,18 @@ import (
 
 var _ Service = (*streamService)(nil)
 
+const (
+	// Public streams are visible for all users
+	Public Visibility = "public"
+	// Protected streams are visibible for users with access
+	Protected Visibility = "protected"
+	// Private streams are only visible to owner
+	Private Visibility = "private"
+)
+
+// Visibility of streams
+type Visibility string
+
 // Location represents Stream location to enable geo
 // search streams. Official MongoDB docs could be found here
 // http://docs.mongoengine.org/guide/querying.html#geo-queries
@@ -41,6 +53,7 @@ func (bq BigQuery) Validate() bool {
 type Stream struct {
 	Owner       string        `bson:"owner,omitempty" json:"owner,omitempty"`
 	ID          bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
+	Visibility  Visibility    `bson:"visibility,omitempty" json:"visibility,omitempty"`
 	Name        string        `bson:"name,omitempty" json:"name,omitempty"`
 	Type        string        `bson:"type,omitempty" json:"type,omitempty"`
 	Description string        `bson:"description,omitempty" json:"description,omitempty"`
@@ -48,8 +61,10 @@ type Stream struct {
 	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
 	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
 	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
+	Terms       string        `bson:"terms,omitempty" json:"terms,omitempty"`
 	External    bool          `bson:"external" json:"external,omitempty"`
 	BQ          BigQuery      `bson:"big_query,omitempty" json:"bq,omitempty"`
+	Metadata    bson.M        `bson:"metadata,omitempty" json:"metadata,omitempty"`
 }
 
 // Page represents paged result for list response.
@@ -71,6 +86,7 @@ const (
 	maxLongitude         = 180
 	minLatitude          = -90
 	maxLatitude          = 90
+	maxMetadataLength    = 2048
 )
 
 // Validate returns an error if stream representation is invalid.
@@ -81,11 +97,17 @@ func (s *Stream) Validate() error {
 		(len(s.Snippet) > maxSnippetLength) ||
 		s.Price <= minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
-		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude {
+		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude ||
+		// // TODO: Add Metadata length validation
+		s.Visibility != Public && s.Visibility != Protected && s.Visibility != Private {
 		return ErrMalformedData
 	}
 
 	if !s.External && (!govalidator.IsURL(s.URL) || len(s.URL) > maxURLLength) {
+		return ErrMalformedData
+	}
+
+	if !s.External && (!govalidator.IsURL(s.Terms) || len(s.Terms) > maxURLLength) {
 		return ErrMalformedData
 	}
 

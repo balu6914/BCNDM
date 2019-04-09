@@ -6,6 +6,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
+import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
@@ -13,7 +14,8 @@ import { Stream, Subscription } from 'app/common/interfaces';
 import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-
+import { Access } from 'app/common/interfaces/access.interface';
+import { Execution } from 'app/common/interfaces/execution.interface';
 
 @Component({
   selector: 'dpc-table-row',
@@ -26,6 +28,7 @@ export class TableRowComponent implements OnInit {
   types = TableType;
   bsModalRef: BsModalRef;
   currentDate: string;
+  execFetched = false;
 
   @Input() row: any;
   @Input() rowType: TableType;
@@ -35,6 +38,9 @@ export class TableRowComponent implements OnInit {
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
+  @Output() accessApproved: EventEmitter<any> = new EventEmitter();
+  @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
+  @Output() fetchExecResult: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -75,6 +81,7 @@ export class TableRowComponent implements OnInit {
     // Parameters editData and streamID are used in DashboardSellEditComponent
     const initialState = {
       editData: {
+        visibility:  row.visibility,
         name:        row.name,
         type:        row.type,
         description: row.description,
@@ -82,12 +89,44 @@ export class TableRowComponent implements OnInit {
         price:       this.dpcPipe.transform(row.price),
         long:        row.location.coordinates[0],
         lat:         row.location.coordinates[1],
-        snippet: row.snippet,
+        snippet:     row.snippet,
+        terms:       row.terms,
       },
       streamID: row.id,
+      ownerID:  row.owner,
     };
+
     // Open DashboardSellEditComponent as Modal
     this.bsModalRef = this.modalService.show(DashboardSellEditComponent, {initialState})
+      .content.streamEdited.subscribe(
+        stream => {
+          this.editEvt.emit(stream);
+        }
+      );
+  }
+
+  openModalEditAi(row: any) {
+    // editData, streamID and ownerID are used in DashboardAiEditComponent
+    const initialState = {
+      editData: {
+        visibility:  row.visibility,
+        name:        row.name,
+        type:        row.type,
+        description: row.description,
+        url:         row.url,
+        price:       this.dpcPipe.transform(row.price),
+        long:        row.location.coordinates[0],
+        lat:         row.location.coordinates[1],
+        snippet:     row.snippet,
+        metadata:    JSON.stringify(row.metadata),
+        terms:       row.terms,
+      },
+      streamID: row.id,
+      ownerID:  row.owner,
+    };
+
+    // Open DashboardAiEditComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAiEditComponent, {initialState})
       .content.streamEdited.subscribe(
         stream => {
           this.editEvt.emit(stream);
@@ -127,11 +166,7 @@ export class TableRowComponent implements OnInit {
     }
     // Parameter stream is set on modal component
     const initialState = {
-      stream: {
-        id:         row.id,
-        name:       row.name,
-        price:      row.price,
-      },
+      stream: row,
     };
     // Open DashboardBuyAddComponent Modal
     this.bsModalRef = this.modalService.show(DashboardBuyAddComponent, {initialState});
@@ -158,5 +193,18 @@ export class TableRowComponent implements OnInit {
 
   onCheckboxChanged(row: Stream) {
     this.checkboxChangedEvt.emit(row);
+  }
+
+  approveAccess(row: Access) {
+    this.accessApproved.emit(row);
+  }
+
+  revokeAccess(row: Access) {
+    this.accessRevoked.emit(row);
+  }
+
+  onFetchExecResult(row: Execution) {
+    this.execFetched = true;
+    this.fetchExecResult.emit(row);
   }
 }

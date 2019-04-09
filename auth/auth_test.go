@@ -18,6 +18,9 @@ var user = auth.User{
 	ID:           "1",
 	FirstName:    "first",
 	LastName:     "last",
+	Company:      "company",
+	Address:      "address",
+	Phone:        "+1234567890",
 }
 
 func newService() auth.Service {
@@ -25,9 +28,9 @@ func newService() auth.Service {
 	hasher := mocks.NewHasher()
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
-	accessRequests := mocks.NewAccessRequestRepository()
+	ac := mocks.NewAccessControl()
 
-	return auth.New(users, hasher, idp, ts, accessRequests)
+	return auth.New(users, hasher, idp, ts, ac)
 }
 
 func TestRegister(t *testing.T) {

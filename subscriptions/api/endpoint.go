@@ -9,18 +9,37 @@ import (
 
 func addSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(addSubReq)
 
-		if err := req.validate(); err != nil {
-			return nil, err
+		req := request.(addSubsReq)
+
+		resps := addSubsRes{}
+
+		for _, sub := range req.Subscriptions {
+
+			if err := sub.Validate(); err != nil {
+				resps.Responses = append(resps.Responses, addSubResp{
+					StreamID:     sub.StreamID,
+					ErrorMessage: err.Error(),
+				})
+				continue
+			}
+
+			id, err := svc.AddSubscription(req.UserID, req.UserToken, sub)
+			if err != nil {
+				resps.Responses = append(resps.Responses, addSubResp{
+					StreamID:     sub.StreamID,
+					ErrorMessage: err.Error(),
+				})
+				continue
+			}
+
+			resps.Responses = append(resps.Responses, addSubResp{
+				StreamID:       sub.StreamID,
+				SubscriptionID: id,
+			})
 		}
-
-		id, err := svc.AddSubscription(req.UserID, req.UserToken, req.Subscription)
-		if err != nil {
-			return nil, err
-		}
-
-		return addSubRes{id}, nil
+		
+		return resps, nil
 	}
 }
 

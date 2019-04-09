@@ -3,6 +3,8 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { Table, TableType } from 'app/shared/table/table';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { TableRowComponent } from 'app/shared/table/row/table.row.component';
+import { Access } from 'app/common/interfaces/access.interface';
+import { Execution } from 'app/common/interfaces/execution.interface';
 
 @Component({
   selector: 'dpc-table',
@@ -36,6 +38,9 @@ export class TableComponent {
   @Output() unhoverRow: EventEmitter<any> = new EventEmitter();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
+  @Output() accessApproved: EventEmitter<any> = new EventEmitter();
+  @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
+  @Output() fetchExecResult: EventEmitter<any> = new EventEmitter();
 
   constructor() { }
 
@@ -107,5 +112,17 @@ export class TableComponent {
 
   onCheckboxChangedEvt(row: Stream) {
     this.checkboxChangedEvt.emit(row);
+  }
+
+  onAccessApproved(row: Access) {
+    this.accessApproved.emit(row);
+  }
+
+  onAccessRevoked(row: Access) {
+    this.accessRevoked.emit(row);
+  }
+
+  onFetchExecResult(row: Execution) {
+    this.fetchExecResult.emit(row);
   }
 }

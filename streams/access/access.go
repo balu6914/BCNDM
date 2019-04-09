@@ -11,11 +11,11 @@ import (
 var _ streams.AccessControl = (*accessControl)(nil)
 
 type accessControl struct {
-	client datapace.AuthServiceClient
+	client datapace.AccessServiceClient
 }
 
 // New returns new access control instance.
-func New(client datapace.AuthServiceClient) streams.AccessControl {
+func New(client datapace.AccessServiceClient) streams.AccessControl {
 	return accessControl{client: client}
 }
 
@@ -23,7 +23,7 @@ func (ac accessControl) Partners(id string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	list, err := ac.client.Partners(ctx, &datapace.UserID{Value: id})
+	list, err := ac.client.Partners(ctx, &datapace.ID{Value: id})
 	if err != nil {
 		return nil, err
 	}

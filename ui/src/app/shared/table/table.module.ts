@@ -7,12 +7,14 @@ import { TableRowDetailsComponent } from './details/table.row.details.component'
 import { TableComponent } from './main/table.component';
 import { TablePaginationComponent } from './pagination/table.pagination.component';
 import { TableTabbedComponent } from './table-tabbed/table-tabbed.component';
+import { ExecutionResultModule } from 'app/shared/execution-result/execution-result.module';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
-    CommonAppModule
+    CommonAppModule,
+    ExecutionResultModule,
   ],
   declarations: [
     TableComponent,

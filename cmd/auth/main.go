@@ -14,7 +14,10 @@ import (
 	mgo "gopkg.in/mgo.v2"
 
 	"datapace"
+	accessapi "datapace/access-control/api/grpc"
 	"datapace/auth"
+	"datapace/auth/access"
+	"datapace/auth/aes"
 	"datapace/auth/api"
 	grpcapi "datapace/auth/api/grpc"
 	httpapi "datapace/auth/api/http"
@@ -27,23 +30,27 @@ import (
 )
 
 const (
-	envHTTPPort        = "DATAPACE_AUTH_HTTP_PORT"
-	envGRPCPort        = "DATAPACE_AUTH_GRPC_PORT"
-	envDBURL           = "DATAPACE_AUTH_DB_URL"
-	envDBUser          = "DATAPACE_AUTH_DB_USER"
-	envDBPass          = "DATAPACE_AUTH_DB_PASS"
-	envDBName          = "DATAPACE_AUTH_DB_NAME"
-	envTransactionsURL = "DATAPACE_TRANSACTIONS_URL"
-	envSecret          = "DATAPACE_AUTH_SECRET"
+	envHTTPPort         = "DATAPACE_AUTH_HTTP_PORT"
+	envGRPCPort         = "DATAPACE_AUTH_GRPC_PORT"
+	envDBURL            = "DATAPACE_AUTH_DB_URL"
+	envDBUser           = "DATAPACE_AUTH_DB_USER"
+	envDBPass           = "DATAPACE_AUTH_DB_PASS"
+	envDBName           = "DATAPACE_AUTH_DB_NAME"
+	envTransactionsURL  = "DATAPACE_TRANSACTIONS_URL"
+	envAccessControlURL = "DATAPACE_ACCESS_CONTROL_URL"
+	envSecret           = "DATAPACE_AUTH_SECRET"
+	envEncryptionKey    = "DATAPACE_ENCRYPTION_KEY"
 
-	defHTTPPort        = "8080"
-	defGRPCPort        = "8081"
-	defDBURL           = "0.0.0.0"
-	defDBUser          = ""
-	defDBPass          = ""
-	defDBName          = "auth"
-	defTransactionsURL = "localhost:8081"
-	defSecret          = "datapace"
+	defHTTPPort         = "8080"
+	defGRPCPort         = "8081"
+	defDBURL            = "0.0.0.0"
+	defDBUser           = ""
+	defDBPass           = ""
+	defDBName           = "auth"
+	defTransactionsURL  = "localhost:8081"
+	defAccessControlURL = "localhost:8081"
+	defSecret           = "datapace"
+	defEncryptionKey    = "AES256Key-32Characters1234567890"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -59,7 +66,9 @@ type config struct {
 	dbConnectTimeout int
 	dbSocketTimeout  int
 	transactionsURL  string
+	accessControlURL string
 	secret           string
+	encryptionKey    string
 }
 
 func main() {
@@ -70,12 +79,16 @@ func main() {
 	ms := connectToDB(cfg, logger)
 	defer ms.Close()
 
-	conn := newGRPCConn(cfg.transactionsURL, logger)
-	defer conn.Close()
+	tconn := newGRPCConn(cfg.transactionsURL, logger)
+	defer tconn.Close()
 
-	tc := transactionsapi.NewClient(conn)
+	acconn := newGRPCConn(cfg.accessControlURL, logger)
+	defer acconn.Close()
 
-	svc := newService(cfg, ms, tc, logger)
+	tc := transactionsapi.NewClient(tconn)
+	ac := accessapi.NewClient(acconn)
+
+	svc := newService(cfg, ms, tc, ac, logger)
 
 	errs := make(chan error, 2)
 
@@ -104,7 +117,9 @@ func loadConfig() config {
 		dbConnectTimeout: dbConnectTimeout,
 		dbSocketTimeout:  dbSocketTimeout,
 		transactionsURL:  datapace.Env(envTransactionsURL, defTransactionsURL),
+		accessControlURL: datapace.Env(envAccessControlURL, defAccessControlURL),
 		secret:           datapace.Env(envSecret, defSecret),
+		encryptionKey:    datapace.Env(envEncryptionKey, defEncryptionKey),
 	}
 }
 
@@ -125,24 +140,25 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func newGRPCConn(transactionsURL string, logger log.Logger) *grpc.ClientConn {
-	conn, err := grpc.Dial(transactionsURL, grpc.WithInsecure())
+func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to connect to transactions service: %s", err))
+		logger.Error(fmt.Sprintf("Failed to connect to GRPC service on address %s: %s", addr, err))
 		os.Exit(1)
 	}
 
 	return conn
 }
 
-func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, logger log.Logger) auth.Service {
-	users := mongo.NewUserRepository(ms)
-	accessControl := mongo.NewAccessRequestRepository(ms)
+func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, asc datapace.AccessServiceClient, logger log.Logger) auth.Service {
+	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
+	users := mongo.NewUserRepository(ms, cipher)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
+	ac := access.New(asc)
 
-	svc := auth.New(users, hasher, idp, ts, accessControl)
+	svc := auth.New(users, hasher, idp, ts, ac)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

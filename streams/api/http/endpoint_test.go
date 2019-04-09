@@ -45,6 +45,7 @@ func genStream() streams.Stream {
 	counter++
 	return streams.Stream{
 		ID:          bson.NewObjectId(),
+		Visibility:  streams.Public,
 		Name:        "name",
 		Type:        "type",
 		Description: "description",
@@ -64,6 +65,7 @@ func genStream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
+		Terms: fmt.Sprintf("https://myStream%d.com", counter),
 	}
 }
 
@@ -96,8 +98,9 @@ func (tr testRequest) make() (*http.Response, error) {
 func newService() streams.Service {
 	repo := mocks.NewStreamRepository()
 	ac := mocks.NewAccessControl([]string{})
+	ai := mocks.NewAIService()
 
-	return streams.NewService(repo, ac)
+	return streams.NewService(repo, ac, ai)
 }
 
 func newServer(svc streams.Service) *httptest.Server {

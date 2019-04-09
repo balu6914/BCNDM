@@ -17,14 +17,21 @@
           <div class="modal__ratio">
             {{stream.price | dpc}} DPC
           </div>
-          <form class="form-inline float-right buy-dpc needs-validation" [formGroup]="form" novalidate>
-            <div class="form-group">
-              <label for="hours" class="form-label mr-2">Subscription hours</label>
-              <input type="number" formControlName="hours" class="form-control buy-dpc__input">
-            </div>
-          </form>
         </div>
       </div>
+      <form [formGroup]="form">
+        <div class="form-group row">
+          <label class="col-sm-9 col-form-label">Subscription hours*</label>
+          <div class="col-sm-3">
+            <input type="text" formControlName="hours" class="form-control subscribe-dpc"
+                   [ngClass]="{ 'is-invalid': submitted && form.controls.hours.errors }" />
+            <div *ngIf="submitted && form.controls.hours.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.hours.errors.required">You must subscribe for at least one hour.</div>
+              <div *ngIf="form.controls.hours.errors.insufficientFunds">You have insufficient funds.</div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="row">
       <div class="col-3 col-sm-5">
@@ -36,6 +43,11 @@
         <div class="modal__summary">
           {{((stream.price * form.value.hours) | dpc)}} DPC
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+         By clicking buy stream you sign and agree  <a target="_blank" href={{stream.terms}} rel="nofollow noopener">on the license agreement.</a>
       </div>
     </div>
   </div>

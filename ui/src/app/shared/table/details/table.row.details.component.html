@@ -26,6 +26,16 @@
     <div class="row">
       <div class="col-sm-4 col-md-12">
         <div class="row">
+          <div class="col-md-12">
+            <div class="stream__title">
+              Visibility
+            </div>
+            <div class="stream__text">
+              {{row.visibility}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
           <div class="col-md-6">
             <div class="stream__title">
               Stream Type
@@ -60,15 +70,37 @@
               {{row.location.coordinates[1]}}, {{row.location.coordinates[0]}}
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-sm-8 col-md-12">
-        <div class="stream-data">
-          <div class="stream-data__title">
-            Example reading(s)
+          <div class="col-sm-6">
+            <div class="stream__title">
+              Terms URL
+            </div>
+            <div class="stream__text">
+              {{row.terms}}
+            </div>
           </div>
-          <div class="stream-data__text">
-            <pre class="stream-data__pre">{{row.snippet}}</pre>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-md-12">
+            <div class="stream-data">
+              <div class="stream-data__title">
+                Example reading(s)
+              </div>
+              <div class="stream-data__text">
+                <pre class="stream-data__pre">{{row.snippet}}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="rowType === types.Ai" class="row">
+          <div class="col-sm-8 col-md-12">
+            <div class="stream-data">
+              <div class="stream-data__title">
+                Metadata
+              </div>
+              <div class="stream-data__text">
+                <pre class="stream-data__pre">{{row.metadata | json}}</pre>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -77,9 +109,9 @@
   <!-- Executions Details -->
   <div *ngIf="rowType === types.Executions" class="box__content">
     <div class="row">
-      <div class="col-sm-4 col-md-12">
+      <div class="col-sm-12">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               ID
             </div>
@@ -87,7 +119,7 @@
               {{row.id}}
             </div>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-3">
             <div class="stream__title">
               Algorithm
             </div>
@@ -95,9 +127,7 @@
               {{row.algo}}
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               Dataset
             </div>
@@ -105,7 +135,7 @@
               {{row.data}}
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="stream__title">
               Mode
             </div>
@@ -115,14 +145,12 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-8 col-md-12">
+      <div class="col-sm-12">
         <div class="stream-data">
-          <div class="stream-data__title">
-            Example reading(s)
-          </div>
-          <div class="stream-data__text">
-            <pre class="stream-data__pre">{{row.snippet}}</pre>
-          </div>
+            <!-- Vizualize execution result -->
+            <div *ngIf="row && row.result">
+              <dpc-execution-result-graph [resultData]="row.result"></dpc-execution-result-graph>
+            </div>
         </div>
       </div>
     </div>

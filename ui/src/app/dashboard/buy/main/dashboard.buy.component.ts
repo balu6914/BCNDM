@@ -7,6 +7,9 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MapComponent } from 'app/shared/map/leaflet/map.leaflet.component';
 import { TableComponent } from 'app/shared/table/main/table.component';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap';
+import { DashboardBuyGroupComponent } from 'app/dashboard/buy/group/dashboard.buy.group.component';
 
 @Component({
   selector: 'dpc-dashboard-buy',
@@ -28,6 +31,7 @@ export class DashboardBuyComponent implements OnInit {
     private AuthService: AuthService,
     public streamService: StreamService,
     public alertService: AlertService,
+    private modalService: BsModalService,
     public midpcPipe: MidpcPipe,
   ) { }
 
@@ -51,19 +55,19 @@ export class DashboardBuyComponent implements OnInit {
 
       this.map.viewChanged.subscribe(
         bounds => {
-          this.query.setPoint('x0', bounds["_southWest" ]["lng"]);
-          this.query.setPoint('y0', bounds["_southWest" ]["lat"]);
-          this.query.setPoint('x1', bounds["_southWest" ]["lng"]);
-          this.query.setPoint('y1', bounds["_northEast" ]["lat"]);
+          this.query.setPoint('x0', bounds['_southWest']['lng']);
+          this.query.setPoint('y0', bounds['_southWest']['lat']);
+          this.query.setPoint('x1', bounds['_southWest']['lng']);
+          this.query.setPoint('y1', bounds['_northEast']['lat']);
 
-          this.query.setPoint('x2', bounds["_northEast" ]["lng"]);
-          this.query.setPoint('y2', bounds["_northEast" ]["lat"]);
-          this.query.setPoint('x3', bounds["_northEast" ]["lng"]);
-          this.query.setPoint('y3', bounds["_southWest" ]["lat"]);
+          this.query.setPoint('x2', bounds['_northEast']['lng']);
+          this.query.setPoint('y2', bounds['_northEast']['lat']);
+          this.query.setPoint('x3', bounds['_northEast']['lng']);
+          this.query.setPoint('y3', bounds['_southWest']['lat']);
           this.fetchStreams();
         },
         err => {
-          console.log(err);
+          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
         }
       );
   }
@@ -71,6 +75,13 @@ export class DashboardBuyComponent implements OnInit {
   onPageChange(page: number) {
     this.query.page = page;
     this.fetchStreams();
+  }
+
+  onBuyClick() {
+    const initialState = {
+      streamsList: this.table.page.content,
+    };
+    this.modalService.show(DashboardBuyGroupComponent, { initialState });
   }
 
   onFiltersChange(filters: any) {
@@ -89,7 +100,7 @@ export class DashboardBuyComponent implements OnInit {
         this.table = temp;
       },
       err => {
-        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
       });
   }
 

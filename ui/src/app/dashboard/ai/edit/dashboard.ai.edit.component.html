@@ -1,0 +1,134 @@
+<!-- Add Stream -->
+<div class="modal-header">
+  <h5 class="modal-title">Edit {{ editData.type }}</h5>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="modalEditStream.hide()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Visibility*</label>
+        <div class="col-sm-8">
+          <select formControlName="visibility" class="form-control selectpicker"
+                  [ngClass]="{ 'is-invalid': submitted && form.controls.visibility.errors }">
+            <option> public </option>
+            <option> protected </option>
+            <option> private </option>
+          </select>
+          <div *ngIf="submitted && form.controls.visibility.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.visibility.errors.required">Visibility is required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Name*</label>
+        <div class="col-sm-8">
+          <input type="text" formControlName="name" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.name.errors }" />
+          <div *ngIf="submitted && form.controls.name.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.name.errors.required">Name is required.</div>
+            <div *ngIf="form.controls.name.errors.maxlength">The maximum length is 32 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Describe your {{ editData.type }}*</label>
+        <div class="col-sm-8">
+          <textarea type="text" formControlName="description" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && form.controls.description.errors }"> </textarea>
+          <div *ngIf="submitted && form.controls.description.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.description.errors.required">Description is required.</div>
+            <div *ngIf="form.controls.description.errors.maxlengtsh">The maximum length is 256 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Your stream snippet</label>
+        <div class="col-sm-8">
+          <textarea type="text" formControlName="snippet" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && form.controls.snippet.errors }">
+          </textarea>
+          <div *ngIf="submitted && form.controls.snippet.erors" class="invalid-feedback">
+            <div *ngIf="submitted && form.controls.snippet.errors.maxlength">The maximum length is 256 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Stream URL*</label>
+        <div class="col-sm-8">
+          <input type="text" formControlName="url" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.url.errors }" />
+          <div *ngIf="submitted && form.controls.url.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.url.errors.required">URL is required.</div>
+            <div *ngIf="form.controls.url.errors.maxlength">The maximum length is 2048 characters.</div>
+            <div *ngIf="form.controls.url.errors.pattern">Invalid URL.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Tokens per hour*</label>
+        <div class="col-sm-8">
+          <input type="text"formControlName="price" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.price.errors }" />
+          <div *ngIf="submitted && form.controls.price.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.price.errors.required">Price is required.</div>
+            <div *ngIf="form.controls.price.errors.pattern">Price must be between 0.00000001 and 1000 DPC.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Latitude of the sensor*</label>
+        <div class="col-sm-8">
+          <input formControlName="lat" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.lat.errors }">
+          <div *ngIf="submitted && form.controls.lat.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.lat.errors.required">Latitude is required.</div>
+            <div *ngIf="form.controls.lat.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
+            <div *ngIf="form.controls.lat.errors.min || form.controls.lat.errors.max">Latitude value must be between -90 and 90.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Longitude of the sensor*</label>
+        <div class="col-sm-8">
+          <input formControlName="long" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && form.controls.long.errors }">
+          <div *ngIf="submitted && form.controls.long.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.long.errors.required">Longitude is required.</div>
+            <div *ngIf="form.controls.long.errors.pattern">Longitude must be a number with an accuracy of maximum 7 decimals.</div>
+            <div *ngIf="form.controls.long.errors.min || form.controls.long.errors.max">Longitude value must be between -180 and 180.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Terms URL*</label>
+        <div class="col-sm-8">
+          <input type="text" formControlName="terms" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.terms.errors }" />
+          <div *ngIf="submitted && form.controls.terms.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.terms.errors.required">Terms URL is required.</div>
+            <div *ngIf="form.controls.terms.errors.maxlength">The maximum length is 2048 characters.</div>
+            <div *ngIf="form.controls.terms.errors.pattern">Invalid URL.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Metadata</label>
+        <div class="col-sm-8">
+          <textarea type="text" formControlName="metadata" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.metadata.errors }"></textarea>
+          <div *ngIf="submitted && form.controls.metadata.errors" class="invalid-feedback">
+            <div *ngIf="form.controls.metadata.errors.maxlength">The maximum length is 2048 characters.</div>
+            <div *ngIf="form.controls.metadata.errors.invalid">Metadata must be a JSON.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-footer__nav">
+          <div class="modal__required">* required fields</div>
+          <button class="btn btn-primary btn-padding-lg btn-xs-full">Edit {{ editData.type }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

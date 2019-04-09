@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
-import { AuthService } from 'app/auth/services/auth.service';
 import { AccessService } from 'app/dashboard/access/access.service';
-import { Access } from 'app/common/interfaces/access.interface';
-import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { AuthService } from 'app/auth/services/auth.service';
+import { UserService } from 'app/common/services/user.service';
+import { User } from 'app/common/interfaces/user.interface';
+import { Access } from 'app/common/interfaces/access.interface';
 import { Page } from 'app/common/interfaces/page.interface';
+import { Table, TableType } from 'app/shared/table/table';
 import { DashboardAccessAddComponent } from 'app/dashboard/access/add/dashboard.access.add.component';
 
 @Component({
@@ -15,7 +17,8 @@ import { DashboardAccessAddComponent } from 'app/dashboard/access/add/dashboard.
   styleUrls: ['./dashboard.access.component.scss']
 })
 export class DashboardAccessComponent implements OnInit {
-    user: any;
+    user: User;
+    users: User[];
     subscription: any;
     temp = [];
     selectedAccess = [];
@@ -30,6 +33,7 @@ export class DashboardAccessComponent implements OnInit {
     constructor(
         private modalService: BsModalService,
         private authService: AuthService,
+        private userService: UserService,
         private accessService: AccessService,
         private alertService: AlertService,
     ) { }
@@ -37,17 +41,15 @@ export class DashboardAccessComponent implements OnInit {
   ngOnInit() {
     this.table.title = 'Access';
     this.table.tableType = TableType.Access;
-    this.table.headers = ['Partners', 'Status'];
-    this.table.page = new Page<Access>(0, 0, 0, [
-      {partner_id: 'Air France', signed: false},
-      {partner_id: 'Korean Air', signed: true},
-    ]);
+    this.table.headers = ['Partner', 'Origin', 'Status', ''];
+    this.table.page = new Page<Access>(0, 0, 0, []);
 
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
-        // this.fetchAccess();
+        // Fetch all registered users
+        this.fetchAllUsers();
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
@@ -55,23 +57,65 @@ export class DashboardAccessComponent implements OnInit {
     );
   }
 
-  fetchAccess() {
-    this.accessService.get(this.query).subscribe(
-      result => {
-        const temp = Object.assign({}, this.table);
-        temp.page = result;
-        // Set table content
-        this.table = temp;
+  fetchAllUsers() {
+    this.userService.getAllUsers().subscribe(
+      (result: any) => {
+        this.users = result.users;
+        // Fetch sent and received access requests
+        this.fetchAccessRequests();
       },
       err => {
         this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
       }
     );
+  }
+
+  fetchAccessRequests() {
+    // access requests sent
+    this.accessService.getAllAccessSent().subscribe(
+      (resp: any) => {
+        this.reqsToTable(resp.Requests, 'sent');
+      },
+      err => {
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+      }
+    );
+    // access requests received
+    this.accessService.getAllAccessReceived().subscribe(
+      (resp: any) => {
+        this.reqsToTable(resp.Requests, 'received');
+      },
+      err => {
+        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+      }
+    );
+  }
+
+  reqsToTable(requests: any, origin: string) {
+    const temp = Object.assign({}, this.table);
+    // modify receiver field to show name instead of ID
+    requests.forEach( req => {
+      const index = this.users.findIndex(
+        user => {
+          if (origin === 'sent') {
+            return req.receiver === user.id;
+          } else {
+            return req.sender === user.id;
+          }
+        }
+      );
+      req.partner = `${this.users[index].first_name} ${this.users[index].last_name}`;
+      // Set origin
+      req.origin = origin;
+      temp.page.content.push(req);
+    });
+    // Set Access table
+    this.table = temp;
   }
 
   onPageChange(page: number) {
     this.query.page = page;
-    this.fetchAccess();
+    this.fetchAccessRequests();
   }
 
   modalNewAccess() {
@@ -80,15 +124,13 @@ export class DashboardAccessComponent implements OnInit {
     // Show DashboardAccessAddComponent as Modal
     this.modalService.show(DashboardAccessAddComponent)
       .content.accessCreated.subscribe(
-        response => {
-          response.items.forEach(partner => {
-            console.log(partner);
-            const row: Access = {
-              partner_id: partner.partner_id,
-              signed: false,
-            };
-            this.table.page.content.push(row);
-          });
+        resp => {
+          const row: any = {
+            partner: `${resp.receiver.first_name} ${resp.receiver.last_name}`,
+            state: 'pending',
+            origin: 'sent',
+          };
+          this.table.page.content.push(row);
         },
         err => {
           console.log(err);
@@ -98,5 +140,35 @@ export class DashboardAccessComponent implements OnInit {
 
     toggleHelp() {
       this.openedHelp = !this.openedHelp;
+    }
+
+    onAccessApproved(row: Access) {
+      this.accessService.approveAccessRequest(row.id).subscribe(
+        (resp: any) => {
+          const index = this.table.page.content.findIndex(
+            (access: Access) => row.id === access.id
+          );
+          const rowToUpdate = <Access> this.table.page.content[index];
+           rowToUpdate.state = 'approved';
+        },
+        err => {
+          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+        }
+      );
+    }
+
+    onAccessRevoked(row: Access) {
+      this.accessService.revokeAccessRequest(row.id).subscribe(
+        (resp: any) => {
+          const index = this.table.page.content.findIndex(
+            (access: Access) => row.id === access.id
+          );
+          const rowToUpdate = <Access> this.table.page.content[index];
+          rowToUpdate.state = 'revoked';
+        },
+        err => {
+          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+        }
+      );
     }
 }

@@ -22,14 +22,14 @@ import { UiSwitchModule } from 'ngx-ui-switch';
     // Import ngx-bootstrap modules
     BsDropdownModule.forRoot(),
     TooltipModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
   ],
   exports: [
     BsDropdownModule,
     TooltipModule,
     ModalModule,
     SidebarModule,
-    UiSwitchModule
+    UiSwitchModule,
   ]
 })
 export class AppBootstrapModule {}

@@ -7,6 +7,20 @@
     </div>
     <div class="action-buttons">
       <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd('Algorithm')">
+            <span class="btn-media__icon btn-media__icon--add">
+            </span>
+            Add Algorithm
+          </button>
+      </p>
+      <p class="action-buttons__item">
+        <button type="button" class="btn btn-primary btn-media" (click)="openModalAdd('Dataset')">
+            <span class="btn-media__icon btn-media__icon--add">
+            </span>
+            Add Dataset
+          </button>
+      </p>
+      <p class="action-buttons__item">
         <button type="button" class="btn btn-primary btn-media"
                 (click)="modalNewExecution()" [disabled]="!checkedStreams.length || !checkedAlgos.length">
           <span class="btn-media__icon btn-media__icon--add"></span>
@@ -17,26 +31,24 @@
   </div>
 
   <div class="row row-grow">
-    <div class="col-lg-6">
-      <dpc-table #tableAlgosComponent
-                 [table]="tableAlgos"
+    <div class="col-lg-6 order-1 order-sm-2">
+      <dpc-table [table]="tableAlgorithms"
                  (pageChanged)="onPageChange($event)"
                  (checkboxChangedEvt)="onAlgoSelected($event)">
       </dpc-table>
     </div>
-    <div class="col-lg-6">
-      <dpc-table #tableStreamsComponent
-                 [table]="tableStreams"
+    <div class="col-lg-6 order-1 order-sm-2">
+      <dpc-table [table]="tableDatasets"
                  (pageChanged)="onPageChange($event)"
-                 (checkboxChangedEvt)="onStreamSelected($event)">
+                 (checkboxChangedEvt)="onDataSelected($event)">
       </dpc-table>
     </div>
   </div>
   <div class="row row-grow">
     <div class="col-lg-12">
-      <dpc-table #tableExecutionComponent
-                 [table]="tableExecutions"
-                 (pageChanged)="onPageChange($event)">
+      <dpc-table [table]="tableExecutions"
+                 (pageChanged)="onPageChange($event)"
+                 (fetchExecResult)="fetchExecutionResult($event)">
       </dpc-table>
     </div>
   </div>

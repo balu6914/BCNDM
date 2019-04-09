@@ -15,14 +15,10 @@ type apiReq interface {
 	validate() error
 }
 
-type addSubReq struct {
-	UserID       string
-	UserToken    string
-	Subscription subscriptions.Subscription
-}
-
-func (req addSubReq) validate() error {
-	return req.Subscription.Validate()
+type addSubsReq struct {
+	UserID        string
+	UserToken     string
+	Subscriptions []subscriptions.Subscription
 }
 
 type searchSubsReq struct {

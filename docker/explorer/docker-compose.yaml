@@ -1,5 +1,10 @@
 version: '2'
 
+networks:
+  explorer-net:
+    external:
+      name: fabric_datapace-bc-net
+
 services: 
 
   explorer-db:
@@ -11,7 +16,12 @@ services:
       - ../explorer/artifacts/explorerpg.sql:/docker-entrypoint-initdb.d/explorerpg.sql
       - ../explorer/artifacts/updatepg.sql:/docker-entrypoint-initdb.d/updatepg.sql
     networks:
-      - datapace-bc-net
+      - explorer-net
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
 
   explorer:
     image: datapace/hyperledger-explorer
@@ -25,8 +35,12 @@ services:
     ports:
       - "9090:8080"
     networks:
-      - datapace-bc-net
+      - explorer-net
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
     depends_on:
       - explorer-db
-      - cli
 

@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h5 class="modal-title">Buy Streams</h5>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="modalBuyGroupStream.hide()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Stream Name</th>
+          <th scope="col">Stream Type</th>
+          <th scope="col">Stream Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stream of this.streamsList">
+          <td>{{stream.name}}</td>
+          <td>{{stream.type}}</td>
+          <td>{{stream.price | dpc}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="modal-section-border">
+      <div class="row">
+        <div class="col-3">
+          <div class="modal__subtitle">
+            Tokens per hour
+          </div>
+        </div>
+        <div class="col-9">
+          <div class="modal__ratio">
+            {{totalSum | dpc}} DPC
+          </div>
+        </div>
+      </div>
+      <form [formGroup]="form">
+        <div class="form-group row">
+          <label class="col-sm-9 col-form-label">Subscription hours*</label>
+          <div class="col-sm-3">
+            <input type="text" formControlName="hours" class="form-control subscribe-dpc"
+                   [ngClass]="{ 'is-invalid': submitted && form.controls.hours.errors }" />
+            <div *ngIf="submitted && form.controls.hours.errors" class="invalid-feedback">
+              <div *ngIf="form.controls.hours.errors.required">You must subscribe for at least one hour.</div>
+              <div *ngIf="form.controls.hours.errors.insufficientFunds">You have insufficient funds.</div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="row">
+      <div class="col-3 col-sm-5">
+        <div class="modal__subtitle">
+          Subscription charge
+        </div>
+      </div>
+      <div class="col-9 col-sm-7">
+        <div class="modal__summary">
+          {{((totalSum * form.value.hours) | dpc)}} DPC
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" (click)="onBuyAllClick()" class="btn btn-primary btn-padding-lg">Buy Stream</button>
+</div>

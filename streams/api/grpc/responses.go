@@ -11,5 +11,6 @@ type oneRes struct {
 	dataset  string
 	table    string
 	fields   string
+	terms    string
 	err      error
 }

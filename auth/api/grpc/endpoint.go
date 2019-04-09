@@ -36,22 +36,16 @@ func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
-func partnersEndpoint(svc auth.Service) endpoint.Endpoint {
+func existsEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(partnersReq)
+		req := request.(existsReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-
-		partners, err := svc.ListPartners(req.id)
-		if err != nil {
-			return partnersRes{}, err
+		if err := svc.Exists(req.id); err != nil {
+			return existsRes{err: err}, err
 		}
 
-		res := partnersRes{
-			partners: partners,
-		}
-
-		return res, nil
+		return existsRes{}, nil
 	}
 }

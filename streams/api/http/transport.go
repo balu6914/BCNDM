@@ -11,6 +11,7 @@ import (
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
+	"gopkg.in/mgo.v2/bson"
 
 	"datapace"
 	"datapace/streams"
@@ -24,7 +25,7 @@ const (
 var (
 	authService    streams.Authorization
 	locationPoints = [4][2]string{{"x0", "y0"}, {"x1", "y1"}, {"x2", "y2"}, {"x3", "y3"}}
-	fields         = []string{"name", "type", "description", "snippet", "price", "longitude", "latitude", "url"}
+	fields         = []string{"name", "type", "description", "snippet", "price", "longitude", "latitude", "url", "terms"}
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
@@ -184,7 +185,15 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 		return nil, err
 	}
 
+	// Convert Metadata from string to bson.M if present
+	data := []byte(record[keys["metadata"]])
+	metadata := bson.M{}
+	if len(data) != 0 {
+		json.Unmarshal(data, &metadata)
+	}
+
 	ret := &streams.Stream{
+		Visibility:  streams.Visibility(record[keys["visibility"]]),
 		Name:        record[keys["name"]],
 		Type:        record[keys["type"]],
 		Description: record[keys["description"]],
@@ -194,7 +203,9 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL: record[keys["url"]],
+		URL:      record[keys["url"]],
+		Terms:    record[keys["terms"]],
+		Metadata: metadata,
 	}
 	return ret, nil
 }

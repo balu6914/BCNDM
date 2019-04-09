@@ -10,6 +10,7 @@ import { DashboardSellAddComponent } from 'app/dashboard/sell/add/dashboard.sell
 import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
+
 @Component({
   providers: [MapComponent],
   selector: 'dpc-dashboard-sell',
@@ -31,7 +32,7 @@ export class DashboardSellComponent implements OnInit {
 
   constructor(
     private streamService: StreamService,
-    private AuthService: AuthService,
+    private authService: AuthService,
     private modalService: BsModalService,
     public alertService: AlertService,
     public midpcPipe: MidpcPipe,
@@ -40,7 +41,7 @@ export class DashboardSellComponent implements OnInit {
 
   ngOnInit() {
     // Fetch current User
-    this.AuthService.getCurrentUser().subscribe(
+    this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
         this.query.owner = this.user.id;

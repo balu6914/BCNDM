@@ -7,6 +7,10 @@
   version = "3.2.0"
 
 [[constraint]]
+  name = "github.com/gorilla/websocket"
+  version = "v1.4.0"
+
+[[constraint]]
   name = "github.com/go-kit/kit"
   version = "0.6.0"
 

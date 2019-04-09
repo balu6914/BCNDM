@@ -48,27 +48,14 @@ type Service interface {
 	// UpdatePassword validates current password and set new one
 	UpdatePassword(string, string, User) error
 
-	// List retrieves list of all system users.
-	List(key string) ([]User, error)
+	// ListUsers retrieves list of all system users.
+	ListUsers(string) ([]User, error)
 
-	// RequestAccess creates new connection between users that has pending
-	// state.
-	RequestAccess(string, string) (string, error)
+	// ListNonPartners retrieves list of all users that are not potential or
+	// actual partners.
+	ListNonPartners(string) ([]User, error)
 
-	// ListSentAccessRequests returns a list of access requests that user with
-	// specified key has sent.
-	ListSentAccessRequests(string, State) ([]AccessRequest, error)
-
-	// ListReceivedAccessRequests returns a list of access requests that user
-	// with specified key has received.
-	ListReceivedAccessRequests(string, State) ([]AccessRequest, error)
-
-	// ListPartners fetches list of users that gave you access to their content.
-	ListPartners(string) ([]string, error)
-
-	// ApproveAccessRequest updates status of access request to approved.
-	ApproveAccessRequest(string, string) error
-
-	// RejectAccessRequest updates status of access request to rejected.
-	RejectAccessRequest(string, string) error
+	// Exists checkes if user with specified id exists. If it doesn't then error
+	// is returned.
+	Exists(string) error
 }

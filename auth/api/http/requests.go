@@ -16,6 +16,9 @@ type registerReq struct {
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
 }
 
 const (
@@ -23,6 +26,9 @@ const (
 	minPasswordLength = 8
 	maxPasswordLength = 32
 	maxNameLength     = 32
+	maxCompanyLength  = 32
+	maxPhoneLength    = 32
+	maxAddressLength  = 128
 )
 
 func (req registerReq) validate() error {
@@ -35,11 +41,23 @@ func (req registerReq) validate() error {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.FirstName != "" && len(req.FirstName) > maxNameLength {
+	if req.FirstName == "" || len(req.FirstName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.LastName != "" && len(req.LastName) > maxNameLength {
+	if req.LastName == "" || len(req.LastName) > maxNameLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Company == "" || len(req.Company) > maxCompanyLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Phone == "" || len(req.Phone) > maxPhoneLength {
+		return auth.ErrMalformedEntity
+	}
+
+	if req.Address == "" || len(req.Address) > maxAddressLength {
 		return auth.ErrMalformedEntity
 	}
 
@@ -84,6 +102,9 @@ type updateReq struct {
 	ContactEmail string `json:"contact_email,omitempty"`
 	FirstName    string `json:"first_name,omitempty"`
 	LastName     string `json:"last_name,omitempty"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
 }
 
 func (req updateReq) validate() error {
@@ -121,74 +142,4 @@ func (req updatePasswordReq) validate() error {
 
 	return nil
 
-}
-
-type requestAccessReq struct {
-	key      string
-	Receiver string `json:"receiver"`
-}
-
-func (req requestAccessReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.Receiver == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	return nil
-}
-
-type approveAccessReq struct {
-	key string
-	id  string
-}
-
-func (req approveAccessReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.id == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	return nil
-}
-
-type rejectAccessReq struct {
-	key string
-	id  string
-}
-
-func (req rejectAccessReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.id == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	return nil
-}
-
-type listAccessRequestsReq struct {
-	key   string
-	state auth.State
-}
-
-func (req listAccessRequestsReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.state != auth.Pending &&
-		req.state != auth.Approved &&
-		req.state != auth.Revoked {
-		return auth.ErrMalformedEntity
-	}
-
-	return nil
 }
