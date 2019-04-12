@@ -10,7 +10,7 @@ import (
 func main() {
 
 	fSetup := blockchain.FabricSetup{
-		OrgAdmin:    "Admin",
+		OrgAdmin:    "Admin@org1.datapace.com",
 		OrgName:     "Org1",
 		ConfigFile:  "../../config/fabric/config.yaml",
 		ChannelID:   "datapacechannel",
@@ -27,7 +27,7 @@ func main() {
 
 	b := token.BcNetwork{Fabric: &fSetup}
 	// Get balance for user Nikola
-	balance, err := b.Balance("nikola@mainflux.com")
+	balance, err := b.Balance("Admin@org1.datapace.com")
 
 	if err != nil {
 		fmt.Println("Error fetching balance!!!", err)

@@ -14,7 +14,7 @@ const (
 	requestFcn = "requestAccess"
 	approveFcn = "approveAccess"
 	revokeFcn  = "revokeAccess"
-	chanID     = "myc"
+	chanID     = "datapacechannel"
 )
 
 var _ access.RequestLedger = (*accessRequestLedger)(nil)

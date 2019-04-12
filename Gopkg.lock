@@ -155,8 +155,8 @@
     "internal/jsonmessage",
     "internal/term"
   ]
-  revision = "bcd4059882ad0ce568e55b899c16b0f1ee7dc4ae"
-  version = "v1.3.5"
+  revision = "1b33efcb40bef3494af8bc6a1f73600f37a3c9d1"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -165,9 +165,12 @@
     "log",
     "metrics",
     "metrics/internal/lv",
+    "metrics/internal/ratemap",
     "metrics/prometheus",
+    "metrics/statsd",
     "transport/grpc",
-    "transport/http"
+    "transport/http",
+    "util/conn"
   ]
   revision = "4dc7be5d2d12881735283bcab7352178e190fc71"
   version = "v0.6.0"
@@ -242,6 +245,12 @@
   version = "v1.4.0"
 
 [[projects]]
+  name = "github.com/grpc-ecosystem/go-grpc-middleware"
+  packages = ["."]
+  revision = "c250d6563d4d4c20252cd865923440e829844f4e"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
@@ -263,22 +272,22 @@
   packages = [
     "bccsp",
     "bccsp/factory",
+    "bccsp/idemix",
+    "bccsp/idemix/bridge",
+    "bccsp/idemix/handlers",
     "bccsp/pkcs11",
     "bccsp/signer",
     "bccsp/sw",
     "bccsp/utils",
     "common/crypto",
     "common/flogging",
+    "common/flogging/fabenc",
     "common/ledger",
     "common/metadata",
+    "common/metrics",
     "common/util",
     "core/chaincode/platforms",
-    "core/chaincode/platforms/car",
     "core/chaincode/platforms/ccmetadata",
-    "core/chaincode/platforms/golang",
-    "core/chaincode/platforms/java",
-    "core/chaincode/platforms/node",
-    "core/chaincode/platforms/util",
     "core/chaincode/shim",
     "core/comm",
     "core/config",
@@ -287,12 +296,15 @@
     "msp",
     "protos/common",
     "protos/ledger/queryresult",
+    "protos/ledger/rwset",
+    "protos/ledger/rwset/kvrwset",
     "protos/msp",
     "protos/peer",
+    "protos/token",
     "protos/utils"
   ]
-  revision = "cae2ad4456914adffcb07b1ca873e9624ce8f8b3"
-  version = "v1.2.0"
+  revision = "d700b43476e803c864c48021e63a78543b60e17e"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/hyperledger/fabric-amcl"
@@ -301,6 +313,12 @@
     "amcl/FP256BN"
   ]
   revision = "31cc24e414990009f09ab4d4d9a85eb94d17ac31"
+
+[[projects]]
+  name = "github.com/hyperledger/fabric-lib-go"
+  packages = ["healthz"]
+  revision = "90dc96fb23ab7eb18477e4bfcf9cd8ebdb7209f0"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/hyperledger/fabric-sdk-go"
@@ -324,8 +342,18 @@
     "internal/github.com/hyperledger/fabric/common/channelconfig",
     "internal/github.com/hyperledger/fabric/common/crypto",
     "internal/github.com/hyperledger/fabric/common/ledger",
+    "internal/github.com/hyperledger/fabric/common/metrics",
+    "internal/github.com/hyperledger/fabric/common/metrics/disabled",
+    "internal/github.com/hyperledger/fabric/common/metrics/internal/namer",
+    "internal/github.com/hyperledger/fabric/common/metrics/prometheus",
+    "internal/github.com/hyperledger/fabric/common/metrics/statsd",
+    "internal/github.com/hyperledger/fabric/common/metrics/statsd/goruntime",
     "internal/github.com/hyperledger/fabric/common/util",
+    "internal/github.com/hyperledger/fabric/core/comm",
+    "internal/github.com/hyperledger/fabric/core/common/privdata",
     "internal/github.com/hyperledger/fabric/core/ledger",
+    "internal/github.com/hyperledger/fabric/core/middleware",
+    "internal/github.com/hyperledger/fabric/core/operations",
     "internal/github.com/hyperledger/fabric/discovery/client",
     "internal/github.com/hyperledger/fabric/msp",
     "internal/github.com/hyperledger/fabric/protos/discovery",
@@ -333,6 +361,7 @@
     "internal/github.com/hyperledger/fabric/protos/orderer",
     "internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge",
     "internal/github.com/hyperledger/fabric/sdkpatch/logbridge",
+    "internal/github.com/hyperledger/fabric/sdkpatch/logbridge/httpadmin",
     "pkg/client/channel",
     "pkg/client/channel/invoke",
     "pkg/client/common/discovery",
@@ -340,10 +369,14 @@
     "pkg/client/common/discovery/greylist",
     "pkg/client/common/discovery/staticdiscovery",
     "pkg/client/common/filter",
+    "pkg/client/common/random",
+    "pkg/client/common/selection/balancer",
     "pkg/client/common/selection/dynamicselection",
     "pkg/client/common/selection/dynamicselection/pgresolver",
     "pkg/client/common/selection/fabricselection",
     "pkg/client/common/selection/options",
+    "pkg/client/common/selection/sorter/balancedsorter",
+    "pkg/client/common/selection/sorter/blockheightsorter",
     "pkg/client/common/verifier",
     "pkg/client/msp",
     "pkg/client/resmgmt",
@@ -381,17 +414,19 @@
     "pkg/fab/events/client",
     "pkg/fab/events/client/dispatcher",
     "pkg/fab/events/client/lbp",
+    "pkg/fab/events/client/peerresolver",
+    "pkg/fab/events/client/peerresolver/balanced",
+    "pkg/fab/events/client/peerresolver/minblockheight",
+    "pkg/fab/events/client/peerresolver/preferorg",
     "pkg/fab/events/deliverclient",
     "pkg/fab/events/deliverclient/connection",
     "pkg/fab/events/deliverclient/dispatcher",
     "pkg/fab/events/deliverclient/seek",
     "pkg/fab/events/endpoint",
-    "pkg/fab/events/eventhubclient",
-    "pkg/fab/events/eventhubclient/connection",
-    "pkg/fab/events/eventhubclient/dispatcher",
     "pkg/fab/events/service",
     "pkg/fab/events/service/blockfilter",
     "pkg/fab/events/service/dispatcher",
+    "pkg/fab/events/service/mocks",
     "pkg/fab/keyvaluestore",
     "pkg/fab/mocks",
     "pkg/fab/orderer",
@@ -404,6 +439,8 @@
     "pkg/fabsdk/factory/defcore",
     "pkg/fabsdk/factory/defmsp",
     "pkg/fabsdk/factory/defsvc",
+    "pkg/fabsdk/metrics",
+    "pkg/fabsdk/metrics/cfg",
     "pkg/fabsdk/provider/chpvdr",
     "pkg/fabsdk/provider/fabpvdr",
     "pkg/fabsdk/provider/msppvdr",
@@ -413,6 +450,7 @@
     "pkg/util/concurrent/futurevalue",
     "pkg/util/concurrent/lazycache",
     "pkg/util/concurrent/lazyref",
+    "pkg/util/concurrent/rollingcounter",
     "pkg/util/pathvar",
     "pkg/util/test",
     "test/metadata",
@@ -425,16 +463,11 @@
     "third_party/github.com/hyperledger/fabric/protos/msp",
     "third_party/github.com/hyperledger/fabric/protos/orderer",
     "third_party/github.com/hyperledger/fabric/protos/peer",
+    "third_party/github.com/hyperledger/fabric/protos/token",
     "third_party/github.com/hyperledger/fabric/protos/utils"
   ]
-  revision = "a906355f73d060d7bf95874a9e90dc17589edbb3"
-  version = "v1.0.0-alpha4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/ijc/Gotty"
-  packages = ["."]
-  revision = "a8b993ba6abdb0e0c12b0125c603323a71c7790c"
+  revision = "0e710cebffe5674d411a625bc103ff0e266bb5e1"
+  version = "v1.0.0-alpha5"
 
 [[projects]]
   name = "github.com/konsorten/go-windows-terminal-sequences"
@@ -661,6 +694,32 @@
   version = "v0.19.0"
 
 [[projects]]
+  name = "go.uber.org/atomic"
+  packages = ["."]
+  revision = "1ea20fb1cbb1cc08cbd0d913a96dead89aa18289"
+  version = "v1.3.2"
+
+[[projects]]
+  name = "go.uber.org/multierr"
+  packages = ["."]
+  revision = "3c4937480c32f4c13a875a1829af76c98ca3d40a"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "go.uber.org/zap"
+  packages = [
+    ".",
+    "buffer",
+    "internal/bufferpool",
+    "internal/color",
+    "internal/exit",
+    "zapcore",
+    "zapgrpc"
+  ]
+  revision = "ff33455a0e382e8a81d14dd7c922020b6b5e7982"
+  version = "v1.9.1"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -835,6 +894,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a5a40946da6b30e83a1a351cce362d63fb830a530843f700188d5594249aadde"
+  inputs-digest = "ce7551283bfdcdc730652d4f164d1bdc2c690890cda384f65b7b4f3a1520197d"
   solver-name = "gps-cdcl"
   solver-version = 1

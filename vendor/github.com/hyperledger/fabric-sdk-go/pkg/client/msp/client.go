@@ -30,6 +30,7 @@ import (
 // Client enables access to Client services
 type Client struct {
 	orgName string
+	caName  string
 	ctx     context.Client
 }
 
@@ -85,8 +86,14 @@ func New(clientProvider context.ClientProvider, opts ...ClientOption) (*Client, 
 	if msp.orgName == "" {
 		return nil, errors.New("organization is not provided")
 	}
+
+	caConfig, ok := ctx.IdentityConfig().CAConfig(msp.orgName)
+	if ok {
+		msp.caName = caConfig.CAName
+	}
+
 	networkConfig := ctx.EndpointConfig().NetworkConfig()
-	_, ok := networkConfig.Organizations[strings.ToLower(msp.orgName)]
+	_, ok = networkConfig.Organizations[strings.ToLower(msp.orgName)]
 	if !ok {
 		return nil, fmt.Errorf("non-existent organization: '%s'", msp.orgName)
 	}
@@ -105,7 +112,11 @@ func newCAClient(ctx context.Client, orgName string) (mspapi.CAClient, error) {
 
 // enrollmentOptions represent enrollment options
 type enrollmentOptions struct {
-	secret string
+	secret   string
+	profile  string
+	label    string
+	typ      string
+	attrReqs []*AttributeRequest
 }
 
 // EnrollmentOption describes a functional parameter for Enroll
@@ -115,6 +126,38 @@ type EnrollmentOption func(*enrollmentOptions) error
 func WithSecret(secret string) EnrollmentOption {
 	return func(o *enrollmentOptions) error {
 		o.secret = secret
+		return nil
+	}
+}
+
+// WithProfile enrollment option
+func WithProfile(profile string) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.profile = profile
+		return nil
+	}
+}
+
+// WithType enrollment option
+func WithType(typ string) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.typ = typ
+		return nil
+	}
+}
+
+// WithLabel enrollment option
+func WithLabel(label string) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.label = label
+		return nil
+	}
+}
+
+// WithAttributeRequests enrollment option
+func WithAttributeRequests(attrReqs []*AttributeRequest) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.attrReqs = attrReqs
 		return nil
 	}
 }
@@ -328,7 +371,24 @@ func (c *Client) Enroll(enrollmentID string, opts ...EnrollmentOption) error {
 	if err != nil {
 		return err
 	}
-	return ca.Enroll(enrollmentID, eo.secret)
+
+	req := &mspapi.EnrollmentRequest{
+		Name:    enrollmentID,
+		Secret:  eo.secret,
+		Profile: eo.profile,
+		Type:    eo.typ,
+		Label:   eo.label,
+	}
+
+	if len(eo.attrReqs) > 0 {
+		attrs := make([]*mspapi.AttributeRequest, 0)
+		for _, attr := range eo.attrReqs {
+			attrs = append(attrs, &mspapi.AttributeRequest{Name: attr.Name, Optional: attr.Optional})
+		}
+		req.AttrReqs = attrs
+	}
+
+	return ca.Enroll(req)
 }
 
 // Reenroll reenrolls an enrolled user in order to obtain a new signed X509 certificate
@@ -337,12 +397,33 @@ func (c *Client) Enroll(enrollmentID string, opts ...EnrollmentOption) error {
 //
 //  Returns:
 //  an error if re-enrollment fails
-func (c *Client) Reenroll(enrollmentID string) error {
+func (c *Client) Reenroll(enrollmentID string, opts ...EnrollmentOption) error {
+	eo := enrollmentOptions{}
+	for _, param := range opts {
+		err := param(&eo)
+		if err != nil {
+			return errors.WithMessage(err, "failed to enroll")
+		}
+	}
+
 	ca, err := newCAClient(c.ctx, c.orgName)
 	if err != nil {
 		return err
 	}
-	return ca.Reenroll(enrollmentID)
+
+	req := &mspapi.ReenrollmentRequest{
+		Name:    enrollmentID,
+		Profile: eo.profile,
+		Label:   eo.label,
+	}
+	if len(eo.attrReqs) > 0 {
+		attrs := make([]*mspapi.AttributeRequest, 0)
+		for _, attr := range eo.attrReqs {
+			attrs = append(attrs, &mspapi.AttributeRequest{Name: attr.Name, Optional: attr.Optional})
+		}
+		req.AttrReqs = attrs
+	}
+	return ca.Reenroll(req)
 }
 
 // Register registers a User with the Fabric CA
@@ -406,6 +487,21 @@ func (c *Client) Revoke(request *RevocationRequest) (*RevocationResponse, error)
 	}, nil
 }
 
+// GetCAInfo returns generic CA information
+func (c *Client) GetCAInfo() (*GetCAInfoResponse, error) {
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := ca.GetCAInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetCAInfoResponse{CAName: resp.CAName, CAChain: resp.CAChain[:], IssuerPublicKey: resp.IssuerPublicKey[:], IssuerRevocationPublicKey: resp.IssuerRevocationPublicKey[:], Version: resp.Version}, nil
+}
+
 // GetSigningIdentity returns signing identity for id
 //  Parameters:
 //  id is user id
@@ -424,6 +520,12 @@ func (c *Client) GetSigningIdentity(id string) (mspctx.SigningIdentity, error) {
 	return si, nil
 }
 
+// CreateSigningIdentity creates a signing identity with the given options
+func (c *Client) CreateSigningIdentity(opts ...mspctx.SigningIdentityOption) (mspctx.SigningIdentity, error) {
+	im, _ := c.ctx.IdentityManager(c.orgName)
+	return im.CreateSigningIdentity(opts...)
+}
+
 //prepareOptsFromOptions reads request options from Option array
 func (c *Client) prepareOptsFromOptions(ctx context.Client, options ...RequestOption) (requestOptions, error) {
 	opts := requestOptions{}
@@ -434,4 +536,164 @@ func (c *Client) prepareOptsFromOptions(ctx context.Client, options ...RequestOp
 		}
 	}
 	return opts, nil
+}
+
+// GetAffiliation returns information about the requested affiliation
+func (c *Client) GetAffiliation(affiliation string, options ...RequestOption) (*AffiliationResponse, error) {
+	// Read request options
+	opts, err := c.prepareOptsFromOptions(c.ctx, options...)
+	if err != nil {
+		return nil, err
+	}
+
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := ca.GetAffiliation(affiliation, opts.CA)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &AffiliationResponse{CAName: r.CAName, AffiliationInfo: AffiliationInfo{}}
+	err = fillAffiliationInfo(&resp.AffiliationInfo, r.Name, r.Affiliations, r.Identities)
+
+	return resp, err
+}
+
+// GetAllAffiliations returns all affiliations that the caller is authorized to see
+func (c *Client) GetAllAffiliations(options ...RequestOption) (*AffiliationResponse, error) {
+	// Read request options
+	opts, err := c.prepareOptsFromOptions(c.ctx, options...)
+	if err != nil {
+		return nil, err
+	}
+
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := ca.GetAllAffiliations(opts.CA)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &AffiliationResponse{CAName: r.CAName, AffiliationInfo: AffiliationInfo{}}
+	err = fillAffiliationInfo(&resp.AffiliationInfo, r.Name, r.Affiliations, r.Identities)
+
+	return resp, err
+}
+
+// AddAffiliation adds a new affiliation to the server
+func (c *Client) AddAffiliation(request *AffiliationRequest) (*AffiliationResponse, error) {
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &mspapi.AffiliationRequest{
+		Name:   request.Name,
+		Force:  request.Force,
+		CAName: request.CAName,
+	}
+
+	r, err := ca.AddAffiliation(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &AffiliationResponse{CAName: r.CAName, AffiliationInfo: AffiliationInfo{}}
+	err = fillAffiliationInfo(&resp.AffiliationInfo, r.Name, r.Affiliations, r.Identities)
+
+	return resp, err
+}
+
+// ModifyAffiliation renames an existing affiliation on the server
+func (c *Client) ModifyAffiliation(request *ModifyAffiliationRequest) (*AffiliationResponse, error) {
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &mspapi.ModifyAffiliationRequest{
+		NewName: request.NewName,
+		AffiliationRequest: mspapi.AffiliationRequest{
+			Name:   request.Name,
+			Force:  request.Force,
+			CAName: request.CAName,
+		},
+	}
+
+	r, err := ca.ModifyAffiliation(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &AffiliationResponse{CAName: r.CAName, AffiliationInfo: AffiliationInfo{}}
+	err = fillAffiliationInfo(&resp.AffiliationInfo, r.Name, r.Affiliations, r.Identities)
+
+	return resp, err
+}
+
+// RemoveAffiliation removes an existing affiliation from the server
+func (c *Client) RemoveAffiliation(request *AffiliationRequest) (*AffiliationResponse, error) {
+	ca, err := newCAClient(c.ctx, c.orgName)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &mspapi.AffiliationRequest{
+		Name:   request.Name,
+		Force:  request.Force,
+		CAName: request.CAName,
+	}
+
+	r, err := ca.RemoveAffiliation(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &AffiliationResponse{CAName: r.CAName, AffiliationInfo: AffiliationInfo{}}
+	err = fillAffiliationInfo(&resp.AffiliationInfo, r.Name, r.Affiliations, r.Identities)
+
+	return resp, err
+}
+
+func fillAffiliationInfo(info *AffiliationInfo, name string, affiliations []mspapi.AffiliationInfo, identities []mspapi.IdentityInfo) error {
+	info.Name = name
+
+	// Add identities which have this affiliation
+	idents := []IdentityInfo{}
+	for _, identity := range identities {
+		idents = append(idents, IdentityInfo{ID: identity.ID, Type: identity.Type, Affiliation: identity.Affiliation, Attributes: getAllAttributes(identity.Attributes), MaxEnrollments: identity.MaxEnrollments})
+	}
+	if len(idents) > 0 {
+		info.Identities = idents
+	}
+
+	// Create child affiliations (if any)
+	children := []AffiliationInfo{}
+	for _, aff := range affiliations {
+		childAff := AffiliationInfo{Name: aff.Name}
+		err := fillAffiliationInfo(&childAff, aff.Name, aff.Affiliations, aff.Identities)
+		if err != nil {
+			return err
+		}
+		children = append(children, childAff)
+	}
+	if len(children) > 0 {
+		info.Affiliations = children
+	}
+	return nil
+}
+
+func getAllAttributes(attrs []mspapi.Attribute) []Attribute {
+	attriburtes := []Attribute{}
+	for _, attr := range attrs {
+		attriburtes = append(attriburtes, Attribute{Name: attr.Name, Value: attr.Value, ECert: attr.ECert})
+	}
+
+	return attriburtes
 }
