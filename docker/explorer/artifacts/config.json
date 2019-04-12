@@ -15,7 +15,7 @@
         }
     }
   },
-    "channel": "datapace",
+    "channel": "datapacechannel",
     "orderers":[
     {
       "mspid": "OrdererMSP",

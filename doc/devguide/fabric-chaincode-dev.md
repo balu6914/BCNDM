@@ -120,19 +120,19 @@ Install our chaincode executing following command:
 
 Next, we must initialize our chaincode
 
-```peer chaincode instantiate -n datapacec -v 0 -c '{"Args":["a","10"]}' -C datapace```
+```peer chaincode instantiate -n datapacec -v 0 -c '{"Args":["a","10"]}' -C datapacechannel```
 
 ***NOTE:***  This chaincode is awailable in cli container because of ***parent chaincode folder*** (its mounted to docker container using volume option so its available in all containers). Its important to remember this, because when you write your own custom chaincode you just need to copy it to fabric-samples/chaincode and it will be automatically available (don't forget to restart docker composition when you copy new chaincode) in all docker containers, so you can install/test you chaincode.
 
 Now issue an invoke the chaincode to change the value of “a” to “20” executing following command:
 
-```peer chaincode invoke -n datapacec -c '{"Args":["set", "a", "20"]}' -C datapace```
+```peer chaincode invoke -n datapacec -c '{"Args":["set", "a", "20"]}' -C datapacechannel```
 
 
 Finally, quer your chaincode. We should get  a value of 20 as a result, executing following command:
 
 
-```peer chaincode query -n datapacec -c '{"Args":["query","a"]}' -C datapace```
+```peer chaincode query -n datapacec -c '{"Args":["query","a"]}' -C datapacechannel```
 
 
 You will see response “Query Result: 20 ”

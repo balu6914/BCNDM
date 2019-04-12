@@ -40,15 +40,15 @@ MSG_DONE="
 #################################################################
 "
 
-# We use a pre-generated orderer.block and channel transaction artifact (datapace.tx),
+# We use a pre-generated orderer.block and channel transaction artifact (datapacechannel.tx),
 # both of which are created using the configtxgen tool
 
-# first we create the channel against the specified configuration in datapace.tx
-# this call returns a channel configuration block - datapace.block - to the CLI container
+# first we create the channel against the specified configuration in datapacechannel.tx
+# this call returns a channel configuration block - datapacechannel.block - to the CLI container
 
 peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --cafile $CERT_PATH
 
-# now we will join the channel and start the chain with datapace.block serving as the
+# now we will join the channel and start the chain with datapacechannel.block serving as the
 # channel's first block (i.e. the genesis block)
 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
 
