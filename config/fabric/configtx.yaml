@@ -93,7 +93,7 @@ Organizations:
               Rule: "OR('Org1MSP.member')"
           Admins:
               Type: Signature
-              Rule: "OR('Org1MSP.member')"
+              Rule: "OR('Org1MSP.admin')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
