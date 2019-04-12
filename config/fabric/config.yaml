@@ -86,7 +86,7 @@ channels:
 
         # Default: true
         eventSource: true
-        
+
 # List of participating organizations in this network
 organizations:
   org1:
@@ -130,7 +130,7 @@ certificateAuthorities:
     url: http://ca.org1.datapace.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when making the request to the Fabric-CA server
     tlsCACerts:
-      #   # Comma-Separated list of paths
+      # Comma-Separated list of paths
       path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
     httpOptions:
       verify: false
