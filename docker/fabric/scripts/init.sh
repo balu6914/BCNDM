@@ -3,12 +3,12 @@ set -e
 # This script expedites the chaincode development process by automating the
 # requisite channel create/join commands and chaincode deployment
 
-CHANNEL_PATH=./artifacts/myc.tx
-CHANNEL_BLOCK=myc.block
+CHANNEL_PATH=./artifacts/datapacechannel.tx
+CHANNEL_BLOCK=datapacechannel.block
 
 ORDERER_URL=orderer.datapace.com:7050
 
-CHANNEL_ID=myc
+CHANNEL_ID=datapacechannel
 
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
@@ -40,15 +40,15 @@ MSG_DONE="
 #################################################################
 "
 
-# We use a pre-generated orderer.block and channel transaction artifact (myc.tx),
+# We use a pre-generated orderer.block and channel transaction artifact (datapacechannel.tx),
 # both of which are created using the configtxgen tool
 
-# first we create the channel against the specified configuration in myc.tx
-# this call returns a channel configuration block - myc.block - to the CLI container
+# first we create the channel against the specified configuration in datapacechannel.tx
+# this call returns a channel configuration block - datapacechannel.block - to the CLI container
 
 peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --cafile $CERT_PATH
 
-# now we will join the channel and start the chain with myc.block serving as the
+# now we will join the channel and start the chain with datapacechannel.block serving as the
 # channel's first block (i.e. the genesis block)
 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
 
@@ -106,17 +106,19 @@ sleep 5
 
 # Init/provision system with DPC
 peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+sleep 30
 
 # Init/provision system with system fee
 peer chaincode instantiate -o $ORDERER_URL -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -c "$FEE_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+sleep 30
 
 # Init/provision system with contracts
 peer chaincode instantiate -o $ORDERER_URL -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -c "$CONTRACTS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+sleep 30
 
 # Init/provision system with access control
 peer chaincode instantiate -o $ORDERER_URL -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -c "$ACCESS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
-
-sleep 5
+sleep 30
 
 echo $MSG_DONE
 

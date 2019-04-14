@@ -61,7 +61,7 @@ client:
 # [Optional]. But most apps would have this section so that channel objects can be constructed based on the content below.
 # If one of your application is creating channels, you might not use this
 channels:
-  myc:
+  datapacechannel:
     # orderers:
     #   - orderer.datapace.com
     #
@@ -140,14 +140,18 @@ certificateAuthorities:
     caName: ca.org1.datapace.com
 
 entityMatchers:
- peer:
-  - pattern: (\w+).org1.datapace.(\w+)
-    urlSubstitutionExp: localhost:7051
-    eventUrlSubstitutionExp: localhost:7053
-    sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
-    mappedHost: local.peer0.org1.datapace.com
-orderer:
-  - pattern: (\w+).datapace.(\w+)
-    urlSubstitutionExp: localhost:7050
-    sslTargetOverrideUrlSubstitutionExp: orderer.datapace.com
-    mappedHost: orderer.datapace.com
+  peer:
+    - pattern: (\w+).org1.datapace.(\w+)
+      urlSubstitutionExp: 'peer0.org1.datapace.com:7051'
+      eventUrlSubstitutionExp: 'peer0.org1.datapace.com:7053'
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
+      mappedHost: peer0.org1.datapace.com
+  orderer:
+    - pattern: (\w+).datapace.(\w+)
+      urlSubstitutionExp: orderer.datapace.com:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer.datapace.com
+      mappedHost: orderer.datapace.com
+  certificateAuthorities:
+    - pattern: (\w*).org1.datapace.com(\w*)
+      urlSubstitutionExp:
+      mappedHost: ca.org1.datapace.com

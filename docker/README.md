@@ -16,7 +16,7 @@ Make sure that you have all Fabric prerequisites and development tools installed
 ```
 go get github.com/hyperledger/fabric
 cd $GOPATH/src/github.com/hyperledger/fabric
-git checkout v1.2.0
+git checkout release-1.4
 make -j 16 cryptogen
 make -j 16 configtxgen
 cp .build/bin/* $GOBIN
@@ -29,7 +29,7 @@ Now you should be able to use tools globally, for example:
 ```
 $ cryptogen version
 cryptogen:
- Version: 1.1.0
+ Version: 1.4
  Go version: go1.10.1
  OS/Arch: linux/amd64
 ```
@@ -62,7 +62,7 @@ docker exec -it cli bash
 Query chaincode:
 
 ```
-peer chaincode query -C myc -n token -c '{"Args":["balanceOf","{\"user\": \"testUser\"}"]}'
+peer chaincode query -C datapacechannel -n token -c '{"Args":["balanceOf","{\"user\": \"testUser\"}"]}'
 ```
 
 You should get response:
@@ -80,7 +80,7 @@ If you want to set system owner and fee, you should first sign up owner using UI
 After that set system owner and fee on blockchain:
 ```
 docker exec -it cli bash
-peer chaincode invoke --tls --cafile $ORDERER_CA -C myc -n fee -c '{"Args":["setFee","{\"owner\":\"<owner_id>\", \"value\": <fee_value>}"]}'
+peer chaincode invoke --tls --cafile $ORDERER_CA -C datapacechannel -n fee -c '{"Args":["setFee","{\"owner\":\"<owner_id>\", \"value\": <fee_value>}"]}'
 ```
 
 From this point on, fee will be transfered to platform owner account.

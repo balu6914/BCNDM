@@ -80,6 +80,7 @@ services:
     environment:
       - DATAPACE_TRANSACTIONS_HTTP_PORT=8082
       - DATAPACE_TRANSACTIONS_GRPC_PORT=8083
+      - DATAPACE_TRANSACTIONS_FABRIC_NAME=Org1
       - DATAPACE_TRANSACTIONS_DB_URL=datapace-transactions-db
       - DATAPACE_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.datapace.com
       - DATAPACE_AUTH_URL=datapace-auth:8081

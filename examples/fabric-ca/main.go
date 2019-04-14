@@ -1,18 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"datapace/examples/blockchain"
 	"datapace/examples/fabric-ca/users"
+	"fmt"
 )
 
 func main() {
 
 	fSetup := blockchain.FabricSetup{
-		OrgAdmin:   "admin",
-		OrgName:    "org1",
+		OrgAdmin:   "Admin@org1.datapace.com",
+		OrgName:    "Org1",
 		ConfigFile: "../../config/fabric/config.yaml",
-		ChannelID:  "myc",
+		ChannelID:  "datapacechannel",
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties

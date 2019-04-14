@@ -79,17 +79,18 @@ services:
   # Fabric tools
   cli:
     container_name: cli
-    image: hyperledger/fabric-tools:x86_64-1.1.0
+    image: hyperledger/fabric-tools:1.4
     tty: true
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_LOGGING_LEVEL=DEBUG
-      - CORE_PEER_ID=cli
+      - FABRIC_LOGGING_SPEC=DEBUG
       # peer0 from Org1 is the default for this CLI container
       - CORE_PEER_ADDRESS=peer0.org1.datapace.com:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_ID=cli
+      - CH_NAME=datapace
       # Reflect peer0 name, org1 name and our company's domain
       - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.datapace.com/peers/peer0.org1.datapace.com/tls/server.crt
       # Reflect peer0 name, org1 name and our company's domain
@@ -99,7 +100,7 @@ services:
       # Reflect peer0 name, org1 name and our company's domain
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp
       # This cert is needed for invoking chaincode methods
-      - ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/datapace.com/users/Admin@datapace.com/tls/ca.crt
+      - ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/msp/tlscacerts/tlsca.datapace.com-cert.pem
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     # On start we are provisioning the network
     command: /bin/bash -c 'scripts/init.sh'

@@ -15,7 +15,7 @@
         }
     }
   },
-    "channel": "myc",
+    "channel": "datapacechannel",
     "orderers":[
     {
       "mspid": "OrdererMSP",

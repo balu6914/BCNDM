@@ -18,7 +18,7 @@ const (
 	affiliation = "org1"
 	balanceFcn  = "balanceOf"
 	transferFcn = "transfer"
-	chanID      = "myc"
+	chanID      = "datapacechannel"
 )
 
 var _ transactions.TokenLedger = (*tokenLedger)(nil)

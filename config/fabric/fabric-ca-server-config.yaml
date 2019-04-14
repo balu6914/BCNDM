@@ -37,7 +37,7 @@
 #############################################################################
 
 # Version of config file
-version: 1.1.0
+version: 1.4.0
 
 # Server's listening port (default: 7054)
 port: 7054
@@ -126,7 +126,7 @@ registry:
      - name: Admin@org1.datapace.com
        pass: adminpw
        type: client
-       affiliation: ""
+       affiliation: "org1"
        attrs:
           hf.Registrar.Roles: "peer,orderer,client,user"
           hf.Registrar.DelegateRoles: "peer,orderer,client,user"
