@@ -8,7 +8,7 @@ services:
   datapace-auth-db:
     image: mongo:latest
     container_name: datapace-auth-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     volumes:
       - ./auth-data:/data/db
     networks:
@@ -52,7 +52,7 @@ services:
   datapace-transactions-db:
     image: mongo:latest
     container_name: datapace-transactions-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     volumes:
       - ./transactions-data:/data/db
     networks:
@@ -106,7 +106,7 @@ services:
   datapace-streams-db:
     image: mongo:latest
     container_name: datapace-streams-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     volumes:
       - ./streams-data:/data/db
     networks:
@@ -157,7 +157,7 @@ services:
   datapace-subscriptions-db:
     image: mongo:latest
     container_name: datapace-subscriptions-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     ports:
       - 27017:27017
     volumes:
@@ -207,7 +207,7 @@ services:
   datapace-executions-db:
     image: mongo:latest
     container_name: datapace-executions-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     volumes:
       - ./executions-data:/data/db
     networks:
@@ -256,7 +256,7 @@ services:
   datapace-access-control-db:
     image: mongo:latest
     container_name: datapace-access-control-db
-    command: --smallfiles --nojournal
+    command: --nojournal
     volumes:
       - ./access-control-data:/data/db
     networks:
