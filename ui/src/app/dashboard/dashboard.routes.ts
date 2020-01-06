@@ -40,6 +40,10 @@ const routes: Routes = [
                loadChildren: 'app/dashboard/ai/dashboard.ai.module#DashboardAiModule',
             },
             {
+                path: 'kubeflow',
+                loadChildren: 'app/dashboard/kubeflow/kubeflow.module#KubeflowModule',
+             },
+            {
                path: 'profile',
                loadChildren: 'app/dashboard/profile/dashboard.profile.module#DashboardProfileModule',
            },

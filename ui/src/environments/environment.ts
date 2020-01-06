@@ -12,5 +12,7 @@ export const environment = {
   API_STREAMS: '/streams/streams',
   API_TOKENS: '/transactions/tokens',
   API_CONTRACTS: '/transactions/contracts',
-  API_EXECUTIONS: '/executions/executions'
+  API_EXECUTIONS: '/executions/executions',
+
+  KUBEFLOW_URL: 'https://ar.k9s.datapace.io/_/pipeline-dashboard'
 };
