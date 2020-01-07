@@ -5,7 +5,7 @@ import { StreamService } from 'app/common/services/stream.service';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
+import { floatRegEx, urlRegEx } from 'app/common/validators/patterns';
 
 @Component({
   selector: 'dpc-dashboard-ai-edit',

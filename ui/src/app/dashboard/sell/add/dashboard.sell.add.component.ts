@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
+import { floatRegEx, urlRegEx } from 'app/common/validators/patterns';
 import { BsModalRef } from 'ngx-bootstrap';
 import { BigQuery, Stream } from 'app/common/interfaces/stream.interface';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
@@ -137,17 +137,12 @@ export class DashboardSellAddComponent implements OnInit {
           stream.id = res['id'];
           this.streamCreated.emit(stream);
           this.alertService.success(`Stream successfully added!`);
+          this.modalAddStream.hide();
         },
         err => {
-          if (err.status === 401) {
-            this.alertService.error('You don\'t have permission to add this Stream.');
-            return;
-          }
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
-
-      this.modalAddStream.hide();
     }
   }
 }

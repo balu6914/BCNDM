@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
-import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
+import { floatRegEx, urlRegEx } from 'app/common/validators/patterns';
 import { BsModalRef } from 'ngx-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BigQuery, Stream } from 'app/common/interfaces/stream.interface';

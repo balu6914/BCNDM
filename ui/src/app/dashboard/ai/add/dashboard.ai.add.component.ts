@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { floatRegEx, urlRegEx } from 'app/shared/validators/patterns';
+import { floatRegEx, urlRegEx } from 'app/common/validators/patterns';
 import { BsModalRef } from 'ngx-bootstrap';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
