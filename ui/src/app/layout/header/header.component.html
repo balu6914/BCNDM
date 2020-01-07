@@ -41,7 +41,7 @@
               Access control
             </a>
           </li>
-          <li class="topbar__item">
+          <li *ngIf="aiEnabled" class="topbar__item">
             <a [routerLink]="['dashboard/ai']" class="topbar__link" routerLinkActive="topbar__link--selected">
               <span class="topbar__icon topbar__icon--ai"></span>
               AI

@@ -1,5 +1,11 @@
 # Copyright (c) 2018 Datapace
-version: "2"
+version: "3"
+
+networks:
+  fabric_datapace-bc-net:
+    external: true
+  datapace-net:
+    driver: bridge
 
 services:
   ###
@@ -14,11 +20,6 @@ services:
     networks:
       # Our network is called "datapace-net"
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Auth service
@@ -40,11 +41,6 @@ services:
       - DATAPACE_AUTH_SECRET=datapace
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Transactions DB
@@ -57,11 +53,6 @@ services:
       - ./transactions-data:/data/db
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Transactions service
@@ -80,7 +71,6 @@ services:
     environment:
       - DATAPACE_TRANSACTIONS_HTTP_PORT=8082
       - DATAPACE_TRANSACTIONS_GRPC_PORT=8083
-      - DATAPACE_TRANSACTIONS_FABRIC_NAME=Org1
       - DATAPACE_TRANSACTIONS_DB_URL=datapace-transactions-db
       - DATAPACE_TRANSACTIONS_FABRIC_ADMIN=Admin@org1.datapace.com
       - DATAPACE_AUTH_URL=datapace-auth:8081
@@ -94,11 +84,6 @@ services:
       # Link to datapace fabric net
       - fabric_datapace-bc-net
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Streams DB
@@ -111,11 +96,6 @@ services:
       - ./streams-data:/data/db
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Streams service
@@ -127,7 +107,6 @@ services:
       - datapace-streams-db
       - datapace-auth
       - datapace-access-control
-      - datapace-executions
     ports:
       - 8084:8084
     expose:
@@ -138,18 +117,12 @@ services:
       - DATAPACE_STREAMS_DB_URL=datapace-streams-db
       - DATAPACE_STREAMS_DB_NAME=streams
       - DATAPACE_AUTH_URL=datapace-auth:8081
-      - DATAPACE_EXECUTIONS_URL=datapace-executions:8089
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
     volumes:
       - ../config/big-query:/big-query
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Subscriptions DB
@@ -164,11 +137,6 @@ services:
       - ./subscriptions-data:/data/db
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Subscriptions service
@@ -195,60 +163,6 @@ services:
       - ../config/big-query:/big-query
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
-
-  ###
-  # Executions DB
-  ###
-  datapace-executions-db:
-    image: mongo:latest
-    container_name: datapace-executions-db
-    command: --nojournal
-    volumes:
-      - ./executions-data:/data/db
-    networks:
-      # Our network is called "datapace-net"
-      - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
-
-  ###
-  # Executions serivce
-  ###
-  datapace-executions:
-    image: datapace/executions:latest
-    container_name: datapace-executions
-    depends_on:
-      - datapace-executions-db
-      - datapace-auth
-    ports:
-      - 8088:8088
-    expose:
-      - 8089
-    environment:
-      - DATAPACE_EXECUTIONS_HTTP_PORT=8088
-      - DATAPACE_EXECUTIONS_GRPC_PORT=8089
-      - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
-      - DATAPACE_AUTH_URL=datapace-auth:8081
-      - DATAPACE_WWH_CATALOG_URL=http://localhost:31222 # instead of localhost place docker host IP
-      - DATAPACE_WWH_DAEMON_URL=localhost:32222 # same here (check it with docker exec -it datapace-executions route)
-      - DATAPACE_WWH_TOKEN=v61rSpnp89
-      - DATAPACE_WWH_USERNAME=admin1
-      - DATAPACE_WWH_PASSWORD=password01
-    networks:
-      - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Access Control DB
@@ -262,11 +176,6 @@ services:
     networks:
       # Our network is called "datapace-net"
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Access Control service
@@ -297,11 +206,6 @@ services:
       # Link to datapace fabric net
       - fabric_datapace-bc-net
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   datapace-proxy:
     image: datapace/proxy:latest
@@ -317,11 +221,6 @@ services:
     restart: on-failure
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   datapace-proxy-db:
     image: redis:latest
@@ -333,11 +232,6 @@ services:
       - ./proxy-data:/data
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
 
   ###
   # Datapace UI
@@ -350,11 +244,6 @@ services:
       - "3000:3000"
     networks:
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
   ###
   # Nginx
   ###
@@ -366,10 +255,9 @@ services:
       - datapace-auth
       - datapace-transactions
       - datapace-streams
-      - datapace-executions
       - datapace-ui
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.base.conf:/etc/nginx/nginx.conf
       - ./ssl/certs/datapace.crt:/etc/ssl/certs/datapace.crt
       - ./ssl/certs/datapace.key:/etc/ssl/private/datapace.key
       - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
@@ -379,14 +267,3 @@ services:
     networks:
       # Our network is called "datapace-net"
       - datapace-net
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: ${LOGSERVER}:24224
-        tag: docker.{{.ID}}
-
-networks:
-  fabric_datapace-bc-net:
-    external: true
-  datapace-net:
-    driver: bridge

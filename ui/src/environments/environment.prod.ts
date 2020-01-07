@@ -8,6 +8,7 @@ export const environment = {
   API_TOKENS: '/transactions/tokens',
   API_CONTRACTS: '/transactions/contracts',
   API_EXECUTIONS: '/executions/executions',
+  AI_ENABLED: true, // Show/Hide AI menu item in dashboard header
 
   KUBEFLOW_URL: 'https://ar.k9s.datapace.io/_/pipeline-dashboard'
 };

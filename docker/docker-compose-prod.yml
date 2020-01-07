@@ -1,0 +1,156 @@
+# Copyright (c) 2018 Datapace
+version: "3"
+
+services:
+  ###
+  # Auth DB
+  ###
+  datapace-auth-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Auth service
+  ###
+  datapace-auth:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Transactions DB
+  ###
+  datapace-transactions-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Transactions service
+  ###
+  datapace-transactions:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Streams DB
+  ###
+  datapace-streams-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Streams service
+  ###
+  datapace-streams:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Subscriptions DB
+  ###
+  datapace-subscriptions-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Subscriptions service
+  ###
+  datapace-subscriptions:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Executions DB
+  ###
+  datapace-executions-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Executions serivce
+  ###
+  datapace-executions:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Access Control DB
+  ###
+  datapace-access-control-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Access Control service
+  ###
+  datapace-access-control:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  datapace-proxy:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  datapace-proxy-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  ###
+  # Datapace UI
+  ###
+  datapace-ui:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+  ###
+  # Nginx
+  ###
+  nginx:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}

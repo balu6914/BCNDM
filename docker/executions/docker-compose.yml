@@ -1,0 +1,47 @@
+# Copyright (c) 2018 Datapace
+version: "3"
+
+services:
+  ## Override nginx volume in order to use different config
+  nginx:
+    volumes:
+      - ./nginx/nginx.exec.conf:/etc/nginx/nginx.conf
+      - ./ssl/certs/datapace.crt:/etc/ssl/certs/datapace.crt
+      - ./ssl/certs/datapace.key:/etc/ssl/private/datapace.key
+      - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
+  ###
+  # Executions DB
+  ###
+  datapace-executions-db:
+    image: mongo:latest
+    restart: on-failure
+    container_name: datapace-executions-db
+    command: --nojournal
+    volumes:
+      - ./executions-data:/data/db
+  ###
+  # Executions serivce
+  ###
+  datapace-executions:
+    image: datapace/executions:latest
+    container_name: datapace-executions
+    restart: on-failure
+    depends_on:
+      - datapace-executions-db
+      - datapace-auth
+    external_links:
+      - datapace-auth
+    ports:
+      - 8088:8088
+    expose:
+      - 8089
+    environment:
+      - DATAPACE_EXECUTIONS_HTTP_PORT=8088
+      - DATAPACE_EXECUTIONS_GRPC_PORT=8089
+      - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
+      - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_WWH_CATALOG_URL=http://localhost:31222 # instead of localhost place docker host IP
+      - DATAPACE_WWH_DAEMON_URL=localhost:32222 # same here (check it with docker exec -it datapace-executions route)
+      - DATAPACE_WWH_TOKEN=v61rSpnp89
+      - DATAPACE_WWH_USERNAME=admin1
+      - DATAPACE_WWH_PASSWORD=password01

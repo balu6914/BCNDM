@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+
+  explorer-db:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+  explorer:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}

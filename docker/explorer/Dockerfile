@@ -7,7 +7,7 @@ RUN apt-get update
 RUN apt-get install -y git bash python build-essential
 
 # clone latest code from github
-RUN git clone --single-branch -b release-4.0 --depth 1 https://github.com/hyperledger/blockchain-explorer.git
+RUN git clone --single-branch -b 0.3.9.1 --depth 1 https://github.com/hyperledger/blockchain-explorer.git
 
 WORKDIR /blockchain-explorer
 

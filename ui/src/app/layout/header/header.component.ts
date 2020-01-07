@@ -4,6 +4,7 @@ import { ISubscription } from 'rxjs/Subscription';
 import { AuthService } from 'app/auth/services/auth.service';
 import { BalanceService } from 'app/shared/balance/balance.service';
 import { Balance } from 'app/common/interfaces/balance.interface';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'dpc-header-component',
@@ -16,6 +17,7 @@ import { Balance } from 'app/common/interfaces/balance.interface';
 export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedin: Boolean;
   user: any;
+  aiEnabled: Boolean;
   balance = new Balance();
   private userSubscription: ISubscription;
   private loggedInSubscription: ISubscription;
@@ -25,6 +27,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private AuthService: AuthService,
     private balanceService: BalanceService,
   ) {
+    this.aiEnabled = environment.AI_ENABLED;
+    console.log("IS AI Enabled ? ", this.aiEnabled)
     // Listen to balance changed events
     this.balanceChangeSubscription = this.balanceService.balance.subscribe(result => {
       this.balance = result;
