@@ -21,8 +21,8 @@ func LoggingMiddleware(svc executions.Service, logger log.Logger) executions.Ser
 
 func (lm loggingMiddleware) Start(exec executions.Execution) (id string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method start for owner %s, algo %s, data %s and mode %s with id %s took %s to complete",
-			exec.Owner, exec.Algo, exec.Data, exec.Mode, id, time.Since(begin))
+		message := fmt.Sprintf("Method start for owner %s, algo %s and data %s with id %s took %s to complete",
+			exec.Owner, exec.Algo, exec.Data, id, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return

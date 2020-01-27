@@ -21,17 +21,10 @@ func startExecutionEndpoint(svc executions.Service) endpoint.Endpoint {
 
 		for _, exec := range req.Executions {
 			e := executions.Execution{
-				Owner:                    req.owner,
-				Algo:                     req.Algo,
-				Data:                     exec.Data,
-				AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-				Type:                     exec.Type,
-				GlobalTimeout:            exec.GlobalTimeout,
-				LocalTimeout:             exec.LocalTimeout,
-				AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-				Mode:                     exec.Mode,
-				AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-				AdditionalFiles:          exec.AdditionalFiles,
+				Owner:    req.owner,
+				Algo:     req.Algo,
+				Data:     exec.Data,
+				Metadata: exec.Metadata,
 			}
 			id, err := svc.Start(e)
 			result := startExecutionResult{
@@ -62,18 +55,12 @@ func viewEndpoint(svc executions.Service) endpoint.Endpoint {
 		}
 
 		res := viewRes{
-			ID:                       exec.ID,
-			Algo:                     exec.Algo,
-			Data:                     exec.Data,
-			AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-			Type:                     exec.Type,
-			GlobalTimeout:            exec.GlobalTimeout,
-			LocalTimeout:             exec.LocalTimeout,
-			AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-			Mode:                     exec.Mode,
-			AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-			AdditionalFiles:          exec.AdditionalFiles,
-			State:                    exec.State,
+			ID:         exec.ID,
+			ExternalID: exec.ExternalID,
+			Algo:       exec.Algo,
+			Data:       exec.Data,
+			Metadata:   exec.Metadata,
+			State:      exec.State,
 		}
 
 		return res, nil
@@ -98,18 +85,12 @@ func listEndpoint(svc executions.Service) endpoint.Endpoint {
 		}
 		for _, exec := range execs {
 			res.Executions = append(res.Executions, viewRes{
-				ID:                       exec.ID,
-				Algo:                     exec.Algo,
-				Data:                     exec.Data,
-				AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-				Type:                     exec.Type,
-				GlobalTimeout:            exec.GlobalTimeout,
-				LocalTimeout:             exec.LocalTimeout,
-				AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-				Mode:                     exec.Mode,
-				AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-				AdditionalFiles:          exec.AdditionalFiles,
-				State:                    exec.State,
+				ID:         exec.ID,
+				ExternalID: exec.ExternalID,
+				Algo:       exec.Algo,
+				Data:       exec.Data,
+				Metadata:   exec.Metadata,
+				State:      exec.State,
 			})
 		}
 

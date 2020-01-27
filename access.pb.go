@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -127,6 +129,17 @@ func (c *accessServiceClient) PotentialPartners(ctx context.Context, in *ID, opt
 type AccessServiceServer interface {
 	Partners(context.Context, *ID) (*PartnersList, error)
 	PotentialPartners(context.Context, *ID) (*PartnersList, error)
+}
+
+// UnimplementedAccessServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedAccessServiceServer struct {
+}
+
+func (*UnimplementedAccessServiceServer) Partners(ctx context.Context, req *ID) (*PartnersList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Partners not implemented")
+}
+func (*UnimplementedAccessServiceServer) PotentialPartners(ctx context.Context, req *ID) (*PartnersList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PotentialPartners not implemented")
 }
 
 func RegisterAccessServiceServer(s *grpc.Server, srv AccessServiceServer) {

@@ -15,11 +15,9 @@ func createAlgoEndpoint(svc executions.Service) endpoint.Endpoint {
 		}
 
 		algo := executions.Algorithm{
-			ID:         req.id,
-			Name:       req.name,
-			Path:       req.path,
-			ModelToken: req.modelToken,
-			ModelName:  req.modelName,
+			ID:       req.id,
+			Name:     req.name,
+			Metadata: req.metadata,
 		}
 
 		if err := svc.CreateAlgorithm(algo); err != nil {
@@ -38,8 +36,8 @@ func createDataEndpoint(svc executions.Service) endpoint.Endpoint {
 		}
 
 		data := executions.Dataset{
-			ID:   req.id,
-			Path: req.path,
+			ID:       req.id,
+			Metadata: req.metadata,
 		}
 
 		if err := svc.CreateDataset(data); err != nil {

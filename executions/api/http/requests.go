@@ -7,25 +7,12 @@ type apiReq interface {
 }
 
 type executionReq struct {
-	Data                     string             `json:"data"`
-	AdditionalLocalJobArgs   []string           `json:"local_args"`
-	Type                     string             `json:"type"`
-	GlobalTimeout            uint64             `json:"global_timeout"`
-	LocalTimeout             uint64             `json:"local_timeout"`
-	AdditionalPreprocessArgs []string           `json:"preprocess_args"`
-	Mode                     executions.JobMode `json:"mode"`
-	AdditionalGlobalJobArgs  []string           `json:"global_args"`
-	AdditionalFiles          []string           `json:"files"`
+	Data     string                 `json:"data"`
+	Metadata map[string]interface{} `json:"metadata"`
 }
 
 func (req executionReq) validate() error {
-	if req.Data == "" || req.Type == "" {
-		return executions.ErrMalformedData
-	}
-
-	if req.Mode != executions.Centralized &&
-		req.Mode != executions.Distributed &&
-		req.Mode != executions.Federated {
+	if req.Data == "" {
 		return executions.ErrMalformedData
 	}
 

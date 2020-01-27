@@ -33,20 +33,12 @@ func (res startExecutionRes) empty() bool {
 }
 
 type viewRes struct {
-	ID                       string             `json:"id"`
-	Algo                     string             `json:"algo"`
-	Data                     string             `json:"data"`
-	AdditionalLocalJobArgs   []string           `json:"local_args"`
-	Type                     string             `json:"type"`
-	GlobalTimeout            uint64             `json:"global_timeout"`
-	LocalTimeout             uint64             `json:"local_timeout"`
-	AdditionalPreprocessArgs []string           `json:"preprocess_args"`
-	Mode                     executions.JobMode `json:"mode"`
-	AdditionalGlobalJobArgs  []string           `json:"global_args"`
-	AdditionalFiles          []string           `json:"files"`
-	TrainedModelToken        string             `json:"model_token,omitempty"`
-	TrainedModelName         string             `json:"model_name,omitempty"`
-	State                    executions.State   `json:"state"`
+	ID         string                 `json:"id"`
+	ExternalID string                 `json:"external_id"`
+	Algo       string                 `json:"algo"`
+	Data       string                 `json:"data"`
+	Metadata   map[string]interface{} `json:"metadata"`
+	State      executions.State       `json:"state"`
 }
 
 func (res viewRes) code() int {

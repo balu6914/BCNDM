@@ -45,11 +45,9 @@ func NewClient(conn *grpc.ClientConn) datapace.ExecutionsServiceClient {
 
 func (client grpcClient) CreateAlgorithm(ctx context.Context, algo *datapace.Algorithm, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := algoReq{
-		id:         algo.GetId(),
-		name:       algo.GetName(),
-		path:       algo.GetPath(),
-		modelToken: algo.GetModelToken(),
-		modelName:  algo.GetModelName(),
+		id:       algo.GetId(),
+		name:     algo.GetName(),
+		metadata: algo.GetMetadata(),
 	}
 
 	res, err := client.createAlgo(ctx, req)
@@ -63,8 +61,8 @@ func (client grpcClient) CreateAlgorithm(ctx context.Context, algo *datapace.Alg
 
 func (client grpcClient) CreateDataset(ctx context.Context, data *datapace.Dataset, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := dataReq{
-		id:   data.GetId(),
-		path: data.GetPath(),
+		id:       data.GetId(),
+		metadata: data.GetMetadata(),
 	}
 
 	res, err := client.createData(ctx, req)
@@ -79,19 +77,17 @@ func (client grpcClient) CreateDataset(ctx context.Context, data *datapace.Datas
 func encodeAlgoReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(algoReq)
 	return &datapace.Algorithm{
-		Id:         req.id,
-		Name:       req.name,
-		Path:       req.path,
-		ModelToken: req.modelToken,
-		ModelName:  req.modelName,
+		Id:       req.id,
+		Name:     req.name,
+		Metadata: req.metadata,
 	}, nil
 }
 
 func encodeDataReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(dataReq)
 	return &datapace.Dataset{
-		Id:   req.id,
-		Path: req.path,
+		Id:       req.id,
+		Metadata: req.metadata,
 	}, nil
 }
 

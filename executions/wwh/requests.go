@@ -1,10 +1,6 @@
 package wwh
 
-import (
-	"encoding/json"
-
-	"datapace/executions"
-)
+import "encoding/json"
 
 type request interface {
 	headers() map[string]string
@@ -37,21 +33,21 @@ type propertyReq struct {
 
 type executeReq struct {
 	token                    string
-	MetaResources            []string           `json:"metaResources"`
-	ChainComputation         string             `json:"chainComputation"`
-	AdditionalLocalJobArgs   []string           `json:"additionalLocalJobArguments"`
-	LogicJarPath             string             `json:"logicJarPath"`
-	RequestID                string             `json:"requestId"`
-	Type                     string             `json:"type"`
-	ResultPath               string             `json:"resultPath"`
-	GlobalTimeout            string             `json:"globalTimeout"`
-	LocalTimeout             string             `json:"localTimeout"`
-	AdditionalPreprocessArgs []string           `json:"additionalPreprocessArguments"`
-	JobMode                  executions.JobMode `json:"jobMode"`
-	AdditionalGlobalJobArgs  []string           `json:"additionalGlobalJobArguments"`
-	AdditionalFiles          []string           `json:"additionalFiles"`
-	TrainedModelToken        string             `json:"trainedModelToken,omitempty"`
-	TrainedModelName         string             `json:"trainedModelName,omitempty"`
+	MetaResources            []string `json:"metaResources"`
+	ChainComputation         string   `json:"chainComputation"`
+	AdditionalLocalJobArgs   []string `json:"additionalLocalJobArguments"`
+	LogicJarPath             string   `json:"logicJarPath"`
+	RequestID                string   `json:"requestId"`
+	Type                     string   `json:"type"`
+	ResultPath               string   `json:"resultPath"`
+	GlobalTimeout            string   `json:"globalTimeout"`
+	LocalTimeout             string   `json:"localTimeout"`
+	AdditionalPreprocessArgs []string `json:"additionalPreprocessArguments"`
+	JobMode                  string   `json:"jobMode"`
+	AdditionalGlobalJobArgs  []string `json:"additionalGlobalJobArguments"`
+	AdditionalFiles          []string `json:"additionalFiles"`
+	TrainedModelToken        string   `json:"trainedModelToken,omitempty"`
+	TrainedModelName         string   `json:"trainedModelName,omitempty"`
 }
 
 func (req executeReq) headers() map[string]string {

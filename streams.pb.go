@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -194,6 +196,14 @@ func (c *streamsServiceClient) One(ctx context.Context, in *ID, opts ...grpc.Cal
 // StreamsServiceServer is the server API for StreamsService service.
 type StreamsServiceServer interface {
 	One(context.Context, *ID) (*Stream, error)
+}
+
+// UnimplementedStreamsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedStreamsServiceServer struct {
+}
+
+func (*UnimplementedStreamsServiceServer) One(ctx context.Context, req *ID) (*Stream, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method One not implemented")
 }
 
 func RegisterStreamsServiceServer(s *grpc.Server, srv StreamsServiceServer) {

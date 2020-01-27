@@ -12,12 +12,10 @@ service ExecutionsService {
 message Algorithm {
     string id = 1;
     string name = 2;
-    string path =3;
-    string modelToken = 4;
-    string modelName = 5;
+    map<string, string> metadata = 3;
 }
 
 message Dataset {
     string id = 1;
-    string path = 2;
+    map<string, string> metadata = 2;
 }

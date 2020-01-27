@@ -28,20 +28,14 @@ func (er executionRepository) Create(exec executions.Execution) (string, error) 
 	id := bson.NewObjectId()
 
 	e := execution{
-		ID:                       id,
-		Owner:                    exec.Owner,
-		Algo:                     exec.Algo,
-		Data:                     exec.Data,
-		AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-		Type:                     exec.Type,
-		GlobalTimeout:            exec.GlobalTimeout,
-		LocalTimeout:             exec.LocalTimeout,
-		AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-		Mode:                     exec.Mode,
-		AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-		AdditionalFiles:          exec.AdditionalFiles,
-		Token:                    exec.Token,
-		State:                    exec.State,
+		ID:         id,
+		Name:       exec.Name,
+		ExternalID: exec.ExternalID,
+		Owner:      exec.Owner,
+		Algo:       exec.Algo,
+		Data:       exec.Data,
+		Metadata:   exec.Metadata,
+		State:      exec.State,
 	}
 	if err := c.Insert(e); err != nil {
 		if mgo.IsDup(err) {
@@ -53,33 +47,40 @@ func (er executionRepository) Create(exec executions.Execution) (string, error) 
 	return id.Hex(), nil
 }
 
-func (er executionRepository) UpdateToken(id, token string) error {
+func (er executionRepository) Update(exec executions.Execution) error {
 	s := er.db.Copy()
 	defer s.Close()
 
-	if !bson.IsObjectIdHex(id) {
+	if !bson.IsObjectIdHex(exec.ID) {
 		return executions.ErrMalformedData
 	}
 
 	c := s.DB(dbName).C(execCollection)
-	u := bson.M{"$set": bson.M{"token": token}}
-	if err := c.UpdateId(bson.ObjectIdHex(id), u); err != nil {
-		if err == mgo.ErrNotFound {
-			return executions.ErrNotFound
-		}
+
+	e := execution{
+		ID:         bson.ObjectIdHex(exec.ID),
+		Name:       exec.Name,
+		ExternalID: exec.ExternalID,
+		Owner:      exec.Owner,
+		Algo:       exec.Algo,
+		Data:       exec.Data,
+		Metadata:   exec.Metadata,
+		State:      exec.State,
+	}
+	if err := c.UpdateId(e.ID, e); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (er executionRepository) UpdateState(token string, state executions.State) error {
+func (er executionRepository) UpdateState(externalID string, state executions.State) error {
 	s := er.db.Copy()
 	defer s.Close()
 
 	c := s.DB(dbName).C(execCollection)
 	u := bson.M{"$set": bson.M{"state": state}}
-	if err := c.Update(bson.M{"token": token}, u); err != nil {
+	if err := c.Update(bson.M{"external_id": externalID}, u); err != nil {
 		if err == mgo.ErrNotFound {
 			return executions.ErrNotFound
 		}
@@ -108,20 +109,12 @@ func (er executionRepository) Execution(owner, id string) (executions.Execution,
 	}
 
 	return executions.Execution{
-		ID:                       id,
-		Owner:                    owner,
-		Algo:                     exec.Algo,
-		Data:                     exec.Data,
-		AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-		Type:                     exec.Type,
-		GlobalTimeout:            exec.GlobalTimeout,
-		LocalTimeout:             exec.LocalTimeout,
-		AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-		Mode:                     exec.Mode,
-		AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-		AdditionalFiles:          exec.AdditionalFiles,
-		State:                    exec.State,
-		Token:                    exec.Token,
+		ID:       id,
+		Owner:    owner,
+		Algo:     exec.Algo,
+		Data:     exec.Data,
+		Metadata: exec.Metadata,
+		State:    exec.State,
 	}, nil
 }
 
@@ -140,20 +133,12 @@ func (er executionRepository) List(owner string) ([]executions.Execution, error)
 	es := []executions.Execution{}
 	for _, exec := range execs {
 		es = append(es, executions.Execution{
-			ID:                       exec.ID.Hex(),
-			Owner:                    owner,
-			Algo:                     exec.Algo,
-			Data:                     exec.Data,
-			AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-			Type:                     exec.Type,
-			GlobalTimeout:            exec.GlobalTimeout,
-			LocalTimeout:             exec.LocalTimeout,
-			AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-			Mode:                     exec.Mode,
-			AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-			AdditionalFiles:          exec.AdditionalFiles,
-			State:                    exec.State,
-			Token:                    exec.Token,
+			ID:       exec.ID.Hex(),
+			Owner:    owner,
+			Algo:     exec.Algo,
+			Data:     exec.Data,
+			Metadata: exec.Metadata,
+			State:    exec.State,
 		})
 	}
 
@@ -161,18 +146,12 @@ func (er executionRepository) List(owner string) ([]executions.Execution, error)
 }
 
 type execution struct {
-	ID                       bson.ObjectId      `bson:"_id"`
-	Owner                    string             `bson:"owner"`
-	Algo                     string             `bson:"algo"`
-	Data                     string             `bson:"data"`
-	AdditionalLocalJobArgs   []string           `bson:"additional_local_job_args"`
-	Type                     string             `bson:"type"`
-	GlobalTimeout            uint64             `bson:"global_timeout"`
-	LocalTimeout             uint64             `bson:"local_timeout"`
-	AdditionalPreprocessArgs []string           `bson:"additional_preprocess_args"`
-	Mode                     executions.JobMode `bson:"mode"`
-	AdditionalGlobalJobArgs  []string           `bson:"additional_global_job_args"`
-	AdditionalFiles          []string           `bson:"additional_files"`
-	State                    executions.State   `bson:"state"`
-	Token                    string             `bson:"token"`
+	ID         bson.ObjectId          `bson:"_id"`
+	Name       string                 `bson:"name"`
+	ExternalID string                 `bson:"external_id"`
+	Owner      string                 `bson:"owner"`
+	Algo       string                 `bson:"algo"`
+	Data       string                 `bson:"data"`
+	Metadata   map[string]interface{} `bson:"metadata"`
+	State      executions.State       `bson:"state"`
 }

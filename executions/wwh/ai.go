@@ -45,66 +45,170 @@ func NewAIService(catalogURL, daemonURL, token, username, password string) execu
 	}
 }
 
-func (as aiService) CreateAlgorithm(algo executions.Algorithm) error {
+func (as aiService) CreateAlgorithm(algo executions.Algorithm) (executions.Algorithm, error) {
 	lid := fmt.Sprintf("local-%s", algo.ID)
 	if err := as.createExecution(lid); err != nil {
-		return err
+		return algo, err
 	}
 
 	gid := fmt.Sprintf("global-%s", algo.ID)
 	if err := as.createExecution(gid); err != nil {
-		return err
+		return algo, err
 	}
 
 	cid := fmt.Sprintf("%s-comp", algo.ID)
 	if err := as.createComputation(cid, lid, gid); err != nil {
-		return err
+		return algo, err
 	}
 
 	clid := fmt.Sprintf("%s-comp-list", algo.ID)
-	return as.createComputationList(clid, cid, "") // leave empty algo parameters for now
+	return algo, as.createComputationList(clid, cid, "") // leave empty algo parameters for now
 }
 
-func (as aiService) CreateDataset(ds executions.Dataset) error {
+func (as aiService) CreateDataset(ds executions.Dataset) (executions.Dataset, error) {
 	hrid := fmt.Sprintf("%s-hr", ds.ID)
-	if err := as.createHardResource(hrid, ds.Path); err != nil {
-		return err
+	path, ok := ds.Metadata["path"]
+	if !ok {
+		return ds, executions.ErrMalformedData
+	}
+
+	if err := as.createHardResource(hrid, path); err != nil {
+		return ds, err
 	}
 
 	mrid := fmt.Sprintf("%s-mr", ds.ID)
-	return as.createMetaResource(mrid, hrid)
+	return ds, as.createMetaResource(mrid, hrid)
 }
 
-func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, data executions.Dataset) (string, error) {
+func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, data executions.Dataset) (executions.Execution, error) {
 	url := fmt.Sprintf("http://%s/daemon/exec/execute", as.daemonURL)
+
+	algoPath, ok := algo.Metadata["path"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	execType, ok := exec.Metadata["type"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	et, ok := execType.(string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	additionalLocalJobArgs, ok := exec.Metadata["additionalLocalJobArguments"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	aljargs, ok := additionalLocalJobArgs.([]string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	globalTime, ok := exec.Metadata["globalTimeout"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	gtime, ok := globalTime.(uint64)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	localTime, ok := exec.Metadata["localTimeout"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	ltime, ok := localTime.(uint64)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	additionalPreprocessArgs, ok := exec.Metadata["additionalPreprocessArguments"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	apa, ok := additionalPreprocessArgs.([]string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	jobMode, ok := exec.Metadata["jobMode"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	jmode, ok := jobMode.(string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	additionalGlobalJobArgs, ok := exec.Metadata["additionalGlobalJobArguments"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	agja, ok := additionalGlobalJobArgs.([]string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	additionalFiles, ok := exec.Metadata["additionalFiles"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+	af, ok := additionalFiles.([]string)
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	algoModelToken, ok := algo.Metadata["trainedModelToken"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
+	algoModelName, ok := algo.Metadata["trainedModelName"]
+	if !ok {
+		return executions.Execution{}, executions.ErrMalformedData
+	}
+
 	er := executeReq{
 		token:                    as.token,
 		MetaResources:            []string{fmt.Sprintf("%s-mr", data.ID)},
 		ChainComputation:         algo.Name,
-		AdditionalLocalJobArgs:   exec.AdditionalLocalJobArgs,
-		LogicJarPath:             algo.Path,
+		AdditionalLocalJobArgs:   aljargs,
+		LogicJarPath:             algoPath,
 		RequestID:                exec.ID,
-		Type:                     exec.Type,
+		Type:                     et,
 		ResultPath:               fmt.Sprintf("/%s", exec.ID),
-		GlobalTimeout:            strconv.FormatUint(exec.GlobalTimeout, 10),
-		LocalTimeout:             strconv.FormatUint(exec.LocalTimeout, 10),
-		AdditionalPreprocessArgs: exec.AdditionalPreprocessArgs,
-		JobMode:                  exec.Mode,
-		AdditionalGlobalJobArgs:  exec.AdditionalGlobalJobArgs,
-		AdditionalFiles:          exec.AdditionalFiles,
-		TrainedModelToken:        algo.ModelToken,
-		TrainedModelName:         algo.ModelName,
+		GlobalTimeout:            strconv.FormatUint(gtime, 10),
+		LocalTimeout:             strconv.FormatUint(ltime, 10),
+		AdditionalPreprocessArgs: apa,
+		JobMode:                  jmode,
+		AdditionalGlobalJobArgs:  agja,
+		AdditionalFiles:          af,
+		TrainedModelToken:        algoModelToken,
+		TrainedModelName:         algoModelName,
 	}
 
 	res, err := sendRequest(http.MethodPost, url, er)
 	if err != nil {
-		return "", err
+		return executions.Execution{}, err
 	}
-	return string(res), nil
+
+	exec.ExternalID = string(res)
+	return exec, nil
 }
 
-func (as aiService) Result(token string) (map[string]interface{}, error) {
-	url := fmt.Sprintf("http://%s/daemon/exec/getResults/%s", as.daemonURL, token)
+func (as aiService) Result(exec executions.Execution) (map[string]interface{}, error) {
+	token, ok := exec.Metadata["token"]
+	if !ok {
+		return nil, executions.ErrMalformedData
+	}
+	tkn, ok := token.(string)
+	if !ok {
+		return nil, executions.ErrMalformedData
+	}
+
+	url := fmt.Sprintf("http://%s/daemon/exec/getResults/%s", as.daemonURL, tkn)
 	req := tokenReq{
 		token: as.token,
 	}
@@ -337,8 +441,8 @@ func readEvents(c *websocket.Conn, ch chan executions.Event) {
 		}
 
 		ch <- executions.Event{
-			Token:  res.Token,
-			Status: res.Status,
+			ExternalID: res.Token,
+			Status:     res.Status,
 		}
 	}
 }

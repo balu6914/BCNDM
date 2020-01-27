@@ -31,15 +31,37 @@ func (repo algorithmRepository) Create(algo executions.Algorithm) error {
 	a := algorithm{
 		ID:         bson.ObjectIdHex(algo.ID),
 		Name:       algo.Name,
-		Path:       algo.Path,
-		ModelToken: algo.ModelToken,
-		ModelName:  algo.ModelName,
+		ExternalID: algo.ExternalID,
+		Metadata:   algo.Metadata,
 	}
 
 	if err := c.Insert(a); err != nil {
 		if mgo.IsDup(err) {
 			return executions.ErrConflict
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (repo algorithmRepository) Update(algo executions.Algorithm) error {
+	s := repo.db.Copy()
+	defer s.Close()
+
+	if !bson.IsObjectIdHex(algo.ID) {
+		return executions.ErrMalformedData
+	}
+
+	c := s.DB(dbName).C(algoCollection)
+
+	a := algorithm{
+		ID:         bson.ObjectIdHex(algo.ID),
+		Name:       algo.Name,
+		ExternalID: algo.ExternalID,
+		Metadata:   algo.Metadata,
+	}
+	if err := c.UpdateId(a.ID, a); err != nil {
 		return err
 	}
 
@@ -66,17 +88,14 @@ func (repo algorithmRepository) One(id string) (executions.Algorithm, error) {
 
 	return executions.Algorithm{
 		ID:         algo.ID.Hex(),
-		Name:       algo.Name,
-		Path:       algo.Path,
-		ModelToken: algo.ModelToken,
-		ModelName:  algo.ModelName,
+		ExternalID: algo.ExternalID,
+		Metadata:   algo.Metadata,
 	}, nil
 }
 
 type algorithm struct {
-	ID         bson.ObjectId `bson:"_id"`
-	Name       string        `bson:"name"`
-	Path       string        `bson:"path"`
-	ModelToken string        `bson:"model_token,omitempty"`
-	ModelName  string        `bson:"model_name,omitempty"`
+	ID         bson.ObjectId     `bson:"_id"`
+	Name       string            `bson:"name"`
+	ExternalID string            `bson:"external_id"`
+	Metadata   map[string]string `bson:"metadata"`
 }

@@ -14,6 +14,10 @@ var (
 	// ErrMalformedData indicates that method receiver invalid input data.
 	ErrMalformedData = errors.New("invalid data received")
 
+	// ErrCreateAlgoFailed indicates executions service failed to create an
+	// algorithm on AI service.
+	ErrCreateAlgoFailed = errors.New("failed to create an algorithm")
+
 	// ErrExecutionFailed indicated that execution has finished and that it has failed.
 	ErrExecutionFailed = errors.New("specified execution has failed")
 )
@@ -79,12 +83,12 @@ func (es executionsService) Start(exec Execution) (string, error) {
 	}
 	exec.ID = id
 
-	token, err := es.ai.Start(exec, algo, data)
+	uexec, err := es.ai.Start(exec, algo, data)
 	if err != nil {
 		return "", err
 	}
 
-	if err := es.execs.UpdateToken(id, token); err != nil {
+	if err := es.execs.Update(uexec); err != nil {
 		return "", err
 	}
 
@@ -101,7 +105,7 @@ func (es executionsService) Result(owner, id string) (map[string]interface{}, er
 		return nil, ErrNotFound
 	}
 
-	return es.ai.Result(exec.Token)
+	return es.ai.Result(exec)
 }
 
 func (es executionsService) Execution(owner, id string) (Execution, error) {
@@ -113,7 +117,16 @@ func (es executionsService) List(owner string) ([]Execution, error) {
 }
 
 func (es executionsService) CreateAlgorithm(algo Algorithm) error {
-	return es.algos.Create(algo)
+	if err := es.algos.Create(algo); err != nil {
+		return err
+	}
+
+	ualgo, err := es.ai.CreateAlgorithm(algo)
+	if err != nil {
+		return err
+	}
+
+	return es.algos.Update(ualgo)
 }
 
 func (es executionsService) CreateDataset(dataset Dataset) error {
@@ -121,8 +134,12 @@ func (es executionsService) CreateDataset(dataset Dataset) error {
 		return err
 	}
 
-	err := es.ai.CreateDataset(dataset)
-	return err
+	udata, err := es.ai.CreateDataset(dataset)
+	if err != nil {
+		return err
+	}
+
+	return es.data.Update(udata)
 }
 
 func (es executionsService) ProcessEvents() error {
@@ -132,7 +149,7 @@ func (es executionsService) ProcessEvents() error {
 	}
 
 	for event := range ch {
-		if err := es.execs.UpdateState(event.Token, event.Status); err != nil {
+		if err := es.execs.UpdateState(event.ExternalID, event.Status); err != nil {
 			continue
 		}
 	}

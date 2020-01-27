@@ -103,7 +103,6 @@
         <div class="col-sm-8">
           <textarea type="text" formControlName="metadata" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.metadata.errors }"></textarea>
           <div *ngIf="submitted && form.controls.metadata.errors" class="invalid-feedback">
-            <div *ngIf="form.controls.metadata.errors.maxlength">The maximum length is 2048 characters.</div>
             <div *ngIf="form.controls.metadata.errors.invalid">Metadata must be a JSON.</div>
           </div>
         </div>

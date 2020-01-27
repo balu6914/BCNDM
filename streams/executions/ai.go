@@ -20,46 +20,19 @@ func New(client datapace.ExecutionsServiceClient) streams.AIService {
 }
 
 func (es executionsService) CreateAlgorithm(s streams.Stream) error {
-	iname, ok := s.Metadata["name"]
-	if !ok {
-		return streams.ErrMalformedData
-	}
-
-	name, ok := iname.(string)
-	if !ok {
-		return streams.ErrMalformedData
-	}
-
-	ipath, ok := s.Metadata["path"]
-	if !ok {
-		return streams.ErrMalformedData
-	}
-
-	path, ok := ipath.(string)
-	if !ok {
-		return streams.ErrMalformedData
-	}
-
-	modelToken := ""
-	if imodelToken, ok := s.Metadata["model_token"]; ok {
-		if mt, ok := imodelToken.(string); ok {
-			modelToken = mt
+	metadata := map[string]string{}
+	for k, v := range s.Metadata {
+		val, ok := v.(string)
+		if !ok {
+			return streams.ErrMalformedData
 		}
-	}
-
-	modelName := ""
-	if imodelName, ok := s.Metadata["model_name"]; ok {
-		if mn, ok := imodelName.(string); ok {
-			modelName = mn
-		}
+		metadata[k] = val
 	}
 
 	algo := datapace.Algorithm{
-		Id:         s.ID.Hex(),
-		Name:       name,
-		Path:       path,
-		ModelToken: modelToken,
-		ModelName:  modelName,
+		Id:       s.ID.Hex(),
+		Name:     s.Name,
+		Metadata: metadata,
 	}
 
 	_, err := es.client.CreateAlgorithm(context.Background(), &algo)
@@ -67,19 +40,18 @@ func (es executionsService) CreateAlgorithm(s streams.Stream) error {
 }
 
 func (es executionsService) CreateDataset(s streams.Stream) error {
-	ipath, ok := s.Metadata["path"]
-	if !ok {
-		return streams.ErrMalformedData
-	}
-
-	path, ok := ipath.(string)
-	if !ok {
-		return streams.ErrMalformedData
+	metadata := map[string]string{}
+	for k, v := range s.Metadata {
+		val, ok := v.(string)
+		if !ok {
+			return streams.ErrMalformedData
+		}
+		metadata[k] = val
 	}
 
 	dataset := datapace.Dataset{
-		Id:   s.ID.Hex(),
-		Path: path,
+		Id:       s.ID.Hex(),
+		Metadata: metadata,
 	}
 
 	_, err := es.client.CreateDataset(context.Background(), &dataset)

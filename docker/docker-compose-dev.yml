@@ -196,6 +196,9 @@ services:
       - DATAPACE_WWH_TOKEN=v61rSpnp89
       - DATAPACE_WWH_USERNAME=admin1
       - DATAPACE_WWH_PASSWORD=password01
+      - DATAPACE_KUBEFLOW_ACTIVE=true
+      - DATAPACE_KUBEFLOW_URL=https://george:Data1_Pace2_Space3@ar.k9s.datapace.io
+      - DATAPACE_KUBEFLOW_STATUS_INTERVAL=10
     networks:
       - datapace-net
 
@@ -293,7 +296,7 @@ services:
       - datapace-executions
       - datapace-ui
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.exec.conf:/etc/nginx/nginx.conf
       - ./ssl/certs/datapace.crt:/etc/ssl/certs/datapace.crt
       - ./ssl/certs/datapace.key:/etc/ssl/private/datapace.key
       - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem

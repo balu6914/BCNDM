@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -157,6 +159,17 @@ func (c *transactionsServiceClient) Transfer(ctx context.Context, in *TransferDa
 type TransactionsServiceServer interface {
 	CreateUser(context.Context, *ID) (*empty.Empty, error)
 	Transfer(context.Context, *TransferData) (*empty.Empty, error)
+}
+
+// UnimplementedTransactionsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedTransactionsServiceServer struct {
+}
+
+func (*UnimplementedTransactionsServiceServer) CreateUser(ctx context.Context, req *ID) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (*UnimplementedTransactionsServiceServer) Transfer(ctx context.Context, req *TransferData) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Transfer not implemented")
 }
 
 func RegisterTransactionsServiceServer(s *grpc.Server, srv TransactionsServiceServer) {

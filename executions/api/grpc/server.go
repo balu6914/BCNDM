@@ -56,19 +56,17 @@ func (s *grpcServer) CreateDataset(ctx context.Context, data *datapace.Dataset) 
 func decodeAlgoReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*datapace.Algorithm)
 	return algoReq{
-		id:         req.GetId(),
-		name:       req.GetName(),
-		path:       req.GetPath(),
-		modelToken: req.GetModelToken(),
-		modelName:  req.GetModelName(),
+		id:       req.GetId(),
+		name:     req.GetName(),
+		metadata: req.GetMetadata(),
 	}, nil
 }
 
 func decodeDataReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*datapace.Dataset)
 	return dataReq{
-		id:   req.GetId(),
-		path: req.GetPath(),
+		id:       req.GetId(),
+		metadata: req.GetMetadata(),
 	}, nil
 }
 

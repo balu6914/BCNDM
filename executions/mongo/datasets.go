@@ -29,14 +29,37 @@ func (repo datasetRepository) Create(data executions.Dataset) error {
 	c := s.DB(dbName).C(dataCollection)
 
 	d := dataset{
-		ID:   bson.ObjectIdHex(data.ID),
-		Path: data.Path,
+		ID:         bson.ObjectIdHex(data.ID),
+		ExternalID: data.ExternalID,
+		Metadata:   data.Metadata,
 	}
 
 	if err := c.Insert(d); err != nil {
 		if mgo.IsDup(err) {
 			return executions.ErrConflict
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (repo datasetRepository) Update(data executions.Dataset) error {
+	s := repo.db.Copy()
+	defer s.Close()
+
+	if !bson.IsObjectIdHex(data.ID) {
+		return executions.ErrMalformedData
+	}
+
+	c := s.DB(dbName).C(dataCollection)
+
+	d := dataset{
+		ID:         bson.ObjectIdHex(data.ID),
+		ExternalID: data.ExternalID,
+		Metadata:   data.Metadata,
+	}
+	if err := c.UpdateId(d.ID, d); err != nil {
 		return err
 	}
 
@@ -62,12 +85,13 @@ func (repo datasetRepository) One(id string) (executions.Dataset, error) {
 	}
 
 	return executions.Dataset{
-		ID:   data.ID.Hex(),
-		Path: data.Path,
+		ID:       data.ID.Hex(),
+		Metadata: data.Metadata,
 	}, nil
 }
 
 type dataset struct {
-	ID   bson.ObjectId `bson:"_id"`
-	Path string        `bson:"path"`
+	ID         bson.ObjectId     `bson:"_id"`
+	ExternalID string            `bson:"external_id"`
+	Metadata   map[string]string `bson:"metadata"`
 }

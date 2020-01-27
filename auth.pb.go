@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -192,6 +194,20 @@ type AuthServiceServer interface {
 	Identify(context.Context, *Token) (*ID, error)
 	Email(context.Context, *Token) (*UserEmail, error)
 	Exists(context.Context, *ID) (*empty.Empty, error)
+}
+
+// UnimplementedAuthServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthServiceServer struct {
+}
+
+func (*UnimplementedAuthServiceServer) Identify(ctx context.Context, req *Token) (*ID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Identify not implemented")
+}
+func (*UnimplementedAuthServiceServer) Email(ctx context.Context, req *Token) (*UserEmail, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Email not implemented")
+}
+func (*UnimplementedAuthServiceServer) Exists(ctx context.Context, req *ID) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Exists not implemented")
 }
 
 func RegisterAuthServiceServer(s *grpc.Server, srv AuthServiceServer) {
