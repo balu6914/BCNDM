@@ -222,6 +222,19 @@ services:
     networks:
       - datapace-net
 
+  datapace-dproxy:
+    image: datapace/dproxy:latest
+    container_name: datapace-dproxy
+    environment:
+      - REDIS_URL=redis://datapace-proxy-db:6379
+    depends_on:
+      - datapace-proxy-db
+    ports:
+      - "9090:9090"
+    restart: on-failure
+    networks:
+      - datapace-net
+
   datapace-proxy-db:
     image: redis:latest
     container_name: datapace-proxy-db
