@@ -92,16 +92,18 @@ func (sr streamRepository) Save(stream streams.Stream) (string, error) {
 	defer s.Close()
 
 	c := s.DB(dbName).C(collection)
-	stream.ID = bson.NewObjectId()
+	// ignore error because invalid ID should be ignored in this case
+	dbs, _ := toDBStream(stream)
+	dbs.ID = bson.NewObjectId()
 
-	if err := c.Insert(stream); err != nil {
+	if err := c.Insert(dbs); err != nil {
 		if mgo.IsDup(err) {
 			return "", streams.ErrConflict
 		}
 		return "", err
 	}
 
-	return stream.ID.Hex(), nil
+	return dbs.ID.Hex(), nil
 }
 
 func (sr streamRepository) SaveAll(blk []streams.Stream) error {
@@ -116,8 +118,12 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 	bulk.Unordered()
 
 	arr := make([]interface{}, len(blk))
-	for i := range blk {
-		arr[i] = blk[i]
+	for i, v := range blk {
+		// ignore error because invalid ID should be ignored in this case
+		dbs, _ := toDBStream(v)
+		dbs.ID = bson.NewObjectId()
+
+		arr[i] = dbs
 	}
 
 	bulk.Insert(arr...)
@@ -153,7 +159,7 @@ func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
 		Content: []streams.Stream{},
 	}
 
-	var results []streams.Stream
+	var results []dbStream
 	q := streams.GenQuery(&query)
 
 	total, err := c.Find(q).Count()
@@ -172,7 +178,12 @@ func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
 		return ret, nil
 	}
 
-	ret.Content = results
+	strms := []streams.Stream{}
+	for _, dbs := range results {
+		strms = append(strms, fromDBStream(dbs))
+	}
+
+	ret.Content = strms
 	return ret, nil
 }
 
@@ -181,8 +192,13 @@ func (sr streamRepository) Update(stream streams.Stream) error {
 	defer s.Close()
 	c := s.DB(dbName).C(collection)
 
-	query := bson.M{"_id": stream.ID, "owner": stream.Owner}
-	update := bson.M{"$set": stream}
+	dbs, err := toDBStream(stream)
+	if err != nil {
+		return err
+	}
+
+	query := bson.M{"_id": dbs.ID, "owner": dbs.Owner}
+	update := bson.M{"$set": dbs}
 	if err := c.Update(query, update); err != nil {
 		if err == mgo.ErrNotFound {
 			return streams.ErrNotFound
@@ -198,17 +214,18 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 	defer s.Close()
 	c := s.DB(dbName).C(collection)
 
-	stream := streams.Stream{}
+	dbs := dbStream{}
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	_id := bson.ObjectIdHex(id)
-	if err := c.Find(bson.M{"_id": _id}).One(&stream); err != nil {
+	if err := c.Find(bson.M{"_id": _id}).One(&dbs); err != nil {
 		if err == mgo.ErrNotFound {
-			return stream, streams.ErrNotFound
+			return streams.Stream{}, streams.ErrNotFound
 		}
-		return stream, err
+		return streams.Stream{}, err
 	}
 
+	stream := fromDBStream(dbs)
 	return stream, nil
 }
 
@@ -227,4 +244,108 @@ func (sr streamRepository) Remove(owner, id string) error {
 	}
 
 	return nil
+}
+
+type dbStream struct {
+	Owner       string             `bson:"owner,omitempty"`
+	ID          bson.ObjectId      `bson:"_id,omitempty"`
+	Visibility  streams.Visibility `bson:"visibility,omitempty"`
+	Name        string             `bson:"name,omitempty"`
+	Type        string             `bson:"type,omitempty"`
+	Description string             `bson:"description,omitempty"`
+	Snippet     string             `bson:"snippet,omitempty"`
+	URL         string             `bson:"url,omitempty"`
+	Price       uint64             `bson:"price,omitempty"`
+	Location    dbLocation         `bson:"location,omitempty"`
+	Terms       string             `bson:"terms,omitempty"`
+	External    bool               `bson:"external"`
+	BQ          dbBigQuery         `bson:"big_query,omitempty"`
+	Metadata    bson.M             `bson:"metadata,omitempty"`
+}
+
+type dbBigQuery struct {
+	// Email represents Gmail address of the owner. It can be either Email
+	// or ContactEmail of the owner.
+	Email   string `bson:"email,omitempty"`
+	Project string `bson:"project,omitempty"`
+	Dataset string `bson:"dataset,omitempty"`
+	Table   string `bson:"table,omitempty"`
+	Fields  string `bson:"fields,omitempty"`
+}
+
+type dbLocation struct {
+	Type string `bson:"type,omitempty"`
+	// Coordinates represent latitude and longitude. It's represented this
+	// way to match the way MongoDB represents geo data.
+	Coordinates [2]float64 `bson:"coordinates,omitempty"`
+}
+
+func toDBStream(stream streams.Stream) (dbStream, error) {
+	dbl := dbLocation{
+		Type:        stream.Location.Type,
+		Coordinates: stream.Location.Coordinates,
+	}
+
+	dbBQ := dbBigQuery{
+		Email:   stream.BQ.Email,
+		Project: stream.BQ.Project,
+		Dataset: stream.BQ.Dataset,
+		Table:   stream.BQ.Table,
+		Fields:  stream.BQ.Fields,
+	}
+
+	dbs := dbStream{
+		Owner:       stream.Owner,
+		Visibility:  stream.Visibility,
+		Name:        stream.Name,
+		Type:        stream.Type,
+		Description: stream.Description,
+		Snippet:     stream.Snippet,
+		URL:         stream.URL,
+		Price:       stream.Price,
+		Location:    dbl,
+		Terms:       stream.Terms,
+		External:    stream.External,
+		BQ:          dbBQ,
+		Metadata:    stream.Metadata,
+	}
+
+	if ok := bson.IsObjectIdHex(stream.ID); !ok {
+		return dbs, streams.ErrMalformedData
+	}
+	dbs.ID = bson.ObjectIdHex(stream.ID)
+
+	return dbs, nil
+}
+
+func fromDBStream(dbs dbStream) streams.Stream {
+	dbl := streams.Location{
+		Type:        dbs.Location.Type,
+		Coordinates: dbs.Location.Coordinates,
+	}
+
+	dbBQ := streams.BigQuery{
+		Email:   dbs.BQ.Email,
+		Project: dbs.BQ.Project,
+		Dataset: dbs.BQ.Dataset,
+		Table:   dbs.BQ.Table,
+		Fields:  dbs.BQ.Fields,
+	}
+
+	return streams.Stream{
+		Owner:       dbs.Owner,
+		ID:          dbs.ID.Hex(),
+		Visibility:  dbs.Visibility,
+		Name:        dbs.Name,
+		Type:        dbs.Type,
+		Description: dbs.Description,
+		Snippet:     dbs.Snippet,
+		URL:         dbs.URL,
+		Price:       dbs.Price,
+		Location:    dbl,
+		Terms:       dbs.Terms,
+		External:    dbs.External,
+		BQ:          dbBQ,
+		Metadata:    dbs.Metadata,
+	}
 }

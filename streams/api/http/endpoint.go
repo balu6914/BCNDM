@@ -5,7 +5,6 @@ import (
 	"datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
@@ -64,7 +63,7 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 
 		if req.stream.ID == "" {
-			req.stream.ID = bson.ObjectIdHex(req.id)
+			req.stream.ID = req.id
 		}
 
 		if err := svc.UpdateStream(req.stream); err != nil {

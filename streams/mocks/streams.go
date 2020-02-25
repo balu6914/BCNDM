@@ -26,7 +26,7 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	dbKey := stream.ID.Hex()
+	dbKey := stream.ID
 
 	if _, ok := srm.streams[dbKey]; ok {
 		return "", streams.ErrConflict
@@ -40,7 +40,7 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 
 	srm.streams[dbKey] = stream
 
-	return stream.ID.Hex(), nil
+	return stream.ID, nil
 }
 
 func (srm *streamRepositoryMock) SaveAll(bulk []streams.Stream) error {
@@ -51,7 +51,7 @@ func (srm *streamRepositoryMock) SaveAll(bulk []streams.Stream) error {
 	}
 
 	for _, stream := range bulk {
-		stream.ID = bson.NewObjectId()
+		stream.ID = bson.NewObjectId().Hex()
 		if _, err := srm.Save(stream); err != nil {
 			if _, ok := err.(streams.ErrBulkConflict); ok {
 				bulkErr.Conflicts = append(bulkErr.Conflicts, stream.URL)
@@ -72,7 +72,7 @@ func (srm *streamRepositoryMock) Update(stream streams.Stream) error {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()
 
-	dbKey := stream.ID.Hex()
+	dbKey := stream.ID
 
 	if v, ok := srm.streams[dbKey]; !ok || v.Owner != stream.Owner {
 		return streams.ErrNotFound

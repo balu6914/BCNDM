@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"cloud.google.com/go/bigquery"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/api/googleapi"
@@ -114,7 +112,7 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 		return "", err
 	}
 
-	stream.ID = bson.ObjectIdHex(id)
+	stream.ID = id
 
 	if stream.Type == "Dataset" {
 		if err := ss.ai.CreateDataset(stream); err != nil {
@@ -234,21 +232,23 @@ func (ss streamService) ViewStream(id, owner string) (Stream, error) {
 		return s, err
 	}
 
-	partners, err := ss.accessControl.Partners(owner)
-	if err != nil {
-		return Stream{}, err
-	}
-	partners = append(partners, owner)
-
-	in := false
-	for _, partner := range partners {
-		if s.Owner == partner {
-			in = true
-			break
+	if s.Visibility == Protected {
+		partners, err := ss.accessControl.Partners(owner)
+		if err != nil {
+			return Stream{}, err
 		}
-	}
-	if !in {
-		return Stream{}, ErrNotFound
+		partners = append(partners, owner)
+
+		in := false
+		for _, partner := range partners {
+			if s.Owner == partner {
+				in = true
+				break
+			}
+		}
+		if !in {
+			return Stream{}, ErrNotFound
+		}
 	}
 
 	if s.Owner != owner {

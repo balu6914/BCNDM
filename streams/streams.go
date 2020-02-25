@@ -33,11 +33,11 @@ type Location struct {
 type BigQuery struct {
 	// Email represents Gmail address of the owner. It can be either Email
 	// or ContactEmail of the owner.
-	Email   string `bson:"email,omitempty" json:"email,omitempty"`
-	Project string `bson:"project,omitempty" json:"project,omitempty"`
-	Dataset string `bson:"dataset,omitempty" json:"dataset,omitempty"`
-	Table   string `bson:"table,omitempty" json:"table,omitempty"`
-	Fields  string `bson:"fields,omitempty" json:"fields,omitempty"`
+	Email   string `json:"email,omitempty"`
+	Project string `json:"project,omitempty"`
+	Dataset string `json:"dataset,omitempty"`
+	Table   string `json:"table,omitempty"`
+	Fields  string `json:"fields,omitempty"`
 }
 
 // Validate provides basic checks of parameters related to the Big Query.
@@ -51,20 +51,20 @@ func (bq BigQuery) Validate() bool {
 
 // Stream represents data stream to be exchanged through platform.
 type Stream struct {
-	Owner       string        `bson:"owner,omitempty" json:"owner,omitempty"`
-	ID          bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
-	Visibility  Visibility    `bson:"visibility,omitempty" json:"visibility,omitempty"`
-	Name        string        `bson:"name,omitempty" json:"name,omitempty"`
-	Type        string        `bson:"type,omitempty" json:"type,omitempty"`
-	Description string        `bson:"description,omitempty" json:"description,omitempty"`
-	Snippet     string        `bson:"snippet,omitempty" json:"snippet,omitempty"`
-	URL         string        `bson:"url,omitempty" json:"url,omitempty"`
-	Price       uint64        `bson:"price,omitempty" json:"price,omitempty"`
-	Location    Location      `bson:"location,omitempty" json:"location,omitempty"`
-	Terms       string        `bson:"terms,omitempty" json:"terms,omitempty"`
-	External    bool          `bson:"external" json:"external,omitempty"`
-	BQ          BigQuery      `bson:"big_query,omitempty" json:"bq,omitempty"`
-	Metadata    bson.M        `bson:"metadata,omitempty" json:"metadata,omitempty"`
+	Owner       string                 `json:"owner,omitempty"`
+	ID          string                 `json:"id,omitempty"`
+	Visibility  Visibility             `json:"visibility,omitempty"`
+	Name        string                 `json:"name,omitempty"`
+	Type        string                 `json:"type,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Snippet     string                 `json:"snippet,omitempty"`
+	URL         string                 `json:"url,omitempty"`
+	Price       uint64                 `json:"price,omitempty"`
+	Location    Location               `json:"location,omitempty"`
+	Terms       string                 `json:"terms,omitempty"`
+	External    bool                   `json:"external,omitempty"`
+	BQ          BigQuery               `json:"bq,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // Page represents paged result for list response.

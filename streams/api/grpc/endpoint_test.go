@@ -19,13 +19,14 @@ import (
 
 var stream = streams.Stream{
 	Owner: owner,
-	ID:    bson.NewObjectId(),
+	ID:    bson.NewObjectId().Hex(),
 	URL:   "http://test.com",
 	Price: 100,
 }
 
 func TestOne(t *testing.T) {
-	svc.AddStream(stream)
+	id, err := svc.AddStream(stream)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
 
 	conn := createConn(t)
 
@@ -39,10 +40,10 @@ func TestOne(t *testing.T) {
 		err    error
 	}{
 		"get existing stream": {
-			id: stream.ID.Hex(),
+			id: id,
 			stream: &datapace.Stream{
 				Owner: stream.Owner,
-				Id:    stream.ID.Hex(),
+				Id:    id,
 				Url:   stream.URL,
 				Price: stream.Price,
 			},

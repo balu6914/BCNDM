@@ -20,7 +20,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 
 		res := oneRes{
-			id:       stream.ID.Hex(),
+			id:       stream.ID,
 			name:     stream.Name,
 			owner:    stream.Owner,
 			url:      stream.URL,

@@ -45,7 +45,7 @@ func stream() streams.Stream {
 	return streams.Stream{
 		Visibility:  streams.Public,
 		Owner:       bson.NewObjectId().Hex(),
-		ID:          bson.NewObjectId(),
+		ID:          bson.NewObjectId().Hex(),
 		Name:        "stream",
 		Type:        "stream type",
 		Description: "stream description",
@@ -72,7 +72,7 @@ func TestSearch(t *testing.T) {
 		s := stream()
 		id, err := repo.Save(s)
 		require.Nil(t, err, "Repo should save streams.")
-		s.ID = bson.ObjectIdHex(id)
+		s.ID = id
 		all = append(all, s)
 		partners = append(partners, s.Owner)
 	}
@@ -85,14 +85,16 @@ func TestSearch(t *testing.T) {
 	s1.Price = s1Price
 	s1.Name = "different name"
 	s1.Type = "different type"
-	id, _ := repo.Save(s1)
-	s1.ID = bson.ObjectIdHex(id)
+	id, err := repo.Save(s1)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
+	s1.ID = id
 
 	s2 := stream()
 	s2.Price = s2Price
 	s2.Owner = bson.NewObjectId().Hex()
-	id, _ = repo.Save(s2)
-	s2.ID = bson.ObjectIdHex(id)
+	id, err = repo.Save(s2)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
+	s2.ID = id
 
 	all = append(all, s1, s2)
 	partners = append(partners, s1.Owner, s2.Owner)
@@ -119,7 +121,7 @@ func TestSearch(t *testing.T) {
 			},
 		},
 		{
-			desc: "search streams reset too big offest to default value silently",
+			desc: "search streams reset too big offset to default value silently",
 			query: streams.Query{
 				Limit:    limit,
 				Page:     uint64(total + maxPage),
@@ -329,7 +331,7 @@ func TestSaveAll(t *testing.T) {
 		validBulk = append(validBulk, s)
 		// Add some new Streams and some Streams with
 		// an existing URL, but non-existent ID.
-		s.ID = bson.NewObjectId()
+		s.ID = bson.NewObjectId().Hex()
 		conflicts = append(conflicts, s.URL)
 		conflictBulk = append(conflictBulk, stream(), s)
 	}
@@ -368,11 +370,11 @@ func TestUpdate(t *testing.T) {
 
 	s := stream()
 	id, err := repo.Save(s)
-	s.ID = bson.ObjectIdHex(id)
-	assert.Nil(t, err, fmt.Sprintf("create a new stream: expected no error, got %s", err))
+	require.Nil(t, err, fmt.Sprintf("got unexpected error when creating stream: %s", err))
+	s.ID = id
 
 	nonExisting := s
-	nonExisting.ID = bson.NewObjectId()
+	nonExisting.ID = bson.NewObjectId().Hex()
 
 	wrong := s
 	wrong.Owner = bson.NewObjectId().Hex()
@@ -411,11 +413,11 @@ func TestOne(t *testing.T) {
 
 	s := stream()
 	id, err := repo.Save(stream())
-	s.ID = bson.ObjectIdHex(id)
+	s.ID = id
 	assert.Nil(t, err, fmt.Sprintf("create new stream: expected no error, got %s", err))
 
 	nonexisting := s
-	nonexisting.ID = bson.NewObjectId()
+	nonexisting.ID = bson.NewObjectId().Hex()
 
 	cases := []struct {
 		desc   string
@@ -435,7 +437,7 @@ func TestOne(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := repo.One(tc.stream.ID.Hex())
+		_, err := repo.One(tc.stream.ID)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
@@ -446,16 +448,16 @@ func TestRemove(t *testing.T) {
 
 	s := stream()
 	id, err := repo.Save(s)
-	s.ID = bson.ObjectIdHex(id)
+	s.ID = id
 	assert.Nil(t, err, fmt.Sprintf("create new stream: expected no error, got %s", err))
 
 	// Show that the removal works the same for both
 	// existing and non-existing (removed) stream.
 	for i := 0; i < 2; i++ {
-		err := repo.Remove(s.Owner, s.ID.Hex())
+		err := repo.Remove(s.Owner, s.ID)
 		assert.Nil(t, err, "removing a stream should not return an error")
 
-		_, err = repo.One(s.ID.Hex())
+		_, err = repo.One(s.ID)
 		assert.Equal(t, streams.ErrNotFound, err, fmt.Sprintf("#%d: expected %s got %s", i, streams.ErrNotFound, err))
 	}
 }

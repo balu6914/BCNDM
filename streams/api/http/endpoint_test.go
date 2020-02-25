@@ -44,7 +44,7 @@ func randomString(n int) string {
 func genStream() streams.Stream {
 	counter++
 	return streams.Stream{
-		ID:          bson.NewObjectId(),
+		ID:          bson.NewObjectId().Hex(),
 		Visibility:  streams.Public,
 		Name:        "name",
 		Type:        "type",
@@ -287,12 +287,12 @@ func TestSearchStreams(t *testing.T) {
 	price2 := uint64(50)
 
 	s := genStream()
-	s.ID = bson.NewObjectId()
+	s.ID = bson.NewObjectId().Hex()
 	s.Price = price1
 	svc.AddStream(s)
 
 	s = genStream()
-	s.ID = bson.NewObjectId()
+	s.ID = bson.NewObjectId().Hex()
 	s.Price = price2
 	s.Owner = bson.NewObjectId().Hex()
 	s.Name = "special_name"
@@ -501,7 +501,7 @@ func TestUpdateStream(t *testing.T) {
 	invalid := toJSON(s)
 	// Create stream that does not exist in database.
 	s = stream
-	nonExistingId := bson.NewObjectId()
+	nonExistingId := bson.NewObjectId().Hex()
 	s.ID = nonExistingId
 	nonExisting := toJSON(s)
 
@@ -517,7 +517,7 @@ func TestUpdateStream(t *testing.T) {
 			req:    valid,
 			auth:   validKey,
 			status: http.StatusOK,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 		},
 		{
 			desc:   "update a stream with non-matching stream ID and URL id",
@@ -531,35 +531,35 @@ func TestUpdateStream(t *testing.T) {
 			req:    nonExisting,
 			auth:   validKey,
 			status: http.StatusNotFound,
-			id:     nonExistingId.Hex(),
+			id:     nonExistingId,
 		},
 		{
 			desc:   "update a stream with invalid data",
 			req:    invalid,
 			auth:   validKey,
 			status: http.StatusBadRequest,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 		},
 		{
 			desc:   "update a stream without an auth key",
 			req:    valid,
 			auth:   "",
 			status: http.StatusForbidden,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 		},
 		{
 			desc:   "update a stream with invalid auth key",
 			req:    valid,
 			auth:   "invalid",
 			status: http.StatusForbidden,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 		},
 		{
 			desc:   "update stream with an empty request",
 			req:    "",
 			auth:   validKey,
 			status: http.StatusBadRequest,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 		},
 	}
 	for _, tc := range cases {
@@ -593,13 +593,13 @@ func TestViewStream(t *testing.T) {
 		{
 			desc:   "get a stream with no errors",
 			auth:   validKey,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 			status: http.StatusOK,
 		},
 		{
 			desc:   "gat a stream with no auth key",
 			auth:   "",
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 			status: http.StatusForbidden,
 		},
 		{
@@ -639,13 +639,13 @@ func TestRemoveStream(t *testing.T) {
 		{
 			desc:   "remove an existing stream",
 			auth:   validKey,
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 			status: http.StatusNoContent,
 		},
 		{
 			desc:   "remove a stream with no auth key",
 			auth:   "",
-			id:     stream.ID.Hex(),
+			id:     stream.ID,
 			status: http.StatusForbidden,
 		},
 		{

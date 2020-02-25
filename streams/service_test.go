@@ -40,7 +40,7 @@ func randomString(n int) string {
 func stream() streams.Stream {
 	return streams.Stream{
 		Owner:       bson.NewObjectId().Hex(),
-		ID:          bson.NewObjectId(),
+		ID:          bson.NewObjectId().Hex(),
 		Name:        randomString(nameLen),
 		Type:        randomString(typeLen),
 		Description: randomString(descLen),
@@ -142,7 +142,7 @@ func TestSearchStreams(t *testing.T) {
 		size++
 		s := stream()
 		id, err := svc.AddStream(s)
-		s.ID = bson.ObjectIdHex(id)
+		s.ID = id
 		require.Nil(t, err, "Repo should save streams.")
 	}
 	// Specify two special Streams to match different
@@ -155,14 +155,14 @@ func TestSearchStreams(t *testing.T) {
 	s1.Name = "different name"
 	s1.Type = "different type"
 	id, _ := svc.AddStream(s1)
-	s1.ID = bson.ObjectIdHex(id)
+	s1.ID = id
 	size++
 
 	s2 := stream()
 	s2.Price = s2Price
 	s2.Owner = bson.NewObjectId().Hex()
 	id, _ = svc.AddStream(s2)
-	s2.ID = bson.ObjectIdHex(id)
+	s2.ID = id
 	size++
 
 	total := uint64(size)
@@ -379,7 +379,7 @@ func TestFullViewStream(t *testing.T) {
 	}{
 		{
 			desc: "view an existing stream",
-			id:   s.ID.Hex(),
+			id:   s.ID,
 			err:  nil,
 		},
 		{
@@ -407,7 +407,7 @@ func TestViewStream(t *testing.T) {
 	}{
 		{
 			desc: "view an existing stream",
-			id:   s.ID.Hex(),
+			id:   s.ID,
 			err:  nil,
 		},
 		{
@@ -430,7 +430,7 @@ func TestRemoveStream(t *testing.T) {
 
 	cases := []struct {
 		desc     string
-		streamId bson.ObjectId
+		streamId string
 		owner    string
 		err      error
 	}{
@@ -442,14 +442,14 @@ func TestRemoveStream(t *testing.T) {
 		},
 		{
 			desc:     "remove a non-existing stream",
-			streamId: bson.NewObjectId(),
+			streamId: bson.NewObjectId().Hex(),
 			owner:    s.Owner,
 			err:      nil,
 		},
 	}
 
 	for _, tc := range cases {
-		err := svc.RemoveStream(tc.owner, tc.streamId.Hex())
+		err := svc.RemoveStream(tc.owner, tc.streamId)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }

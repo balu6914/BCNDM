@@ -100,7 +100,7 @@ func (req updateStreamReq) validate() error {
 		return streams.ErrMalformedData
 	}
 
-	if req.stream.ID != "" && req.id != req.stream.ID.Hex() {
+	if req.stream.ID != "" && req.id != req.stream.ID {
 		return streams.ErrMalformedData
 	}
 

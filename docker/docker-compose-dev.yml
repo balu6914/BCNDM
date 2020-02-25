@@ -197,7 +197,7 @@ services:
       - DATAPACE_WWH_USERNAME=admin1
       - DATAPACE_WWH_PASSWORD=password01
       - DATAPACE_KUBEFLOW_ACTIVE=true
-      - DATAPACE_KUBEFLOW_URL=https://george:Data1_Pace2_Space3@ar.k9s.datapace.io
+      - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io/
       - DATAPACE_KUBEFLOW_STATUS_INTERVAL=10
     networks:
       - datapace-net

@@ -30,7 +30,7 @@ func (es executionsService) CreateAlgorithm(s streams.Stream) error {
 	}
 
 	algo := datapace.Algorithm{
-		Id:       s.ID.Hex(),
+		Id:       s.ID,
 		Name:     s.Name,
 		Metadata: metadata,
 	}
@@ -50,7 +50,7 @@ func (es executionsService) CreateDataset(s streams.Stream) error {
 	}
 
 	dataset := datapace.Dataset{
-		Id:       s.ID.Hex(),
+		Id:       s.ID,
 		Metadata: metadata,
 	}
 
