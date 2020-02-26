@@ -1,0 +1,65 @@
+swagger: "2.0"
+info:
+  title: dProxy service
+  description: HTTP API for dProxy.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /api/register:
+    post:
+      summary: Creating and sending JWT token
+      description: |
+        Creates JWT and sends it to requestor.
+      tags:
+        - register-request
+      parameters:
+        - name: register-request
+          description: Create access request data with user receiver.
+          in: body
+          schema:
+            $ref: "#/definitions/RegisterReq"
+          required: true
+      responses:
+        201:
+          description: JWT token created and sent.
+          schema:
+            $ref: "#/definitions/RegisterRes"
+        400:
+          description: |
+            Failed due to malformed JSON or invalid access request format.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  RegisterReq:
+    type: object
+    properties:
+      url:
+        type: string
+        description: url of the proxied resource.
+      ttl:
+        type: int
+        description: number of seconds for which JWT will be valid.
+  RegisterRes:
+    type: object
+    properties:
+      token:
+        type: string
+        description: access token.

@@ -3,8 +3,14 @@ package main
 import (
 	"datapace"
 	"datapace/dproxy"
+	"datapace/dproxy/api"
+	httpapi "datapace/dproxy/api/http"
+	"datapace/dproxy/jwt"
 	"datapace/logger"
+	log "datapace/logger"
 	"fmt"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,41 +20,60 @@ import (
 const (
 	envHTTPPort  = "DATAPACE_PROXY_HTTP_PORT"
 	defHTTPPort  = "9090"
-	envTargetURL = "DATAPACE_PROXY_TARGET_URL"
-	defTargetURL = "http://localhost"
+	envJWTSecret = "DATAPACE_JWT_SECRET"
+	defJWTSecret = "examplesecret"
 )
 
 type config struct {
 	httpPort  string
-	targetURL string
+	jwtSecret string
 }
 
 func main() {
 	cfg := loadConfig()
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
-
-	go startHTTPServer(cfg.targetURL, cfg.httpPort, logger, errs)
+	svc := newService(cfg.jwtSecret, logger)
+	go startHTTPServer(svc, cfg.httpPort, logger, errs)
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
 		errs <- fmt.Errorf("%s", <-c)
 	}()
-
 	err := <-errs
 	logger.Error(fmt.Sprintf("Proxy service terminated: %s", err))
+}
 
+func newService(jwtSecret string, logger log.Logger) dproxy.Service {
+	svc := jwt.NewService(jwtSecret)
+	svc = api.LoggingMiddleware(svc, logger)
+	svc = api.MetricsMiddleware(
+		svc,
+		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+			Namespace: "dproxy",
+			Subsystem: "api",
+			Name:      "request_count",
+			Help:      "Number of requests received.",
+		}, []string{"method"}),
+		kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+			Namespace: "dproxy",
+			Subsystem: "api",
+			Name:      "request_latency_microseconds",
+			Help:      "Total duration of requests in microseconds.",
+		}, []string{"method"}),
+	)
+	return svc
 }
 
 func loadConfig() config {
 	return config{
 		httpPort:  datapace.Env(envHTTPPort, defHTTPPort),
-		targetURL: datapace.Env(envTargetURL, defTargetURL),
+		jwtSecret: datapace.Env(envJWTSecret, defJWTSecret),
 	}
 }
 
-func startHTTPServer(target, port string, logger logger.Logger, errs chan error) {
+func startHTTPServer(svc dproxy.Service, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
-	logger.Info(fmt.Sprintf("Executions HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, http.HandlerFunc(dproxy.MakeReverseProxy(target)))
+	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc))
 }
