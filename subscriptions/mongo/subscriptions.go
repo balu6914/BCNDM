@@ -23,7 +23,7 @@ func NewSubscriptionRepository(db *mgo.Session) subscriptions.SubscriptionReposi
 func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collentionName)
+	c := s.DB(dbName).C(collectionName)
 
 	sub.ID = bson.NewObjectId()
 	dbSub := toDBSub(sub)
@@ -42,7 +42,7 @@ func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, e
 func (sr subscriptionRepository) Search(query subscriptions.Query) (subscriptions.Page, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collentionName)
+	c := s.DB(dbName).C(collectionName)
 
 	limit := int(query.Limit)
 	page := int(query.Page)
@@ -82,7 +82,7 @@ func (sr subscriptionRepository) Search(query subscriptions.Query) (subscription
 func (sr subscriptionRepository) One(id string) (subscriptions.Subscription, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collentionName)
+	c := s.DB(dbName).C(collectionName)
 
 	var dbSub subscription
 	query := bson.M{
@@ -102,6 +102,31 @@ func (sr subscriptionRepository) One(id string) (subscriptions.Subscription, err
 	return sub, nil
 }
 
+func (sr subscriptionRepository) OneByUserAndStream(userID string, streamID string) (subscriptions.Subscription, error) {
+	s := sr.db.Copy()
+	defer s.Close()
+	c := s.DB(dbName).C(collectionName)
+
+	var dbSub subscription
+	query := bson.M{
+		"user_id":   userID,
+		"stream_id": streamID,
+		"end_date":  map[string]time.Time{"$gt": time.Now()},
+		"active":    true,
+	}
+
+	if err := c.Find(query).One(&dbSub); err != nil {
+		if err == mgo.ErrNotFound {
+			return subscriptions.Subscription{}, subscriptions.ErrNotFound
+		}
+
+		return subscriptions.Subscription{}, err
+	}
+
+	sub := toSub(dbSub)
+	return sub, nil
+}
+
 func (sr subscriptionRepository) Activate(id string) error {
 	return sr.setActive(id, true)
 }
@@ -113,7 +138,7 @@ func (sr subscriptionRepository) Remove(id string) error {
 func (sr subscriptionRepository) setActive(id string, active bool) error {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collentionName)
+	c := s.DB(dbName).C(collectionName)
 
 	update := bson.M{
 		"$set": subscription{Active: active},

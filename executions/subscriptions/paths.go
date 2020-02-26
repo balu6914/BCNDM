@@ -1,0 +1,35 @@
+package subscriptions
+
+import (
+	"datapace/executions"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+type pathRepository struct {
+	subscriptionsURL string
+}
+
+// New returns path repository instance.
+func New(subscriptionsURL string) executions.PathRepository {
+	return pathRepository{
+		subscriptionsURL: subscriptionsURL,
+	}
+}
+
+func (repo pathRepository) Current(owner, data string) (string, error) {
+	url := fmt.Sprintf("%s/owner/%s/stream/%s/subscriptions", repo.subscriptionsURL, owner, data)
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var sub viewSubRes
+	if err := json.NewDecoder(resp.Body).Decode(&sub); err != nil {
+		return "", err
+	}
+
+	return sub.URL, nil
+}

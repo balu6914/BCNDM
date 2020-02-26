@@ -191,13 +191,14 @@ services:
       - DATAPACE_EXECUTIONS_GRPC_PORT=8089
       - DATAPACE_EXECUTIONS_DB_URL=datapace-executions-db
       - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_SUBSCRIPTIONS_URL=http://datapace-subscriptions:8086
       - DATAPACE_WWH_CATALOG_URL=http://localhost:31222 # instead of localhost place docker host IP
       - DATAPACE_WWH_DAEMON_URL=localhost:32222 # same here (check it with docker exec -it datapace-executions route)
       - DATAPACE_WWH_TOKEN=v61rSpnp89
       - DATAPACE_WWH_USERNAME=admin1
       - DATAPACE_WWH_PASSWORD=password01
       - DATAPACE_KUBEFLOW_ACTIVE=true
-      - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io/
+      - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io
       - DATAPACE_KUBEFLOW_STATUS_INTERVAL=10
     networks:
       - datapace-net

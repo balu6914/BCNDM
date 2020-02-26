@@ -53,15 +53,17 @@ type executionsService struct {
 	algos AlgorithmRepository
 	data  DatasetRepository
 	ai    AIService
+	paths PathRepository
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(execs ExecutionRepository, algos AlgorithmRepository, data DatasetRepository, ai AIService) Service {
+func NewService(execs ExecutionRepository, algos AlgorithmRepository, data DatasetRepository, ai AIService, paths PathRepository) Service {
 	return executionsService{
 		execs: execs,
 		algos: algos,
 		data:  data,
 		ai:    ai,
+		paths: paths,
 	}
 }
 
@@ -75,6 +77,12 @@ func (es executionsService) Start(exec Execution) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	path, err := es.paths.Current(exec.Owner, exec.Data)
+	if err != nil {
+		return "", err
+	}
+	data.Metadata["path"] = path
 
 	exec.State = InProgress
 	id, err := es.execs.Create(exec)

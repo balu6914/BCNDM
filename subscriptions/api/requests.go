@@ -49,3 +49,16 @@ func (req viewSubReq) validate() error {
 	}
 	return nil
 }
+
+type viewSubByUserAndStreamReq struct {
+	userID   string
+	streamID string
+}
+
+func (req viewSubByUserAndStreamReq) validate() error {
+	if req.userID == "" || req.streamID == "" {
+		return subscriptions.ErrMalformedEntity
+	}
+
+	return nil
+}

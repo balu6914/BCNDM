@@ -10,7 +10,7 @@ import (
 // CollectionName - Collection name
 const (
 	dbName         = "datapace-subscriptions"
-	collentionName = "subscriptions"
+	collectionName = "subscriptions"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error
@@ -35,7 +35,7 @@ func Connect(addr string, tout int, socketTout int, db string,
 
 	session := ms.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(collentionName)
+	collection := session.DB(dbName).C(collectionName)
 
 	indices := []mgo.Index{
 

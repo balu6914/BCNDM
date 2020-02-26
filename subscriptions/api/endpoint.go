@@ -38,7 +38,7 @@ func addSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 				SubscriptionID: id,
 			})
 		}
-		
+
 		return resps, nil
 	}
 }
@@ -78,6 +78,26 @@ func viewSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 		}
 
 		s, err := svc.ViewSubscription(req.userID, req.subscriptionID)
+		if err != nil {
+			return nil, err
+		}
+
+		res := viewSubRes{
+			Subscription: s,
+		}
+		return res, nil
+	}
+}
+
+func viewSubByUserAndStreamEndpoint(svc subscriptions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(viewSubByUserAndStreamReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		s, err := svc.ViewSubByUserAndStream(req.userID, req.streamID)
 		if err != nil {
 			return nil, err
 		}

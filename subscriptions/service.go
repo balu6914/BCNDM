@@ -55,6 +55,10 @@ type Service interface {
 
 	// ViewSubscription retrieves subscription by the given ID.
 	ViewSubscription(string, string) (Subscription, error)
+
+	// ViewSubByUserAndStream retrieves subscription by the given user ID and
+	// stream ID.
+	ViewSubByUserAndStream(string, string) (Subscription, error)
 }
 
 var _ Service = (*subscriptionsService)(nil)
@@ -147,7 +151,7 @@ func (ss subscriptionsService) createTable(ds *bigquery.Dataset, stream Stream, 
 	return nil
 }
 
-func (ss subscriptionsService) createVewDataset(email, datasetID string, client *bigquery.Client) error {
+func (ss subscriptionsService) createViewDataset(email, datasetID string, client *bigquery.Client) error {
 	ds := client.Dataset(datasetID)
 	ae := &bigquery.AccessEntry{
 		Role:       bigquery.ReaderRole,
@@ -239,7 +243,7 @@ func (ss subscriptionsService) createBQ(url *string, token string, stream Stream
 	datasetID := fmt.Sprintf("%s_%s", stream.Dataset, id)
 	viewID := fmt.Sprintf("%s_%s", stream.Table, id)
 	// Create dataset for authorized view.
-	if err := ss.createVewDataset(gmail, datasetID, client); err != nil {
+	if err := ss.createViewDataset(gmail, datasetID, client); err != nil {
 		return nil, err
 	}
 	// Create authorized view.
@@ -339,4 +343,8 @@ func (ss subscriptionsService) ViewSubscription(userID, subID string) (Subscript
 	}
 
 	return sub, nil
+}
+
+func (ss subscriptionsService) ViewSubByUserAndStream(userID, streamID string) (Subscription, error) {
+	return ss.subscriptions.OneByUserAndStream(userID, streamID)
 }

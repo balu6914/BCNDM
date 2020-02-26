@@ -50,6 +50,10 @@ func (srm *subscriptionRepositoryMock) One(subID string) (subscriptions.Subscrip
 	return subscriptions.Subscription{}, subscriptions.ErrNotFound
 }
 
+func (srm *subscriptionRepositoryMock) OneByUserAndStream(owner, data string) (subscriptions.Subscription, error) {
+	return subscriptions.Subscription{}, nil
+}
+
 func (srm *subscriptionRepositoryMock) Search(query subscriptions.Query) (subscriptions.Page, error) {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()

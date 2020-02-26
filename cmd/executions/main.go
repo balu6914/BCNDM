@@ -24,6 +24,7 @@ import (
 	httpapi "datapace/executions/api/http"
 	"datapace/executions/kubeflow"
 	"datapace/executions/mongo"
+	"datapace/executions/subscriptions"
 	"datapace/executions/wwh"
 	"datapace/logger"
 )
@@ -36,6 +37,7 @@ const (
 	envDBPass           = "DATAPACE_EXECUTIONS_DB_PASS"
 	envDBName           = "DATAPACE_EXECUTIONS_DB_NAME"
 	envAuthURL          = "DATAPACE_AUTH_URL"
+	envSubscriptionsURL = "DATAPACE_SUBSCRIPTIONS_URL"
 	envWWHCatalogURL    = "DATAPACE_WWH_CATALOG_URL"
 	envWWHDaemonURL     = "DATAPACE_WWH_DAEMON_URL"
 	envWWHToken         = "DATAPACE_WWH_TOKEN"
@@ -52,6 +54,7 @@ const (
 	defDBPass           = ""
 	defDBName           = "executions"
 	defAuthURL          = "localhost:8081"
+	defSubscriptionsURL = "localhost:8086"
 	defWWHCatalogURL    = "http://localhost:31222"
 	defWWHDaemonURL     = "http://localhost:32222"
 	defWWHToken         = ""
@@ -75,6 +78,7 @@ type config struct {
 	dbConnectTimeout int
 	dbSocketTimeout  int
 	authURL          string
+	subscriptionsURL string
 	wwhCatalogURL    string
 	wwhDaemonURL     string
 	wwhToken         string
@@ -145,6 +149,7 @@ func loadConfig() config {
 		dbConnectTimeout: dbConnectTimeout,
 		dbSocketTimeout:  dbSocketTimeout,
 		authURL:          datapace.Env(envAuthURL, defAuthURL),
+		subscriptionsURL: datapace.Env(envSubscriptionsURL, defSubscriptionsURL),
 		wwhCatalogURL:    datapace.Env(envWWHCatalogURL, defWWHCatalogURL),
 		wwhDaemonURL:     datapace.Env(envWWHDaemonURL, defWWHDaemonURL),
 		wwhToken:         datapace.Env(envWWHToken, defWWHToken),
@@ -187,13 +192,14 @@ func newService(cfg config, ms *mgo.Session, logger logger.Logger) executions.Se
 	execs := mongo.NewExecutionRepository(ms)
 	algos := mongo.NewAlgorithmRepository(ms)
 	data := mongo.NewDatasetRepository(ms)
+	paths := subscriptions.New(cfg.subscriptionsURL)
 	var ai executions.AIService
 	if cfg.kfFlag {
 		ai = kubeflow.New(cfg.kfURL, cfg.kfInterval, logger)
 	} else {
 		ai = wwh.NewAIService(cfg.wwhCatalogURL, cfg.wwhDaemonURL, cfg.wwhToken, cfg.wwhUsername, cfg.wwhPassword)
 	}
-	svc := executions.NewService(execs, algos, data, ai)
+	svc := executions.NewService(execs, algos, data, ai, paths)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

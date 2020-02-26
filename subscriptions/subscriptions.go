@@ -54,6 +54,10 @@ type SubscriptionRepository interface {
 	// One retrieves a subscription by its ID.
 	One(string) (Subscription, error)
 
+	// OneByUserAndStream retrieves a subscription by its owner ID
+	// and stream ID.
+	OneByUserAndStream(string, string) (Subscription, error)
+
 	// Activate subscription by ID.
 	Activate(string) error
 

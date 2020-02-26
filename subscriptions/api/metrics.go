@@ -52,3 +52,12 @@ func (ms *metricsMiddleware) SearchSubscriptions(query subscriptions.Query) (sub
 
 	return ms.svc.SearchSubscriptions(query)
 }
+
+func (ms *metricsMiddleware) ViewSubByUserAndStream(userID, streamID string) (subscriptions.Subscription, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_sub_by_user_and_stream").Add(1)
+		ms.latency.With("method", "view_sub_by_user_and_stream").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ViewSubByUserAndStream(userID, streamID)
+}

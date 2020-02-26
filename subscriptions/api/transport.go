@@ -40,6 +40,13 @@ func MakeHandler(svc subscriptions.Service, ac datapace.AuthServiceClient) http.
 		opts...,
 	))
 
+	r.Get("/owner/:ownerID/stream/:streamID/subscriptions", kithttp.NewServer(
+		viewSubByUserAndStreamEndpoint(svc),
+		decodeViewSubByUserAndStreamRequest,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Get("/subscriptions/bought", kithttp.NewServer(
 		searchSubsEndpoint(svc),
 		decodeBoughtSubsRequest,
@@ -120,8 +127,8 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 	}
 
 	req := addSubsReq{
-		UserID:       userID,
-		UserToken:    r.Header.Get("Authorization"),
+		UserID:        userID,
+		UserToken:     r.Header.Get("Authorization"),
 		Subscriptions: subs,
 	}
 
@@ -169,6 +176,17 @@ func decodeViewSubRequest(_ context.Context, r *http.Request) (interface{}, erro
 	req := viewSubReq{
 		userID:         userID,
 		subscriptionID: bone.GetValue(r, "id"),
+	}
+	return req, nil
+}
+
+func decodeViewSubByUserAndStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID := bone.GetValue(r, "ownerID")
+	streamID := bone.GetValue(r, "streamID")
+
+	req := viewSubByUserAndStreamReq{
+		userID:   userID,
+		streamID: streamID,
 	}
 	return req, nil
 }
