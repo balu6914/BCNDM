@@ -18,15 +18,18 @@ import (
 )
 
 const (
-	envHTTPPort  = "DATAPACE_PROXY_HTTP_PORT"
-	defHTTPPort  = "9090"
-	envJWTSecret = "DATAPACE_JWT_SECRET"
-	defJWTSecret = "examplesecret"
+	envHTTPPort    = "DATAPACE_PROXY_HTTP_PORT"
+	defHTTPPort    = "9090"
+	envJWTSecret   = "DATAPACE_JWT_SECRET"
+	defJWTSecret   = "examplesecret"
+	envLocalFsRoot = "DATAPACE_LOCAL_FS_ROOT"
+	defLocalFsRoot = "/tmp/test"
 )
 
 type config struct {
-	httpPort  string
-	jwtSecret string
+	httpPort    string
+	jwtSecret   string
+	localFsRoot string
 }
 
 func main() {
@@ -34,7 +37,9 @@ func main() {
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	svc := newService(cfg.jwtSecret, logger)
-	go startHTTPServer(svc, cfg.httpPort, logger, errs)
+	r := httpapi.NewReverseProxy(svc, logger)
+	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, logger)
+	go startHTTPServer(svc, r, f, cfg.httpPort, logger, errs)
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
@@ -67,13 +72,14 @@ func newService(jwtSecret string, logger log.Logger) dproxy.Service {
 
 func loadConfig() config {
 	return config{
-		httpPort:  datapace.Env(envHTTPPort, defHTTPPort),
-		jwtSecret: datapace.Env(envJWTSecret, defJWTSecret),
+		httpPort:    datapace.Env(envHTTPPort, defHTTPPort),
+		jwtSecret:   datapace.Env(envJWTSecret, defJWTSecret),
+		localFsRoot: datapace.Env(envLocalFsRoot, defLocalFsRoot),
 	}
 }
 
-func startHTTPServer(svc dproxy.Service, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.FsProxy, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs))
 }

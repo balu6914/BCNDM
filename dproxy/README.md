@@ -15,7 +15,11 @@ More information about this endpoint can be found in the swagger.yml file in thi
 
 Once user has the JWT token, he can fetch the proxied resource by accessing `/http` endpoint on dProxy.
 User should issue HTTP GET request to `/http` endpoint with HTTP header: "Authorization: your-jwt-token-here".
-Upon this request, dProxy will analyze the JWT token from the HTTP header, and if valid, it will fetch the resource and send it to user.
+Upon this request, dProxy will analyze the JWT token from the HTTP header, and if valid, it will fetch the resource specified in the token and send it to user.
+
+User can also fetch files from local filesystem directory which is configured using `DATAPACE_LOCAL_FS_ROOT ` env variable.
+Files within that directory will be available if user sends HTTP GET request to `/fs` endpoint with HTTP header: "Authorization: your-jwt-token-here".
+Upon this request, dProxy will analyze the JWT token from the HTTP header, and if valid, it will fetch local file specified in the token and send it to user.
 
 
 ## Configuration
@@ -25,10 +29,11 @@ The service is configured using the environment variables presented in the
 following table. Note that any unset variables will be replaced with their
 default values.
 
-| Variable                             | Description                              | Default                |
-|--------------------------------------|------------------------------------------|------------------------|
-| DATAPACE_PROXY_HTTP_PORT             | Reverse proxy HTTP port                  | 9090                   |
-| DATAPACE_JWT_SECRET                  | Reverse proxy JWT secret                 | examplesecret       |
+| Variable                             | Description                                                                         | Default                |
+|--------------------------------------|-------------------------------------------------------------------------------------|------------------------|
+| DATAPACE_PROXY_HTTP_PORT             | Reverse proxy HTTP port                                                             | 9090                   |
+| DATAPACE_JWT_SECRET                  | Reverse proxy JWT secret                                                            | examplesecret       |
+| DATAPACE_LOCAL_FS_ROOT               | Local filesystem directory which serves as root directory when serving local files  | /tmp/test       |
 
 The service itself is distributed as Docker container. You can find a Docker composition
 [here](../docker/docker-compose.yml).
@@ -45,5 +50,5 @@ make dproxy
 make install
 
 # set the environment variables and run the service
-DATAPACE_PROXY_HTTP_PORT=[Reverse proxy HTTP port] DATAPACE_JWT_SECRET=[Reverse proxy JWT secret] $GOBIN/datapace-dproxy
+DATAPACE_PROXY_HTTP_PORT=[Reverse proxy HTTP port] DATAPACE_JWT_SECRET=[Reverse proxy JWT secret] DATAPACE_LOCAL_FS_ROOT=[Path to local files directory] $GOBIN/datapace-dproxy
 ```

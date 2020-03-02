@@ -2,7 +2,9 @@ package http
 
 import (
 	"datapace/dproxy"
+	log "datapace/logger"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -11,12 +13,14 @@ import (
 var errTokenNotFound = errors.New("token not found in url")
 
 type ReverseProxy struct {
-	svc dproxy.Service
-	p   *httputil.ReverseProxy
+	svc       dproxy.Service
+	p         *httputil.ReverseProxy
+	logger    log.Logger
+	logPrefix string
 }
 
-func NewReverseProxy(svc dproxy.Service) *ReverseProxy {
-	return &ReverseProxy{svc: svc, p: &httputil.ReverseProxy{}}
+func NewReverseProxy(svc dproxy.Service, logger log.Logger) *ReverseProxy {
+	return &ReverseProxy{svc: svc, p: &httputil.ReverseProxy{}, logger: logger, logPrefix: "rp"}
 }
 
 func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +53,7 @@ func (rp *ReverseProxy) makeDirector(originalReq *http.Request) (func(r *http.Re
 	if err != nil {
 		return nil, err
 	}
+	rp.logger.Info(fmt.Sprintf("%s: proxying request from %s to %s", rp.logPrefix, originalReq.RemoteAddr, targetURL))
 	return func(r *http.Request) {
 		u, _ := url.Parse(targetURL)
 		r.URL.Host = u.Host

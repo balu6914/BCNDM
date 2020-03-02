@@ -15,12 +15,13 @@ import (
 var errUnsupportedContentType = errors.New("unsupported content type")
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc dproxy.Service) http.Handler {
+func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 	r := bone.New()
-	r.Get("/http", NewReverseProxy(svc))
+	r.GetFunc("/fs", fs.GetFile)
+	r.Get("/http", rp)
 	r.Post("/api/register", kithttp.NewServer(createTokenEndpoint(svc),
 		decodeCreateToken,
 		encodeResponse,
