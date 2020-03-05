@@ -24,13 +24,13 @@ func MetricsMiddleware(svc dproxy.Service, counter metrics.Counter, latency metr
 	}
 }
 
-func (ms *metricsMiddleware) CreateToken(url string, ttl int) (string, error) {
+func (ms *metricsMiddleware) CreateToken(url string, ttl, maxCalls int) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "create_token").Add(1)
 		ms.latency.With("method", "create_token").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.CreateToken(url, ttl)
+	return ms.svc.CreateToken(url, ttl, maxCalls)
 }
 
 func (ms *metricsMiddleware) GetTargetURL(url string) (string, error) {

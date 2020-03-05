@@ -50,7 +50,7 @@ func (f *FsProxy) GetFile(w http.ResponseWriter, r *http.Request) {
 func (f *FsProxy) prepareFilePath(token string) (string, error) {
 	targetURL, err := f.svc.GetTargetURL(token)
 	if err != nil {
-		return "", errUnauthorized
+		return "", err
 	}
 	fp := filepath.Join(f.localFsRoot, targetURL)
 	if strings.Contains(fp, "..") {

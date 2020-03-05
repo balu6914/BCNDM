@@ -32,8 +32,19 @@ default values.
 | Variable                             | Description                                                                         | Default                |
 |--------------------------------------|-------------------------------------------------------------------------------------|------------------------|
 | DATAPACE_PROXY_HTTP_PORT             | Reverse proxy HTTP port                                                             | 9090                   |
-| DATAPACE_JWT_SECRET                  | Reverse proxy JWT secret                                                            | examplesecret       |
-| DATAPACE_LOCAL_FS_ROOT               | Local filesystem directory which serves as root directory when serving local files  | /tmp/test       |
+| DATAPACE_JWT_SECRET                  | Reverse proxy JWT secret                                                            | examplesecret          |
+| DATAPACE_LOCAL_FS_ROOT               | Local filesystem directory which serves as root directory when serving local files  | /tmp/test              |
+| DATAPACE_DPROXY_DB_HOST              | dProxy database host                                                                | localhost              |
+| DATAPACE_DPROXY_DB_PORT              | dProxy database port                                                                | 5432                   |
+| DATAPACE_DPROXY_DB_USER              | dProxy database username                                                            | dproxy                 |
+| DATAPACE_DPROXY_DB_PASS              | dProxy database password                                                            | dproxy                 |
+| DATAPACE_DPROXY_DB                   | dProxy database name                                                                | dproxy                 |
+| DATAPACE_DPROXY_DB_SSL_MODE          | dProxy database ssl switch                                                          | disable                |
+| DATAPACE_DPROXY_DB_SSL_CERT          | dProxy database certificate                                                         |                        |
+| DATAPACE_DPROXY_DB_SSL_KEY           | dProxy database private key                                                         |                        |
+| DATAPACE_DPROXY_DB_SSL_ROOT_CERT     | dProxy database root certificate                                                    |                        |
+
+
 
 The service itself is distributed as Docker container. You can find a Docker composition
 [here](../docker/docker-compose.yml).
