@@ -6,7 +6,7 @@ IoT data marketplace based on blockchain.
 ## Install
 ```
 cd $GOPATH/src
-git@github.com:Datapace/datapace.git datapace
+git clone git@github.com:Datapace/datapace.git datapace
 ```
 
 For read-only access (non-developer) you can use `https` and avoid setting necessary GitHub SSH keys:
@@ -69,6 +69,7 @@ In order to build backend microservices (i.e. Datapace dApp) you will need to ma
 ```
 make dockers
 ```
+
 ### Logging
 For production centralized logging run the following command:
 
