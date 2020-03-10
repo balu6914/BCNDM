@@ -22,7 +22,7 @@ func (d *jwtService) Create(url string, ttl int, maxCalls int) (string, error) {
 		StandardClaims: jwt.StandardClaims{
 			Id:        uuid.NewV4().String(),
 			NotBefore: time.Now().Unix(),
-			ExpiresAt: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(ttl)).Unix(),
 		},
 		URL:      url,
 		MaxCalls: maxCalls,

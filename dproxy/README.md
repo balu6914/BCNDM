@@ -10,7 +10,7 @@ Upon successful authorization, dProxy will fetch the protected resource and deli
 
 ## Usage
 In order to grant access to the resource behind the dProxy, one needs to create the authorization JWT token.
-this is done by doing HTTP POST request to  `/api/register` endpoint with the json payload describing the resource URL and the ttl (number of seconds for which the token is valid).
+this is done by doing HTTP POST request to  `/api/register` endpoint with the json payload describing the resource URL and the ttl (number of hours for which the token is valid).
 More information about this endpoint can be found in the swagger.yml file in this directory. 
 
 Once user has the JWT token, he can fetch the proxied resource by accessing `/http` endpoint on dProxy.
