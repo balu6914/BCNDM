@@ -1,0 +1,38 @@
+version: "3"
+
+networks:
+  datapace-net:
+    driver: bridge
+
+services:
+  datapace-dproxy:
+    image: datapace/dproxy:latest
+    container_name: datapace-dproxy
+    environment:
+      - DATAPACE_DPROXY_DB_HOST=datapace-dproxy-db
+      - DATAPACE_DPROXY_DB_PORT=5432
+      - DATAPACE_DPROXY_DB_USER=dproxy
+      - DATAPACE_DPROXY_DB_PASS=dproxy
+      - DATAPACE_DPROXY_DB_=dproxy
+      - DATAPACE_LOCAL_FS_ROOT=/data
+    depends_on:
+      - datapace-dproxy-db
+    volumes:
+      - ./dproxy-localfiles:/data
+    ports:
+      - "9090:9090"
+    restart: on-failure
+    networks:
+      - datapace-net
+
+  datapace-dproxy-db:
+    image: postgres:10.8-alpine
+    container_name: datapace-dproxy-db
+    environment:
+      - POSTGRES_USER=dproxy
+      - POSTGRES_PASSWORD=dproxy
+      - POSTGRES_DB=dproxy
+    volumes:
+      - ./dproxy-dbdata:/var/lib/postgresql/data
+    networks:
+      - datapace-net
