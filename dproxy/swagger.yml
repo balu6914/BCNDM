@@ -56,7 +56,7 @@ definitions:
         description: url of the proxied resource.
       ttl:
         type: int
-        description: number of seconds for which JWT will be valid.
+        description: number of hours for which JWT will be valid.
       max_calls:
         type: int
         description: maximum number of proxy calls using issued token.
