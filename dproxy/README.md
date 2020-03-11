@@ -21,6 +21,10 @@ User can also fetch files from local filesystem directory which is configured us
 Files within that directory will be available if user sends HTTP GET request to `/fs` endpoint with HTTP header: "Authorization: your-jwt-token-here".
 Upon this request, dProxy will analyze the JWT token from the HTTP header, and if valid, it will fetch local file specified in the token and send it to user.
 
+User can also upload files to local filesystem directory which is configured using `DATAPACE_LOCAL_FS_ROOT ` env variable.
+Files will be uploaded if user sends HTTP PUT request to `/fs` endpoint with HTTP header: "Authorization: your-jwt-token-here".
+Upon this request, dProxy will analyze the JWT token from the HTTP header, and if valid, it will store HTTP body content to the file specified in the token.
+
 
 ## Configuration
 

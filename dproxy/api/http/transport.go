@@ -21,6 +21,7 @@ func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy) http.Handler
 	}
 	r := bone.New()
 	r.GetFunc("/fs", fs.GetFile)
+	r.PutFunc("/fs", fs.PutFile)
 	r.Get("/http", rp)
 	r.Post("/api/register", kithttp.NewServer(createTokenEndpoint(svc),
 		decodeCreateToken,

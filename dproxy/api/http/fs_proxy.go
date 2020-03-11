@@ -47,6 +47,27 @@ func (f *FsProxy) GetFile(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, b)
 }
 
+func (f *FsProxy) PutFile(w http.ResponseWriter, r *http.Request) {
+	fp, err := f.prepareFilePath(r.Header.Get("Authorization"))
+	if err != nil {
+		f.logger.Error(fmt.Sprintf("%s: failed to prepare file path %s with error %s", f.logPrefix, fp, err))
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+	f.logger.Info(fmt.Sprintf("%s: received request from %s to %s", f.logPrefix, r.RemoteAddr, fp))
+	file, err := os.Create(fp)
+	if err != nil {
+		f.logger.Error(fmt.Sprintf("%s: failed to create file %s with error %s", f.logPrefix, fp, err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+		return
+	}
+	defer file.Close()
+	defer r.Body.Close()
+	io.Copy(file, r.Body)
+}
+
 func (f *FsProxy) prepareFilePath(token string) (string, error) {
 	targetURL, err := f.svc.GetTargetURL(token)
 	if err != nil {
