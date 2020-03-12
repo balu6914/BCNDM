@@ -43,7 +43,7 @@
     "ngx-select-ex": "^3.6.8",
     "ngx-toastr": "^8.8.0",
     "ngx-ui-switch": "^7.0.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.0",
     "rxjs": "^6.4.0",
     "rxjs-compat": "^6.4.0",
     "zone.js": "^0.8.29"

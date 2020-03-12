@@ -19,7 +19,7 @@ services:
   # Auth service
   ###
   datapace-auth:
-    image: datapace/auth
+    image: registry.gitlab.com/drasko/datapace-docker/auth
     container_name: datapace-auth
     restart: on-failure
     depends_on:
@@ -52,7 +52,7 @@ services:
   # Transactions service
   ###
   datapace-transactions:
-    image: datapace/transactions
+    image: registry.gitlab.com/drasko/datapace-docker/transactions
     container_name: datapace-transactions
     restart: on-failure
     depends_on:
@@ -95,7 +95,7 @@ services:
   # Streams service
   ###
   datapace-streams:
-    image: datapace/streams:latest
+    image: registry.gitlab.com/drasko/datapace-docker/streams:latest
     container_name: datapace-streams
     depends_on:
       - datapace-streams-db
@@ -138,7 +138,7 @@ services:
   # Subscriptions service
   ###
   datapace-subscriptions:
-    image: datapace/subscriptions:latest
+    image: registry.gitlab.com/drasko/datapace-docker/subscriptions:latest
     container_name: datapace-subscriptions
     depends_on:
       - datapace-subscriptions-db
@@ -177,7 +177,7 @@ services:
   # Executions serivce
   ###
   datapace-executions:
-    image: datapace/executions:latest
+    image: registry.gitlab.com/drasko/datapace-docker/executions:latest
     container_name: datapace-executions
     depends_on:
       - datapace-executions-db
@@ -220,7 +220,7 @@ services:
   # Access Control service
   ###
   datapace-access-control:
-    image: datapace/access-control
+    image: registry.gitlab.com/drasko/datapace-docker/access-control
     container_name: datapace-access-control
     restart: on-failure
     depends_on:
@@ -247,7 +247,7 @@ services:
       - datapace-net
 
   datapace-proxy:
-    image: datapace/proxy:latest
+    image: registry.gitlab.com/drasko/datapace-docker/proxy:latest
     container_name: datapace-proxy
     environment:
       - REDIS_URL=redis://datapace-proxy-db:6379
@@ -276,7 +276,7 @@ services:
   # Datapace UI
   ###
   datapace-ui:
-    image: datapace/ui
+    image: registry.gitlab.com/drasko/datapace-docker/ui
     container_name: datapace-ui
     restart: on-failure
     ports:

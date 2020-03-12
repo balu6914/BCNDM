@@ -1,5 +1,5 @@
 
-FROM golang:1.10-alpine AS builder
+FROM golang:1.13-alpine AS builder
 ARG SVC_NAME
 WORKDIR /go/src/datapace
 COPY . .
@@ -8,6 +8,7 @@ RUN apk update \
     && make $SVC_NAME \
     && mv build/datapace-$SVC_NAME /exe
 
-FROM golang:1.10-alpine
+FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /exe /
 ENTRYPOINT ["/exe"]
