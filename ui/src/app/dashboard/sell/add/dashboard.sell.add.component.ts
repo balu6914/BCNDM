@@ -130,7 +130,6 @@ export class DashboardSellAddComponent implements OnInit {
         stream.url = this.form.get('url').value;
       }
 
-      // Send addStream request
       this.streamService.addStream(stream).subscribe(
         res => {
           // Add ID from http response to stream

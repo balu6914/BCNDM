@@ -5,30 +5,31 @@ import { StreamService } from 'app/common/services/stream.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
-  selector: 'dashboard-sell-delete',
-  templateUrl: './dashboard.sell.delete.component.html',
-  styleUrls: ['./dashboard.sell.delete.component.scss']
+  selector: 'dpc-dashboard-ai-delete',
+  templateUrl: './dashboard.ai.delete.component.html',
+  styleUrls: ['./dashboard.ai.delete.component.scss']
 })
-export class DashboardSellDeleteComponent implements OnInit {
+export class DashboardAiDeleteComponent implements OnInit {
   stream: any;
 
   @Output() streamDeleted: EventEmitter<any> = new EventEmitter();
   constructor(
     private streamService: StreamService,
-    public  modalDeleteStream: BsModalRef,
+    public  modalDeleteAi: BsModalRef,
     public  alertService: AlertService,
   ) {}
 
 
   confirm(): void {
+    // Send addStream request
     this.streamService.removeStream(this.stream.id).subscribe(
       res => {
         this.streamDeleted.emit(this.stream.id);
-        this.modalDeleteStream.hide();
-        this.alertService.success(`Stream succesfully removed!`);
+        this.modalDeleteAi.hide();
+        this.alertService.success(`AI succesfully removed!`);
       },
       err => {
-        this.modalDeleteStream.hide();
+        this.modalDeleteAi.hide();
         this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
     });
   }

@@ -1,0 +1,54 @@
+<!-- Add Stream -->
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Delete AI</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalDeleteAi.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <div class="box__content">
+      <div class="row">
+        <div class="col-sm-4 col-md-12">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Name
+              </div>
+              <div class="stream__text">
+                {{ stream.name }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stream__title">
+                Stream Type
+              </div>
+              <div class="stream__text">
+                {{ stream.type }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Description
+              </div>
+              <div class="stream__text">
+                {{ stream.description }}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stream__title">
+                Price
+              1</div>
+              <div class="stream__text">
+                {{ stream.price }} DPC
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Are you sure?</p>
+    <button type="button" class="btn btn-primary" (click)="confirm()">Yes</button>
+    <button type="button" class="btn btn-danger" (click)="modalDeleteAi.hide()">No</button>
+  </div>
+</div>

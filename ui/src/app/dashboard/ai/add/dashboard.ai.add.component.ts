@@ -84,7 +84,6 @@ export class DashboardAiAddComponent implements OnInit {
         terms: this.form.value.terms,
       };
 
-      // Send addStream request
       this.streamService.addStream(stream).subscribe(
         res => {
           // Set this parameters to configure table rows

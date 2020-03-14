@@ -70,7 +70,6 @@ export class DashboardSellEditComponent implements OnInit {
         terms: this.form.value.terms,
       };
 
-      // Send addStream request
       this.streamService.updateStream(this.streamID, stream).subscribe(
         res => {
           stream.id = this.streamID;

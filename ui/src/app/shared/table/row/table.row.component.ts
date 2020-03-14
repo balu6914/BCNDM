@@ -6,8 +6,9 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
-import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
+import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
+import { DashboardAiDeleteComponent } from 'app/dashboard/ai/delete';
 import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
 import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
 import { Stream, Subscription } from 'app/common/interfaces';
@@ -147,6 +148,27 @@ export class TableRowComponent implements OnInit {
     };
     // Open DashboardSellDeleteComponent as Modal
     this.bsModalRef = this.modalService.show(DashboardSellDeleteComponent, {initialState})
+      .content.streamDeleted.subscribe(
+        id => {
+          // Emit event to TableComponent
+          this.deleteEvt.emit(id);
+        }
+      );
+  }
+
+  openModalDeleteAi(row: any) {
+    // Parameter stream is used in DashboardSellDeleteComponent
+    const initialState = {
+      stream: {
+        id:          row.id,
+        name:        row.name,
+        type:        row.type,
+        description: row.description,
+        price:       this.dpcPipe.transform(row.price),
+      },
+    };
+    // Open DashboardSellDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAiDeleteComponent, {initialState})
       .content.streamDeleted.subscribe(
         id => {
           // Emit event to TableComponent

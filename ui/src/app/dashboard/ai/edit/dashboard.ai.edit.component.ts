@@ -90,7 +90,6 @@ export class DashboardAiEditComponent implements OnInit {
         metadata: JSON.parse(this.form.value.metadata),
       };
 
-      // Send addStream request
       this.streamService.updateStream(this.streamID, stream).subscribe(
         res => {
           // Set this parameters to configure table rows

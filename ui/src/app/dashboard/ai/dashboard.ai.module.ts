@@ -13,6 +13,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
 import { DashboardAiAddComponent } from './add';
 import { DashboardAiEditComponent } from './edit';
+import { DashboardAiDeleteComponent } from './delete';
 
 @NgModule({
   imports: [
@@ -30,11 +31,13 @@ import { DashboardAiEditComponent } from './edit';
     DashboardAiExecuteComponent,
     DashboardAiAddComponent,
     DashboardAiEditComponent,
+    DashboardAiDeleteComponent,
   ],
   entryComponents: [
     DashboardAiExecuteComponent,
     DashboardAiAddComponent,
     DashboardAiEditComponent,
+    DashboardAiDeleteComponent,
   ],
 })
 export class DashboardAiModule { }
