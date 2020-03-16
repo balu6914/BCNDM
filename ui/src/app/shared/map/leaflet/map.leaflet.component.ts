@@ -86,9 +86,8 @@ export class MapComponent implements OnChanges {
     this.map.addLayer(this.drawLayerGroup);
 
     // Set markers and polygon layer inside the created polygon
-    map.on('draw:created', e => {
-      const event = e as L.DrawEvents.Created;
-      const layer = event.layer as L.Rectangle;
+    map.on('draw:created', (e: any) => {
+      const layer = e.layer as L.Rectangle;
       this.drawLayerGroup.addLayer(layer);
       const drawBounds = layer.getBounds();
       this.viewChanged.emit(drawBounds);

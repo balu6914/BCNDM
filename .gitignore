@@ -15,6 +15,7 @@ access-control-data/
 datapace-service-kvs/
 datapace-service-msp/
 elasticsearch-data/
+dproxy-dbdata/
 
 # System Files
 .DS_Store
