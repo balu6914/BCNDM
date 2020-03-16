@@ -14,7 +14,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"datapace"
+	"datapace/errors"
 	"datapace/streams"
+	"datapace/streams/executions"
 )
 
 const (
@@ -350,32 +352,42 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
-
-	switch err {
-	case streams.ErrMalformedData, streams.ErrBigQuery:
-		w.WriteHeader(http.StatusBadRequest)
-	case streams.ErrUnauthorizedAccess:
-		w.WriteHeader(http.StatusForbidden)
-	case streams.ErrInvalidBQAccess:
-		w.WriteHeader(http.StatusUnauthorized)
-	case streams.ErrNotFound:
-		w.WriteHeader(http.StatusNotFound)
-	case streams.ErrWrongType:
-		w.WriteHeader(http.StatusUnsupportedMediaType)
-	case streams.ErrConflict:
-		w.WriteHeader(http.StatusConflict)
-	case io.ErrUnexpectedEOF:
-		w.WriteHeader(http.StatusBadRequest)
-	case io.EOF:
-		w.WriteHeader(http.StatusBadRequest)
-	default:
-		switch err.(type) {
-		case *json.SyntaxError:
+	switch errVal := err.(type) {
+	case errors.Error:
+		switch {
+		case errors.Contains(errVal, executions.ErrCrateDataset), errors.Contains(errVal, executions.ErrCrateAlgorithm):
 			w.WriteHeader(http.StatusBadRequest)
-		case *json.UnmarshalTypeError:
+		case errors.Contains(errVal, streams.ErrMalformedData), errors.Contains(errVal, streams.ErrBigQuery):
+			w.WriteHeader(http.StatusBadRequest)
+		case errors.Contains(errVal, streams.ErrUnauthorizedAccess):
+			w.WriteHeader(http.StatusForbidden)
+		case errors.Contains(errVal, streams.ErrInvalidBQAccess):
+			w.WriteHeader(http.StatusUnauthorized)
+		case errors.Contains(errVal, streams.ErrNotFound):
+			w.WriteHeader(http.StatusNotFound)
+		case errors.Contains(errVal, streams.ErrWrongType):
+			w.WriteHeader(http.StatusUnsupportedMediaType)
+		case errors.Contains(errVal, streams.ErrConflict):
+			w.WriteHeader(http.StatusConflict)
+		}
+		if errVal.Msg() != "" {
+			json.NewEncoder(w).Encode(errorRes{Err: errVal.Msg()})
+		}
+	default:
+		switch err {
+		case io.ErrUnexpectedEOF:
+			w.WriteHeader(http.StatusBadRequest)
+		case io.EOF:
 			w.WriteHeader(http.StatusBadRequest)
 		default:
-			w.WriteHeader(http.StatusInternalServerError)
+			switch err.(type) {
+			case *json.SyntaxError:
+				w.WriteHeader(http.StatusBadRequest)
+			case *json.UnmarshalTypeError:
+				w.WriteHeader(http.StatusBadRequest)
+			default:
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}
 	}
 }

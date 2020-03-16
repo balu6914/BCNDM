@@ -10,7 +10,6 @@ import (
 func addStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(addStreamReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}

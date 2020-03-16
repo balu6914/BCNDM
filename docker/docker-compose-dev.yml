@@ -115,6 +115,7 @@ services:
       - DATAPACE_EXECUTIONS_URL=datapace-executions:8089
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+      - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io/
     volumes:
       - ../config/big-query:/big-query
     networks:

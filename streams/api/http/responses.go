@@ -124,3 +124,7 @@ func (res removeStreamRes) headers() map[string]string {
 func (res removeStreamRes) empty() bool {
 	return true
 }
+
+type errorRes struct {
+	Err string `json:"error"`
+}

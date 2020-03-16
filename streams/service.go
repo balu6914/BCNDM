@@ -2,7 +2,7 @@ package streams
 
 import (
 	"context"
-	"errors"
+	"datapace/errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -116,13 +116,13 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 
 	if stream.Type == "Dataset" {
 		if err := ss.ai.CreateDataset(stream); err != nil {
-			return "", err
+			return "", errors.Wrap(err, ss.RemoveStream(stream.Owner, id))
 		}
 	}
 
 	if stream.Type == "Algorithm" {
 		if err := ss.ai.CreateAlgorithm(stream); err != nil {
-			return "", err
+			return "", errors.Wrap(err, ss.RemoveStream(stream.Owner, id))
 		}
 	}
 

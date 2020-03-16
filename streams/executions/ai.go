@@ -3,10 +3,17 @@ package executions
 import (
 	"context"
 	"datapace"
+	"datapace/errors"
 	"datapace/streams"
 )
 
 var _ streams.AIService = (*executionsService)(nil)
+
+// Creation errors
+var (
+	ErrCrateAlgorithm = errors.New("error creating algorithm")
+	ErrCrateDataset   = errors.New("error creating dataset")
+)
 
 type executionsService struct {
 	client datapace.ExecutionsServiceClient
@@ -35,8 +42,10 @@ func (es executionsService) CreateAlgorithm(s streams.Stream) error {
 		Metadata: metadata,
 	}
 
-	_, err := es.client.CreateAlgorithm(context.Background(), &algo)
-	return err
+	if _, err := es.client.CreateAlgorithm(context.Background(), &algo); err != nil {
+		return errors.Wrap(ErrCrateAlgorithm, err)
+	}
+	return nil
 }
 
 func (es executionsService) CreateDataset(s streams.Stream) error {
@@ -54,6 +63,8 @@ func (es executionsService) CreateDataset(s streams.Stream) error {
 		Metadata: metadata,
 	}
 
-	_, err := es.client.CreateDataset(context.Background(), &dataset)
-	return err
+	if _, err := es.client.CreateDataset(context.Background(), &dataset); err != nil {
+		return errors.Wrap(ErrCrateDataset, err)
+	}
+	return nil
 }
