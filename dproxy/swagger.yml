@@ -59,7 +59,7 @@ definitions:
         description: number of hours for which JWT will be valid.
       max_calls:
         type: int
-        description: maximum number of proxy calls using issued token.
+        description: maximum number of proxy calls using issued token (0 or absent means unlimited).
   RegisterRes:
     type: object
     properties:

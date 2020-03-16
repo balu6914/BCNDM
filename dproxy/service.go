@@ -51,7 +51,7 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if t.MaxCalls() != -1 && calls > t.MaxCalls() {
+	if t.MaxCalls() != 0 && calls > t.MaxCalls() {
 		return "", ErrQuotaExceeded
 	}
 	return t.Url(), err
