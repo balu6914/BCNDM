@@ -41,23 +41,23 @@ func (req registerReq) validate() error {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.FirstName == "" || len(req.FirstName) > maxNameLength {
+	if len(req.FirstName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.LastName == "" || len(req.LastName) > maxNameLength {
+	if len(req.LastName) > maxNameLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.Company == "" || len(req.Company) > maxCompanyLength {
+	if len(req.Company) > maxCompanyLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.Phone == "" || len(req.Phone) > maxPhoneLength {
+	if len(req.Phone) > maxPhoneLength {
 		return auth.ErrMalformedEntity
 	}
 
-	if req.Address == "" || len(req.Address) > maxAddressLength {
+	if len(req.Address) > maxAddressLength {
 		return auth.ErrMalformedEntity
 	}
 
