@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/catch';
@@ -15,7 +15,7 @@ import { AuthService } from 'app/auth/services/auth.service';
   providers: [
   ],
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit {
   public form: FormGroup;
   public errorMsg: String;
   submitted = false;
@@ -24,8 +24,8 @@ export class SignupComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private UserService: UserService,
-    private AuthService: AuthService
+    private userService: UserService,
+    private authService: AuthService
   ) {
   }
 
@@ -71,10 +71,10 @@ export class SignupComponent {
         company: this.form.value.company,
         address: this.form.value.address,
         phone: this.form.value.phone,
-      }
-      this.UserService.addUser(user).subscribe(
+      };
+      this.userService.addUser(user).subscribe(
         response => {
-          this.AuthService.login(user.email, user.password)
+          this.authService.login(user.email, user.password)
             .subscribe(
               token => this.router.navigate(['/dashboard']),
               err => this.errorMsg = err.status
@@ -83,11 +83,12 @@ export class SignupComponent {
         err => {
           // Handle tmp case when user already exists and we don't have error msg on API side yet.
           if (err.status === 409) {
-            this.errorMsg = "User with this email already exists."
+            this.errorMsg = 'User with this email already exists.';
           } else {
             this.errorMsg = err.status;
           }
-        });
+        }
+      );
     }
   }
 }

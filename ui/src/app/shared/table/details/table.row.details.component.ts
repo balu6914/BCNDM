@@ -28,14 +28,12 @@ export class TableRowDetailsComponent implements OnInit {
   constructor(
     private modalService: BsModalService,
     private dpcPipe: DpcPipe,
-
   ) {}
 
   ngOnInit() {
   }
 
   close() {
-    console.log(this.row)
     this.backClicked.emit('trigger');
   }
 

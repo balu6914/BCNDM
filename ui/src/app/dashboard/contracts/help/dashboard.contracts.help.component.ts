@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'dashboard-contracts-help',
+  selector: 'dpc-dashboard-contracts-help',
   templateUrl: './dashboard.contracts.help.component.html',
   styleUrls: [ './dashboard.contracts.help.component.scss' ]
 })

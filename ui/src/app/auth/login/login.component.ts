@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators  } from '@angular/forms';
 
 import {Router} from '@angular/router';
@@ -19,15 +19,14 @@ const emailValidator = Validators.pattern('^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5
   ],
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     public form: FormGroup;
     private subscription;
     public errorMsg: String;
     constructor(
         private fb: FormBuilder,
         private router: Router,
-        private UserService: UserService,
-        private AuthService: AuthService
+        private authService: AuthService
 
     ) {
 
@@ -44,13 +43,13 @@ export class LoginComponent {
     onSubmit(model: User, isValid: boolean) {
         this.errorMsg = null;
         if (isValid) {
-            this.AuthService.login(model.email, model.password)
+            this.authService.login(model.email, model.password)
               .subscribe(
                 (token: any) => {
-                    this.router.navigate(['/dashboard'])
+                    this.router.navigate(['/dashboard']);
                 },
                 err => {
-                    this.errorMsg = 'Invalid Credentials.'
+                    this.errorMsg = 'Invalid Credentials.';
                  }
               );
         }

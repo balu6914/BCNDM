@@ -14,6 +14,7 @@ import { MidpcPipe } from 'app/common/pipes/converter.pipe';
 export class BalanceWithdrawComponent implements OnInit {
   form: FormGroup;
   processing: Boolean;
+
   @Output()
   // Emit event when we successfully sold some token , to get updated balance.
   balanceUpdate = new EventEmitter();
@@ -34,12 +35,12 @@ export class BalanceWithdrawComponent implements OnInit {
   }
 
   onSubmit(form, isValid: boolean) {
-    if(isValid) {
+    if (isValid) {
       this.processing = true;
       // Convert to miDPC
       const toMidpcAmount =  {
         amount: this.midpcPipe.transform(form.amount),
-      }
+      };
       this.balanceService.withdraw(toMidpcAmount).subscribe(
         response => {
           this.balanceUpdate.emit('update');
@@ -52,7 +53,4 @@ export class BalanceWithdrawComponent implements OnInit {
       );
     }
   }
-
-
-
 }

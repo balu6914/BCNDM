@@ -28,7 +28,7 @@ export class DashboardBuyComponent implements OnInit {
   private tableComponent: TableComponent;
 
   constructor(
-    private AuthService: AuthService,
+    private authService: AuthService,
     public streamService: StreamService,
     public alertService: AlertService,
     private modalService: BsModalService,
@@ -43,7 +43,7 @@ export class DashboardBuyComponent implements OnInit {
 
     // Fetch current User
     this.user = {};
-    this.AuthService.getCurrentUser().subscribe(
+    this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
         this.query.owner = '-'.concat(this.user.id);

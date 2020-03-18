@@ -5,7 +5,7 @@ import { StreamService } from 'app/common/services/stream.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 @Component({
-  selector: 'dashboard-sell-delete',
+  selector: 'dpc-dashboard-sell-delete',
   templateUrl: './dashboard.sell.delete.component.html',
   styleUrls: ['./dashboard.sell.delete.component.scss']
 })

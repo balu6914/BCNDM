@@ -68,18 +68,18 @@ export class BalanceComponent implements OnInit {
   }
 
   getBalance() {
-    let promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
       this.balanceService.get().subscribe(
         (result: any) => {
           this.balance.amount = result.balance;
-          //TODO remove this Mock of fiatAmount when we add this info on API side
+          // TODO remove this Mock of fiatAmount when we add this info on API side
           this.balance.fiatAmount = this.balance.amount;
           // Publish new balance data to balance message buss
           this.balanceService.changed(this.balance);
           resolve();
         },
         err => {
-          console.error("Error fetching user balance ", err)
+          console.error('Error fetching user balance ', err);
           reject();
         });
     });

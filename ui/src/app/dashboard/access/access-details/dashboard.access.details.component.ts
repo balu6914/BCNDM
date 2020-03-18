@@ -9,18 +9,16 @@ import { Router } from '@angular/router';
 })
 export class DashboardAccessDetailsComponent implements OnInit {
 
-    @Input('selectedAccess') access: any;
-
+    @Input() selectedAccess: any;
     constructor(
         private router: Router
     ) { }
 
     ngOnInit() {
-        console.log("here it is ", this.access);
+      console.log('Access details: ', this.selectedAccess);
     }
 
     calculateProfit() {
-        console.log("here is a math", (this.access.share/this.access.stream.price)*10000)
+      console.log('Access share / price', (this.selectedAccess.share / this.selectedAccess.stream.price) * 10000);
     }
-
 }

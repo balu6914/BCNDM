@@ -1,1 +1,1 @@
-export * from './dashborad.main.component'
+export * from './dashborad.main.component';

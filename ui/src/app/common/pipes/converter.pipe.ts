@@ -16,7 +16,7 @@ export class MidpcPipe implements PipeTransform {
 export class DpcPipe implements PipeTransform {
   transform(value: any): any {
       // Convert miDPC to DPC
-      const dpc = parseInt(value) / dpcToMidpcCoef;
+      const dpc = parseInt(value, 10) / dpcToMidpcCoef;
       return dpc.toString();
   }
 }

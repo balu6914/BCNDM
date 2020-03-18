@@ -5,14 +5,14 @@ import { NgProgressModule, NgProgressInterceptor } from 'ngx-progressbar';
 import { NgPipesModule } from 'ngx-pipes';
 
 import { AppRoutingModule } from './app.routes';
-import { AppBootstrapModule } from './app-bootstrap/app-bootstrap.module'
+import { AppBootstrapModule } from './app-bootstrap/app-bootstrap.module';
 import { AppComponent } from './app.component';
 import { NoContentComponent } from './no-content';
 
 // Import our modules
 import { CommonAppModule } from './common/common.module';
 import { SharedModule } from './shared/shared.module';
-import { LayoutModule } from './layout'
+import { LayoutModule } from './layout';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 

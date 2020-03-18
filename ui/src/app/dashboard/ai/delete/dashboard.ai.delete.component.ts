@@ -21,7 +21,6 @@ export class DashboardAiDeleteComponent implements OnInit {
 
 
   confirm(): void {
-    // Send addStream request
     this.streamService.removeStream(this.stream.id).subscribe(
       res => {
         this.streamDeleted.emit(this.stream.id);

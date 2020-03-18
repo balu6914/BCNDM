@@ -32,26 +32,26 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
   }
 
   createChart() {
-    let chartData = {
-      type: "line",
+    const chartData = {
+      type: 'line',
       data: {
         datasets: [{
-          label: "Outcome",
+          label: 'Outcome',
           data: this.outcome,
-          backgroundColor: "rgba(6, 210, 216, .1)",
-          borderColor: "rgba(6, 210, 216, 1)",
+          backgroundColor: 'rgba(6, 210, 216, .1)',
+          borderColor: 'rgba(6, 210, 216, 1)',
           borderWidth: 1,
-          barThickness: 1
+          barThickness: 1,
         },
         {
-          label: "Income",
+          label: 'Income',
           data: this.income,
-          backgroundColor: "rgba(0, 125, 255, .1)",
-          borderColor: "#007DFF",
+          backgroundColor: 'rgba(0, 125, 255, .1)',
+          borderColor: '#007DFF',
           borderWidth: 4,
-          pointBackgroundColor: "#ffffff",
+          pointBackgroundColor: '#ffffff',
           pointRadius: 3,
-          pointBorderWidth: 1
+          pointBorderWidth: 1,
         }
         ]
       },
@@ -59,7 +59,7 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
         maintainAspectRatio: false,
         scaleShowVerticalLines: false,
         tooltips: {
-          backgroundColor: "#007DFF",
+          backgroundColor: '#007DFF',
           xPadding: 15,
           yPadding: 5,
           titleMarginBottom: 0,
@@ -69,7 +69,7 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
           caretSize: 0,
           callbacks: {
             label: function(tooltipItem, data) {
-              return `${tooltipItem.yLabel} DPC on ${moment(tooltipItem.xLabel).format('MMM, D')}`
+              return `${tooltipItem.yLabel} DPC on ${moment(tooltipItem.xLabel).format('MMM, D')}`;
             },
             title: function(tooltipItem, data) {
               return;
@@ -88,30 +88,29 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
             distribution: 'linear',
             gridLines: {
               lineWidth: 0,
-              color: "rgba(255,255,255,0)",
-              zeroLineColor: "rgba(255,255,255,0)"
+              color: 'rgba(255,255,255,0)',
+              zeroLineColor: 'rgba(255,255,255,0)'
             },
             ticks: {
-              fontColor: "rgba(158,175,200, 1)",
+              fontColor: 'rgba(158,175,200, 1)',
               fontSize: 11
             }
           }],
           yAxes: [{
             display: true,
             afterTickToLabelConversion: function(q) {
-              for (var tick in q.ticks) {
-                let newLabel = q.ticks[tick] + " DPC ";
-                q.ticks[tick] = newLabel;
-              }
+              q.ticks.forEach( t => {
+                t = t + ' DPC ';
+              });
             },
             gridLines: {
-              color: "rgba(223,233,247,1)",
-              zeroLineColor: "rgba(223,233,247,1)",
+              color: 'rgba(223,233,247,1)',
+              zeroLineColor: 'rgba(223,233,247,1)',
               borderDash: [15, 15],
               drawBorder: false
             },
             ticks: {
-              fontColor: "rgba(158,175,200, 1)",
+              fontColor: 'rgba(158,175,200, 1)',
               fontSize: 11,
               stepSize: this.calculteStepSize()
             }
@@ -119,7 +118,7 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
         }
       }
     };
-    this.chart = new Chart("statisticChart", chartData);
+    this.chart = new Chart('statisticChart', chartData);
   }
   // Method parse inputed subscriptions array to chart.js data friendly objects array
   parseInputs() {
@@ -129,6 +128,6 @@ export class StatisticGraphComponent implements OnInit, OnChanges {
   // Method takes largest ammount and do the math to build a step size
   calculteStepSize() {
     const d = this.income.concat(this.outcome);
-    return Math.max(...d.map(o => o.y)) / 5
+    return Math.max(...d.map(o => o.y)) / 5;
   }
 }

@@ -1,1 +1,1 @@
-export * from './dashboard.contracts.add.component'
+export * from './dashboard.contracts.add.component';

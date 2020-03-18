@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 // Pipes
 import { MidpcPipe, SubscriptionTypePipe, DpcPipe } from './pipes/converter.pipe';
 import { WalletBalanceStatisticPipe } from './pipes/balance.income.pipe';
@@ -15,7 +14,6 @@ import { ExecutionsService } from './services/executions.service';
   imports: [
     CommonModule,
     FormsModule,
-    HttpModule,
     ReactiveFormsModule,
   ],
   declarations: [

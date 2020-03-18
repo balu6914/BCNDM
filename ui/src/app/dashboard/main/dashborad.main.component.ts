@@ -25,7 +25,7 @@ export class DashboardMainComponent implements OnInit {
   limit = 50;
 
   constructor(
-    private AuthService: AuthService,
+    private authService: AuthService,
     private subscriptionService: SubscriptionService,
     private streamService: StreamService,
     private dpcPipe: DpcPipe,
@@ -70,7 +70,7 @@ fetchStreams(page: Page<Subscription>) {
 
   ngOnInit() {
     // Fetch current User
-    this.AuthService.getCurrentUser().subscribe(
+    this.authService.getCurrentUser().subscribe(
       data => {
         this.user = data;
       },

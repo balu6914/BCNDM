@@ -33,34 +33,16 @@ export class DashboardSellAddComponent implements OnInit {
     const floatValidator = Validators.pattern(floatRegEx);
     const urlValidator = Validators.pattern(urlRegEx);
     this.form = this.formBuilder.group({
-      visibility: ['', [Validators.required]],
-      name: ['', [Validators.required, Validators.maxLength(32)]],
-      type: ['', [Validators.required, Validators.maxLength(32)]],
+      visibility:  ['', [Validators.required]],
+      name:        ['', [Validators.required, Validators.maxLength(32)]],
+      type:        ['', [Validators.required, Validators.maxLength(32)]],
       description: ['', [Validators.required, Validators.maxLength(256)]],
-      url: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
-      terms: ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
-      price: ['', [Validators.required, Validators.maxLength(9), floatValidator]],
-      lat: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(11),
-          floatValidator,
-          Validators.min(-90),
-          Validators.max(90)
-        ]
-      ],
-      long: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(12),
-          floatValidator,
-          Validators.min(-180),
-          Validators.max(180)
-        ]
-      ],
-      snippet: ['', [Validators.maxLength(256)]],
+      url:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      terms:       ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+      price:       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
+      lat:         ['', [Validators.required, Validators.maxLength(11), floatValidator, Validators.min(-90), Validators.max(90)]],
+      long:        ['', [Validators.required, Validators.maxLength(12), floatValidator, Validators.min(-180), Validators.max(180)]],
+      snippet:     ['', [Validators.maxLength(256)]],
       project: [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
       dataset: [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
       table:   [{ value: '', disabled: true }, [this.requiredBQ.bind(this)]],
@@ -103,31 +85,31 @@ export class DashboardSellAddComponent implements OnInit {
 
     if (this.form.valid) {
       const stream: Stream = {
-        visibility: this.form.get('visibility').value,
-        name: this.form.get('name').value,
-        type: this.form.get('type').value,
-        description: this.form.get('description').value,
-        price: this.midpcPipe.transform(this.form.get('price').value),
-        snippet: this.form.get('snippet').value,
+        visibility: this.form.value.visibility,
+        name: this.form.value.name,
+        type: this.form.value.type,
+        description: this.form.value.description,
+        price: this.midpcPipe.transform(this.form.value.price),
+        snippet: this.form.value.snippet,
         location: {
           type: 'Point',
           coordinates: [
-            parseFloat(this.form.get('long').value),
-            parseFloat(this.form.get('lat').value)
+            parseFloat(this.form.value.long),
+            parseFloat(this.form.value.lat)
           ]
         },
         external: this.external,
-        terms: this.form.get('terms').value,
+        terms: this.form.value.terms,
       };
       if (this.external) {
         stream.bq = new BigQuery(
-          this.form.get('project').value,
-          this.form.get('dataset').value,
-          this.form.get('table').value,
-          this.form.get('fields').value
+          this.form.value.project,
+          this.form.value.dataset,
+          this.form.value.table,
+          this.form.value.fields
         );
       } else {
-        stream.url = this.form.get('url').value;
+        stream.url = this.form.value.url;
       }
 
       this.streamService.addStream(stream).subscribe(

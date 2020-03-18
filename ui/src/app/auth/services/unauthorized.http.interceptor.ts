@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http'
-import { Observable } from 'rxjs/Observable';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 import 'rxjs/add/operator/do';
 
 import { AuthService } from './auth.service';
@@ -14,11 +14,11 @@ export class UnauthorizedInterceptor implements HttpInterceptor {
         const auth = this.inj.get(AuthService);
         return next.handle(req).catch(event =>  {
             if (event instanceof HttpErrorResponse && event.status === 403) {
-                console.error("403 Forbiden!")
+                console.error('403 Forbiden!');
                 // handle 403 errors
-                auth.logout()
+                auth.logout();
             }
-            return Observable.throw(event);
+            return throwError(event);
         });
     }
 }

@@ -21,7 +21,7 @@
   <div class="row row-grow">
     <!-- Help container -->
     <div *ngIf="openedHelp" class="col-lg-4 col-xl-3">
-      <dashboard-contracts-help (closeTrigger)="toggleHelp()" (addContractTrigger)="modalNewContract()"></dashboard-contracts-help>
+      <dpc-dashboard-contracts-help (closeTrigger)="toggleHelp()" (addContractTrigger)="modalNewContract()"></dpc-dashboard-contracts-help>
     </div>
     <!-- Contracts table -->
     <div class="col-12 js-help-main-area" [ngClass]="{'col-lg-8':openedHelp, 'col-xl-9': openedHelp}">

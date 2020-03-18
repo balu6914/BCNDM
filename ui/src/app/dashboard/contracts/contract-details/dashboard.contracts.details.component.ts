@@ -1,28 +1,24 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'dashboard-contracts-details',
+  selector: 'dpc-dashboard-contracts-details',
   templateUrl: './dashboard.contracts.details.component.html',
   styleUrls: [ './dashboard.contracts.details.component.scss' ]
 })
-export class DashboardContractsDetailsComponent {
+export class DashboardContractsDetailsComponent implements OnInit {
 
-    @Input('selectedContract') contract: any;
-
+    @Input() selectedContract: any;
     constructor(
-        private router: Router
+      private router: Router
     ) { }
 
     ngOnInit() {
-        console.log("here it is ", this.contract);
+      console.log('Contract details: ', this.selectedContract);
     }
 
     calculateProfit() {
-        console.log("here is a math", (this.contract.share/this.contract.stream.price)*10000)
-
+      console.log('Contract share / price', (this.selectedContract.share / this.selectedContract.stream.price) * 10000);
     }
-
-
 }

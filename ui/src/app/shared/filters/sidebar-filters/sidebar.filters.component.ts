@@ -32,7 +32,7 @@ export class SidebarFiltersComponent {
          minPrice: ['', [ Validators.min(0.000001)]],
          maxPrice: ['', [ Validators.max(1000000)]]
        });
-    } 
+    }
 
     _toggleSidebar() {
       this._opened = !this._opened;
@@ -44,10 +44,9 @@ export class SidebarFiltersComponent {
     }
 
     onSubmit() {
-    this.submitted = true;
-    if (this.form.valid) {
-       this.filtersUpdate.emit(this.form.value);
-       }
+      this.submitted = true;
+      if (this.form.valid) {
+        this.filtersUpdate.emit(this.form.value);
+      }
     }
-
 }

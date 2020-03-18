@@ -24,11 +24,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private balanceSubscription: ISubscription;
   private balanceChangeSubscription: ISubscription;
   constructor(
-    private AuthService: AuthService,
+    private authService: AuthService,
     private balanceService: BalanceService,
   ) {
     this.aiEnabled = environment.AI_ENABLED;
-    console.log("IS AI Enabled ? ", this.aiEnabled)
+    console.log('IS AI Enabled ? ', this.aiEnabled);
     // Listen to balance changed events
     this.balanceChangeSubscription = this.balanceService.balance.subscribe(result => {
       this.balance = result;
@@ -38,11 +38,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
    }
 
   ngOnInit() {
-    this.loggedInSubscription = this.AuthService.loggedIn
+    this.loggedInSubscription = this.authService.loggedIn
       .subscribe(is => {
         this.isLoggedin = is;
         if (this.isLoggedin) {
-          this.userSubscription = this.AuthService.getCurrentUser()
+          this.userSubscription = this.authService.getCurrentUser()
           .subscribe(data => {
             this.user = data;
             // Get user balance
@@ -74,6 +74,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.AuthService.logout();
+    this.authService.logout();
   }
 }

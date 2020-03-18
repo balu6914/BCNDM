@@ -37,7 +37,7 @@ export class DashboardAiAddComponent implements OnInit {
         name:        ['', [Validators.required, Validators.maxLength(32)]],
         description: ['', [Validators.required, Validators.maxLength(256)]],
         url:         ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
-        terms:    ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
+        terms:       ['', [Validators.required, Validators.maxLength(2048), urlValidator]],
         price:       ['', [Validators.required, Validators.maxLength(9), floatValidator]],
         lat:         ['', [Validators.required, Validators.maxLength(11), Validators.min(-90), Validators.max(90), floatValidator]],
         long:        ['', [Validators.required, Validators.maxLength(12), Validators.min(-180), Validators.max(180), floatValidator]],
@@ -74,8 +74,8 @@ export class DashboardAiAddComponent implements OnInit {
         url: this.form.value.url,
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
-          'type': 'Point',
-          'coordinates': [
+          type: 'Point',
+          coordinates: [
             parseFloat(this.form.value.long),
             parseFloat(this.form.value.lat)
           ]
@@ -93,10 +93,6 @@ export class DashboardAiAddComponent implements OnInit {
           this.alertService.success(`${this.streamType} successfully added!`);
         },
         err => {
-          if (err.status === 401) {
-            this.alertService.error(`You don't have permission to add this ${this.streamType}.`);
-            return;
-          }
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );

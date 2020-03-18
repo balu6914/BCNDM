@@ -6,8 +6,15 @@ import { DashboardModule } from './dashboard/dashboard.module';
 // Define our Application Routes
 const routes: Routes = [
   // Not found page
-  {path: '', redirectTo: "login", pathMatch: 'full'},
-  { path: '**',    component: NoContentComponent },
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
+  {
+    path: '**',
+    component: NoContentComponent,
+  },
 ];
 
 @NgModule({
