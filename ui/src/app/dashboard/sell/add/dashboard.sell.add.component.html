@@ -68,7 +68,6 @@
           <div *ngIf="submitted && form.controls.url.errors" class="invalid-feedback">
             <div *ngIf="form.controls.url.errors.required">URL is required.</div>
             <div *ngIf="form.controls.url.errors.maxlength">The maximum length is 2048 characters.</div>
-            <div *ngIf="form.controls.url.errors.pattern">Invalid URL.</div>
           </div>
         </div>
       </div>

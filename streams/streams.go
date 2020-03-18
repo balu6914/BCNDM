@@ -103,7 +103,7 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
-	if !s.External && (!govalidator.IsURL(s.URL) || len(s.URL) > maxURLLength) {
+	if !s.External && len(s.URL) > maxURLLength {
 		return ErrMalformedData
 	}
 
