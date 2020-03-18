@@ -13,14 +13,21 @@ import (
 var errTokenNotFound = errors.New("token not found in url")
 
 type ReverseProxy struct {
-	svc       dproxy.Service
-	p         *httputil.ReverseProxy
-	logger    log.Logger
-	logPrefix string
+	svc        dproxy.Service
+	p          *httputil.ReverseProxy
+	logger     log.Logger
+	logPrefix  string
+	PathPrefix string
 }
 
-func NewReverseProxy(svc dproxy.Service, logger log.Logger) *ReverseProxy {
-	return &ReverseProxy{svc: svc, p: &httputil.ReverseProxy{}, logger: logger, logPrefix: "rp"}
+func NewReverseProxy(svc dproxy.Service, pathPrefix string, logger log.Logger) *ReverseProxy {
+	return &ReverseProxy{
+		svc:        svc,
+		p:          &httputil.ReverseProxy{},
+		PathPrefix: pathPrefix,
+		logger:     logger,
+		logPrefix:  "rp",
+	}
 }
 
 func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +53,9 @@ func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (rp *ReverseProxy) makeDirector(originalReq *http.Request) (func(r *http.Request), error) {
 	t := originalReq.Header.Get("Authorization")
+	//if there is no token in authorization header, try token in the url
 	if t == "" {
-		return nil, errTokenNotFound
+		t = originalReq.URL.Path
 	}
 	targetURL, err := rp.svc.GetTargetURL(t)
 	if err != nil {

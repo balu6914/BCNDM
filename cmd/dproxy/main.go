@@ -20,38 +20,50 @@ import (
 )
 
 const (
-	defHTTPPort      = "9090"
-	defJWTSecret     = "examplesecret"
-	defLocalFsRoot   = "/tmp/test"
-	defDBHost        = "localhost"
-	defDBPort        = "5432"
-	defDBUser        = "dproxy"
-	defDBPass        = "dproxy"
-	defDBName        = "dproxy"
-	defDBSSLMode     = "disable"
-	defDBSSLCert     = ""
-	defDBSSLKey      = ""
-	defDBSSLRootCert = ""
+	defHTTPProto      = "http"
+	defHTTPHost       = "localhost"
+	defHTTPPort       = "9090"
+	defJWTSecret      = "examplesecret"
+	defLocalFsRoot    = "/tmp/test"
+	defDBHost         = "localhost"
+	defDBPort         = "5432"
+	defDBUser         = "dproxy"
+	defDBPass         = "dproxy"
+	defDBName         = "dproxy"
+	defDBSSLMode      = "disable"
+	defDBSSLCert      = ""
+	defDBSSLKey       = ""
+	defDBSSLRootCert  = ""
+	defFSPathPrefix   = "/fs"
+	defHTTPPathPrefix = "/http"
 
-	envHTTPPort      = "DATAPACE_PROXY_HTTP_PORT"
-	envJWTSecret     = "DATAPACE_JWT_SECRET"
-	envLocalFsRoot   = "DATAPACE_LOCAL_FS_ROOT"
-	envDBHost        = "DATAPACE_DPROXY_DB_HOST"
-	envDBPort        = "DATAPACE_DPROXY_DB_PORT"
-	envDBUser        = "DATAPACE_DPROXY_DB_USER"
-	envDBPass        = "DATAPACE_DPROXY_DB_PASS"
-	envDBName        = "DATAPACE_DPROXY_DB"
-	envDBSSLMode     = "DATAPACE_DPROXY_DB_SSL_MODE"
-	envDBSSLCert     = "DATAPACE_DPROXY_DB_SSL_CERT"
-	envDBSSLKey      = "DATAPACE_DPROXY_DB_SSL_KEY"
-	envDBSSLRootCert = "DATAPACE_DPROXY_DB_SSL_ROOT_CERT"
+	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
+	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
+	envHTTPPort       = "DATAPACE_PROXY_HTTP_PORT"
+	envJWTSecret      = "DATAPACE_JWT_SECRET"
+	envLocalFsRoot    = "DATAPACE_LOCAL_FS_ROOT"
+	envDBHost         = "DATAPACE_DPROXY_DB_HOST"
+	envDBPort         = "DATAPACE_DPROXY_DB_PORT"
+	envDBUser         = "DATAPACE_DPROXY_DB_USER"
+	envDBPass         = "DATAPACE_DPROXY_DB_PASS"
+	envDBName         = "DATAPACE_DPROXY_DB"
+	envDBSSLMode      = "DATAPACE_DPROXY_DB_SSL_MODE"
+	envDBSSLCert      = "DATAPACE_DPROXY_DB_SSL_CERT"
+	envDBSSLKey       = "DATAPACE_DPROXY_DB_SSL_KEY"
+	envDBSSLRootCert  = "DATAPACE_DPROXY_DB_SSL_ROOT_CERT"
+	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
+	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
 )
 
 type config struct {
-	httpPort    string
-	jwtSecret   string
-	localFsRoot string
-	dbConfig    postgres.Config
+	httpProto      string
+	httpHost       string
+	httpPort       string
+	jwtSecret      string
+	localFsRoot    string
+	dbConfig       postgres.Config
+	fsPathPrefix   string
+	httpPathPrefix string
 }
 
 func main() {
@@ -59,9 +71,9 @@ func main() {
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	svc := newService(cfg.jwtSecret, cfg.dbConfig, logger)
-	r := httpapi.NewReverseProxy(svc, logger)
-	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, logger)
-	go startHTTPServer(svc, r, f, cfg.httpPort, logger, errs)
+	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
+	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
+	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
@@ -117,15 +129,19 @@ func loadConfig() config {
 		SSLRootCert: datapace.Env(envDBSSLRootCert, defDBSSLRootCert),
 	}
 	return config{
-		httpPort:    datapace.Env(envHTTPPort, defHTTPPort),
-		jwtSecret:   datapace.Env(envJWTSecret, defJWTSecret),
-		localFsRoot: datapace.Env(envLocalFsRoot, defLocalFsRoot),
-		dbConfig:    dbConfig,
+		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
+		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
+		httpPort:       datapace.Env(envHTTPPort, defHTTPPort),
+		jwtSecret:      datapace.Env(envJWTSecret, defJWTSecret),
+		localFsRoot:    datapace.Env(envLocalFsRoot, defLocalFsRoot),
+		dbConfig:       dbConfig,
+		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
+		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 	}
 }
 
-func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.FsProxy, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.FsProxy, port, dProxyRootUrl string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))
 }

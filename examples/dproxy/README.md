@@ -12,7 +12,7 @@ In the example below, a file in that directory is fetched by dProxy
 
 To create a token for a filesystem resource which will last for 1 hour and have unlimited number of fetches, use the following curl request template.
 
-```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/register -d '{"url": "<your-filename-here>","ttl": 1,"max_calls": 0}'```
+```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/token -d '{"url": "<your-filename-here>","ttl": 1,"max_calls": 0}'```
 
 - Replace `<your-filename-here>` with the the filename of the file you put in `dproxy-localfiles` directory
 
@@ -35,7 +35,7 @@ dProxy will deliver your file contents and curl will save it with the specified 
 
 To create a token to store HTTP PUT payload to a file which will last for 1 hour and have unlimited number of uploads, use the following curl request template.
 
-```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/register -d '{"url": "<your-filename-here>","ttl": 1,"max_calls": 0}'```
+```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/token -d '{"url": "<your-filename-here>","ttl": 1,"max_calls": 0}'```
 
 - Replace `<your-filename-here>` with the the filename of the file you want to be created in the `dproxy-localfiles` directory. Please note that if file already exists, it will be overwritten with every HTTP PUT request
 
@@ -58,7 +58,7 @@ dProxy will save contents of your payload to the filename specified in the token
 
 To create a token for a resource on the network which will last for 1 hour and have unlimited number of fetches, use the following curl request template.
 
-```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/register -d '{"url": "http://<your-hostname-here>/<path-to-your-resource>","ttl": 1,"max_calls": 0}'```
+```curl -X POST -H "Content-Type: application/json" http://localhost:9090/api/token -d '{"url": "http://<your-hostname-here>/<path-to-your-resource>","ttl": 1,"max_calls": 0}'```
 
 - Replace `<your-hostname-here>` with hostname of your server.
 

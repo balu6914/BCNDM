@@ -20,14 +20,15 @@ type FsProxy struct {
 	localFsRoot string
 	logger      log.Logger
 	logPrefix   string
+	PathPrefix  string
 }
 
-func NewFsProxy(svc dproxy.Service, localFsRoot string, logger log.Logger) *FsProxy {
-	return &FsProxy{svc: svc, localFsRoot: localFsRoot, logger: logger, logPrefix: "fs"}
+func NewFsProxy(svc dproxy.Service, localFsRoot, pathPrefix string, logger log.Logger) *FsProxy {
+	return &FsProxy{svc: svc, localFsRoot: localFsRoot, PathPrefix: pathPrefix, logger: logger, logPrefix: "fs"}
 }
 
 func (f *FsProxy) GetFile(w http.ResponseWriter, r *http.Request) {
-	fp, err := f.prepareFilePath(r.Header.Get("Authorization"))
+	fp, err := f.prepareFilePath(r)
 	if err != nil {
 		f.logger.Error(fmt.Sprintf("%s: failed to prepare file path %s with error %s", f.logPrefix, fp, err))
 		w.WriteHeader(http.StatusUnauthorized)
@@ -48,7 +49,7 @@ func (f *FsProxy) GetFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (f *FsProxy) PutFile(w http.ResponseWriter, r *http.Request) {
-	fp, err := f.prepareFilePath(r.Header.Get("Authorization"))
+	fp, err := f.prepareFilePath(r)
 	if err != nil {
 		f.logger.Error(fmt.Sprintf("%s: failed to prepare file path %s with error %s", f.logPrefix, fp, err))
 		w.WriteHeader(http.StatusUnauthorized)
@@ -68,8 +69,13 @@ func (f *FsProxy) PutFile(w http.ResponseWriter, r *http.Request) {
 	io.Copy(file, r.Body)
 }
 
-func (f *FsProxy) prepareFilePath(token string) (string, error) {
-	targetURL, err := f.svc.GetTargetURL(token)
+func (f *FsProxy) prepareFilePath(r *http.Request) (string, error) {
+	t := r.Header.Get("Authorization")
+	//if there is no token in authorization header, try token in the url
+	if t == "" {
+		t = strings.TrimPrefix(r.URL.Path, f.PathPrefix+"/")
+	}
+	targetURL, err := f.svc.GetTargetURL(t)
 	if err != nil {
 		return "", err
 	}

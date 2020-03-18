@@ -7,7 +7,7 @@ import (
 type requestCreateToken struct {
 	URL      string `json:"url"`
 	TTL      int    `json:"ttl"`
-	MaxCalls int    `json:"max_calls"`
+	MaxCalls int    `json:"max_calls,omitempty"`
 }
 
 func (req requestCreateToken) validate() error {

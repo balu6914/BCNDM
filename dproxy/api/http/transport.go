@@ -12,20 +12,30 @@ import (
 	"net/http"
 )
 
+const tokenoutput = "token"
+const urloutput = "url"
+
 var errUnsupportedContentType = errors.New("unsupported content type")
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy) http.Handler {
+func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy, dProxyRootUrl string) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 	r := bone.New()
-	r.GetFunc("/fs", fs.GetFile)
-	r.PutFunc("/fs", fs.PutFile)
-	r.Get("/http", rp)
-	r.Post("/api/register", kithttp.NewServer(createTokenEndpoint(svc),
+	r.GetFunc(fs.PathPrefix, fs.GetFile)
+	r.GetFunc(fs.PathPrefix+"/", fs.GetFile)
+	r.PutFunc(fs.PathPrefix, fs.PutFile)
+	r.PutFunc(fs.PathPrefix+"/", fs.PutFile)
+	r.Get(rp.PathPrefix+"/", http.StripPrefix(rp.PathPrefix+"/", rp))
+	r.Get(rp.PathPrefix, rp)
+	r.Post("/api/token", kithttp.NewServer(createTokenEndpoint(svc, tokenoutput, dProxyRootUrl, fs.PathPrefix, rp.PathPrefix),
 		decodeCreateToken,
-		encodeResponse,
+		encodeTokenResponse,
+		opts...))
+	r.Post("/api/register", kithttp.NewServer(createTokenEndpoint(svc, urloutput, dProxyRootUrl, fs.PathPrefix, rp.PathPrefix),
+		decodeCreateUrl,
+		encodeUrlResponse,
 		opts...))
 	return r
 }
@@ -41,9 +51,28 @@ func decodeCreateToken(_ context.Context, r *http.Request) (interface{}, error) 
 	return req, nil
 }
 
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+func decodeCreateUrl(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+	var req requestCreateToken
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func encodeTokenResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", contentType)
 	if _, ok := response.(createTokenRes); ok {
+		w.WriteHeader(http.StatusCreated)
+	}
+	return json.NewEncoder(w).Encode(response)
+}
+
+func encodeUrlResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", contentType)
+	if _, ok := response.(createUrlRes); ok {
 		w.WriteHeader(http.StatusCreated)
 	}
 	return json.NewEncoder(w).Encode(response)
