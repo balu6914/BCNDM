@@ -19,6 +19,7 @@ import (
 const (
 	defContentType  = "application/json"
 	defStorageState = "STORAGESTATE_AVAILABLE"
+	datapceURL      = "datapace_url"
 )
 
 var _ executions.AIService = (*aiService)(nil)
@@ -110,7 +111,7 @@ func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, 
 
 	params := []paramRequest{
 		{
-			Name:  "bucket",
+			Name:  datapceURL,
 			Value: dpath,
 		},
 	}
