@@ -24,9 +24,11 @@ func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy, dProxyRootUr
 	}
 	r := bone.New()
 	r.GetFunc(fs.PathPrefix, fs.GetFile)
-	r.GetFunc(fs.PathPrefix+"/", fs.GetFile)
+	r.GetFunc(fs.PathPrefix+"/:token", fs.GetFile)
 	r.PutFunc(fs.PathPrefix, fs.PutFile)
-	r.PutFunc(fs.PathPrefix+"/", fs.PutFile)
+	r.PutFunc(fs.PathPrefix+"/:token", fs.PutFile)
+	r.PostFunc(fs.PathPrefix, fs.PostFile)
+	r.PostFunc(fs.PathPrefix+"/:token", fs.PostFile)
 	r.Get(rp.PathPrefix+"/", http.StripPrefix(rp.PathPrefix+"/", rp))
 	r.Get(rp.PathPrefix, rp)
 	r.Post("/api/token", kithttp.NewServer(createTokenEndpoint(svc, tokenoutput, dProxyRootUrl, fs.PathPrefix, rp.PathPrefix),

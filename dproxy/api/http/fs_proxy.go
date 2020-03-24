@@ -6,11 +6,13 @@ import (
 	log "datapace/logger"
 	"errors"
 	"fmt"
+	"github.com/go-zoo/bone"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var errUnauthorized = errors.New("unauthorized")
@@ -56,24 +58,28 @@ func (f *FsProxy) PutFile(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
 		return
 	}
-	f.logger.Info(fmt.Sprintf("%s: received request from %s to %s", f.logPrefix, r.RemoteAddr, fp))
-	file, err := os.Create(fp)
+	f.logger.Info(fmt.Sprintf("%s: received PUT request from %s to %s", f.logPrefix, r.RemoteAddr, fp))
+	f.saveFile(fp, w, r)
+}
+
+func (f *FsProxy) PostFile(w http.ResponseWriter, r *http.Request) {
+	fp, err := f.prepareFilePath(r)
 	if err != nil {
-		f.logger.Error(fmt.Sprintf("%s: failed to create file %s with error %s", f.logPrefix, fp, err))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+		f.logger.Error(fmt.Sprintf("%s: failed to prepare file path %s with error %s", f.logPrefix, fp, err))
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
 		return
 	}
-	defer file.Close()
-	defer r.Body.Close()
-	io.Copy(file, r.Body)
+	fp = fp + time.Now().Format(time.RFC3339Nano)
+	f.logger.Info(fmt.Sprintf("%s: received POST request from %s to %s", f.logPrefix, r.RemoteAddr, fp))
+	f.saveFile(fp, w, r)
 }
 
 func (f *FsProxy) prepareFilePath(r *http.Request) (string, error) {
 	t := r.Header.Get("Authorization")
 	//if there is no token in authorization header, try token in the url
 	if t == "" {
-		t = strings.TrimPrefix(r.URL.Path, f.PathPrefix+"/")
+		t = bone.GetValue(r, "token")
 	}
 	targetURL, err := f.svc.GetTargetURL(t)
 	if err != nil {
@@ -84,4 +90,17 @@ func (f *FsProxy) prepareFilePath(r *http.Request) (string, error) {
 		return "", errUnauthorized
 	}
 	return fp, nil
+}
+
+func (f *FsProxy) saveFile(fp string, w http.ResponseWriter, r *http.Request) {
+	file, err := os.Create(fp)
+	if err != nil {
+		f.logger.Error(fmt.Sprintf("%s: failed to create file %s with error %s", f.logPrefix, fp, err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+		return
+	}
+	defer file.Close()
+	defer r.Body.Close()
+	io.Copy(file, r.Body)
 }
