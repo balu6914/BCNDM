@@ -128,14 +128,19 @@ export class DashboardAiComponent implements OnInit {
     this.subscriptionService.bought(0, 100).subscribe(
       (page: Page<Subscription>) => {
         page.content.forEach( sub => {
-          this.streamService.getStream(sub.stream_id).subscribe(
-            (stream: Stream) => {
-              this.addAiStreamToTable(stream);
-            },
-            err => {
-              this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-            }
-          );
+          const date = new Date();
+          const subDate = new Date(sub.start_date);
+          subDate.setHours(subDate.getHours() + Number(sub.hours));
+          if (date < subDate) {
+            this.streamService.getStream(sub.stream_id).subscribe(
+              (stream: Stream) => {
+                this.addAiStreamToTable(stream);
+              },
+              err => {
+                this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+              }
+            );
+          }
         });
       },
       err => console.log(err)
