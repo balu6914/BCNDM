@@ -9,13 +9,13 @@ auth-data/
 streams-data/
 subscriptions-data/
 transactions-data/
-proxy-data/
 executions-data/
 access-control-data/
 datapace-service-kvs/
 datapace-service-msp/
 elasticsearch-data/
-dproxy-dbdata/
+dproxy-data/
+dproxy-db-data/
 
 # System Files
 .DS_Store

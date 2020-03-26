@@ -122,14 +122,14 @@ services:
         fluentd-address: ${LOGSERVER}:24224
         tag: docker.{{.ID}}
 
-  datapace-proxy:
+  datapace-dproxy:
     logging:
       driver: fluentd
       options:
         fluentd-address: ${LOGSERVER}:24224
         tag: docker.{{.ID}}
 
-  datapace-proxy-db:
+  datapace-dproxy-db:
     logging:
       driver: fluentd
       options:
