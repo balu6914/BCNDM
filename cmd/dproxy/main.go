@@ -22,7 +22,7 @@ import (
 const (
 	defHTTPProto      = "http"
 	defHTTPHost       = "localhost"
-	defHTTPPort       = "9090"
+	defHTTPPort       = "8087"
 	defJWTSecret      = "examplesecret"
 	defLocalFsRoot    = "/tmp/test"
 	defDBHost         = "localhost"

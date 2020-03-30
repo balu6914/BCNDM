@@ -154,7 +154,7 @@ services:
       - DATAPACE_AUTH_URL=datapace-auth:8081
       - DATAPACE_STREAMS_URL=datapace-streams:8085
       - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
-      - DATAPACE_PROXY_URL=http://datapace-dproxy:9090
+      - DATAPACE_PROXY_URL=http://datapace-dproxy:8087
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
     volumes:
       - ../config/big-query:/big-query
@@ -262,7 +262,7 @@ services:
     volumes:
       - ./dproxy-data:/data
     ports:
-      - "9090:9090"
+      - "8087:8087"
     restart: on-failure
     networks:
       - datapace-net
