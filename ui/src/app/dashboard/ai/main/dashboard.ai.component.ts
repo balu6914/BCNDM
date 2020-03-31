@@ -28,7 +28,7 @@ export class DashboardAiComponent implements OnInit {
   tableDatasets: Table = new Table();
   tableExecutions: Table = new Table();
   query = new Query();
-  checkedStreams = [];
+  checkedDatasets = [];
   checkedAlgos = [];
 
   constructor(
@@ -203,7 +203,7 @@ export class DashboardAiComponent implements OnInit {
 
   modalNewExecution() {
     const initialState = {
-      streams: this.checkedStreams,
+      datasets: this.checkedDatasets,
       algos: this.checkedAlgos,
     };
 
@@ -220,13 +220,13 @@ export class DashboardAiComponent implements OnInit {
     }
 
     onDataSelected(row: Stream) {
-      const index = this.checkedStreams.findIndex(
+      const index = this.checkedDatasets.findIndex(
         stream =>  row.id === stream.id
       );
       if (index === -1) {
-        this.checkedStreams.push(row);
+        this.checkedDatasets.push(row);
       } else {
-        this.checkedStreams.splice(index, 1);
+        this.checkedDatasets.splice(index, 1);
       }
     }
 
@@ -254,5 +254,13 @@ export class DashboardAiComponent implements OnInit {
             this.addAiStreamToTable(stream);
           }
         );
+    }
+
+    deleteAlgo(algoID) {
+      this.checkedAlgos = this.checkedAlgos.filter(a => a.id !== algoID);
+    }
+
+    deleteData(dataID) {
+      this.checkedDatasets = this.checkedDatasets.filter(d => d.id !== dataID);
     }
 }

@@ -14,7 +14,7 @@ import { ExecutionReq, StartExecutionReq } from 'app/common/interfaces/execution
 })
 export class DashboardAiExecuteComponent implements OnInit {
   form: FormGroup;
-  streams = [];
+  datasets = [];
   algos = [];
 
   executionReqList: ExecutionReq[] = [];
@@ -34,9 +34,9 @@ export class DashboardAiExecuteComponent implements OnInit {
   }
 
   execute() {
-    this.streams.forEach ( (stream, i) => {
+    this.datasets.forEach ( (dataset, i) => {
       const executionReq: ExecutionReq = {
-        data: stream.id,
+        data: dataset.id,
         // TODO: Make this fields configurable.
         local_args: ['--isShuffle', '--nEstimators', '100',
         '--oobScore', '--maxFeatures', '0.3', '--minSamplesLeaf',

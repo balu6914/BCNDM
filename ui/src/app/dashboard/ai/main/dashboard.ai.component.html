@@ -22,7 +22,7 @@
       </p>
       <p class="action-buttons__item">
         <button type="button" class="btn btn-primary btn-media"
-                (click)="modalNewExecution()" [disabled]="!checkedStreams.length || !checkedAlgos.length">
+                (click)="modalNewExecution()" [disabled]="!checkedDatasets.length || !checkedAlgos.length">
           <span class="btn-media__icon btn-media__icon--add"></span>
           Execute
         </button>
@@ -34,12 +34,14 @@
     <div class="col-lg-6 order-1 order-sm-2">
       <dpc-table [table]="tableAlgorithms"
                  (pageChanged)="onPageChange($event)"
+                 (deleteEvt)="deleteAlgo($event)"
                  (checkboxChangedEvt)="onAlgoSelected($event)">
       </dpc-table>
     </div>
     <div class="col-lg-6 order-1 order-sm-2">
       <dpc-table [table]="tableDatasets"
                  (pageChanged)="onPageChange($event)"
+                 (deleteEvt)="deleteData($event)"
                  (checkboxChangedEvt)="onDataSelected($event)">
       </dpc-table>
     </div>
