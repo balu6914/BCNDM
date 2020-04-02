@@ -42,7 +42,7 @@ export class DashboardAiEditComponent implements OnInit {
         lat:         ['', [Validators.required, Validators.maxLength(11), Validators.min(-90), Validators.max(90), floatValidator]],
         long:        ['', [Validators.required, Validators.maxLength(12), Validators.min(-180), Validators.max(180), floatValidator]],
         snippet:     ['', [Validators.maxLength(2048)]],
-        metadata:    ['', [Validators.maxLength(2048)]],
+        metadata:    [''],
       },
       {
         validator: this.metadataValidator,
