@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.dproxy.suffix }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "datapace.fullname" . }}
+      component: {{ .Values.dproxy.suffix }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "datapace.fullname" . }}
+        component: {{ .Values.dproxy.suffix }}
+    spec:
+      imagePullSecrets:
+        - name: registrykey
+      serviceAccountName: {{ include "datapace.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - env:
+            - name: DATAPACE_DPROXY_DB_HOST
+              value: "{{- printf "%s-%s" .Release.Name "datapace-postgresql"}}"
+            - name: DATAPACE_DPROXY_DB_USER
+              value: postgres
+            - name: DATAPACE_DPROXY_DB_PASS
+              value: {{ .Values.postgresql.postgresqlPassword }}
+            - name: DATAPACE_DPROXY_DB
+              value: postgres
+            - name: DATAPACE_PROXY_HTTP_PORT
+              value: "{{ .Values.dproxy.service.port.http }}"
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ default .Values.defaults.image.repository .Values.dproxy.image.repository }}/{{ .Values.dproxy.image.name }}:{{ default .Values.defaults.image.tag .Values.dproxy.image.tag }}"
+          imagePullPolicy: {{default .Values.defaults.image.pullPolicy .Values.dproxy.image.pullPolicy}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.dproxy.service.port.http }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.dproxy.service.port.http }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.dproxy.service.port.http }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

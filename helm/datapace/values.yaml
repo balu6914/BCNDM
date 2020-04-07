@@ -1,0 +1,137 @@
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:
+
+podSecurityContext: {}
+
+securityContext: {}
+
+resources: {}
+
+imageCredentials:
+  registry: registry.gitlab.com/drasko/datapace-docker
+
+defaults:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "registry.gitlab.com/drasko/datapace-docker"
+    tag: "latest"
+
+dproxy:
+  suffix: dproxy
+  image:
+    name: dproxy
+  service:
+    type: ClusterIP
+    port:
+      http: 8087
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: dproxy.datapace.local
+        paths: ["/"]
+    tls: []
+
+auth:
+  suffix: auth
+  image:
+    name: auth
+  service:
+    type: ClusterIP
+    port:
+      http: 8080
+      grpc: 8081
+
+transactions:
+  suffix: transactions
+  image:
+    name: transactions
+    tag: test
+  service:
+    type: ClusterIP
+    port:
+      http: 8082
+      grpc: 8083
+
+accesscontrol:
+  suffix: accesscontrol
+  image:
+    name: access-control
+  service:
+    type: ClusterIP
+    port:
+      http: 8090
+      grpc: 8091
+
+streams:
+  suffix: streams
+  image:
+    name: streams
+  service:
+    type: ClusterIP
+    port:
+      http: 8084
+      grpc: 8085
+
+executions:
+  suffix: executions
+  image:
+    name: executions
+  service:
+    type: ClusterIP
+    port:
+      http: 8088
+      grpc: 8089
+
+subscriptions:
+  suffix: subscriptions
+  image:
+    name: subscriptions
+  service:
+    type: ClusterIP
+    port:
+      http: 8086
+
+ui:
+  suffix: ui
+  image:
+    name: ui
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: true
+    annotations: {}
+    host: ui.datapace.local
+    tls:
+      - hosts:
+        - ui.datapace.local
+        secretName: ui.datapace.local
+
+postgresql:
+  postgresqlPassword: dproxy
+  nameOverride: datapace-postgresql
+
+mongodb:
+  nameOverride: datapace-mongodb
+  usePassword: false
+
+bc:
+  ip: 10.0.0.1
+  hostname: peer0.org1.datapace.com
+  hostnames:
+    - peer0.org1.datapace.com
+    - orderer.datapace.com
+    - ca.org1.datapace.com
+
+nfs:
+  ip: 10.0.0.1
+  path: /nfsshare

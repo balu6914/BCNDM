@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.auth.suffix }}"
+  labels:
+    {{- include "datapace.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.auth.service.type }}
+  ports:
+    - port: {{ .Values.auth.service.port.http }}
+      targetPort: {{ .Values.auth.service.port.http }}
+      protocol: TCP
+      name: http
+    - port: {{ .Values.auth.service.port.grpc }}
+      targetPort: {{ .Values.auth.service.port.grpc }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: {{ include "datapace.fullname" . }}
+    component: {{ .Values.auth.suffix }}

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.auth.suffix }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "datapace.fullname" . }}
+      component: {{ .Values.auth.suffix }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "datapace.fullname" . }}
+        component: {{ .Values.auth.suffix }}
+    spec:
+      imagePullSecrets:
+        - name: registrykey
+      serviceAccountName: {{ include "datapace.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - env:
+            - name: DATAPACE_AUTH_DB_URL
+              value: "{{- printf "%s-%s" .Release.Name "datapace-mongodb"}}"
+            - name: DATAPACE_TRANSACTIONS_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.transactions.suffix }}:{{ .Values.transactions.service.port.grpc }}"
+            - name: DATAPACE_ACCESS_CONTROL_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.accesscontrol.suffix }}:{{ .Values.accesscontrol.service.port.grpc }}"
+            - name: DATAPACE_AUTH_SECRET
+              value: "datapace"
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ default .Values.defaults.image.repository .Values.auth.image.repository }}/{{ .Values.auth.image.name }}:{{ default .Values.defaults.image.tag .Values.auth.image.tag }}"
+          imagePullPolicy: {{default .Values.defaults.image.pullPolicy .Values.auth.image.pullPolicy}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.auth.service.port.http }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.auth.service.port.http }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.auth.service.port.http }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

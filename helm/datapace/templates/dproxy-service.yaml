@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.dproxy.suffix }}"
+  labels:
+    {{- include "datapace.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.dproxy.service.type }}
+  ports:
+    - port: {{ .Values.dproxy.service.port.http }}
+      targetPort: {{ .Values.dproxy.service.port.http }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "datapace.fullname" . }}
+    component: {{ .Values.dproxy.suffix }}

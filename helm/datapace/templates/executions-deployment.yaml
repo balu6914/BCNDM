@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.executions.suffix }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "datapace.fullname" . }}
+      component: {{ .Values.executions.suffix }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "datapace.fullname" . }}
+        component: {{ .Values.executions.suffix }}
+    spec:
+      imagePullSecrets:
+        - name: registrykey
+      serviceAccountName: {{ include "datapace.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - env:
+            - name: DATAPACE_EXECUTIONS_HTTP_PORT
+              value: "{{ .Values.executions.service.port.http }}"
+            - name: DATAPACE_EXECUTIONS_GRPC_PORT
+              value: "{{ .Values.executions.service.port.grpc }}"
+            - name: DATAPACE_EXECUTIONS_DB_URL
+              value: "{{- printf "%s-%s" .Release.Name "datapace-mongodb"}}"
+            - name: DATAPACE_AUTH_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.auth.suffix }}:{{ .Values.auth.service.port.grpc }}"
+            - name: DATAPACE_SUBSCRIPTIONS_URL
+              value: "http://{{ include "datapace.fullname" . }}-{{ .Values.subscriptions.suffix }}:{{ .Values.subscriptions.service.port.http }}"
+            - name: DATAPACE_WWH_CATALOG_URL
+              value: http://localhost:31222 # instead of localhost place docker host IP
+            - name: DATAPACE_WWH_DAEMON_URL
+              value: localhost:32222 # same here (check it with docker exec -it datapace-executions route)
+            - name: DATAPACE_WWH_TOKEN
+              value: v61rSpnp89
+            - name: DATAPACE_WWH_USERNAME
+              value: admin1
+            - name: DATAPACE_WWH_PASSWORD
+              value: password01
+            - name: DATAPACE_KUBEFLOW_ACTIVE
+              value: "true"
+            - name: DATAPACE_KUBEFLOW_URL
+              value: "https://kubeflow.datapace.io"
+            - name: DATAPACE_KUBEFLOW_STATUS_INTERVAL
+              value: "10"
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ default .Values.defaults.image.repository .Values.executions.image.repository }}/{{ .Values.executions.image.name }}:{{ default .Values.defaults.image.tag .Values.executions.image.tag }}"
+          imagePullPolicy: {{default .Values.defaults.image.pullPolicy .Values.executions.image.pullPolicy}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.executions.service.port.http }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.executions.service.port.http }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.executions.service.port.http }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

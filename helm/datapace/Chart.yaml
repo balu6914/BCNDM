@@ -1,0 +1,13 @@
+apiVersion: v2
+name: datapace
+description: A Helm chart for Datapace
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+dependencies:
+  - name: postgresql
+    version: "8.7.2"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: mongodb
+    version: "7.10.10"
+    repository: "https://charts.bitnami.com/bitnami"

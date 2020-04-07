@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.subscriptions.suffix }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "datapace.fullname" . }}
+      component: {{ .Values.subscriptions.suffix }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "datapace.fullname" . }}
+        component: {{ .Values.subscriptions.suffix }}
+    spec:
+      imagePullSecrets:
+        - name: registrykey
+      serviceAccountName: {{ include "datapace.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - env:
+            - name: DATAPACE_SUBSCRIPTIONS_PORT
+              value: "{{ .Values.subscriptions.service.port.http }}"
+            - name: DATAPACE_SUBSCRIPTIONS_DB_URL
+              value: "{{- printf "%s-%s" .Release.Name "datapace-mongodb"}}"
+            - name: DATAPACE_SUBSCRIPTIONS_DB_NAME
+              value: subscriptions
+            - name: DATAPACE_AUTH_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.auth.suffix }}:{{ .Values.auth.service.port.grpc }}"
+            - name: DATAPACE_STREAMS_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.streams.suffix }}:{{ .Values.streams.service.port.grpc }}"
+            - name: DATAPACE_TRANSACTIONS_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.transactions.suffix }}:{{ .Values.transactions.service.port.grpc }}"
+            - name: DATAPACE_PROXY_URL
+              value: "http://{{ include "datapace.fullname" . }}-{{ .Values.dproxy.suffix }}:{{ .Values.dproxy.service.port.http }}"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /tmp/config/big-query/DigiSense-1987a4981f2e.json
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ default .Values.defaults.image.repository .Values.subscriptions.image.repository }}/{{ .Values.subscriptions.image.name }}:{{ default .Values.defaults.image.tag .Values.subscriptions.image.tag }}"
+          imagePullPolicy: {{default .Values.defaults.image.pullPolicy .Values.subscriptions.image.pullPolicy}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.subscriptions.service.port.http }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.subscriptions.service.port.http }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.subscriptions.service.port.http }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: "/tmp/config"
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: config

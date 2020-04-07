@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    {{- include "datapace.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: post-install-job
+          image: "alpine:3.11"
+          command: ["/bin/sh","-c"]
+          args: ["cp -r /tmp/bc/datapace-service-kvs/. /tmp/datapace-service-kvs/; cp -r /tmp/bc/datapace-service-msp/. /tmp/datapace-service-msp/; cp -r /tmp/bc/config/. /tmp/config/"]
+          volumeMounts:
+            - name: "nfsshare"
+              mountPath: "/tmp/bc"
+            - name: kvs
+              mountPath: "/tmp/datapace-service-kvs"
+            - name: msp
+              mountPath: "/tmp/datapace-service-msp"
+            - name: config
+              mountPath: "/tmp/config"
+      volumes:
+        - name: "nfsshare"
+          nfs:
+            server: {{ .Values.nfs.ip }}
+            path: {{ .Values.nfs.path }}
+        - name: kvs
+          persistentVolumeClaim:
+            claimName: kvs
+        - name: msp
+          persistentVolumeClaim:
+              claimName: msp
+        - name: config
+          persistentVolumeClaim:
+              claimName: config
+

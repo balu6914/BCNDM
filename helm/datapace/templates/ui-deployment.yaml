@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "datapace.fullname" . }}-{{ .Values.ui.suffix }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "datapace.fullname" . }}
+      component: {{ .Values.ui.suffix }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "datapace.fullname" . }}
+        component: {{ .Values.ui.suffix }}
+    spec:
+      imagePullSecrets:
+        - name: registrykey
+      serviceAccountName: {{ include "datapace.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - env:
+            - name: DATAPACE_DPROXY_DB_HOST
+              value: "{{- printf "%s-%s" .Release.Name "datapace-postgresql"}}"
+            - name: DATAPACE_DPROXY_DB_USER
+              value: postgres
+            - name: DATAPACE_DPROXY_DB_PASS
+              value: dproxy
+            - name: DATAPACE_DPROXY_DB
+              value: postgres
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ default .Values.defaults.image.repository .Values.ui.image.repository }}/{{ .Values.ui.image.name }}:{{ default .Values.defaults.image.tag .Values.ui.image.tag }}"
+          imagePullPolicy: {{default .Values.defaults.image.pullPolicy .Values.ui.image.pullPolicy}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.ui.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.ui.service.port }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: {{ .Values.ui.service.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
