@@ -71,13 +71,13 @@ export class DashboardAiAddComponent implements OnInit {
         type: this.streamType,
         description: this.form.value.description,
         snippet: this.form.value.snippet,
-        url: this.form.value.url,
+        url: this.form.value.url || 'http://www.undefined.com',
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
           type: 'Point',
           coordinates: [
-            parseFloat(this.form.value.long),
-            parseFloat(this.form.value.lat)
+            parseFloat(this.form.value.long || 0),
+            parseFloat(this.form.value.lat || 0)
           ]
         },
         metadata: JSON.parse(this.form.value.metadata),
