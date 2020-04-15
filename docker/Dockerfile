@@ -10,5 +10,6 @@ RUN apk update \
 
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /etc/nsswitch.conf /etc/nsswitch.conf
 COPY --from=builder /exe /
 ENTRYPOINT ["/exe"]
