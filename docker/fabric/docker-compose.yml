@@ -13,6 +13,8 @@ services:
       service: orderer.datapace.com
     #The container name is a copy of the orderer name
     container_name: orderer.datapace.com
+    ports:
+      - "7050:7050"
     networks:
       - datapace-bc-net
 
@@ -24,6 +26,9 @@ services:
       file:  base/docker-compose-base.yaml
       # Refers to peer name
       service: peer0.org1.datapace.com
+    ports:
+      - "7051:7051"
+      - "7053:7053"
     networks:
       # Our network is called "datapace-net"
       - datapace-bc-net
@@ -39,6 +44,8 @@ services:
     depends_on:
       - fabric-ca-pgsql
     restart: on-failure
+    ports:
+      - "7054:7054"
     networks:
       - datapace-bc-net
 
