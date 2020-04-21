@@ -51,6 +51,7 @@ export class DashboardAiEditComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.editData.snippet = this.editData.snippet || '';
     this.editData.metadata = this.editData.metadata || null;
     this.form.setValue(this.editData);
   }
