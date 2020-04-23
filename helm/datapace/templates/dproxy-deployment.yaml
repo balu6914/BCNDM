@@ -21,6 +21,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - env:
+            - name: DATAPACE_PROXY_HTTP_HOST
+              value:  {{ (index .Values.dproxy.ingress.hosts 0).host }}
             - name: DATAPACE_DPROXY_DB_HOST
               value: "{{- printf "%s-%s" .Release.Name "datapace-postgresql"}}"
             - name: DATAPACE_DPROXY_DB_USER

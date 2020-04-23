@@ -17,15 +17,10 @@ spec:
       containers:
         - name: post-install-job
           image: "alpine:3.11"
-          command: ["/bin/sh","-c"]
-          args: ["cp -r /tmp/bc/datapace-service-kvs/. /tmp/datapace-service-kvs/; cp -r /tmp/bc/datapace-service-msp/. /tmp/datapace-service-msp/; cp -r /tmp/bc/config/. /tmp/config/"]
+          command: ["cp","-r","/tmp/bc/config/.","/tmp/config/"]
           volumeMounts:
             - name: "nfsshare"
               mountPath: "/tmp/bc"
-            - name: kvs
-              mountPath: "/tmp/datapace-service-kvs"
-            - name: msp
-              mountPath: "/tmp/datapace-service-msp"
             - name: config
               mountPath: "/tmp/config"
       volumes:

@@ -22,6 +22,10 @@ In order for Datapace to communicate with blockchain, the bc->ip needs to be set
 
 The kubernetes install is done using the following commands:
 
+- add external repo
+
+`helm repo add bitnami https://charts.bitnami.com/bitnami`
+
 - install helm dependencies
 
 `helm dependency build`

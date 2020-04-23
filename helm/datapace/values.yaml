@@ -31,7 +31,7 @@ dproxy:
   service:
     type: ClusterIP
     port:
-      http: 8087
+      http: 80
   ingress:
     enabled: true
     annotations: {}
