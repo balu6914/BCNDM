@@ -1,0 +1,7 @@
+BCHOSTIP='blockchainserverip'
+DATAPACEHOSTIP='k8sserverip'
+GITHUBTOKEN='yourgithubtoken'
+GITLABUSER='yourgithubusername'
+GITLABTOKEN='yourgitlabtoken'
+UIHOSTNAME='uihostname'
+DPROXYHOSTNAME='dproxyhostname'
