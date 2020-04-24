@@ -54,7 +54,7 @@ transactions:
   suffix: transactions
   image:
     name: transactions
-    tag: test
+    tag: latest
   service:
     type: ClusterIP
     port:

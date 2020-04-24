@@ -5,10 +5,12 @@ ssh-keyscan -H $DATAPACEHOSTIP >> ~/.ssh/known_hosts
 scp /tmp/cryptogen ubuntu\@$BCHOSTIP:/home/ubuntu/
 if [ $? -ne 0 ]; then
     echo "failed to copy cryptogen, is it in your /tmp dir?"
+    exit 1
 fi
 scp /tmp/configtxgen ubuntu\@$BCHOSTIP:/home/ubuntu/
 if [ $? -ne 0 ]; then
     echo "failed to copy configtxgen, is it in your /tmp dir?"
+    exit 1
 fi
 echo "doing bc machine"
 ssh ubuntu@$BCHOSTIP << EOF
