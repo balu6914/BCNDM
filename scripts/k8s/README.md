@@ -8,7 +8,7 @@ The setup consists of three machines:
 
 ## Prerequisites:
 
-- on **LOCAL** machine **cryptogen** and **configtxgen** binaries should be put in the /tmp dir
+- on **LOCAL** machine **cryptogen** and **configtxgen** binaries should be put in this dir
 - on **BC** machine ports 7050, 7051, 7053 and 7054 should be open  to the outside world
 - on **K8S** machine ports 80 and 443 should be open to the outside world
 

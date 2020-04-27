@@ -131,7 +131,3 @@ bc:
     - peer0.org1.datapace.com
     - orderer.datapace.com
     - ca.org1.datapace.com
-
-nfs:
-  ip: 10.0.0.2
-  path: /nfsshare

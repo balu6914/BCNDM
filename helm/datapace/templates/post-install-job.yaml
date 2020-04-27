@@ -19,15 +19,15 @@ spec:
           image: "alpine:3.11"
           command: ["cp","-r","/tmp/bc/config/.","/tmp/config/"]
           volumeMounts:
-            - name: "nfsshare"
+            - name: "localdir"
               mountPath: "/tmp/bc"
             - name: config
               mountPath: "/tmp/config"
       volumes:
-        - name: "nfsshare"
-          nfs:
-            server: {{ .Values.nfs.ip }}
-            path: {{ .Values.nfs.path }}
+        - name: "localdir"
+          hostPath:
+            path: /tmp/bc
+            type: DirectoryOrCreate
         - name: kvs
           persistentVolumeClaim:
             claimName: kvs
