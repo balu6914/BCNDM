@@ -9,4 +9,4 @@ docker-compose -f docker/fabric/docker-compose.yaml stop
 docker rm $(docker ps -a | grep -v "fabric-ca-pgsql" | awk '{print $1}')
 
 # Run the network again
-docker-compose -f docker/fabric/docker-compose.yaml -f docker/explorer/docker-compose.yaml up
+docker-compose -f docker/fabric/docker-compose.yml up
