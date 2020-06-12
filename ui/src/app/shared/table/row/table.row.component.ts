@@ -5,6 +5,8 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
+import { DashboardAdminEditComponent } from 'app/dashboard/admin/edit/dashboard.admin.edit.component';
+import { DashboardAdminDeleteComponent } from 'app/dashboard/admin/delete/dashboard.admin.delete.component';
 import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
 import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
 import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
@@ -42,6 +44,7 @@ export class TableRowComponent implements OnInit {
   @Output() accessApproved: EventEmitter<any> = new EventEmitter();
   @Output() accessRevoked: EventEmitter<any> = new EventEmitter();
   @Output() fetchExecResult: EventEmitter<any> = new EventEmitter();
+  @Output() editEvent: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private authService: AuthService,
@@ -174,7 +177,7 @@ export class TableRowComponent implements OnInit {
           // Emit event to TableComponent
           this.deleteEvt.emit(id);
         }
-      );
+    );
   }
 
   openModalSubscription(row: any) {
@@ -228,5 +231,50 @@ export class TableRowComponent implements OnInit {
   onFetchExecResult(row: Execution) {
     this.execFetched = true;
     this.fetchExecResult.emit(row);
+  }
+
+  openModalEditUser(row: any) {
+    const initialState = {
+      user: {
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        phone: row.phone,
+        address: row.address,
+        company: row.company,
+      },
+    };
+
+    // Open DashboardSellDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAdminEditComponent, {initialState})
+      .content.userEdited.subscribe(
+        user => {
+          // Emit event to TableComponent
+          this.editEvt.emit(user);
+        }
+      );
+  }
+
+  openModalDeleteUser(row: any) {
+    const initialState = {
+      user: {
+        id: row.id,
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        phone: row.phone,
+        address: row.address,
+        company: row.company,
+      },
+    };
+
+    // Open DashboardAdminDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAdminDeleteComponent, {initialState})
+      .content.userDeleted.subscribe(
+        id => {
+          // Emit event to TableComponent
+          this.deleteEvt.emit(id);
+        }
+      );
   }
 }
