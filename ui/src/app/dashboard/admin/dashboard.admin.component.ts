@@ -14,9 +14,9 @@ import { TableComponent } from 'app/shared/table/main/table.component';
   styleUrls: ['./dashboard.admin.component.scss']
 })
 export class DashboardAdminComponent implements OnInit {
-  user: User;
+  admin: User;
   temp = [];
-  streams = [];
+  users = [];
   table: Table = new Table();
   query = new Query();
 
@@ -34,8 +34,8 @@ export class DashboardAdminComponent implements OnInit {
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
       data => {
-        this.user = data;
-        this.query.owner = this.user.id;
+        this.admin = data;
+        this.query.owner = this.admin.id;
         this.fetchUsers();
       },
       err => {
@@ -48,15 +48,6 @@ export class DashboardAdminComponent implements OnInit {
     this.table.tableType = TableType.Users;
     this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', ''];
     this.table.hasDetails = true;
-    const loco = {
-      email: 'NENENENENEN@loco.com',
-      first_name: 'MANULOCO',
-      last_name: 'NENG',
-      phone: '076969696',
-      address: 'NO SE DONDE ESTOY LOCO 097',
-      company: 'la bamba',
-    };
-    this.table.page.content.push(loco);
   }
 
   openModalSignup() {
