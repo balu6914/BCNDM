@@ -25,9 +25,25 @@ Prior to running the script, change the environment variables in env.sh
 
 this is the IP address of the BC machine
 
+- BCHOSTUSER
+
+this is the installation user on the BC machine
+
+- BCHOSTHOME
+
+this is installation user home directory on BC machine
+
 - DATAPACEHOSTIP
 
 this is the IP address of the K8S machine
+
+- DATAPACEHOSTUSER
+
+this is the installation user on the K8S machine
+
+- DATAPACEHOSTHOME
+
+this is the installation user home directory on the K8S machine
 
 - GITHUBTOKEN
 
