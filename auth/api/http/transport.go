@@ -87,6 +87,7 @@ func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
+	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }

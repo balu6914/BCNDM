@@ -21,7 +21,14 @@ func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts Transacti
 	}
 }
 
-func (as *authService) Register(user User) error {
+func (as *authService) Register(key string, user User) error {
+	isAdmin, err := as.isAdmin(key)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	if !isAdmin {
+		return ErrUnauthorizedAccess
+	}
 	hash, err := as.hasher.Hash(user.Password)
 	if err != nil {
 		return ErrMalformedEntity
@@ -42,6 +49,30 @@ func (as *authService) Register(user User) error {
 	return nil
 }
 
+func (as *authService) InitAdmin(user User) error {
+	hash, err := as.hasher.Hash(user.Password)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	user.Password = hash
+
+	_, err = as.users.OneByEmail(user.Email)
+	if err != ErrNotFound {
+		return err
+	}
+
+	id, err := as.users.Save(user)
+	if err != nil {
+		return err
+	}
+	if err := as.ts.CreateUser(id); err != nil {
+		as.users.Remove(id)
+		return err
+	}
+
+	return nil
+}
+
 func (as *authService) Login(user User) (string, error) {
 	dbu, err := as.users.OneByEmail(user.Email)
 	if err != nil {
@@ -52,7 +83,7 @@ func (as *authService) Login(user User) (string, error) {
 		return "", ErrUnauthorizedAccess
 	}
 
-	return as.idp.TemporaryKey(dbu.ID)
+	return as.idp.TemporaryKey(dbu.ID, dbu.Roles)
 }
 
 func (as *authService) Update(key string, user User) error {
@@ -155,4 +186,18 @@ func (as *authService) Exists(id string) error {
 	}
 
 	return nil
+}
+
+func (as *authService) isAdmin(key string) (bool, error) {
+	roles, err := as.idp.Roles(key)
+	if err != nil {
+		return false, ErrMalformedEntity
+	}
+	isAdmin := false
+	for _, role := range roles {
+		if role == "admin" {
+			isAdmin = true
+		}
+	}
+	return isAdmin, nil
 }

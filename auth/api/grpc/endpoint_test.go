@@ -2,10 +2,10 @@ package grpc_test
 
 import (
 	"context"
-	"fmt"
 	"datapace"
 	"datapace/auth"
 	grpcapi "datapace/auth/api/grpc"
+	"fmt"
 	"testing"
 	"time"
 
@@ -29,8 +29,20 @@ var user = auth.User{
 	LastName:  "Doe",
 }
 
+var admin = auth.User{
+	ID:        "admin@example.com",
+	Email:     "admin@example.com",
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
+	Roles:     []string{"admin"},
+}
+
 func TestIdentify(t *testing.T) {
-	svc.Register(user)
+	svc.Register(k, user)
 
 	authAddr := fmt.Sprintf("localhost:%d", port)
 	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())

@@ -12,6 +12,7 @@ type User struct {
 	Company      string
 	Address      string
 	Phone        string
+	Roles        []string
 }
 
 // UserRepository specifies an account persistence API.
