@@ -26,13 +26,22 @@ func MetricsMiddleware(svc auth.Service, counter metrics.Counter, latency metric
 	}
 }
 
-func (ms *metricsMiddleware) Register(user auth.User) error {
+func (ms *metricsMiddleware) Register(key string, user auth.User) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "register").Add(1)
 		ms.latency.With("method", "register").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.Register(user)
+	return ms.svc.Register(key, user)
+}
+
+func (ms *metricsMiddleware) InitAdmin(user auth.User) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "init_admin").Add(1)
+		ms.latency.With("method", "init_admin").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.InitAdmin(user)
 }
 
 func (ms *metricsMiddleware) Login(user auth.User) (string, error) {

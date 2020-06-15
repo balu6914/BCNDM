@@ -13,9 +13,17 @@ type userRepositoryMock struct {
 }
 
 // NewUserRepository creates in-memory user repository.
-func NewUserRepository() auth.UserRepository {
+func NewUserRepository(hasher auth.Hasher, usr auth.User) auth.UserRepository {
+	users := make(map[string]auth.User)
+	hash, _ := hasher.Hash(usr.Password)
+	users[usr.Email] = auth.User{
+		ID:       usr.ID,
+		Email:    usr.Email,
+		Password: hash,
+		Roles:    usr.Roles,
+	}
 	return &userRepositoryMock{
-		users: make(map[string]auth.User),
+		users: users,
 	}
 }
 

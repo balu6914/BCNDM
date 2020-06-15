@@ -20,7 +20,7 @@ func LoggingMiddleware(svc auth.Service, logger log.Logger) auth.Service {
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) Register(user auth.User) (err error) {
+func (lm *loggingMiddleware) Register(key string, user auth.User) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method register for user %s took %s to complete", user.Email, time.Since(begin))
 		if err != nil {
@@ -31,7 +31,21 @@ func (lm *loggingMiddleware) Register(user auth.User) (err error) {
 
 	}(time.Now())
 
-	return lm.svc.Register(user)
+	return lm.svc.Register(key, user)
+}
+
+func (lm *loggingMiddleware) InitAdmin(user auth.User) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method init_admin for admin %s took %s to complete", user.Email, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.InitAdmin(user)
 }
 
 func (lm *loggingMiddleware) Login(user auth.User) (token string, err error) {

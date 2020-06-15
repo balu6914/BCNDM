@@ -23,53 +23,103 @@ var user = auth.User{
 	Phone:        "+1234567890",
 }
 
-func newService() auth.Service {
-	users := mocks.NewUserRepository()
+var admin = auth.User{
+	Email:        "admin@example.com",
+	ContactEmail: "admin@example.com",
+	Password:     "password",
+	ID:           "admin",
+	FirstName:    "first",
+	LastName:     "last",
+	Company:      "company",
+	Address:      "address",
+	Phone:        "+1234567890",
+	Roles:        []string{"admin"},
+}
+
+var nonadmin = auth.User{
+	Email:        "nonadmin@example.com",
+	ContactEmail: "nonadmin@example.com",
+	Password:     "password",
+	ID:           "nonadmin",
+	FirstName:    "first",
+	LastName:     "last",
+	Company:      "company",
+	Address:      "address",
+	Phone:        "+1234567890",
+}
+
+func newService() (auth.Service, string) {
+	svc, key, _ := newServiceWithAdmin()
+	return svc, key
+}
+
+func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
+	users := mocks.NewUserRepository(hasher, admin)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
-
-	return auth.New(users, hasher, idp, ts, ac)
+	svc := auth.New(users, hasher, idp, ts, ac)
+	key, _ := svc.Login(auth.User{
+		Email:    admin.Email,
+		Password: admin.Password,
+	})
+	return svc, key, admin
 }
 
 func TestRegister(t *testing.T) {
-	svc := newService()
+	svc, key, _ := newServiceWithAdmin()
 	invalidUser := user
 	invalidUser.Password = ""
-
+	svc.Register(key, nonadmin)
+	nonadminkey, _ := svc.Login(auth.User{
+		Email:    nonadmin.Email,
+		Password: nonadmin.Password,
+	})
 	cases := []struct {
 		desc string
+		key  string
 		user auth.User
 		err  error
 	}{
 		{
+			desc: "register new user by nonadmin",
+			key:  nonadminkey,
+			user: user,
+			err:  auth.ErrUnauthorizedAccess,
+		},
+		{
 			desc: "register new user",
+			key:  key,
 			user: user,
 			err:  nil,
 		},
 		{
 			desc: "register user with invalid data",
+			key:  key,
 			user: invalidUser,
 			err:  auth.ErrMalformedEntity,
 		},
 		{
 			desc: "register existing user",
+			key:  key,
 			user: user,
 			err:  auth.ErrConflict,
 		},
 	}
 
 	for _, tc := range cases {
-		err := svc.Register(tc.user)
+		err := svc.Register(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 
 func TestView(t *testing.T) {
-	svc := newService()
-	svc.Register(user)
-	key, _ := svc.Login(user)
+	svc, k := newService()
+
+	svc.Register(k, user)
+	key, err := svc.Login(user)
+	_ = err
 
 	cases := map[string]struct {
 		key string
@@ -96,8 +146,8 @@ func TestView(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	svc := newService()
-	svc.Register(user)
+	svc, k := newService()
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 	user.ContactEmail = "new@email.com"
 
@@ -128,8 +178,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpdatePassword(t *testing.T) {
-	svc := newService()
-	svc.Register(user)
+	svc, k := newService()
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 	user.Password = "newpassword"
 
@@ -160,8 +210,8 @@ func TestUpdatePassword(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	svc := newService()
-	svc.Register(user)
+	svc, k := newService()
+	svc.Register(k, user)
 
 	user2 := user
 	user2.Email = wrong
@@ -194,8 +244,8 @@ func TestLogin(t *testing.T) {
 }
 
 func TestIdentify(t *testing.T) {
-	svc := newService()
-	svc.Register(user)
+	svc, k := newService()
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 
 	cases := map[string]struct {

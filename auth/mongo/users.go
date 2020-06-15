@@ -173,6 +173,7 @@ type mongoUser struct {
 	Company      string        `bson:"company,omitempty"`
 	Address      string        `bson:"address,omitempty"`
 	Phone        string        `bson:"phone,omitempty"`
+	Roles        []string      `bson:"roles,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -187,6 +188,7 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 			Company:      user.Company,
 			Address:      user.Address,
 			Phone:        user.Phone,
+			Roles:        user.Roles,
 		}, nil
 	}
 
@@ -205,6 +207,7 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		Company:      user.Company,
 		Address:      user.Address,
 		Phone:        user.Phone,
+		Roles:        user.Roles,
 	}, nil
 }
 
@@ -219,5 +222,6 @@ func (user mongoUser) toUser() auth.User {
 		Company:      user.Company,
 		Address:      user.Address,
 		Phone:        user.Phone,
+		Roles:        user.Roles,
 	}
 }

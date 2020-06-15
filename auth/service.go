@@ -27,7 +27,11 @@ var (
 type Service interface {
 	// Register creates new user account. In case of the failed registration, a
 	// non-nil error value is returned.
-	Register(User) error
+	Register(string, User) error
+
+	// InitAdmin creates admin account if it does not exist already. In case of the failed creation, a
+	// non-nil error value is returned.
+	InitAdmin(User) error
 
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are

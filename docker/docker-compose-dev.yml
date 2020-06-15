@@ -33,6 +33,8 @@ services:
       - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - DATAPACE_AUTH_SECRET=datapace
+      - DATAPACE_ADMIN_EMAIL=admin@datapace.localhost
+      - DATAPACE_ADMIN_PASSWORD=datapaceadmin
     networks:
       - datapace-net
 

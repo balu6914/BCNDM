@@ -23,8 +23,9 @@ func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
 			Company:      req.Company,
 			Address:      req.Address,
 			Phone:        req.Phone,
+			Roles:        req.Roles,
 		}
-		err := svc.Register(user)
+		err := svc.Register(req.key, user)
 		return createRes{}, err
 	}
 }

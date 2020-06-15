@@ -20,23 +20,63 @@ type jwtIdentityProvider struct {
 	secret string
 }
 
+type CustomClaims struct {
+	Roles []string `json:"roles"`
+	jwt.StandardClaims
+}
+
 // New instantiates a JWT identity provider.
 func New(secret string) auth.IdentityProvider {
 	return &jwtIdentityProvider{}
 }
 
-func (idp *jwtIdentityProvider) TemporaryKey(id string) (string, error) {
+func (idp *jwtIdentityProvider) TemporaryKey(id string, roles []string) (string, error) {
 	now := time.Now().UTC()
 	exp := now.Add(duration)
 
-	claims := jwt.StandardClaims{
-		Subject:   id,
-		Issuer:    issuer,
-		IssuedAt:  now.Unix(),
-		ExpiresAt: exp.Unix(),
+	claims := CustomClaims{
+		roles,
+		jwt.StandardClaims{
+			Subject:   id,
+			Issuer:    issuer,
+			IssuedAt:  now.Unix(),
+			ExpiresAt: exp.Unix(),
+		},
 	}
 
 	return idp.jwt(claims)
+}
+
+func (idp *jwtIdentityProvider) Roles(key string) ([]string, error) {
+	token, err := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, auth.ErrUnauthorizedAccess
+		}
+
+		return []byte(idp.secret), nil
+	})
+	var roles []string
+	if err != nil || !token.Valid {
+		return roles, auth.ErrUnauthorizedAccess
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return roles, auth.ErrUnauthorizedAccess
+	}
+	if _, ok := claims["roles"]; !ok {
+		return roles, nil
+	}
+	var rr []interface{}
+	if rr, ok = claims["roles"].([]interface{}); !ok {
+		return roles, nil
+	}
+	for _, v := range rr {
+		if r, ok := v.(string); ok {
+			roles = append(roles, r)
+		}
+	}
+	return roles, nil
 }
 
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
@@ -59,7 +99,7 @@ func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 	return claims["sub"].(string), nil
 }
 
-func (idp *jwtIdentityProvider) jwt(claims jwt.StandardClaims) (string, error) {
+func (idp *jwtIdentityProvider) jwt(claims CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(idp.secret))
 }
