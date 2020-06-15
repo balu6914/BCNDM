@@ -1,6 +1,9 @@
 package mocks
 
-import "datapace/auth"
+import (
+	"datapace/auth"
+	"strings"
+)
 
 var _ auth.IdentityProvider = (*identityProviderMock)(nil)
 
@@ -12,22 +15,40 @@ func NewIdentityProvider() auth.IdentityProvider {
 	return &identityProviderMock{}
 }
 
-func (idp *identityProviderMock) TemporaryKey(id string) (string, error) {
+func (idp *identityProviderMock) TemporaryKey(id string, roles []string) (string, error) {
 	if id == "" {
 		return "", auth.ErrUnauthorizedAccess
 	}
-
+	if len(roles) > 0 {
+		return id + "|" + strings.Join(roles, "|"), nil
+	}
 	return id, nil
+
 }
 
 func (idp *identityProviderMock) PermanentKey(id string) (string, error) {
-	return idp.TemporaryKey(id)
+	return idp.TemporaryKey(id, []string{})
 }
 
 func (idp *identityProviderMock) Identity(key string) (string, error) {
 	if key == "invalid" {
 		return "", auth.ErrUnauthorizedAccess
 	}
+	parts := strings.Split(key, "|")
+	l := len(parts)
+	var roles []string
+	if l > 1 {
+		roles = parts[1:]
+	}
+	return idp.TemporaryKey(parts[0], roles)
+}
 
-	return idp.TemporaryKey(key)
+func (idp *identityProviderMock) Roles(key string) ([]string, error) {
+	parts := strings.Split(key, "|")
+	l := len(parts)
+	var roles []string
+	if l > 1 {
+		roles = parts[1:]
+	}
+	return roles, nil
 }

@@ -40,6 +40,8 @@ const (
 	envAccessControlURL = "DATAPACE_ACCESS_CONTROL_URL"
 	envSecret           = "DATAPACE_AUTH_SECRET"
 	envEncryptionKey    = "DATAPACE_ENCRYPTION_KEY"
+	envAdminEmail       = "DATAPACE_ADMIN_EMAIL"
+	envAdminPassword    = "DATAPACE_ADMIN_PASSWORD"
 
 	defHTTPPort         = "8080"
 	defGRPCPort         = "8081"
@@ -51,6 +53,8 @@ const (
 	defAccessControlURL = "localhost:8081"
 	defSecret           = "datapace"
 	defEncryptionKey    = "AES256Key-32Characters1234567890"
+	defAdminEmail       = "admin@datapace.localhost"
+	defAdminPassword    = "datapaceadmin"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -69,6 +73,8 @@ type config struct {
 	accessControlURL string
 	secret           string
 	encryptionKey    string
+	adminEmail       string
+	adminPassword    string
 }
 
 func main() {
@@ -89,6 +95,7 @@ func main() {
 	ac := accessapi.NewClient(acconn)
 
 	svc := newService(cfg, ms, tc, ac, logger)
+	initAdmin(svc, cfg.adminEmail, cfg.adminPassword, logger)
 
 	errs := make(chan error, 2)
 
@@ -120,6 +127,8 @@ func loadConfig() config {
 		accessControlURL: datapace.Env(envAccessControlURL, defAccessControlURL),
 		secret:           datapace.Env(envSecret, defSecret),
 		encryptionKey:    datapace.Env(envEncryptionKey, defEncryptionKey),
+		adminEmail:       datapace.Env(envAdminEmail, defAdminEmail),
+		adminPassword:    datapace.Env(envAdminPassword, defAdminPassword),
 	}
 }
 
@@ -138,6 +147,25 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	}
 
 	return ms
+}
+
+func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Logger) {
+	err := svc.InitAdmin(auth.User{
+		Email:        adminEmail,
+		ContactEmail: adminEmail,
+		Password:     adminPassword,
+		ID:           "",
+		FirstName:    "",
+		LastName:     "",
+		Company:      "",
+		Address:      "",
+		Phone:        "",
+		Roles:        []string{"admin"},
+	})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to create admin: %s", err))
+		os.Exit(1)
+	}
 }
 
 func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {

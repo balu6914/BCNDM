@@ -35,14 +35,47 @@ var user = auth.User{
 	Phone:     "+1234567890",
 }
 
-func newService() auth.Service {
-	repo := mocks.NewUserRepository()
+var admin = auth.User{
+	ID:        "admin@example.com",
+	Email:     "admin@example.com",
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
+	Roles:     []string{"admin"},
+}
+
+var nonadmin = auth.User{
+	ID:        "nonadmin@example.com",
+	Email:     "nonadmin@example.com",
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
+}
+
+func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
+	repo := mocks.NewUserRepository(hasher, admin)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
 
-	return auth.New(repo, hasher, idp, ts, ac)
+	svc := auth.New(repo, hasher, idp, ts, ac)
+	key, _ := svc.Login(auth.User{
+		Email:    admin.Email,
+		Password: admin.Password,
+	})
+	return svc, key, admin
+}
+
+func newService() (auth.Service, string) {
+	svc, key, _ := newServiceWithAdmin()
+	return svc, key
 }
 
 func newServer(svc auth.Service) *httptest.Server {
@@ -82,7 +115,7 @@ func toJSON(data interface{}) string {
 }
 
 func TestRegister(t *testing.T) {
-	svc := newService()
+	svc, key := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
@@ -105,59 +138,87 @@ func TestRegister(t *testing.T) {
 		LastName:  "Doe",
 	})
 
+	nonadminkey, _ := svc.Login(auth.User{
+		Email:    nonadmin.Email,
+		Password: nonadmin.Password,
+	})
+
 	cases := []struct {
 		desc        string
 		contentType string
 		req         string
 		status      int
+		key         string
 	}{
+		{
+			desc:        "fail to register new user without admin role",
+			contentType: contentType,
+			req:         data,
+			status:      http.StatusForbidden,
+			key:         nonadminkey,
+		},
+		{
+			desc:        "fail to register new user without authorization credentials",
+			contentType: contentType,
+			req:         data,
+			status:      http.StatusForbidden,
+			key:         "",
+		},
 		{
 			desc:        "register new user",
 			contentType: contentType,
 			req:         data,
 			status:      http.StatusCreated,
+			key:         key,
 		},
 		{
 			desc:        "register existing user",
 			contentType: contentType,
 			req:         data,
 			status:      http.StatusConflict,
+			key:         key,
 		},
 		{
 			desc:        "register invalid user",
 			contentType: contentType,
 			req:         invalidData,
 			status:      http.StatusBadRequest,
+			key:         key,
 		},
 		{
 			desc:        "register user with invalid email",
 			contentType: contentType,
 			req:         invalidEmailData,
 			status:      http.StatusBadRequest,
+			key:         key,
 		},
 		{
 			desc:        "register user with missing content type",
 			contentType: "",
 			req:         data,
 			status:      http.StatusUnsupportedMediaType,
+			key:         key,
 		},
 		{
 			desc:        "register user with invalid request format",
 			contentType: contentType,
 			req:         "}",
 			status:      http.StatusBadRequest,
+			key:         key,
 		},
 		{
 			desc:        "register user with empty JSON request",
 			contentType: contentType,
 			req:         "{}",
 			status:      http.StatusBadRequest,
+			key:         key,
 		},
 		{
 			desc:        "register user with empty request",
 			contentType: contentType,
 			req:         "",
 			status:      http.StatusBadRequest,
+			key:         key,
 		},
 	}
 
@@ -168,6 +229,7 @@ func TestRegister(t *testing.T) {
 			url:         fmt.Sprintf("%s/users", ts.URL),
 			contentType: tc.contentType,
 			body:        strings.NewReader(tc.req),
+			token:       tc.key,
 		}
 		res, err := req.make()
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
@@ -176,11 +238,11 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	svc := newService()
+	svc, key := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(user)
+	svc.Register(key, user)
 
 	credentials := user
 	credentials.ID = ""
@@ -275,11 +337,11 @@ func TestLogin(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	svc := newService()
+	svc, k := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(user)
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 
 	data := toJSON(testUpdateReq{
@@ -381,11 +443,11 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpdatePassowrd(t *testing.T) {
-	svc := newService()
+	svc, k := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(user)
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 
 	data := toJSON(testUpdatePassswordReq{
@@ -481,11 +543,11 @@ func TestUpdatePassowrd(t *testing.T) {
 }
 
 func TestView(t *testing.T) {
-	svc := newService()
+	svc, k := newService()
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(user)
+	svc.Register(k, user)
 	key, _ := svc.Login(user)
 
 	cases := map[string]struct {

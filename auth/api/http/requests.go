@@ -11,14 +11,16 @@ type apiReq interface {
 }
 
 type registerReq struct {
-	Email        string `json:"email"`
-	Password     string `json:"password"`
-	ContactEmail string `json:"contact_email,omitempty"`
-	FirstName    string `json:"first_name,omitempty"`
-	LastName     string `json:"last_name,omitempty"`
-	Company      string `json:"company,omitempty"`
-	Address      string `json:"address,omitempty"`
-	Phone        string `json:"phone,omitempty"`
+	key          string
+	Email        string   `json:"email"`
+	Password     string   `json:"password"`
+	ContactEmail string   `json:"contact_email,omitempty"`
+	FirstName    string   `json:"first_name,omitempty"`
+	LastName     string   `json:"last_name,omitempty"`
+	Company      string   `json:"company,omitempty"`
+	Address      string   `json:"address,omitempty"`
+	Phone        string   `json:"phone,omitempty"`
+	Roles        []string `json:"roles,omitempty"`
 }
 
 const (

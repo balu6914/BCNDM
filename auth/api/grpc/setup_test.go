@@ -16,22 +16,32 @@ import (
 const port = 8081
 
 var svc auth.Service
+var k string
 
 func TestMain(m *testing.M) {
-	svc = newService()
+	svc, k = newService()
 	startGRPCServer(svc, port)
 	code := m.Run()
 	os.Exit(code)
 }
 
-func newService() auth.Service {
-	repo := mocks.NewUserRepository()
+func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
+	repo := mocks.NewUserRepository(hasher, admin)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
+	svc := auth.New(repo, hasher, idp, ts, ac)
+	key, _ := svc.Login(auth.User{
+		Email:    admin.Email,
+		Password: admin.Password,
+	})
+	return svc, key, admin
+}
 
-	return auth.New(repo, hasher, idp, ts, ac)
+func newService() (auth.Service, string) {
+	svc, key, _ := newServiceWithAdmin()
+	return svc, key
 }
 
 func startGRPCServer(svc auth.Service, port int) {

@@ -31,6 +31,7 @@ paths:
       tags:
         - users
       parameters:
+        - $ref: "#/parameters/Authorization"
         - name: user
           description: JSON-formatted document describing the new user.
           in: body
@@ -149,6 +150,11 @@ definitions:
         type: string
         format: password
         description: Free-form account password used for acquiring auth token(s).
+      roles:
+        type: array
+          items:
+            type: string
+        description: An array of roles that user can have. admin role is most significant
     required:
       - email
       - password
