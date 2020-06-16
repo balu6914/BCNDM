@@ -1,21 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 // Buy components
-import { DashboardBuyComponent } from '.';
-import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+import { DashboardBuyComponent } from './main/dashboard.buy.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
-// Import add subscription component
-import { DashboardBuyAddComponent } from './add';
+// Import add subscription componen
+import { DashboardBuyAddComponent } from './add/dashboard.buy.add.component';
 // Buy routes
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';
-import { DashboardBuyGroupComponent } from './group';
+import { DashboardBuyGroupComponent } from './group/dashboard.buy.group.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    AppBootstrapModule,
+    ModalModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     CommonAppModule,

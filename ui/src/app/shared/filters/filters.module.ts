@@ -1,15 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import {
-  FormsModule,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxSelectModule } from 'ngx-select-ex';
-import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+import { SidebarModule } from 'ng-sidebar';
+
 import { CommonAppModule } from 'app/common/common.module';
 import { SidebarFiltersComponent } from './sidebar-filters/sidebar.filters.component';
-
-
 
 @NgModule({
   imports: [
@@ -17,7 +13,7 @@ import { SidebarFiltersComponent } from './sidebar-filters/sidebar.filters.compo
     NgxSelectModule,
     FormsModule,
     ReactiveFormsModule,
-    AppBootstrapModule,
+    SidebarModule,
     CommonAppModule
   ],
   declarations: [
@@ -26,6 +22,5 @@ import { SidebarFiltersComponent } from './sidebar-filters/sidebar.filters.compo
   exports: [
     SidebarFiltersComponent
   ],
-
 })
 export class FiltersModule { }

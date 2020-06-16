@@ -5,9 +5,9 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Stream } from 'app/common/interfaces/stream.interface';
 import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';
-import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
-import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
-import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
+import { DashboardSellEditComponent } from 'app/dashboard/sell/edit/dashboard.sell.edit.component';
+import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete/dashboard.sell.delete.component';
+import { DashboardBuyAddComponent } from 'app/dashboard/buy/add/dashboard.buy.add.component';
 
 @Component({
   selector: 'dpc-table-row-details',

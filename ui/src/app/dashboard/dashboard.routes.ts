@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, CanActivate, RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
-import { DashboardMainComponent } from './main';
+import { DashboardMainComponent } from './main/dashboard.main.component';
 import { AuthGuardService as AuthGuard } from 'app/auth/guardians/auth.guardian';
 
 // Define our Dashboard Routes

@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 // AI routes
 import { DashboardAiRoutingModule } from './dashboard.ai.routes';
 // AI components
@@ -10,15 +12,15 @@ import { DashboardAiExecuteComponent } from './execute/dashboard.ai.execute.comp
 
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
-import { DashboardAiAddComponent } from './add';
-import { DashboardAiEditComponent } from './edit';
-import { DashboardAiDeleteComponent } from './delete';
+
+import { DashboardAiAddComponent } from './add/dashboard.ai.add.component';
+import { DashboardAiEditComponent } from './edit/dashboard.ai.edit.component';
+import { DashboardAiDeleteComponent } from './delete/dashboard.ai.delete.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    AppBootstrapModule,
+    ModalModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,

@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgPipesModule } from 'ngx-pipes';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // Sell routes
 import { DashboardContractsRoutingModule } from './dashboard.contracts.routes';
@@ -13,18 +15,18 @@ import { DashboardContractsSignComponent } from './sign/dashboard.contracts.sign
 import { DashboardContractsHelpComponent } from './help/dashboard.contracts.help.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+
 
 @NgModule({
   imports: [
     CommonModule,
-    AppBootstrapModule,
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,
     CommonAppModule,
     DashboardContractsRoutingModule,
     SharedModule,
+    ModalModule.forRoot(),
   ],
   declarations: [
     DashboardContractsComponent,

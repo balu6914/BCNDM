@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { NoContentComponent } from './no-content';
+import { NoContentComponent } from './no-content/no-content.component';
 import { DashboardModule } from './dashboard/dashboard.module';
 
 // Define our Application Routes

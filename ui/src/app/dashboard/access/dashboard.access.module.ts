@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 // Sell routes
 import { DashboardAccessRoutingModule } from './dashboard.access.routes';
 // Components
@@ -11,12 +13,12 @@ import { DashboardAccessAddComponent } from './add/dashboard.access.add.componen
 import { DashboardAccessHelpComponent } from './help/dashboard.access.help.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { AppBootstrapModule } from 'app/app-bootstrap/app-bootstrap.module';
+
 
 @NgModule({
   imports: [
     CommonModule,
-    AppBootstrapModule,
+    ModalModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     NgPipesModule,

@@ -5,12 +5,12 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 import { AuthService } from 'app/auth/services/auth.service';
 import { User } from 'app/common/interfaces/user.interface';
-import { DashboardSellEditComponent } from 'app/dashboard/sell/edit';
-import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete';
-import { DashboardAiEditComponent } from 'app/dashboard/ai/edit';
-import { DashboardAiDeleteComponent } from 'app/dashboard/ai/delete';
-import { DashboardBuyAddComponent } from 'app/dashboard/buy/add';
-import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign';
+import { DashboardSellEditComponent } from 'app/dashboard/sell/edit/dashboard.sell.edit.component';
+import { DashboardSellDeleteComponent } from 'app/dashboard/sell/delete/dashboard.sell.delete.component';
+import { DashboardAiEditComponent } from 'app/dashboard/ai/edit/dashboard.ai.edit.component';
+import { DashboardAiDeleteComponent } from 'app/dashboard/ai/delete/dashboard.ai.delete.component';
+import { DashboardBuyAddComponent } from 'app/dashboard/buy/add/dashboard.buy.add.component';
+import { DashboardContractsSignComponent } from 'app/dashboard/contracts/sign/dashboard.contracts.sign.component';
 import { Stream, Subscription } from 'app/common/interfaces';
 import { DpcPipe } from 'app/common/pipes/converter.pipe';
 import { TableType } from 'app/shared/table/table';

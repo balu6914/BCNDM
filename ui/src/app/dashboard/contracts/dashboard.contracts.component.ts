@@ -7,7 +7,7 @@ import { Contract } from 'app/common/interfaces/contract.interface';
 import { Table, TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { Page } from 'app/common/interfaces/page.interface';
-import { DashboardContractsAddComponent } from './add/';
+import { DashboardContractsAddComponent } from './add/dashboard.contracts.add.component';
 
 @Component({
   selector: 'dpc-dashboard-contracts-list',
