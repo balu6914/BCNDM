@@ -56,7 +56,7 @@
                   </p>
                 </div>
                 <div *ngIf="table.tableType === types.Buy">
-                  <p class="lead no-content">There are currently no streams for you.</p>
+                  <p class="lead no-content">There are currently no streams to buy.</p>
                 </div>
                 <div *ngIf="table.tableType === types.Contract">
                   <p class="lead no-content">You have no contracts yet. Start buying and selling streams today!</p>
@@ -75,6 +75,9 @@
                 </div>
                 <div *ngIf="table.tableType === types.Executions">
                   <p class="lead no-content">There are currently no started executions.</p>
+                </div>
+                <div *ngIf="table.tableType === types.Users">
+                  <p class="lead no-content">There are currently no users in the system.</p>
                 </div>
               </div>
             </div>

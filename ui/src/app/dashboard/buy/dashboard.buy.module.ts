@@ -7,7 +7,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { DashboardBuyComponent } from './main/dashboard.buy.component';
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
-// Import add subscription componen
+// Import add subscription component
 import { DashboardBuyAddComponent } from './add/dashboard.buy.add.component';
 // Buy routes
 import { DashboardBuyRoutingModule } from './dashboard.buy.routes';

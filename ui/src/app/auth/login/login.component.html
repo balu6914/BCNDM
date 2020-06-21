@@ -3,7 +3,7 @@
   <div class="box">
     <p class="box__title">
       Sign In
-        <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
+      <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
     </p>
     <form  [formGroup]="form" class="needs-validation" novalidate>
       <div class="form-group row">
@@ -39,8 +39,5 @@
       </p>
       <button (click)="onSubmit(form.value, form.valid)"  class="btn btn-block btn-primary">Sign In</button>
     </form>
-    <p class="box__action">
-      Don't have an account? <a routerLink="/signup" class="box__action-link">Signup</a>
-    </p>
   </div>
 </div>
