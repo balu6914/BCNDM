@@ -1,10 +1,11 @@
 package api
 
 import (
-	"datapace/streams"
 	"net/url"
 	"reflect"
 	"strconv"
+
+	"github.com/datapace/streams"
 )
 
 func parseInt(val string) (uint64, error) {

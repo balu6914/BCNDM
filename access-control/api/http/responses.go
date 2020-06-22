@@ -1,9 +1,10 @@
 package http
 
 import (
-	access "datapace/access-control"
 	"fmt"
 	"net/http"
+
+	access "github.com/datapace/access-control"
 )
 
 const contentType = "application/json"

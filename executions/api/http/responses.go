@@ -1,8 +1,9 @@
 package http
 
 import (
-	"datapace/executions"
 	"net/http"
+
+	"github.com/datapace/executions"
 )
 
 type apiRes interface {

@@ -1,7 +1,7 @@
 package http
 
 import (
-	"datapace/auth"
+	"github.com/datapace/auth"
 
 	"github.com/asaskevich/govalidator"
 )

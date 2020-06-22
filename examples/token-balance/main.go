@@ -1,10 +1,11 @@
 package main
 
 import (
-	"datapace/examples/blockchain"
-	"datapace/examples/token-balance/token"
 	"fmt"
 	"os"
+
+	"github.com/datapace/examples/blockchain"
+	"github.com/datapace/examples/token-balance/token"
 )
 
 func main() {

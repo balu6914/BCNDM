@@ -1,6 +1,6 @@
 package mocks
 
-import "datapace/streams"
+import "github.com/datapace/streams"
 
 var _ streams.AIService = (*aiServiceMock)(nil)
 

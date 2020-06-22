@@ -1,9 +1,6 @@
 package http_test
 
 import (
-	"datapace/auth"
-	httpapi "datapace/auth/api/http"
-	"datapace/auth/mocks"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,6 +9,10 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/datapace/auth"
+	httpapi "github.com/datapace/auth/api/http"
+	"github.com/datapace/auth/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

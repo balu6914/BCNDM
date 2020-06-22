@@ -1,12 +1,13 @@
 package fabric
 
 import (
-	log "datapace/logger"
-	"datapace/transactions"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
+
+	log "github.com/datapace/logger"
+	"github.com/datapace/transactions"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"

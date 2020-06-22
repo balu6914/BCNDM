@@ -2,9 +2,11 @@ package executions
 
 import (
 	"context"
-	"datapace"
-	"datapace/errors"
-	"datapace/streams"
+
+	"github.com/datapace"
+
+	"github.com/datapace/errors"
+	"github.com/datapace/streams"
 )
 
 var _ streams.AIService = (*executionsService)(nil)

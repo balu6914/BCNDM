@@ -1,6 +1,6 @@
 package grpc
 
-import "datapace/streams"
+import "github.com/datapace/streams"
 
 type oneReq struct {
 	id string

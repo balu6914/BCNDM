@@ -20,7 +20,7 @@ default values.
 | DATAPACE_TRANSACTIONS_DB_NAME          | Name of the database used by the service | transactions           |
 | DATAPACE_TRANSACTIONS_FABRIC_ADMIN     | Organization admin for Fabric            | admin                  |
 | DATAPACE_TRANSACTIONS_FABRIC_NAME      | Organization name for Fabric             | org1                   |
-| DATAPACE_CONFIG                        | Path to the configuration directory      | `/src/datapace/config` |
+| DATAPACE_CONFIG                        | Path to the configuration directory      | `/src/github.com/datapace/config` |
 | DATAPACE_TRANSACTIONS_FABRIC_CHAINCODE | Fabric token chaincode id                | token                  |
 | DATAPACE_AUTH_URL                      | Auth service gRPC URL                    | localhost:8081         |
 

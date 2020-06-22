@@ -2,7 +2,8 @@ package grpc
 
 import (
 	"context"
-	"datapace/streams"
+
+	"github.com/datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
 )

@@ -3,9 +3,11 @@ package access
 
 import (
 	"context"
-	"datapace"
-	"datapace/streams"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/streams"
 )
 
 var _ streams.AccessControl = (*accessControl)(nil)

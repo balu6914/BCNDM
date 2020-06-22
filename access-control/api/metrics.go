@@ -1,8 +1,9 @@
 package api
 
 import (
-	access "datapace/access-control"
 	"time"
+
+	access "github.com/datapace/access-control"
 
 	"github.com/go-kit/kit/metrics"
 )

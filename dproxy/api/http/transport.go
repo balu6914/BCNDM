@@ -2,14 +2,15 @@ package http
 
 import (
 	"context"
-	"datapace/access-control"
-	"datapace/dproxy"
 	"encoding/json"
 	"errors"
-	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/go-zoo/bone"
 	"io"
 	"net/http"
+
+	"github.com/datapace/access-control"
+	"github.com/datapace/dproxy"
+	kithttp "github.com/go-kit/kit/transport/http"
+	"github.com/go-zoo/bone"
 )
 
 const tokenoutput = "token"

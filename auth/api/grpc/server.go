@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
-	"datapace"
-	"datapace/auth"
+
+	"github.com/datapace"
+
+	"github.com/datapace/auth"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	empty "github.com/golang/protobuf/ptypes/empty"

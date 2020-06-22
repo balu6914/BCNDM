@@ -1,14 +1,16 @@
 package grpc_test
 
 import (
-	"datapace"
-	"datapace/transactions"
-	grpcapi "datapace/transactions/api/grpc"
-	"datapace/transactions/mocks"
 	"fmt"
 	"net"
 	"os"
 	"testing"
+
+	"github.com/datapace"
+
+	"github.com/datapace/transactions"
+	grpcapi "github.com/datapace/transactions/api/grpc"
+	"github.com/datapace/transactions/mocks"
 
 	"google.golang.org/grpc"
 )

@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"datapace/executions"
+	"github.com/datapace/executions"
 )
 
 type algoReq struct {

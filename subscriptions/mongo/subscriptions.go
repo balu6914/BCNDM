@@ -1,8 +1,9 @@
 package mongo
 
 import (
-	"datapace/subscriptions"
 	"time"
+
+	"github.com/datapace/subscriptions"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

@@ -2,9 +2,11 @@ package streams
 
 import (
 	"context"
-	"datapace"
-	"datapace/subscriptions"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/subscriptions"
 )
 
 var _ subscriptions.StreamsService = (*streamsService)(nil)

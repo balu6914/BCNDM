@@ -2,12 +2,13 @@ package subscriptions
 
 import (
 	"context"
-	"datapace"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/datapace"
 
 	"cloud.google.com/go/bigquery"
 	uuid "github.com/satori/go.uuid"

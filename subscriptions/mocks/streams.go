@@ -1,6 +1,6 @@
 package mocks
 
-import "datapace/subscriptions"
+import "github.com/datapace/subscriptions"
 
 var _ subscriptions.StreamsService = (*streamsServiceMock)(nil)
 

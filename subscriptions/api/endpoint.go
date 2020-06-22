@@ -2,7 +2,8 @@ package api
 
 import (
 	"context"
-	"datapace/subscriptions"
+
+	"github.com/datapace/subscriptions"
 
 	"github.com/go-kit/kit/endpoint"
 )

@@ -2,9 +2,9 @@ package grpc
 
 import (
 	"context"
-	"datapace"
-	access "datapace/access-control"
 
+	"github.com/datapace"
+	access "github.com/datapace/access-control"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

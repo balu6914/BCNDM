@@ -1,8 +1,9 @@
 package api
 
 import (
-	"datapace/streams"
 	"time"
+
+	"github.com/datapace/streams"
 
 	"github.com/go-kit/kit/metrics"
 )

@@ -1,6 +1,6 @@
 package token
 
-import "datapace/examples/blockchain"
+import "github.com/datapace/examples/blockchain"
 
 // BC network instance
 type BcNetwork struct {

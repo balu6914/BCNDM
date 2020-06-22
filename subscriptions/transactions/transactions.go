@@ -2,9 +2,11 @@ package transactions
 
 import (
 	"context"
-	"datapace"
-	"datapace/subscriptions"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/subscriptions"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

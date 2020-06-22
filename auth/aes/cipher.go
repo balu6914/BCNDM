@@ -4,9 +4,10 @@ import (
 	"crypto/aes"
 	c "crypto/cipher"
 	"crypto/rand"
-	"datapace/auth"
 	"encoding/base64"
 	"io"
+
+	"github.com/datapace/auth"
 )
 
 type aesCipher struct {

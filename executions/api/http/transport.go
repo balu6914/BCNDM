@@ -2,13 +2,15 @@ package http
 
 import (
 	"context"
-	"datapace"
-	"datapace/executions"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/executions"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"

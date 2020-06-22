@@ -2,12 +2,14 @@ package grpc_test
 
 import (
 	"context"
-	"datapace"
-	"datapace/streams"
-	grpcapi "datapace/streams/api/grpc"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/streams"
+	grpcapi "github.com/datapace/streams/api/grpc"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

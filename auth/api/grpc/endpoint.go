@@ -2,7 +2,8 @@ package grpc
 
 import (
 	"context"
-	"datapace/auth"
+
+	"github.com/datapace/auth"
 
 	"github.com/go-kit/kit/endpoint"
 )

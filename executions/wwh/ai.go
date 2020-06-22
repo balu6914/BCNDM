@@ -2,8 +2,6 @@ package wwh
 
 import (
 	"bytes"
-	"datapace/executions"
-	"datapace/streams"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +9,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/datapace/executions"
+	"github.com/datapace/streams"
 
 	"github.com/gorilla/websocket"
 )

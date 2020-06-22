@@ -3,7 +3,7 @@ package mocks
 import (
 	"sync"
 
-	"datapace/subscriptions"
+	"github.com/datapace/subscriptions"
 )
 
 var _ subscriptions.SubscriptionRepository = (*subscriptionRepositoryMock)(nil)

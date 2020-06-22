@@ -1,8 +1,9 @@
 package mongo
 
 import (
-	"datapace/streams"
 	"strings"
+
+	"github.com/datapace/streams"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

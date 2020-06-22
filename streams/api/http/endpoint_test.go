@@ -2,9 +2,6 @@ package http_test
 
 import (
 	"bytes"
-	"datapace/streams"
-	httpapi "datapace/streams/api/http"
-	"datapace/streams/mocks"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +12,10 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/datapace/streams"
+	httpapi "github.com/datapace/streams/api/http"
+	"github.com/datapace/streams/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2/bson"

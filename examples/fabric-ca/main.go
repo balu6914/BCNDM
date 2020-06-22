@@ -1,9 +1,10 @@
 package main
 
 import (
-	"datapace/examples/blockchain"
-	"datapace/examples/fabric-ca/users"
 	"fmt"
+
+	"github.com/datapace/examples/blockchain"
+	"github.com/datapace/examples/fabric-ca/users"
 )
 
 func main() {

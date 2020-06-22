@@ -1,13 +1,14 @@
 package mongo_test
 
 import (
-	log "datapace/logger"
-	"datapace/streams"
-	"datapace/streams/mongo"
 	"fmt"
 	"math/rand"
 	"os"
 	"testing"
+
+	log "github.com/datapace/logger"
+	"github.com/datapace/streams"
+	"github.com/datapace/streams/mongo"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

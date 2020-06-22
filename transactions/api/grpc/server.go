@@ -3,8 +3,10 @@ package grpc
 import (
 	"context"
 	"errors"
-	"datapace"
-	"datapace/transactions"
+
+	"github.com/datapace"
+
+	"github.com/datapace/transactions"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"

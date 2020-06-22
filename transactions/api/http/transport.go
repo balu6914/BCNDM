@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"datapace"
-	"datapace/transactions"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/transactions"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"

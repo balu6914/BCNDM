@@ -2,9 +2,10 @@ package mongo_test
 
 import (
 	"fmt"
-	"datapace/transactions"
-	"datapace/transactions/mongo"
 	"testing"
+
+	"github.com/datapace/transactions"
+	"github.com/datapace/transactions/mongo"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"

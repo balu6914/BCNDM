@@ -1,10 +1,11 @@
 package auth_test
 
 import (
-	"datapace/auth"
-	"datapace/auth/mocks"
 	"fmt"
 	"testing"
+
+	"github.com/datapace/auth"
+	"github.com/datapace/auth/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

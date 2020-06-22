@@ -14,8 +14,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"datapace"
-	"datapace/subscriptions"
+	"github.com/datapace"
+
+	"github.com/datapace/subscriptions"
 )
 
 var (

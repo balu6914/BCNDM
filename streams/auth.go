@@ -3,10 +3,12 @@ package streams
 import (
 	"context"
 	"fmt"
-	"datapace"
-	log "datapace/logger"
 	"net/http"
 	"time"
+
+	"github.com/datapace"
+
+	log "github.com/datapace/logger"
 )
 
 var _ Authorization = (*authService)(nil)

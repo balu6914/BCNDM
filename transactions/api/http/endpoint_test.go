@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"datapace/transactions"
-	httpapi "datapace/transactions/api/http"
-	"datapace/transactions/mocks"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/datapace/transactions"
+	httpapi "github.com/datapace/transactions/api/http"
+	"github.com/datapace/transactions/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

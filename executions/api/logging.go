@@ -1,10 +1,11 @@
 package api
 
 import (
-	"datapace/executions"
-	log "datapace/logger"
 	"fmt"
 	"time"
+
+	"github.com/datapace/executions"
+	log "github.com/datapace/logger"
 )
 
 var _ executions.Service = (*loggingMiddleware)(nil)

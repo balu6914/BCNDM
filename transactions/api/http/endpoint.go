@@ -2,8 +2,9 @@ package http
 
 import (
 	"context"
-	"datapace/transactions"
 	"time"
+
+	"github.com/datapace/transactions"
 
 	"github.com/go-kit/kit/endpoint"
 )

@@ -2,9 +2,10 @@ package http
 
 import (
 	"context"
-	"datapace/dproxy"
-	"datapace/errors"
 	"fmt"
+
+	"github.com/datapace/dproxy"
+	"github.com/datapace/errors"
 	"github.com/go-kit/kit/endpoint"
 )
 

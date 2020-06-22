@@ -2,9 +2,10 @@ package transactions_test
 
 import (
 	"fmt"
-	"datapace/transactions"
-	"datapace/transactions/mocks"
 	"testing"
+
+	"github.com/datapace/transactions"
+	"github.com/datapace/transactions/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

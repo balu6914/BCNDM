@@ -1,10 +1,11 @@
 package api
 
 import (
-	access "datapace/access-control"
-	log "datapace/logger"
 	"fmt"
 	"time"
+
+	access "github.com/datapace/access-control"
+	log "github.com/datapace/logger"
 )
 
 var _ access.Service = (*loggingMiddleware)(nil)

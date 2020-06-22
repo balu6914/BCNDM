@@ -1,10 +1,11 @@
 package subscriptions
 
 import (
-	"datapace/executions"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/datapace/executions"
 )
 
 type pathRepository struct {

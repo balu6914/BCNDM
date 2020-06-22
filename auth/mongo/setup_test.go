@@ -1,17 +1,18 @@
 package mongo_test
 
 import (
-	"datapace/auth/mongo"
-	log "datapace/logger"
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/datapace/auth/mongo"
+	log "github.com/datapace/logger"
 
 	"github.com/ory/dockertest"
 )
 
 const (
-	testDB          = "datapace"
+	testDB          = "github.com/datapace"
 	userDB          = ""
 	passDB          = ""
 	timeoutDB       = 5000

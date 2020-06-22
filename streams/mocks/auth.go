@@ -1,9 +1,11 @@
 package mocks
 
 import (
-	"datapace"
-	"datapace/streams"
 	"net/http"
+
+	"github.com/datapace"
+
+	"github.com/datapace/streams"
 )
 
 type authorization struct {

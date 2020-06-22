@@ -1,6 +1,6 @@
 package mocks
 
-import "datapace/auth"
+import "github.com/datapace/auth"
 
 var _ auth.TransactionsService = (*mockTransactionsService)(nil)
 

@@ -1,17 +1,6 @@
 package main
 
 import (
-	"datapace"
-	accessapi "datapace/access-control/api/grpc"
-	authapi "datapace/auth/api/grpc"
-	executionsapi "datapace/executions/api/grpc"
-	log "datapace/logger"
-	"datapace/streams"
-	"datapace/streams/api"
-	grpcapi "datapace/streams/api/grpc"
-	httpapi "datapace/streams/api/http"
-	"datapace/streams/executions"
-	"datapace/streams/mongo"
 	"fmt"
 	"net"
 	"net/http"
@@ -20,7 +9,20 @@ import (
 	"syscall"
 	"time"
 
-	"datapace/streams/access"
+	"github.com/datapace"
+
+	accessapi "github.com/datapace/access-control/api/grpc"
+	authapi "github.com/datapace/auth/api/grpc"
+	executionsapi "github.com/datapace/executions/api/grpc"
+	log "github.com/datapace/logger"
+	"github.com/datapace/streams"
+	"github.com/datapace/streams/api"
+	grpcapi "github.com/datapace/streams/api/grpc"
+	httpapi "github.com/datapace/streams/api/http"
+	"github.com/datapace/streams/executions"
+	"github.com/datapace/streams/mongo"
+
+	"github.com/datapace/streams/access"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"

@@ -2,9 +2,11 @@ package access
 
 import (
 	"context"
-	"datapace"
-	"datapace/auth"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/auth"
 )
 
 var _ auth.AccessControl = (*accessControl)(nil)

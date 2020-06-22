@@ -1,12 +1,13 @@
 package main_test
 
 import (
-	"datapace/chaincode/mocks"
 	"encoding/json"
 	"fmt"
 	"testing"
 
-	fee "datapace/chaincode/system-fee"
+	"github.com/datapace/chaincode/mocks"
+
+	fee "github.com/datapace/chaincode/system-fee"
 
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"

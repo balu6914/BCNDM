@@ -2,8 +2,9 @@ package mocks
 
 import (
 	"context"
-	"datapace"
 	"sync"
+
+	"github.com/datapace"
 
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"

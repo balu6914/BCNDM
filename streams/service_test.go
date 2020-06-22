@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/mgo.v2/bson"
 
-	"datapace/streams"
-	"datapace/streams/mocks"
+	"github.com/datapace/streams"
+	"github.com/datapace/streams/mocks"
 )
 
 const (

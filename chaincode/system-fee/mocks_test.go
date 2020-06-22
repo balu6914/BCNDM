@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	fee "datapace/chaincode/system-fee"
+	fee "github.com/datapace/chaincode/system-fee"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )

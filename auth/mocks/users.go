@@ -1,8 +1,9 @@
 package mocks
 
 import (
-	"datapace/auth"
 	"sync"
+
+	"github.com/datapace/auth"
 )
 
 var _ auth.UserRepository = (*userRepositoryMock)(nil)

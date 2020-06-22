@@ -3,9 +3,11 @@ package auth
 
 import (
 	"context"
-	"datapace"
-	access "datapace/access-control"
 	"time"
+
+	"github.com/datapace"
+
+	access "github.com/datapace/access-control"
 )
 
 var _ access.AuthService = (*authService)(nil)

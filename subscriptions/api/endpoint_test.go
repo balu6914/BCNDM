@@ -2,14 +2,16 @@ package api_test
 
 import (
 	"bytes"
-	"datapace"
-	"datapace/subscriptions"
-	httpapi "datapace/subscriptions/api"
-	"datapace/subscriptions/mocks"
 	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/datapace"
+
+	"github.com/datapace/subscriptions"
+	httpapi "github.com/datapace/subscriptions/api"
+	"github.com/datapace/subscriptions/mocks"
 
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +42,7 @@ var (
 		StreamURL: streamURL,
 		Hours:     hours,
 	}
-	subs = []subscriptions.Subscription{sub,}
+	subs = []subscriptions.Subscription{sub}
 )
 
 func newService() subscriptions.Service {

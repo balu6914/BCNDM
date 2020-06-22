@@ -1,14 +1,16 @@
 package grpc_test
 
 import (
-	"datapace"
-	"datapace/streams"
-	grpcapi "datapace/streams/api/grpc"
-	"datapace/streams/mocks"
 	"fmt"
 	"net"
 	"os"
 	"testing"
+
+	"github.com/datapace"
+
+	"github.com/datapace/streams"
+	grpcapi "github.com/datapace/streams/api/grpc"
+	"github.com/datapace/streams/mocks"
 
 	"google.golang.org/grpc"
 )

@@ -3,10 +3,12 @@ package transactions
 
 import (
 	"context"
-	"datapace"
-	"datapace/auth"
-	"datapace/transactions"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/auth"
+	"github.com/datapace/transactions"
 )
 
 const timeout = time.Second

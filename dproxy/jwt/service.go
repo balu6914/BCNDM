@@ -1,10 +1,11 @@
 package jwt
 
 import (
-	"datapace/dproxy"
+	"time"
+
+	"github.com/datapace/dproxy"
 	"github.com/dgrijalva/jwt-go"
 	uuid "github.com/satori/go.uuid"
-	"time"
 )
 
 type jwtService struct {

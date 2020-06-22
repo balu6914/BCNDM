@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
-	"datapace"
-	"datapace/streams"
+
+	"github.com/datapace"
+
+	"github.com/datapace/streams"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc/codes"

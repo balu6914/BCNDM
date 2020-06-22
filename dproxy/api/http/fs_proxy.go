@@ -2,17 +2,18 @@ package http
 
 import (
 	"bufio"
-	"datapace/dproxy"
-	log "datapace/logger"
 	"errors"
 	"fmt"
-	"github.com/go-zoo/bone"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/datapace/dproxy"
+	log "github.com/datapace/logger"
+	"github.com/go-zoo/bone"
 )
 
 var errUnauthorized = errors.New("unauthorized")

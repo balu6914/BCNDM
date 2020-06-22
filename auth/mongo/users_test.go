@@ -1,11 +1,12 @@
 package mongo_test
 
 import (
-	"datapace/auth"
-	"datapace/auth/aes"
-	"datapace/auth/mongo"
 	"fmt"
 	"testing"
+
+	"github.com/datapace/auth"
+	"github.com/datapace/auth/aes"
+	"github.com/datapace/auth/mongo"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"

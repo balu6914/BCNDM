@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"datapace/dproxy/persistence"
+	"github.com/datapace/dproxy/persistence"
 	"github.com/jmoiron/sqlx"
 )
 

@@ -1,10 +1,11 @@
 package api
 
 import (
-	"datapace/dproxy"
-	log "datapace/logger"
 	"fmt"
 	"time"
+
+	"github.com/datapace/dproxy"
+	log "github.com/datapace/logger"
 )
 
 var _ dproxy.Service = (*loggingMiddleware)(nil)

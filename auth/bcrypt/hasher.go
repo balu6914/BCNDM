@@ -2,7 +2,7 @@
 package bcrypt
 
 import (
-	"datapace/auth"
+	"github.com/datapace/auth"
 
 	"golang.org/x/crypto/bcrypt"
 )

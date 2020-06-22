@@ -1,9 +1,10 @@
 package mocks
 
 import (
-	"datapace/streams"
 	"strings"
 	"sync"
+
+	"github.com/datapace/streams"
 
 	"gopkg.in/mgo.v2/bson"
 )

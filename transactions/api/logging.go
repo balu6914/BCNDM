@@ -2,9 +2,10 @@ package api
 
 import (
 	"fmt"
-	log "datapace/logger"
-	"datapace/transactions"
 	"time"
+
+	log "github.com/datapace/logger"
+	"github.com/datapace/transactions"
 )
 
 var _ transactions.Service = (*loggingMiddleware)(nil)

@@ -2,9 +2,6 @@ package kubeflow
 
 import (
 	"bytes"
-	"datapace/executions"
-	log "datapace/logger"
-	"datapace/streams"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +11,10 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/datapace/executions"
+	log "github.com/datapace/logger"
+	"github.com/datapace/streams"
 )
 
 const (

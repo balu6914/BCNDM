@@ -1,22 +1,24 @@
 package main
 
 import (
-	"datapace"
-	"datapace/dproxy"
-	"datapace/dproxy/api"
-	httpapi "datapace/dproxy/api/http"
-	"datapace/dproxy/jwt"
-	"datapace/dproxy/persistence/postgres"
-	"datapace/logger"
-	log "datapace/logger"
 	"fmt"
-	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/jmoiron/sqlx"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/datapace"
+
+	"github.com/datapace/dproxy"
+	"github.com/datapace/dproxy/api"
+	httpapi "github.com/datapace/dproxy/api/http"
+	"github.com/datapace/dproxy/jwt"
+	"github.com/datapace/dproxy/persistence/postgres"
+	"github.com/datapace/logger"
+	log "github.com/datapace/logger"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/jmoiron/sqlx"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (

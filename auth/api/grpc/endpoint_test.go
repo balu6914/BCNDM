@@ -2,12 +2,14 @@ package grpc_test
 
 import (
 	"context"
-	"datapace"
-	"datapace/auth"
-	grpcapi "datapace/auth/api/grpc"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/datapace"
+
+	"github.com/datapace/auth"
+	grpcapi "github.com/datapace/auth/api/grpc"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	access "datapace/access-control"
+	access "github.com/datapace/access-control"
 
 	"github.com/go-kit/kit/endpoint"
 )

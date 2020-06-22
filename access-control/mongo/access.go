@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	access "datapace/access-control"
+	access "github.com/datapace/access-control"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

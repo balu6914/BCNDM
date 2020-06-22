@@ -3,9 +3,10 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"datapace/chaincode/mocks"
-	token "datapace/chaincode/token"
 	"testing"
+
+	"github.com/datapace/chaincode/mocks"
+	token "github.com/datapace/chaincode/token"
 
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"

@@ -2,12 +2,14 @@ package http
 
 import (
 	"context"
-	"datapace"
-	"datapace/access-control"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
+
+	"github.com/datapace"
+
+	"github.com/datapace/access-control"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 

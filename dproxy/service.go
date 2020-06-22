@@ -1,9 +1,10 @@
 package dproxy
 
 import (
-	"datapace/dproxy/persistence"
 	"errors"
 	"time"
+
+	"github.com/datapace/dproxy/persistence"
 )
 
 var (

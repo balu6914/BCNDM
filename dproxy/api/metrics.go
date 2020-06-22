@@ -1,9 +1,10 @@
 package api
 
 import (
-	"datapace/dproxy"
-	"github.com/go-kit/kit/metrics"
 	"time"
+
+	"github.com/datapace/dproxy"
+	"github.com/go-kit/kit/metrics"
 )
 
 var _ dproxy.Service = (*metricsMiddleware)(nil)

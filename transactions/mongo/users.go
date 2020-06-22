@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"datapace/transactions"
+	"github.com/datapace/transactions"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

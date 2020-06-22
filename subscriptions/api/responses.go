@@ -1,8 +1,9 @@
 package api
 
 import (
-	"datapace/subscriptions"
 	"net/http"
+
+	"github.com/datapace/subscriptions"
 )
 
 const contentType = "application/json"

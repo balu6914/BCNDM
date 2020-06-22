@@ -3,7 +3,7 @@ package http
 import (
 	"gopkg.in/mgo.v2/bson"
 
-	"datapace/streams"
+	"github.com/datapace/streams"
 )
 
 const (
