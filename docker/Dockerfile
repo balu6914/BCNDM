@@ -1,7 +1,7 @@
 
 FROM golang:1.13-alpine AS builder
 ARG SVC_NAME
-WORKDIR /go/src/datapace
+WORKDIR /go/src/github.com/datapace
 COPY . .
 RUN apk update \
     && apk add make \
