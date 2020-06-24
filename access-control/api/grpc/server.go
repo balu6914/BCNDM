@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace"
-	access "github.com/datapace/access-control"
+	"github.com/datapace/datapace"
+	access "github.com/datapace/datapace/access-control"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

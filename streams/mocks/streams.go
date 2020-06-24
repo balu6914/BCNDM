@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 
 	"gopkg.in/mgo.v2/bson"
 )

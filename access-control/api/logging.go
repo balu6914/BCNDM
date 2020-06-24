@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	access "github.com/datapace/access-control"
-	log "github.com/datapace/logger"
+	access "github.com/datapace/datapace/access-control"
+	log "github.com/datapace/datapace/logger"
 )
 
 var _ access.Service = (*loggingMiddleware)(nil)

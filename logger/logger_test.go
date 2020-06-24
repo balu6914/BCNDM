@@ -6,7 +6,7 @@ import (
 	"io"
 	"testing"
 
-	log "github.com/datapace/logger"
+	log "github.com/datapace/datapace/logger"
 
 	"github.com/stretchr/testify/assert"
 )

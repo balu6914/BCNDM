@@ -1,8 +1,8 @@
 package http
 
 import (
-	access "github.com/datapace/access-control"
-	"github.com/datapace/auth"
+	access "github.com/datapace/datapace/access-control"
+	"github.com/datapace/datapace/auth"
 )
 
 type apiReq interface {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"

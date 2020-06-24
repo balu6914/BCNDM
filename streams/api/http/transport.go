@@ -13,11 +13,11 @@ import (
 	"github.com/go-zoo/bone"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/errors"
-	"github.com/datapace/streams"
-	"github.com/datapace/streams/executions"
+	"github.com/datapace/datapace/errors"
+	"github.com/datapace/datapace/streams"
+	"github.com/datapace/datapace/streams/executions"
 )
 
 const (

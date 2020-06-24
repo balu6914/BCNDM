@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/datapace/chaincode/mocks"
+	"github.com/datapace/datapace/chaincode/mocks"
 
-	fee "github.com/datapace/chaincode/system-fee"
+	fee "github.com/datapace/datapace/chaincode/system-fee"
 
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"

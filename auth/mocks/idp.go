@@ -3,7 +3,7 @@ package mocks
 import (
 	"strings"
 
-	"github.com/datapace/auth"
+	"github.com/datapace/datapace/auth"
 )
 
 var _ auth.IdentityProvider = (*identityProviderMock)(nil)

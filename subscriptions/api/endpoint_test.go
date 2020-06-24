@@ -7,11 +7,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/subscriptions"
-	httpapi "github.com/datapace/subscriptions/api"
-	"github.com/datapace/subscriptions/mocks"
+	"github.com/datapace/datapace/subscriptions"
+	httpapi "github.com/datapace/datapace/subscriptions/api"
+	"github.com/datapace/datapace/subscriptions/mocks"
 
 	"net/http"
 	"net/http/httptest"

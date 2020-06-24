@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/datapace/auth"
-	"github.com/datapace/auth/mocks"
+	"github.com/datapace/datapace/auth"
+	"github.com/datapace/datapace/auth/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

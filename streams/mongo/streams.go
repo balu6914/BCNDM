@@ -3,7 +3,7 @@ package mongo
 import (
 	"strings"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

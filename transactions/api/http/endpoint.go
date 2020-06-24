@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 
 	"github.com/go-kit/kit/endpoint"
 )

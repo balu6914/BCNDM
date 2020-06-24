@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
-	log "github.com/datapace/logger"
-	"github.com/datapace/transactions/mongo"
+	log "github.com/datapace/datapace/logger"
+	"github.com/datapace/datapace/transactions/mongo"
 
 	"github.com/ory/dockertest"
 )
 
 const (
-	testDB          = "github.com/datapace"
+	testDB          = "github.com/datapace/datapace"
 	userDB          = ""
 	passDB          = ""
 	timeoutDB       = 5000

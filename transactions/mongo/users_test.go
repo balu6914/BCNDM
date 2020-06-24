@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/datapace/transactions"
-	"github.com/datapace/transactions/mongo"
+	"github.com/datapace/datapace/transactions"
+	"github.com/datapace/datapace/transactions/mongo"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"

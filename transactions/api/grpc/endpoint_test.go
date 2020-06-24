@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	grpcapi "github.com/datapace/transactions/api/grpc"
+	grpcapi "github.com/datapace/datapace/transactions/api/grpc"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

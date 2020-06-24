@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	fabricConfig "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
@@ -17,15 +17,15 @@ import (
 	"google.golang.org/grpc"
 	mgo "gopkg.in/mgo.v2"
 
-	access "github.com/datapace/access-control"
-	"github.com/datapace/access-control/api"
-	grpcapi "github.com/datapace/access-control/api/grpc"
-	httpapi "github.com/datapace/access-control/api/http"
-	"github.com/datapace/access-control/auth"
-	"github.com/datapace/access-control/fabric"
-	"github.com/datapace/access-control/mongo"
-	authapi "github.com/datapace/auth/api/grpc"
-	log "github.com/datapace/logger"
+	access "github.com/datapace/datapace/access-control"
+	"github.com/datapace/datapace/access-control/api"
+	grpcapi "github.com/datapace/datapace/access-control/api/grpc"
+	httpapi "github.com/datapace/datapace/access-control/api/http"
+	"github.com/datapace/datapace/access-control/auth"
+	"github.com/datapace/datapace/access-control/fabric"
+	"github.com/datapace/datapace/access-control/mongo"
+	authapi "github.com/datapace/datapace/auth/api/grpc"
+	log "github.com/datapace/datapace/logger"
 )
 
 const (
@@ -50,7 +50,7 @@ const (
 	defAuthURL        = "localhost:8081"
 	defFabricOrgAdmin = "admin"
 	defFabricOrgName  = "org1"
-	defDatapaceConfig = "/src/github.com/datapace/config"
+	defDatapaceConfig = "/src/github.com/datapace/datapace/config"
 	defChaincodeID    = "access"
 
 	fabricConfigFile = "fabric/config.yaml"

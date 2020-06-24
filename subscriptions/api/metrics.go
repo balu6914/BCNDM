@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"github.com/datapace/subscriptions"
+	"github.com/datapace/datapace/subscriptions"
 
 	"github.com/go-kit/kit/metrics"
 )

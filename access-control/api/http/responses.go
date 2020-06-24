@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	access "github.com/datapace/access-control"
+	access "github.com/datapace/datapace/access-control"
 )
 
 const contentType = "application/json"

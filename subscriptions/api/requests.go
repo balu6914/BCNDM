@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/datapace/subscriptions"
+	"github.com/datapace/datapace/subscriptions"
 
 	"gopkg.in/mgo.v2/bson"
 )

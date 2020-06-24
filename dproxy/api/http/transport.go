@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/datapace/access-control"
-	"github.com/datapace/dproxy"
+	"github.com/datapace/datapace/access-control"
+	"github.com/datapace/datapace/dproxy"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 )

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
 	"cloud.google.com/go/bigquery"
 	uuid "github.com/satori/go.uuid"

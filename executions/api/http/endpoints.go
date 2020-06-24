@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	"github.com/datapace/executions"
+	"github.com/datapace/datapace/executions"
 
 	"github.com/go-kit/kit/endpoint"
 )

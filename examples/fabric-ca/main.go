@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/datapace/examples/blockchain"
-	"github.com/datapace/examples/fabric-ca/users"
+	"github.com/datapace/datapace/examples/blockchain"
+	"github.com/datapace/datapace/examples/fabric-ca/users"
 )
 
 func main() {

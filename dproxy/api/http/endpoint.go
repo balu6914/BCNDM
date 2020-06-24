@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/datapace/dproxy"
-	"github.com/datapace/errors"
+	"github.com/datapace/datapace/dproxy"
+	"github.com/datapace/datapace/errors"
 	"github.com/go-kit/kit/endpoint"
 )
 

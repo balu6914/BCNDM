@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/datapace/auth"
-	httpapi "github.com/datapace/auth/api/http"
-	"github.com/datapace/auth/mocks"
+	"github.com/datapace/datapace/auth"
+	httpapi "github.com/datapace/datapace/auth/api/http"
+	"github.com/datapace/datapace/auth/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

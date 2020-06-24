@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"

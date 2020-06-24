@@ -3,7 +3,7 @@ package jwt
 import (
 	"time"
 
-	"github.com/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy"
 	"github.com/dgrijalva/jwt-go"
 	uuid "github.com/satori/go.uuid"
 )

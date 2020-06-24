@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/datapace/auth"
-	"github.com/datapace/auth/aes"
-	"github.com/datapace/auth/mongo"
+	"github.com/datapace/datapace/auth"
+	"github.com/datapace/datapace/auth/aes"
+	"github.com/datapace/datapace/auth/mongo"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"

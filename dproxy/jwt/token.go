@@ -1,6 +1,6 @@
 package jwt
 
-import "github.com/datapace/dproxy"
+import "github.com/datapace/datapace/dproxy"
 
 type token struct {
 	url      string

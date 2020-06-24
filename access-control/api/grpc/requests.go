@@ -1,6 +1,6 @@
 package grpc
 
-import access "github.com/datapace/access-control"
+import access "github.com/datapace/datapace/access-control"
 
 type partnersReq struct {
 	id string

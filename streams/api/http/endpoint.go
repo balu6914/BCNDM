@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
 )

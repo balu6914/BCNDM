@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 )
 
 var _ transactions.StreamsService = (*streamsService)(nil)

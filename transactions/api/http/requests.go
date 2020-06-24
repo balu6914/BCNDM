@@ -3,7 +3,7 @@ package http
 import (
 	"time"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 )
 
 type balanceReq struct {

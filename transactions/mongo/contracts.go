@@ -3,7 +3,7 @@ package mongo
 import (
 	"time"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

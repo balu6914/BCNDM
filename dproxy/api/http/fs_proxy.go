@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/datapace/dproxy"
-	log "github.com/datapace/logger"
+	"github.com/datapace/datapace/dproxy"
+	log "github.com/datapace/datapace/logger"
 	"github.com/go-zoo/bone"
 )
 

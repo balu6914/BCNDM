@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	log "github.com/datapace/logger"
+	log "github.com/datapace/datapace/logger"
 )
 
 var _ Authorization = (*authService)(nil)

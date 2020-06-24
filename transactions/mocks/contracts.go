@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/datapace/transactions"
+import "github.com/datapace/datapace/transactions"
 
 var _ transactions.ContractLedger = (*mockContractLedger)(nil)
 

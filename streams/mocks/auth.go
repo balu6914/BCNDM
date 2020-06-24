@@ -3,9 +3,9 @@ package mocks
 import (
 	"net/http"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 )
 
 type authorization struct {

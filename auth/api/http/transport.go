@@ -7,9 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/auth"
+	"github.com/datapace/datapace/auth"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"

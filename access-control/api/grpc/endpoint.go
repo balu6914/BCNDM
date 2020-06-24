@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	access "github.com/datapace/access-control"
+	access "github.com/datapace/datapace/access-control"
 
 	"github.com/go-kit/kit/endpoint"
 )

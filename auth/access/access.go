@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/auth"
+	"github.com/datapace/datapace/auth"
 )
 
 var _ auth.AccessControl = (*accessControl)(nil)

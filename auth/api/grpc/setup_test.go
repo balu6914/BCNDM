@@ -6,11 +6,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/auth"
-	grpcapi "github.com/datapace/auth/api/grpc"
-	"github.com/datapace/auth/mocks"
+	"github.com/datapace/datapace/auth"
+	grpcapi "github.com/datapace/datapace/auth/api/grpc"
+	"github.com/datapace/datapace/auth/mocks"
 
 	"google.golang.org/grpc"
 )

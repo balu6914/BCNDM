@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"

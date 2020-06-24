@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/datapace/chaincode/mocks"
-	token "github.com/datapace/chaincode/token"
+	"github.com/datapace/datapace/chaincode/mocks"
+	token "github.com/datapace/datapace/chaincode/token"
 
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/shim"

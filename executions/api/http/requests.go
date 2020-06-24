@@ -1,6 +1,6 @@
 package http
 
-import "github.com/datapace/executions"
+import "github.com/datapace/datapace/executions"
 
 type apiReq interface {
 	validate() error

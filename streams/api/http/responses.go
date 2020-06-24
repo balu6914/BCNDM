@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 )
 
 const (

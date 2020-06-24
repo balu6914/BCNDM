@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/datapace/executions"
+	"github.com/datapace/datapace/executions"
 )
 
 type pathRepository struct {

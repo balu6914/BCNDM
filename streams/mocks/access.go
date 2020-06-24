@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/datapace/streams"
+import "github.com/datapace/datapace/streams"
 
 var _ streams.AccessControl = (*accessControlMock)(nil)
 

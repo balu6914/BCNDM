@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/streams"
 )
 
 func parseInt(val string) (uint64, error) {

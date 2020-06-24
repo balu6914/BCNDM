@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy"
 )
 
 type requestCreateToken struct {

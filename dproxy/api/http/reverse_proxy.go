@@ -7,8 +7,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/datapace/dproxy"
-	log "github.com/datapace/logger"
+	"github.com/datapace/datapace/dproxy"
+	log "github.com/datapace/datapace/logger"
 )
 
 var errTokenNotFound = errors.New("token not found in url")

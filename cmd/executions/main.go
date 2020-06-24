@@ -16,18 +16,18 @@ import (
 	"google.golang.org/grpc"
 	mgo "gopkg.in/mgo.v2"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	authapi "github.com/datapace/auth/api/grpc"
-	"github.com/datapace/executions"
-	"github.com/datapace/executions/api"
-	grpcapi "github.com/datapace/executions/api/grpc"
-	httpapi "github.com/datapace/executions/api/http"
-	"github.com/datapace/executions/kubeflow"
-	"github.com/datapace/executions/mongo"
-	"github.com/datapace/executions/subscriptions"
-	"github.com/datapace/executions/wwh"
-	"github.com/datapace/logger"
+	authapi "github.com/datapace/datapace/auth/api/grpc"
+	"github.com/datapace/datapace/executions"
+	"github.com/datapace/datapace/executions/api"
+	grpcapi "github.com/datapace/datapace/executions/api/grpc"
+	httpapi "github.com/datapace/datapace/executions/api/http"
+	"github.com/datapace/datapace/executions/kubeflow"
+	"github.com/datapace/datapace/executions/mongo"
+	"github.com/datapace/datapace/executions/subscriptions"
+	"github.com/datapace/datapace/executions/wwh"
+	"github.com/datapace/datapace/logger"
 )
 
 const (

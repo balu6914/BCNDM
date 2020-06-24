@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/datapace/executions"
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/executions"
+	"github.com/datapace/datapace/streams"
 
 	"github.com/gorilla/websocket"
 )

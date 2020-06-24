@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace"
+	"github.com/datapace/datapace"
 
-	"github.com/datapace/subscriptions"
+	"github.com/datapace/datapace/subscriptions"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

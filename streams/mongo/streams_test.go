@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	log "github.com/datapace/logger"
-	"github.com/datapace/streams"
-	"github.com/datapace/streams/mongo"
+	log "github.com/datapace/datapace/logger"
+	"github.com/datapace/datapace/streams"
+	"github.com/datapace/datapace/streams/mongo"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

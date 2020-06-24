@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/datapace/dproxy/persistence"
+	"github.com/datapace/datapace/dproxy/persistence"
 )
 
 var (

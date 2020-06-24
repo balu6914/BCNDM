@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"github.com/datapace/auth"
+	"github.com/datapace/datapace/auth"
 )
 
 type aesCipher struct {

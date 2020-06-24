@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/datapace/executions"
-	log "github.com/datapace/logger"
-	"github.com/datapace/streams"
+	"github.com/datapace/datapace/executions"
+	log "github.com/datapace/datapace/logger"
+	"github.com/datapace/datapace/streams"
 )
 
 const (

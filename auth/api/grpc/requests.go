@@ -1,6 +1,6 @@
 package grpc
 
-import "github.com/datapace/auth"
+import "github.com/datapace/datapace/auth"
 
 type identityReq struct {
 	token string

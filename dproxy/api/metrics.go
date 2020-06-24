@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"github.com/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy"
 	"github.com/go-kit/kit/metrics"
 )
 

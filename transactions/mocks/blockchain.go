@@ -3,7 +3,7 @@ package mocks
 import (
 	"sync"
 
-	"github.com/datapace/transactions"
+	"github.com/datapace/datapace/transactions"
 )
 
 var _ transactions.TokenLedger = (*mockNetwork)(nil)

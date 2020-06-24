@@ -4,13 +4,13 @@ package jwt
 import (
 	"time"
 
-	"github.com/datapace/auth"
+	"github.com/datapace/datapace/auth"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (
-	issuer   = "github.com/datapace"
+	issuer   = "github.com/datapace/datapace"
 	duration = 10 * time.Hour
 )
 

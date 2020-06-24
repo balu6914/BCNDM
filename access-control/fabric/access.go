@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	access "github.com/datapace/access-control"
-	log "github.com/datapace/logger"
+	access "github.com/datapace/datapace/access-control"
+	log "github.com/datapace/datapace/logger"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
