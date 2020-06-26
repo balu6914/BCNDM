@@ -12,8 +12,8 @@ import { UserService } from 'app/common/services/user.service';
 export class AuthService {
   token: string;
   user: any;
-  @Output() loggedIn: EventEmitter<Boolean> = new EventEmitter();
 
+  @Output() loggedIn: EventEmitter<Boolean> = new EventEmitter();
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -21,9 +21,9 @@ export class AuthService {
   ) {
     this.token = localStorage.getItem('token');
   }
+
   // Get user token
   login(username: string, password: string) {
-
     return this.http.post(`${environment.API_AUTH_TOKENS}`, JSON.stringify({
         email: username,
         password: password
@@ -43,6 +43,7 @@ export class AuthService {
       return throwError(error);
     });
   }
+
   // Logout user, remove token from local storage
   logout() {
     localStorage.removeItem('token');
@@ -51,37 +52,38 @@ export class AuthService {
     this.router.navigate(['login']);
   }
 
-    // Check if user is logged in
-    isLoggedin() {
-        return !!localStorage.getItem('token');
-    }
+  // Check if user is logged in
+  isLoggedin() {
+    return !!localStorage.getItem('token');
+  }
 
-    setCurrentUser(data) {
-        if (data) {
-            this.user = data;
-            this.loggedIn.emit(true);
-        }
+  setCurrentUser(data) {
+    if (data) {
+      this.user = data;
+      this.loggedIn.emit(true);
     }
+  }
 
-    getCurrentUser() {
-        if (this.user) {
-            return of(this.user);
-        } else {
-            if (this.isLoggedin()) {
-              return this.fetchCurrentUser();
-            }
-        }
+  getCurrentUser() {
+    if (this.user) {
+      return of(this.user);
+    } else {
+      if (this.isLoggedin()) {
+        return this.fetchCurrentUser();
+      }
     }
+  }
 
-    fetchCurrentUser() {
-        return this.http.get(`${environment.API_AUTH}`)
-        .map((data: any) =>  {
-            this.setCurrentUser(data);
-            return data;
-        });
-    }
+  fetchCurrentUser() {
+    return this.http.get(`${environment.API_AUTH}`).map(
+      (data: any) =>  {
+        this.setCurrentUser(data);
+        return data;
+      }
+    );
+  }
 
-    getUserToken(): string {
-        return localStorage.getItem('token');
-    }
+  getUserToken(): string {
+    return localStorage.getItem('token');
+  }
 }

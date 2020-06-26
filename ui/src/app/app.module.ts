@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+
 import { NgProgressModule, NgProgressInterceptor } from 'ngx-progressbar';
 import { NgPipesModule } from 'ngx-pipes';
 import { SidebarModule } from 'ng-sidebar';
@@ -33,6 +35,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     SharedModule,
     DashboardModule,
     AppRoutingModule,
+    HttpClientModule,
   ],
   declarations: [
     AppComponent,

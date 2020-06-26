@@ -3,8 +3,22 @@ import { Routes, RouterModule } from '@angular/router';
 import { NoContentComponent } from './no-content/no-content.component';
 import { DashboardModule } from './dashboard/dashboard.module';
 
+import { SignupComponent } from 'app/dashboard/signup/signup.component';
+import { LoginComponent } from 'app/dashboard/login/login.component';
+import { AuthLoggedinGuardService as AuthGuard } from 'app/auth/guardians/auth.loggedin.guardian';
+
 // Define our Application Routes
 const routes: Routes = [
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
+    canActivate: [AuthGuard]
+  },
   // Not found page
   {
     path: '',

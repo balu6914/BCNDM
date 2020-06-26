@@ -1,37 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressInterceptor } from 'ngx-progressbar';
 
 import { CommonAppModule } from 'app/common/common.module';
-// Auth routes
-import { AuthRoutingModule } from './auth.routes';
+
+// Auth Guardians
 import { AuthGuardService } from './guardians/auth.guardian';
-import { AuthLoggedinGuardService } from './guardians/auth.loggedin.guardin';
-import { LoginComponent } from './login';
-// Add services
+import { AuthLoggedinGuardService } from './guardians/auth.loggedin.guardian';
+// Auth Services
 import { AuthService } from './services/auth.service';
-// Interceptors
-import { TokenInterceptor } from './services/token.http.interceptor.service';
-import { UnauthorizedInterceptor } from './services/unauthorized.http.interceptor';
-// Auth components
-import { SignupComponent } from './signup';
+// Auth Interceptors
+import { TokenInterceptor } from './services/token.interceptor.service';
+import { UnauthorizedInterceptor } from './services/unauthorized.interceptor.service';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-    AuthRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    CommonAppModule,
-  ],
-  declarations: [
-    SignupComponent,
-    LoginComponent
-  ],
   providers: [
     AuthService,
     AuthGuardService,
