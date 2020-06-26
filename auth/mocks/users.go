@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	"gopkg.in/mgo.v2/bson"
 	"sync"
 
 	"github.com/datapace/datapace/auth"
@@ -40,7 +41,9 @@ func (urm *userRepositoryMock) Save(user auth.User) (string, error) {
 	if _, ok := urm.users[user.ID]; ok {
 		return "", auth.ErrConflict
 	}
-
+	if user.ID == "" {
+		user.ID = bson.NewObjectId().Hex()
+	}
 	urm.users[user.Email], urm.users[user.ID] = user, user
 	return user.ID, nil
 }

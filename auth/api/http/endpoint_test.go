@@ -120,7 +120,7 @@ func TestRegister(t *testing.T) {
 	svc, key := newService()
 	ts := newServer(svc)
 	defer ts.Close()
-
+	svc.Register(key, nonadmin)
 	data := toJSON(testRegisterReq{
 		Email:        user.Email,
 		Password:     user.Password,

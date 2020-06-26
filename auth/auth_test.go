@@ -72,7 +72,8 @@ func TestRegister(t *testing.T) {
 	svc, key, _ := newServiceWithAdmin()
 	invalidUser := user
 	invalidUser.Password = ""
-	svc.Register(key, nonadmin)
+	_, err := svc.Register(key, nonadmin)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, nonadmin.ID))
 	nonadminkey, _ := svc.Login(auth.User{
 		Email:    nonadmin.Email,
 		Password: nonadmin.Password,
@@ -122,8 +123,17 @@ func TestView(t *testing.T) {
 		Email:    "testview@example.com",
 		Password: "testpass",
 	}
-	id, _ := svc.Register(k, uv)
+	uv2 := auth.User{
+		ID:       "testv2",
+		Email:    "testview2@example.com",
+		Password: "testpass2",
+	}
+	id, err := svc.Register(k, uv)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, uv.ID))
+	_, err = svc.Register(k, uv2)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, uv2.ID))
 	key, err := svc.Login(uv)
+	key2, err := svc.Login(uv2)
 	_ = err
 
 	cases := map[string]struct {
@@ -135,6 +145,11 @@ func TestView(t *testing.T) {
 			key: key,
 			id:  id,
 			err: nil,
+		},
+		"view existing user as another": {
+			key: key2,
+			id:  id,
+			err: auth.ErrUnauthorizedAccess,
 		},
 		"view existing user as admin": {
 			key: k,
@@ -161,7 +176,8 @@ func TestView(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	svc, k := newService()
-	svc.Register(k, user)
+	_, err := svc.Register(k, user)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
 	user.ContactEmail = "new@email.com"
 
@@ -193,7 +209,8 @@ func TestUpdate(t *testing.T) {
 
 func TestUpdatePassword(t *testing.T) {
 	svc, k := newService()
-	svc.Register(k, user)
+	_, err := svc.Register(k, user)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
 	user.Password = "newpassword"
 
@@ -225,8 +242,8 @@ func TestUpdatePassword(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	svc, k := newService()
-	svc.Register(k, user)
-
+	_, err := svc.Register(k, user)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	user2 := user
 	user2.Email = wrong
 
@@ -259,7 +276,8 @@ func TestLogin(t *testing.T) {
 
 func TestIdentify(t *testing.T) {
 	svc, k := newService()
-	svc.Register(k, user)
+	_, err := svc.Register(k, user)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
 
 	cases := map[string]struct {
