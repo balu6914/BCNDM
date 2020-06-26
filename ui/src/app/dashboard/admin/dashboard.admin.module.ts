@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgPipesModule } from 'ngx-pipes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { DashboardAdminRoutingModule } from './dashboard.admin.routes';
 import { DashboardAdminComponent } from './dashboard.admin.component';
@@ -22,6 +23,7 @@ import { SharedModule } from 'app/shared/shared.module';
     CommonAppModule,
     DashboardAdminRoutingModule,
     SharedModule,
+    ModalModule.forRoot(),
   ],
   declarations: [
     DashboardAdminComponent,

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { UserService } from 'app/common/services/user.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { Query } from 'app/common/interfaces/query.interface';
 import { Table, TableType } from 'app/shared/table/table';
@@ -25,6 +26,7 @@ export class DashboardAdminComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private modalService: BsModalService,
     public alertService: AlertService,
   ) {
@@ -33,8 +35,8 @@ export class DashboardAdminComponent implements OnInit {
   ngOnInit() {
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
-      data => {
-        this.admin = data;
+      resp => {
+        this.admin = resp;
         this.query.owner = this.admin.id;
         this.fetchUsers();
       },
@@ -73,7 +75,14 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   fetchUsers() {
-    // TODO: fetch list of Users
+    this.userService.getAllUsers().subscribe(
+      (resp: any) => {
+        this.table.page.content = resp.users;
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   onPageChange(page: number) {
