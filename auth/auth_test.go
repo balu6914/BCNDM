@@ -110,38 +110,51 @@ func TestRegister(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := svc.Register(tc.key, tc.user)
+		_, err := svc.Register(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 
 func TestView(t *testing.T) {
 	svc, k := newService()
-
-	svc.Register(k, user)
-	key, err := svc.Login(user)
+	uv := auth.User{
+		ID:       "testv",
+		Email:    "testview@example.com",
+		Password: "testpass",
+	}
+	id, _ := svc.Register(k, uv)
+	key, err := svc.Login(uv)
 	_ = err
 
 	cases := map[string]struct {
 		key string
+		id  string
 		err error
 	}{
-		"view existing user": {
+		"view existing user as self": {
 			key: key,
+			id:  id,
+			err: nil,
+		},
+		"view existing user as admin": {
+			key: k,
+			id:  id,
 			err: nil,
 		},
 		"view non-existing user": {
 			key: wrong,
+			id:  id,
 			err: auth.ErrUnauthorizedAccess,
 		},
 		"view user with empty key": {
 			key: "",
+			id:  id,
 			err: auth.ErrUnauthorizedAccess,
 		},
 	}
 
 	for desc, tc := range cases {
-		_, err := svc.View(tc.key)
+		_, err := svc.View(tc.key, tc.id)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
 	}
 }

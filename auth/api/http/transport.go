@@ -34,6 +34,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 	))
 
 	r.Get("/users", kithttp.NewServer(
+		listEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/users/:id", kithttp.NewServer(
 		viewEndpoint(svc),
 		decodeIdentity,
 		encodeResponse,
@@ -43,13 +50,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r.Put("/users", kithttp.NewServer(
 		updateEndpoint(svc),
 		decodeUpdate,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/users/all", kithttp.NewServer(
-		listEndpoint(svc),
-		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))
@@ -98,7 +98,7 @@ func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 	req := identityReq{
 		key: r.Header.Get("Authorization"),
 	}
-
+	req.ID = bone.GetValue(r, "id")
 	return req, nil
 }
 

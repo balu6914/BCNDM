@@ -27,7 +27,7 @@ var (
 type Service interface {
 	// Register creates new user account. In case of the failed registration, a
 	// non-nil error value is returned.
-	Register(string, User) error
+	Register(string, User) (string, error)
 
 	// InitAdmin creates admin account if it does not exist already. In case of the failed creation, a
 	// non-nil error value is returned.
@@ -42,9 +42,14 @@ type Service interface {
 	// non-nil error value is returned.
 	Update(string, User) error
 
-	// ViewClient retrieves data about the client identified with the provided
+	// View retrieves data about the client identified with the provided ID
+	// Key provided must have same ID (user viewing his own data) or admin role.
+	View(string, string) (User, error)
+
+	// ViewEmail provides backwards compatibility for grpc which doesn't support authorization at the moment
+	// It retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
-	View(string) (User, error)
+	ViewEmail(string) (User, error)
 
 	// Identity retrieves Client ID for provided client token.
 	Identify(string) (string, error)

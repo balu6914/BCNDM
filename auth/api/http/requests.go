@@ -89,6 +89,7 @@ func (req credentialsReq) validate() error {
 
 type identityReq struct {
 	key string
+	ID  string
 }
 
 func (req identityReq) validate() error {

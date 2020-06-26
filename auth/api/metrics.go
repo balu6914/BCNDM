@@ -26,7 +26,7 @@ func MetricsMiddleware(svc auth.Service, counter metrics.Counter, latency metric
 	}
 }
 
-func (ms *metricsMiddleware) Register(key string, user auth.User) error {
+func (ms *metricsMiddleware) Register(key string, user auth.User) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "register").Add(1)
 		ms.latency.With("method", "register").Observe(time.Since(begin).Seconds())
@@ -71,13 +71,22 @@ func (ms *metricsMiddleware) UpdatePassword(key string, old string, user auth.Us
 	return ms.svc.UpdatePassword(key, old, user)
 }
 
-func (ms *metricsMiddleware) View(key string) (auth.User, error) {
+func (ms *metricsMiddleware) View(key, ID string) (auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view").Add(1)
 		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.View(key)
+	return ms.svc.View(key, ID)
+}
+
+func (ms *metricsMiddleware) ViewEmail(key string) (auth.User, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_email").Add(1)
+		ms.latency.With("method", "view_email").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ViewEmail(key)
 }
 
 func (ms *metricsMiddleware) ListUsers(key string) ([]auth.User, error) {

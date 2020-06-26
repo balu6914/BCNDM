@@ -21,32 +21,32 @@ func New(users UserRepository, hasher Hasher, idp IdentityProvider, ts Transacti
 	}
 }
 
-func (as *authService) Register(key string, user User) error {
+func (as *authService) Register(key string, user User) (string, error) {
 	isAdmin, err := as.isAdmin(key)
 	if err != nil {
-		return ErrMalformedEntity
+		return "", ErrMalformedEntity
 	}
 	if !isAdmin {
-		return ErrUnauthorizedAccess
+		return "", ErrUnauthorizedAccess
 	}
 	hash, err := as.hasher.Hash(user.Password)
 	if err != nil {
-		return ErrMalformedEntity
+		return "", ErrMalformedEntity
 	}
 
 	user.Password = hash
 
 	id, err := as.users.Save(user)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := as.ts.CreateUser(id); err != nil {
 		as.users.Remove(id)
-		return err
+		return "", err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (as *authService) InitAdmin(user User) error {
@@ -55,12 +55,15 @@ func (as *authService) InitAdmin(user User) error {
 		return ErrMalformedEntity
 	}
 	user.Password = hash
-
 	_, err = as.users.OneByEmail(user.Email)
-	if err != ErrNotFound {
+	if err != nil && err != ErrNotFound {
 		return err
 	}
 
+	//User already exists so just return
+	if err != ErrNotFound {
+		return nil
+	}
 	id, err := as.users.Save(user)
 	if err != nil {
 		return err
@@ -69,7 +72,6 @@ func (as *authService) InitAdmin(user User) error {
 		as.users.Remove(id)
 		return err
 	}
-
 	return nil
 }
 
@@ -123,30 +125,49 @@ func (as *authService) UpdatePassword(key string, old string, user User) error {
 	return as.users.Update(user)
 }
 
-func (as *authService) View(key string) (User, error) {
+func (as *authService) View(key, userID string) (User, error) {
 	id, err := as.idp.Identity(key)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
+	isAdmin, err := as.isAdmin(key)
+	if err != nil {
+		return User{}, ErrMalformedEntity
+	}
+	if id != userID && !isAdmin {
+		return User{}, ErrUnauthorizedAccess
+	}
+	user, err := as.users.OneByID(userID)
+	if err != nil {
+		return User{}, ErrUnauthorizedAccess
+	}
+	return user, nil
+}
 
+func (as *authService) ViewEmail(key string) (User, error) {
+	id, err := as.idp.Identity(key)
+	if err != nil {
+		return User{}, ErrUnauthorizedAccess
+	}
 	user, err := as.users.OneByID(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
-
 	return user, nil
 }
 
 func (as *authService) ListUsers(key string) ([]User, error) {
-	if _, err := as.idp.Identity(key); err != nil {
-		return nil, ErrUnauthorizedAccess
+	isAdmin, err := as.isAdmin(key)
+	if err != nil {
+		return []User{}, ErrMalformedEntity
 	}
-
+	if !isAdmin {
+		return []User{}, ErrUnauthorizedAccess
+	}
 	users, err := as.users.AllExcept([]string{})
 	if err != nil {
 		return []User{}, err
 	}
-
 	return users, nil
 }
 

@@ -12,7 +12,9 @@ type apiRes interface {
 	empty() bool
 }
 
-type createRes struct{}
+type createRes struct {
+	ID string
+}
 
 func (res createRes) headers() map[string]string {
 	return map[string]string{}

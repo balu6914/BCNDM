@@ -29,7 +29,7 @@ func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-		u, err := svc.View(req.token)
+		u, err := svc.ViewEmail(req.token)
 		if err != nil {
 			return emailRes{}, err
 		}

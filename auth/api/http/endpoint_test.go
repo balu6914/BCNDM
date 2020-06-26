@@ -3,6 +3,7 @@ package http_test
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -139,10 +140,11 @@ func TestRegister(t *testing.T) {
 		LastName:  "Doe",
 	})
 
-	nonadminkey, _ := svc.Login(auth.User{
+	nonadminkey, err := svc.Login(auth.User{
 		Email:    nonadmin.Email,
 		Password: nonadmin.Password,
 	})
+	require.Nil(t, err, "unexpected error logging nonadmin user: %s", err)
 
 	cases := []struct {
 		desc        string
@@ -343,7 +345,8 @@ func TestUpdate(t *testing.T) {
 	defer ts.Close()
 
 	svc.Register(k, user)
-	key, _ := svc.Login(user)
+	key, err := svc.Login(user)
+	require.Nil(t, err, "unexpected error logging in user: %s", err)
 
 	data := toJSON(testUpdateReq{
 		ContactEmail: "john@email.com",
@@ -449,7 +452,8 @@ func TestUpdatePassowrd(t *testing.T) {
 	defer ts.Close()
 
 	svc.Register(k, user)
-	key, _ := svc.Login(user)
+	key, err := svc.Login(user)
+	require.Nil(t, err, "unexpected error logging in user: %s", err)
 
 	data := toJSON(testUpdatePassswordReq{
 		NewPassword: "newpassword",
@@ -548,23 +552,29 @@ func TestView(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(k, user)
-	key, _ := svc.Login(user)
+	id, err := svc.Register(k, user)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	key, err := svc.Login(user)
+	require.Nil(t, err, "unexpected error logging in user: %s", err)
 
 	cases := map[string]struct {
 		token  string
+		id     string
 		status int
 	}{
 		"view existing user": {
 			token:  key,
+			id:     id,
 			status: http.StatusOK,
 		},
 		"view user with invalid token": {
 			token:  invalid,
+			id:     id,
 			status: http.StatusForbidden,
 		},
 		"view user with empty token": {
 			token:  "",
+			id:     id,
 			status: http.StatusForbidden,
 		},
 	}
@@ -573,7 +583,7 @@ func TestView(t *testing.T) {
 		req := testRequest{
 			client: ts.Client(),
 			method: http.MethodGet,
-			url:    fmt.Sprintf("%s/users", ts.URL),
+			url:    fmt.Sprintf("%s/users/%s", ts.URL, tc.id),
 			token:  tc.token,
 		}
 		res, err := req.make()

@@ -10,7 +10,8 @@ produces:
 paths:
   /users:
     get:
-      summary: Retrieves user info
+      summary: List of all users
+      description: Fetches list of all users registered on the system (requires admin role in auth token).
       tags:
         - users
       parameters:
@@ -73,17 +74,25 @@ paths:
           description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
-  /users/all:
+  /users/{id}:
     get:
-      summary: List of all users
-      description: Fetches list of all users registered on the system.
+      summary: Retrieves user info. User can retrieve info for it's own ID contained in token. Admin can retrieve infor for any ID.
       tags:
         - users
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+            description: User ID.
+            in: path
+            type: string
+            required: true
       responses:
         200:
           description: User data retrieved.
         403:
           description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
   /users/non-partners:

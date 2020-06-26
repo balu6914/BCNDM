@@ -20,7 +20,7 @@ func LoggingMiddleware(svc auth.Service, logger log.Logger) auth.Service {
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) Register(key string, user auth.User) (err error) {
+func (lm *loggingMiddleware) Register(key string, user auth.User) (ID string, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method register for user %s took %s to complete", user.Email, time.Since(begin))
 		if err != nil {
@@ -87,9 +87,9 @@ func (lm *loggingMiddleware) UpdatePassword(key string, old string, user auth.Us
 	return lm.svc.UpdatePassword(key, old, user)
 }
 
-func (lm *loggingMiddleware) View(key string) (user auth.User, err error) {
+func (lm *loggingMiddleware) View(key, ID string) (user auth.User, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method view for key %s and took %s to complete", key, time.Since(begin))
+		message := fmt.Sprintf("Method view for key %s and ID %s and took %s to complete", key, ID, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -97,7 +97,20 @@ func (lm *loggingMiddleware) View(key string) (user auth.User, err error) {
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.View(key)
+	return lm.svc.View(key, ID)
+}
+
+func (lm *loggingMiddleware) ViewEmail(key string) (user auth.User, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method view for key %s  and took %s to complete", key, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.ViewEmail(key)
 }
 
 func (lm *loggingMiddleware) ListUsers(key string) (list []auth.User, err error) {

@@ -42,7 +42,7 @@ func (urm *userRepositoryMock) Save(user auth.User) (string, error) {
 	}
 
 	urm.users[user.Email], urm.users[user.ID] = user, user
-	return user.Email, nil
+	return user.ID, nil
 }
 
 func (urm *userRepositoryMock) OneByID(id string) (auth.User, error) {
