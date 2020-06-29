@@ -36,12 +36,7 @@ func (idp *identityProviderMock) Identity(key string) (string, error) {
 		return "", auth.ErrUnauthorizedAccess
 	}
 	parts := strings.Split(key, "|")
-	l := len(parts)
-	var roles []string
-	if l > 1 {
-		roles = parts[1:]
-	}
-	return idp.TemporaryKey(parts[0], roles)
+	return idp.TemporaryKey(parts[0], nil)
 }
 
 func (idp *identityProviderMock) Roles(key string) ([]string, error) {

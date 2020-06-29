@@ -24,7 +24,7 @@ type registerReq struct {
 }
 
 const (
-	maxEmailLength    = 32
+	maxEmailLength    = 254
 	minPasswordLength = 8
 	maxPasswordLength = 32
 	maxNameLength     = 32
@@ -101,48 +101,20 @@ func (req identityReq) validate() error {
 }
 
 type updateReq struct {
-	key          string
-	ContactEmail string `json:"contact_email,omitempty"`
-	FirstName    string `json:"first_name,omitempty"`
-	LastName     string `json:"last_name,omitempty"`
-	Company      string `json:"company,omitempty"`
-	Address      string `json:"address,omitempty"`
-	Phone        string `json:"phone,omitempty"`
+	ContactEmail string   `json:"contact_email,omitempty"`
+	FirstName    string   `json:"first_name,omitempty"`
+	LastName     string   `json:"last_name,omitempty"`
+	Company      string   `json:"company,omitempty"`
+	Address      string   `json:"address,omitempty"`
+	Phone        string   `json:"phone,omitempty"`
+	Roles        []string `json:"roles,omitempty"`
+	Password     string   `json:"password"`
 }
 
 func (req updateReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
 	if !govalidator.IsEmail(req.ContactEmail) ||
 		len(req.ContactEmail) > maxEmailLength {
 		return auth.ErrMalformedEntity
 	}
-
 	return nil
-}
-
-type updatePasswordReq struct {
-	key         string
-	NewPassword string `json:"new_password"`
-	RePassword  string `json:"re_password,omitempty"`
-	OldPassword string `json:"old_password,omitempty"`
-}
-
-func (req updatePasswordReq) validate() error {
-	if req.key == "" {
-		return auth.ErrUnauthorizedAccess
-	}
-
-	if req.OldPassword == "" || req.NewPassword == "" || req.RePassword == "" {
-		return auth.ErrMalformedEntity
-	}
-
-	if req.NewPassword != req.RePassword {
-		return auth.ErrMalformedEntity
-	}
-
-	return nil
-
 }

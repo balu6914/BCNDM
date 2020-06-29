@@ -47,7 +47,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Put("/users", kithttp.NewServer(
+	r.Patch("/users/:id", kithttp.NewServer(
 		updateEndpoint(svc),
 		decodeUpdate,
 		encodeResponse,
@@ -64,13 +64,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Put("/users/password", kithttp.NewServer(
-		updatePasswordEndpoint(svc),
-		decodePasswordUpdate,
 		encodeResponse,
 		opts...,
 	))
@@ -103,17 +96,10 @@ func decodeIdentity(_ context.Context, r *http.Request) (interface{}, error) {
 }
 
 func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var req updateReq
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-	req.key = r.Header.Get("Authorization")
-
-	return req, nil
+	return r, nil
 }
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
@@ -125,21 +111,6 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-func decodePasswordUpdate(_ context.Context, r *http.Request) (interface{}, error) {
-	var req updatePasswordReq
-	if r.Header.Get("Content-Type") != contentType {
-		return nil, errUnsupportedContentType
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-
-	req.key = r.Header.Get("Authorization")
 
 	return req, nil
 }

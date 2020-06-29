@@ -37,6 +37,28 @@ var user = auth.User{
 	Phone:     "+1234567890",
 }
 
+var userForUpdate = auth.User{
+	ID:        "123update",
+	Email:     "update@example.com",
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
+}
+
+var nonAdminForUpdate = auth.User{
+	ID:        "nonadmin333update",
+	Email:     "nonadminforupdate@example.com",
+	Password:  "password",
+	FirstName: "Joe",
+	LastName:  "Doe",
+	Company:   "company",
+	Address:   "address",
+	Phone:     "+1234567890",
+}
+
 var admin = auth.User{
 	ID:        "admin@example.com",
 	Email:     "admin@example.com",
@@ -344,8 +366,13 @@ func TestUpdate(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(k, user)
-	key, err := svc.Login(user)
+	_, err := svc.Register(k, userForUpdate)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	key, err := svc.Login(userForUpdate)
+	require.Nil(t, err, "unexpected error logging in user: %s", err)
+	_, err = svc.Register(k, nonAdminForUpdate)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	nk, err := svc.Login(nonAdminForUpdate)
 	require.Nil(t, err, "unexpected error logging in user: %s", err)
 
 	data := toJSON(testUpdateReq{
@@ -354,50 +381,51 @@ func TestUpdate(t *testing.T) {
 		LastName:     "doe",
 	})
 
-	invalidData := toJSON(auth.User{})
-	invalidEmailData := toJSON(auth.User{
-		ContactEmail: invalid,
-	})
-
 	cases := []struct {
 		desc        string
 		contentType string
 		req         string
+		userID      string
 		token       string
 		status      int
 	}{
 		{
-			desc:        "update existing user",
+			desc:        "update existing user by admin",
 			contentType: contentType,
 			req:         data,
+			userID:      userForUpdate.ID,
+			token:       k,
+			status:      http.StatusOK,
+		},
+		{
+			desc:        "update self by user",
+			contentType: contentType,
+			req:         data,
+			userID:      userForUpdate.ID,
 			token:       key,
 			status:      http.StatusOK,
 		},
 		{
-			desc:        "update non-existent user",
+			desc:        "update user by nonadmin",
 			contentType: contentType,
 			req:         data,
+			userID:      userForUpdate.ID,
+			token:       nk,
+			status:      http.StatusForbidden,
+		},
+		{
+			desc:        "update with bad token",
+			contentType: contentType,
+			req:         data,
+			userID:      userForUpdate.ID,
 			token:       "non-existent",
-			status:      http.StatusNotFound,
-		},
-		{
-			desc:        "update user with invalid data",
-			contentType: contentType,
-			req:         invalidData,
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with invalid email",
-			contentType: contentType,
-			req:         invalidEmailData,
-			token:       key,
-			status:      http.StatusBadRequest,
+			status:      http.StatusForbidden,
 		},
 		{
 			desc:        "update user with empty token",
 			contentType: contentType,
 			req:         data,
+			userID:      userForUpdate.ID,
 			token:       "",
 			status:      http.StatusForbidden,
 		},
@@ -405,137 +433,16 @@ func TestUpdate(t *testing.T) {
 			desc:        "update user with empty content type",
 			contentType: "",
 			req:         data,
-			token:       key,
+			userID:      userForUpdate.ID,
+			token:       k,
 			status:      http.StatusUnsupportedMediaType,
-		},
-		{
-			desc:        "update user with invalid request format",
-			contentType: contentType,
-			req:         "}",
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with empty JSON request",
-			contentType: contentType,
-			req:         "{}",
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with empty request",
-			contentType: contentType,
-			req:         "",
-			token:       key,
-			status:      http.StatusBadRequest,
 		},
 	}
 	for _, tc := range cases {
 		req := testRequest{
 			client:      ts.Client(),
-			method:      http.MethodPut,
-			url:         fmt.Sprintf("%s/users", ts.URL),
-			contentType: tc.contentType,
-			token:       tc.token,
-			body:        strings.NewReader(tc.req),
-		}
-		res, err := req.make()
-		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
-		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
-	}
-
-}
-
-func TestUpdatePassowrd(t *testing.T) {
-	svc, k := newService()
-	ts := newServer(svc)
-	defer ts.Close()
-
-	svc.Register(k, user)
-	key, err := svc.Login(user)
-	require.Nil(t, err, "unexpected error logging in user: %s", err)
-
-	data := toJSON(testUpdatePassswordReq{
-		NewPassword: "newpassword",
-		RePassword:  "newpassword",
-		OldPassword: "password",
-	})
-
-	mismatchData := toJSON(testUpdatePassswordReq{
-		NewPassword: "newpassword",
-		RePassword:  "newpassword1",
-		OldPassword: "password",
-	})
-
-	invalidOldData := toJSON(testUpdatePassswordReq{
-		NewPassword: "newpassword",
-		RePassword:  "newpassword",
-		OldPassword: "password_invalid",
-	})
-
-	cases := []struct {
-		desc        string
-		contentType string
-		req         string
-		token       string
-		status      int
-	}{
-		{
-			desc:        "update existing user password",
-			contentType: contentType,
-			req:         data,
-			token:       key,
-			status:      http.StatusOK,
-		},
-		{
-			desc:        "update user with empty token",
-			contentType: contentType,
-			req:         data,
-			token:       "",
-			status:      http.StatusForbidden,
-		},
-		{
-			desc:        "update user with empty content type",
-			contentType: "",
-			req:         data,
-			token:       key,
-			status:      http.StatusUnsupportedMediaType,
-		},
-		{
-			desc:        "update user with invalid request format",
-			contentType: contentType,
-			req:         "}",
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with empty JSON request",
-			contentType: contentType,
-			req:         "{}",
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with wrong old password",
-			contentType: contentType,
-			req:         invalidOldData,
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-		{
-			desc:        "update user with password mismatch",
-			contentType: contentType,
-			req:         mismatchData,
-			token:       key,
-			status:      http.StatusBadRequest,
-		},
-	}
-
-	for _, tc := range cases {
-		req := testRequest{
-			client:      ts.Client(),
-			method:      http.MethodPut,
-			url:         fmt.Sprintf("%s/users/password", ts.URL),
+			method:      http.MethodPatch,
+			url:         fmt.Sprintf("%s/users/%s", ts.URL, tc.userID),
 			contentType: tc.contentType,
 			token:       tc.token,
 			body:        strings.NewReader(tc.req),

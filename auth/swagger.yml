@@ -95,6 +95,36 @@ paths:
           description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
+    patch:
+      summary: Updates user attributes for user id. User with Admin role can update any user attributes, while user without it can update only his attributes (but not roles).
+      Update is performed by replacing the current resource data with values
+      provided in a request payload. Resource's unique identifier (User id) will not be
+      affected.
+      tags:
+        - users
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: User ID.
+          in: path
+          type: string
+          required: true
+        - name: user
+            description: JSON-formatted document describing the updated user fields.
+            in: body
+            schema:
+              $ref: "#/definitions/User"
+            required: true
+      responses:
+        200:
+          description: User data updated.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
+
   /users/non-partners:
     get:
       summary: List of non-partners

@@ -54,9 +54,6 @@ type Service interface {
 	// Identity retrieves Client ID for provided client token.
 	Identify(string) (string, error)
 
-	// UpdatePassword validates current password and set new one
-	UpdatePassword(string, string, User) error
-
 	// ListUsers retrieves list of all system users.
 	ListUsers(string) ([]User, error)
 

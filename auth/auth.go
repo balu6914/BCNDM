@@ -1,5 +1,9 @@
 package auth
 
+import (
+	"github.com/asaskevich/govalidator"
+)
+
 var _ Service = (*authService)(nil)
 
 type authService struct {
@@ -88,40 +92,41 @@ func (as *authService) Login(user User) (string, error) {
 	return as.idp.TemporaryKey(dbu.ID, dbu.Roles)
 }
 
+// Update updates existing user. Key(token) supplied needs to either have admin role or
+// it needs to contain user.ID same with the user that is being updated (self update)
+// if non empty password is supplied, then password is hashed and saved instead of clear text
 func (as *authService) Update(key string, user User) error {
 	id, err := as.idp.Identity(key)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
-	user.ID = id
-
-	return as.users.Update(user)
-}
-
-func (as *authService) UpdatePassword(key string, old string, user User) error {
-	id, err := as.idp.Identity(key)
+	// If user tries to change someone else's details, he needs to have admin role
+	isAdmin, err := as.isAdmin(key)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	if user.ID != id && !isAdmin {
+		return ErrUnauthorizedAccess
+	}
+	oldUser, err := as.users.OneByID(id)
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-	user.ID = id
-	// Validate current password with hashed record in DB
-	dbu, err := as.users.OneByID(user.ID)
-	if err != nil {
-		return ErrNotFound
+	//if user is not admin, do not allow change
+	if !isAdmin {
+		user.Roles = oldUser.Roles
 	}
-
-	if err := as.hasher.Compare(old, dbu.Password); err != nil {
+	// If password supplied, hash it
+	if user.Password != "" {
+		hash, err := as.hasher.Hash(user.Password)
+		if err != nil {
+			return ErrMalformedEntity
+		}
+		user.Password = hash
+	}
+	if user.ContactEmail != "" && !govalidator.IsEmail(user.ContactEmail) {
 		return ErrMalformedEntity
 	}
-
-	hash, err := as.hasher.Hash(user.Password)
-
-	if err != nil {
-		return ErrMalformedEntity
-	}
-	user.Password = hash
-
 	return as.users.Update(user)
 }
 

@@ -2,8 +2,10 @@ package http
 
 import (
 	"context"
-
+	"encoding/json"
 	"github.com/datapace/datapace/auth"
+	"github.com/go-zoo/bone"
+	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -53,42 +55,43 @@ func loginEndpoint(svc auth.Service) endpoint.Endpoint {
 
 func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(updateReq)
-		if err := req.validate(); err != nil {
-			return nil, err
+		r := request.(*http.Request)
+		current, err := svc.View(r.Header.Get("Authorization"), bone.GetValue(r, "id"))
+		// Filling updateReq with current user data
+		updateReq := updateReq{
+			ContactEmail: current.ContactEmail,
+			FirstName:    current.FirstName,
+			LastName:     current.LastName,
+			Company:      current.Company,
+			Address:      current.Address,
+			Phone:        current.Phone,
+			Roles:        current.Roles,
+			Password:     "",
+		}
+		if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
+			return updateRes{}, err
+		}
+
+		if err != nil {
+			return updateRes{}, err
 		}
 
 		user := auth.User{
-			ContactEmail: req.ContactEmail,
-			FirstName:    req.FirstName,
-			LastName:     req.LastName,
-			Company:      req.Company,
-			Address:      req.Address,
-			Phone:        req.Phone,
+			ID:           current.ID,
+			Email:        current.Email,
+			ContactEmail: updateReq.ContactEmail,
+			Password:     updateReq.Password,
+			FirstName:    updateReq.FirstName,
+			LastName:     updateReq.LastName,
+			Company:      updateReq.Company,
+			Address:      updateReq.Address,
+			Phone:        updateReq.Phone,
+			Roles:        updateReq.Roles,
 		}
-		if err := svc.Update(req.key, user); err != nil {
-			return nil, err
+		if err := svc.Update(r.Header.Get("Authorization"), user); err != nil {
+			return updateRes{}, err
 		}
-
 		return updateRes{}, nil
-	}
-}
-
-func updatePasswordEndpoint(svc auth.Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(updatePasswordReq)
-		if err := req.validate(); err != nil {
-			return nil, err
-		}
-
-		user := auth.User{
-			Password: req.NewPassword,
-		}
-		if err := svc.UpdatePassword(req.key, req.OldPassword, user); err != nil {
-			return nil, err
-		}
-
-		return updatePasswordRes{}, nil
 	}
 }
 
