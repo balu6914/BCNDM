@@ -157,7 +157,11 @@ func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 
 	users := []auth.User{}
 	for _, u := range mu {
-		users = append(users, u.toUser())
+		du, err := ur.cipher.Decrypt(u.toUser())
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, du)
 	}
 
 	return users, nil
