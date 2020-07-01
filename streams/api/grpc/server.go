@@ -3,23 +3,24 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/streams"
 
+	commonproto "github.com/datapace/datapace/proto/common"
+	streamsproto "github.com/datapace/datapace/proto/streams"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-var _ datapace.StreamsServiceServer = (*grpcServer)(nil)
+var _ streamsproto.StreamsServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
+	streamsproto.UnimplementedStreamsServiceServer
 	handler kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
-func NewServer(svc streams.Service) datapace.StreamsServiceServer {
+func NewServer(svc streams.Service) streamsproto.StreamsServiceServer {
 	return &grpcServer{
 		handler: kitgrpc.NewServer(
 			oneEndpoint(svc),
@@ -29,23 +30,23 @@ func NewServer(svc streams.Service) datapace.StreamsServiceServer {
 	}
 }
 
-func (s grpcServer) One(ctx context.Context, id *datapace.ID) (*datapace.Stream, error) {
+func (s grpcServer) One(ctx context.Context, id *commonproto.ID) (*streamsproto.Stream, error) {
 	_, res, err := s.handler.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
 	}
 
-	return res.(*datapace.Stream), nil
+	return res.(*streamsproto.Stream), nil
 }
 
 func decodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.ID)
+	req := grpcReq.(*commonproto.ID)
 	return oneReq{id: req.GetValue()}, nil
 }
 
 func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(oneRes)
-	stream := datapace.Stream{
+	stream := streamsproto.Stream{
 		Id:       res.id,
 		Name:     res.name,
 		Owner:    res.owner,

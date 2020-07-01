@@ -11,6 +11,9 @@ import (
 
 	authapi "github.com/datapace/datapace/auth/api/grpc"
 	log "github.com/datapace/datapace/logger"
+	authproto "github.com/datapace/datapace/proto/auth"
+	streamsproto "github.com/datapace/datapace/proto/streams"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	streamsapi "github.com/datapace/datapace/streams/api/grpc"
 	"github.com/datapace/datapace/subscriptions"
 	"github.com/datapace/datapace/subscriptions/api"
@@ -148,7 +151,8 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(ac datapace.AuthServiceClient, ms *mgo.Session, sc datapace.StreamsServiceClient, tc datapace.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
+func newService(ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
+	tc transactionsproto.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
 	ps := proxy.New(proxyURL)
@@ -176,7 +180,7 @@ func newService(ac datapace.AuthServiceClient, ms *mgo.Session, sc datapace.Stre
 	return svc
 }
 
-func serveHTTPServer(svc subscriptions.Service, ac datapace.AuthServiceClient, port string, logger log.Logger, errs chan error) {
+func serveHTTPServer(svc subscriptions.Service, ac authproto.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Subscriptions service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, api.MakeHandler(svc, ac))

@@ -6,10 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/auth"
 	grpcapi "github.com/datapace/datapace/auth/api/grpc"
+	authproto "github.com/datapace/datapace/proto/auth"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,7 +75,7 @@ func TestIdentify(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		id, err := client.Identify(ctx, &datapace.Token{Value: tc.token})
+		id, err := client.Identify(ctx, &authproto.Token{Value: tc.token})
 		assert.Equal(t, tc.id, id.GetValue(), fmt.Sprintf("%s: expected %s got %s", desc, tc.id, id.GetValue()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
@@ -113,7 +112,7 @@ func TestEmail(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		email, err := client.Email(ctx, &datapace.Token{Value: tc.token})
+		email, err := client.Email(ctx, &authproto.Token{Value: tc.token})
 		assert.Equal(t, tc.email, email.GetEmail(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetEmail()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}

@@ -6,8 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/datapace/datapace"
-
+	streamsproto "github.com/datapace/datapace/proto/streams"
 	"github.com/datapace/datapace/streams"
 	grpcapi "github.com/datapace/datapace/streams/api/grpc"
 	"github.com/datapace/datapace/streams/mocks"
@@ -35,7 +34,7 @@ func startServer() {
 	svc = newService()
 	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	server := grpc.NewServer()
-	datapace.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
+	streamsproto.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)
 }
 

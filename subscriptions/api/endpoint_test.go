@@ -7,8 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/datapace/datapace"
-
+	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/subscriptions"
 	httpapi "github.com/datapace/datapace/subscriptions/api"
 	"github.com/datapace/datapace/subscriptions/mocks"
@@ -56,7 +55,7 @@ func newService() subscriptions.Service {
 	return subscriptions.New(auth, subs, streams, proxy, transactions)
 }
 
-func newServer(svc subscriptions.Service, ac datapace.AuthServiceClient) *httptest.Server {
+func newServer(svc subscriptions.Service, ac authproto.AuthServiceClient) *httptest.Server {
 	mux := httpapi.MakeHandler(svc, ac)
 	return httptest.NewServer(mux)
 }

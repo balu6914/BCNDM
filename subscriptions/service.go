@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/datapace/datapace"
+	authproto "github.com/datapace/datapace/proto/auth"
 
 	"cloud.google.com/go/bigquery"
 	uuid "github.com/satori/go.uuid"
@@ -65,7 +65,7 @@ type Service interface {
 var _ Service = (*subscriptionsService)(nil)
 
 type subscriptionsService struct {
-	auth          datapace.AuthServiceClient
+	auth          authproto.AuthServiceClient
 	subscriptions SubscriptionRepository
 	streams       StreamsService
 	proxy         Proxy
@@ -73,7 +73,7 @@ type subscriptionsService struct {
 }
 
 // New instantiates the domain service implementation.
-func New(auth datapace.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
+func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
 	return &subscriptionsService{
 		auth:          auth,
 		subscriptions: subs,
@@ -83,7 +83,7 @@ func New(auth datapace.AuthServiceClient, subs SubscriptionRepository, streams S
 	}
 }
 
-func (ss subscriptionsService) checkEmail(userEmail datapace.UserEmail) (string, error) {
+func (ss subscriptionsService) checkEmail(userEmail authproto.UserEmail) (string, error) {
 	email := strings.ToLower(userEmail.Email)
 	contactEmail := strings.ToLower(userEmail.ContactEmail)
 	if strings.HasSuffix(email, gmailSuffix) {
@@ -101,7 +101,7 @@ func (ss subscriptionsService) createDataset(client *bigquery.Client, userToken,
 	}
 
 	ds := client.Dataset(datasetID)
-	email, err := ss.auth.Email(context.Background(), &datapace.Token{Value: userToken})
+	email, err := ss.auth.Email(context.Background(), &authproto.Token{Value: userToken})
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (ss subscriptionsService) setViewAccess(srcID, dstID, tableID string, clien
 }
 
 func (ss subscriptionsService) createBQ(url *string, token string, stream Stream, client *bigquery.Client, expire time.Time) (*bigquery.Dataset, error) {
-	email, err := ss.auth.Email(context.Background(), &datapace.Token{Value: token})
+	email, err := ss.auth.Email(context.Background(), &authproto.Token{Value: token})
 	if err != nil {
 		return nil, err
 	}

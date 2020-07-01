@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/datapace/datapace"
-
 	log "github.com/datapace/datapace/logger"
+	authproto "github.com/datapace/datapace/proto/auth"
 )
 
 var _ Authorization = (*authService)(nil)
@@ -19,16 +18,16 @@ type Authorization interface {
 	// Authorize method is used to authorize http request.
 	Authorize(r *http.Request) (string, error)
 	// Email method is used to fetch email and contactEmail for the user.
-	Email(token string) (datapace.UserEmail, error)
+	Email(token string) (authproto.UserEmail, error)
 }
 
 type authService struct {
-	auth   datapace.AuthServiceClient
+	auth   authproto.AuthServiceClient
 	logger log.Logger
 }
 
 // NewAuthorization method instantiates new security service.
-func NewAuthorization(auth datapace.AuthServiceClient, logger log.Logger) Authorization {
+func NewAuthorization(auth authproto.AuthServiceClient, logger log.Logger) Authorization {
 	return authService{
 		auth:   auth,
 		logger: logger,
@@ -40,7 +39,7 @@ func (as authService) Authorize(r *http.Request) (string, error) {
 	defer cancel()
 
 	key := r.Header.Get("Authorization")
-	res, err := as.auth.Identify(ctx, &datapace.Token{Value: key})
+	res, err := as.auth.Identify(ctx, &authproto.Token{Value: key})
 	if err != nil {
 		as.logger.Error(fmt.Sprintf("failed to authorize request: %s", err))
 		return "", ErrUnauthorizedAccess
@@ -49,14 +48,14 @@ func (as authService) Authorize(r *http.Request) (string, error) {
 	return res.GetValue(), nil
 }
 
-func (as authService) Email(token string) (datapace.UserEmail, error) {
+func (as authService) Email(token string) (authproto.UserEmail, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	res, err := as.auth.Email(ctx, &datapace.Token{Value: token})
+	res, err := as.auth.Email(ctx, &authproto.Token{Value: token})
 	if err != nil {
 		as.logger.Error(fmt.Sprintf("failed to fetch users emails: %s", err))
-		return datapace.UserEmail{}, ErrUnauthorizedAccess
+		return authproto.UserEmail{}, ErrUnauthorizedAccess
 	}
 
 	return *res, nil

@@ -5,19 +5,19 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace/datapace"
-
+	accessproto "github.com/datapace/datapace/proto/access"
+	commonproto "github.com/datapace/datapace/proto/common"
 	"github.com/datapace/datapace/streams"
 )
 
 var _ streams.AccessControl = (*accessControl)(nil)
 
 type accessControl struct {
-	client datapace.AccessServiceClient
+	client accessproto.AccessServiceClient
 }
 
 // New returns new access control instance.
-func New(client datapace.AccessServiceClient) streams.AccessControl {
+func New(client accessproto.AccessServiceClient) streams.AccessControl {
 	return accessControl{client: client}
 }
 
@@ -25,7 +25,7 @@ func (ac accessControl) Partners(id string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	list, err := ac.client.Partners(ctx, &datapace.ID{Value: id})
+	list, err := ac.client.Partners(ctx, &commonproto.ID{Value: id})
 	if err != nil {
 		return nil, err
 	}

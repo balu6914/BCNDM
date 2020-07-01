@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/auth"
+	authproto "github.com/datapace/datapace/proto/auth"
+	commonproto "github.com/datapace/datapace/proto/common"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	empty "github.com/golang/protobuf/ptypes/empty"
@@ -13,16 +13,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ datapace.AuthServiceServer = (*grpcServer)(nil)
+var _ authproto.AuthServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
+	authproto.UnimplementedAuthServiceServer
 	identify kitgrpc.Handler
 	email    kitgrpc.Handler
 	exists   kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
-func NewServer(svc auth.Service) datapace.AuthServiceServer {
+func NewServer(svc auth.Service) authproto.AuthServiceServer {
 	identify := kitgrpc.NewServer(
 		identifyEndpoint(svc),
 		decodeIdentifyRequest,
@@ -48,23 +49,23 @@ func NewServer(svc auth.Service) datapace.AuthServiceServer {
 	}
 }
 
-func (s *grpcServer) Identify(ctx context.Context, token *datapace.Token) (*datapace.ID, error) {
+func (s *grpcServer) Identify(ctx context.Context, token *authproto.Token) (*commonproto.ID, error) {
 	_, res, err := s.identify.ServeGRPC(ctx, token)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	return res.(*datapace.ID), nil
+	return res.(*commonproto.ID), nil
 }
 
-func (s *grpcServer) Email(ctx context.Context, id *datapace.Token) (*datapace.UserEmail, error) {
+func (s *grpcServer) Email(ctx context.Context, id *authproto.Token) (*authproto.UserEmail, error) {
 	_, res, err := s.email.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	return res.(*datapace.UserEmail), nil
+	return res.(*authproto.UserEmail), nil
 }
 
-func (s *grpcServer) Exists(ctx context.Context, id *datapace.ID) (*empty.Empty, error) {
+func (s *grpcServer) Exists(ctx context.Context, id *commonproto.ID) (*empty.Empty, error) {
 	_, res, err := s.exists.ServeGRPC(ctx, id)
 	if err != nil {
 		return nil, encodeError(err)
@@ -73,22 +74,22 @@ func (s *grpcServer) Exists(ctx context.Context, id *datapace.ID) (*empty.Empty,
 }
 
 func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.Token)
+	req := grpcReq.(*authproto.Token)
 	return identityReq{req.GetValue()}, nil
 }
 
 func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(identityRes)
-	return &datapace.ID{Value: res.id}, encodeError(res.err)
+	return &commonproto.ID{Value: res.id}, encodeError(res.err)
 }
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(emailRes)
-	return &datapace.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
+	return &authproto.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
 }
 
 func decodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.ID)
+	req := grpcReq.(*commonproto.ID)
 	return existsReq{req.GetValue()}, nil
 }
 

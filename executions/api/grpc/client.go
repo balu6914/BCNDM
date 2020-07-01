@@ -3,15 +3,14 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace/datapace"
-
+	executionsproto "github.com/datapace/datapace/proto/executions"
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )
 
-var _ datapace.ExecutionsServiceClient = (*grpcClient)(nil)
+var _ executionsproto.ExecutionsServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
 	createAlgo endpoint.Endpoint
@@ -19,7 +18,7 @@ type grpcClient struct {
 }
 
 // NewClient returns new gRPC client instance.
-func NewClient(conn *grpc.ClientConn) datapace.ExecutionsServiceClient {
+func NewClient(conn *grpc.ClientConn) executionsproto.ExecutionsServiceClient {
 	createAlgo := kitgrpc.NewClient(
 		conn,
 		"datapace.ExecutionsService",
@@ -44,7 +43,7 @@ func NewClient(conn *grpc.ClientConn) datapace.ExecutionsServiceClient {
 	}
 }
 
-func (client grpcClient) CreateAlgorithm(ctx context.Context, algo *datapace.Algorithm, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) CreateAlgorithm(ctx context.Context, algo *executionsproto.Algorithm, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := algoReq{
 		id:       algo.GetId(),
 		name:     algo.GetName(),
@@ -60,7 +59,7 @@ func (client grpcClient) CreateAlgorithm(ctx context.Context, algo *datapace.Alg
 	return &empty.Empty{}, cr.err
 }
 
-func (client grpcClient) CreateDataset(ctx context.Context, data *datapace.Dataset, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) CreateDataset(ctx context.Context, data *executionsproto.Dataset, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := dataReq{
 		id:       data.GetId(),
 		metadata: data.GetMetadata(),
@@ -77,7 +76,7 @@ func (client grpcClient) CreateDataset(ctx context.Context, data *datapace.Datas
 
 func encodeAlgoReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(algoReq)
-	return &datapace.Algorithm{
+	return &executionsproto.Algorithm{
 		Id:       req.id,
 		Name:     req.name,
 		Metadata: req.metadata,
@@ -86,7 +85,7 @@ func encodeAlgoReq(_ context.Context, grpcReq interface{}) (interface{}, error) 
 
 func encodeDataReq(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(dataReq)
-	return &datapace.Dataset{
+	return &executionsproto.Dataset{
 		Id:       req.id,
 		Metadata: req.metadata,
 	}, nil

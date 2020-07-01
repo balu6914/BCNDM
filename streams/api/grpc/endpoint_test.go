@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/datapace/datapace"
-
+	commonproto "github.com/datapace/datapace/proto/common"
+	streamsproto "github.com/datapace/datapace/proto/streams"
 	"github.com/datapace/datapace/streams"
 	grpcapi "github.com/datapace/datapace/streams/api/grpc"
 
@@ -38,12 +38,12 @@ func TestOne(t *testing.T) {
 
 	cases := map[string]struct {
 		id     string
-		stream *datapace.Stream
+		stream *streamsproto.Stream
 		err    error
 	}{
 		"get existing stream": {
 			id: id,
-			stream: &datapace.Stream{
+			stream: &streamsproto.Stream{
 				Owner: stream.Owner,
 				Id:    id,
 				Url:   stream.URL,
@@ -59,7 +59,7 @@ func TestOne(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		stream, err := cli.One(ctx, &datapace.ID{Value: tc.id})
+		stream, err := cli.One(ctx, &commonproto.ID{Value: tc.id})
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 		assert.Equal(t, tc.stream, stream, fmt.Sprintf("%s: expected %v got %v", desc, tc.stream, stream))
 	}

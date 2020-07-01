@@ -12,6 +12,9 @@ import (
 
 	authapi "github.com/datapace/datapace/auth/api/grpc"
 	log "github.com/datapace/datapace/logger"
+	authproto "github.com/datapace/datapace/proto/auth"
+	streamsproto "github.com/datapace/datapace/proto/streams"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	streamsapi "github.com/datapace/datapace/streams/api/grpc"
 	"github.com/datapace/datapace/transactions"
 	"github.com/datapace/datapace/transactions/api"
@@ -170,7 +173,7 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 	return ms
 }
 
-func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient datapace.StreamsServiceClient, logger log.Logger) transactions.Service {
+func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, streamsClient streamsproto.StreamsServiceClient, logger log.Logger) transactions.Service {
 	tl := fabric.NewTokenLedger(
 		sdk,
 		cfg.fabricOrgAdmin,
@@ -221,7 +224,7 @@ func newGRPCConn(authURL string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func startHTTPServer(svc transactions.Service, ac datapace.AuthServiceClient, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(svc transactions.Service, ac authproto.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Users HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, ac))
@@ -235,7 +238,7 @@ func startGRPCServer(svc transactions.Service, port string, logger log.Logger, e
 	}
 
 	server := grpc.NewServer()
-	datapace.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
+	transactionsproto.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Transactions gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

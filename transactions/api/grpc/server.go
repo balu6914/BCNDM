@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/transactions"
 
+	commonproto "github.com/datapace/datapace/proto/common"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
@@ -16,15 +16,16 @@ import (
 
 var errMalformedEntity = errors.New("malformed entity")
 
-var _ datapace.TransactionsServiceServer = (*grpcServer)(nil)
+var _ transactionsproto.TransactionsServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
+	transactionsproto.UnimplementedTransactionsServiceServer
 	createUser kitgrpc.Handler
 	transfer   kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
-func NewServer(svc transactions.Service) datapace.TransactionsServiceServer {
+func NewServer(svc transactions.Service) transactionsproto.TransactionsServiceServer {
 	createUser := kitgrpc.NewServer(
 		createUserEndpoint(svc),
 		decodeCreateUserRequest,
@@ -43,7 +44,7 @@ func NewServer(svc transactions.Service) datapace.TransactionsServiceServer {
 	}
 }
 
-func (s grpcServer) CreateUser(ctx context.Context, user *datapace.ID) (*empty.Empty, error) {
+func (s grpcServer) CreateUser(ctx context.Context, user *commonproto.ID) (*empty.Empty, error) {
 	_, res, err := s.createUser.ServeGRPC(ctx, user)
 	if err != nil {
 		return nil, encodeError(err)
@@ -52,7 +53,7 @@ func (s grpcServer) CreateUser(ctx context.Context, user *datapace.ID) (*empty.E
 	return res.(*empty.Empty), nil
 }
 
-func (s grpcServer) Transfer(ctx context.Context, td *datapace.TransferData) (*empty.Empty, error) {
+func (s grpcServer) Transfer(ctx context.Context, td *transactionsproto.TransferData) (*empty.Empty, error) {
 	_, res, err := s.transfer.ServeGRPC(ctx, td)
 	if err != nil {
 		return nil, encodeError(err)
@@ -62,7 +63,7 @@ func (s grpcServer) Transfer(ctx context.Context, td *datapace.TransferData) (*e
 }
 
 func decodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.ID)
+	req := grpcReq.(*commonproto.ID)
 	return createUserReq{id: req.GetValue()}, nil
 }
 
@@ -72,7 +73,7 @@ func encodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 }
 
 func decodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
-	req := grpcReq.(*datapace.TransferData)
+	req := grpcReq.(*transactionsproto.TransferData)
 	return transferReq{
 		streamID: req.GetStreamID(),
 		from:     req.GetFrom(),

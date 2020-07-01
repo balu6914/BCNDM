@@ -27,6 +27,9 @@ import (
 	"github.com/datapace/datapace/auth/mongo"
 	"github.com/datapace/datapace/auth/transactions"
 	log "github.com/datapace/datapace/logger"
+	accessproto "github.com/datapace/datapace/proto/access"
+	authproto "github.com/datapace/datapace/proto/auth"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	transactionsapi "github.com/datapace/datapace/transactions/api/grpc"
 )
 
@@ -179,7 +182,7 @@ func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(cfg config, ms *mgo.Session, tc datapace.TransactionsServiceClient, asc datapace.AccessServiceClient, logger log.Logger) auth.Service {
+func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsServiceClient, asc accessproto.AccessServiceClient, logger log.Logger) auth.Service {
 	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
 	users := mongo.NewUserRepository(ms, cipher)
 	hasher := bcrypt.New()
@@ -222,7 +225,7 @@ func startGRPCServer(svc auth.Service, port string, logger log.Logger, errs chan
 	}
 
 	server := grpc.NewServer()
-	datapace.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
+	authproto.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Auth gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/datapace/datapace"
-
+	commonproto "github.com/datapace/datapace/proto/common"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	grpcapi "github.com/datapace/datapace/transactions/api/grpc"
 
 	"github.com/stretchr/testify/assert"
@@ -53,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := cli.CreateUser(ctx, &datapace.ID{Value: tc.id})
+		_, err := cli.CreateUser(ctx, &commonproto.ID{Value: tc.id})
 		e, ok := status.FromError(err)
 		assert.True(t, ok, "OK expected to be true")
 		assert.Equal(t, tc.status, e.Code(), fmt.Sprintf("%s: expected %s got %s", tc.desc, tc.status, e.Code()))
@@ -98,7 +98,7 @@ func TestTransfer(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		req := datapace.TransferData{
+		req := transactionsproto.TransferData{
 			StreamID: streamID,
 			From:     tc.from,
 			To:       tc.to,

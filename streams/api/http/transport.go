@@ -14,6 +14,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/datapace/datapace"
+	authproto "github.com/datapace/datapace/proto/auth"
 
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
@@ -87,7 +88,7 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	return r
 }
 
-func checkEmail(userEmail datapace.UserEmail) (string, error) {
+func checkEmail(userEmail authproto.UserEmail) (string, error) {
 	email := strings.ToLower(userEmail.Email)
 	contactEmail := strings.ToLower(userEmail.ContactEmail)
 	if strings.HasSuffix(email, gmailSuffix) {

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package datapace;
+
+import "proto/common.proto";
+option go_package = "github.com/datapace/datapace/proto/access";
+
+service AccessService {
+    rpc Partners(ID) returns (PartnersList) {}
+    rpc PotentialPartners(ID) returns (PartnersList) {}
+}
+
+message PartnersList {
+    repeated string value = 1;
+}

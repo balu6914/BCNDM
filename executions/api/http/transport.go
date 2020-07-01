@@ -12,6 +12,7 @@ import (
 
 	"github.com/datapace/datapace/executions"
 
+	authproto "github.com/datapace/datapace/proto/auth"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"google.golang.org/grpc/codes"
@@ -23,11 +24,11 @@ const contentType = "application/json"
 var (
 	errUnauthorizedAccess     = errors.New("missing or invalid credentials provided")
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      datapace.AuthServiceClient
+	auth                      authproto.AuthServiceClient
 )
 
 // MakeHandler returns HTTP handler for executions serivce.
-func MakeHandler(svc executions.Service, ac datapace.AuthServiceClient) http.Handler {
+func MakeHandler(svc executions.Service, ac authproto.AuthServiceClient) http.Handler {
 	auth = ac
 
 	opts := []kithttp.ServerOption{
@@ -166,7 +167,7 @@ func authorize(r *http.Request) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	id, err := auth.Identify(ctx, &datapace.Token{Value: token})
+	id, err := auth.Identify(ctx, &authproto.Token{Value: token})
 	if err != nil {
 		e, ok := status.FromError(err)
 		if ok && e.Code() == codes.Unauthenticated {

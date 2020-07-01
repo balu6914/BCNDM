@@ -3,7 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace/datapace"
+	authproto "github.com/datapace/datapace/proto/auth"
+	commonproto "github.com/datapace/datapace/proto/common"
 
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
@@ -11,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var _ datapace.AuthServiceClient = (*grpcClient)(nil)
+var _ authproto.AuthServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
 	identify endpoint.Endpoint
@@ -20,14 +21,14 @@ type grpcClient struct {
 }
 
 // NewClient returns new gRPC client instance.
-func NewClient(conn *grpc.ClientConn) datapace.AuthServiceClient {
+func NewClient(conn *grpc.ClientConn) authproto.AuthServiceClient {
 	identify := kitgrpc.NewClient(
 		conn,
 		"datapace.AuthService",
 		"Identify",
 		encodeIdentifyRequest,
 		decodeIdentifyResponse,
-		datapace.ID{},
+		commonproto.ID{},
 	).Endpoint()
 
 	email := kitgrpc.NewClient(
@@ -36,7 +37,7 @@ func NewClient(conn *grpc.ClientConn) datapace.AuthServiceClient {
 		"Email",
 		encodeIdentifyRequest,
 		decodeEmailResponse,
-		datapace.UserEmail{},
+		authproto.UserEmail{},
 	).Endpoint()
 
 	exists := kitgrpc.NewClient(
@@ -55,27 +56,27 @@ func NewClient(conn *grpc.ClientConn) datapace.AuthServiceClient {
 	}
 }
 
-func (client grpcClient) Identify(ctx context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.ID, error) {
+func (client grpcClient) Identify(ctx context.Context, token *authproto.Token, _ ...grpc.CallOption) (*commonproto.ID, error) {
 	res, err := client.identify(ctx, identityReq{token.GetValue()})
 	if err != nil {
 		return nil, err
 	}
 
 	idRes := res.(identityRes)
-	return &datapace.ID{Value: idRes.id}, idRes.err
+	return &commonproto.ID{Value: idRes.id}, idRes.err
 }
 
-func (client grpcClient) Email(ctx context.Context, token *datapace.Token, _ ...grpc.CallOption) (*datapace.UserEmail, error) {
+func (client grpcClient) Email(ctx context.Context, token *authproto.Token, _ ...grpc.CallOption) (*authproto.UserEmail, error) {
 	res, err := client.email(ctx, identityReq{token.GetValue()})
 	if err != nil {
 		return nil, err
 	}
 
 	emailRes := res.(emailRes)
-	return &datapace.UserEmail{Email: emailRes.email, ContactEmail: emailRes.contactEmail}, emailRes.err
+	return &authproto.UserEmail{Email: emailRes.email, ContactEmail: emailRes.contactEmail}, emailRes.err
 }
 
-func (client grpcClient) Exists(ctx context.Context, id *datapace.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) Exists(ctx context.Context, id *commonproto.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
 	res, err := client.exists(ctx, existsReq{id.GetValue()})
 	if err != nil {
 		return nil, err
@@ -87,22 +88,22 @@ func (client grpcClient) Exists(ctx context.Context, id *datapace.ID, _ ...grpc.
 
 func encodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(identityReq)
-	return &datapace.Token{Value: req.token}, nil
+	return &authproto.Token{Value: req.token}, nil
 }
 
 func decodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
-	res := grpcRes.(*datapace.ID)
+	res := grpcRes.(*commonproto.ID)
 	return identityRes{res.GetValue(), nil}, nil
 }
 
 func decodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
-	res := grpcRes.(*datapace.UserEmail)
+	res := grpcRes.(*authproto.UserEmail)
 	return emailRes{res.GetEmail(), res.GetContactEmail(), nil}, nil
 }
 
 func encodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(existsReq)
-	return &datapace.ID{Value: req.id}, nil
+	return &commonproto.ID{Value: req.id}, nil
 }
 
 func decodeExistsResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {

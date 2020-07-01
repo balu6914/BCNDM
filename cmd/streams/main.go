@@ -15,6 +15,7 @@ import (
 	authapi "github.com/datapace/datapace/auth/api/grpc"
 	executionsapi "github.com/datapace/datapace/executions/api/grpc"
 	log "github.com/datapace/datapace/logger"
+	streamsproto "github.com/datapace/datapace/proto/streams"
 	"github.com/datapace/datapace/streams"
 	"github.com/datapace/datapace/streams/api"
 	grpcapi "github.com/datapace/datapace/streams/api/grpc"
@@ -187,7 +188,7 @@ func startGRPCServer(svc streams.Service, port string, logger log.Logger, errs c
 	}
 
 	server := grpc.NewServer()
-	datapace.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
+	streamsproto.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Streams gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

@@ -6,11 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/auth"
 	grpcapi "github.com/datapace/datapace/auth/api/grpc"
 	"github.com/datapace/datapace/auth/mocks"
+	authproto "github.com/datapace/datapace/proto/auth"
 
 	"google.golang.org/grpc"
 )
@@ -49,6 +48,6 @@ func newService() (auth.Service, string) {
 func startGRPCServer(svc auth.Service, port int) {
 	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	server := grpc.NewServer()
-	datapace.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
+	authproto.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)
 }

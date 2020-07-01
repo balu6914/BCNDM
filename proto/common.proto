@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package datapace;
+option go_package = "github.com/datapace/datapace/proto/common";
+
+message ID {
+    string value = 1;
+}

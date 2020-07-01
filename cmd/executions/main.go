@@ -28,6 +28,8 @@ import (
 	"github.com/datapace/datapace/executions/subscriptions"
 	"github.com/datapace/datapace/executions/wwh"
 	"github.com/datapace/datapace/logger"
+	authproto "github.com/datapace/datapace/proto/auth"
+	executionproto "github.com/datapace/datapace/proto/executions"
 )
 
 const (
@@ -220,7 +222,7 @@ func newService(cfg config, ms *mgo.Session, logger logger.Logger) executions.Se
 	return svc
 }
 
-func startHTTPServer(svc executions.Service, ac datapace.AuthServiceClient, port string, logger logger.Logger, errs chan error) {
+func startHTTPServer(svc executions.Service, ac authproto.AuthServiceClient, port string, logger logger.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Executions HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, ac))
@@ -234,7 +236,7 @@ func startGRPCServer(svc executions.Service, port string, logger logger.Logger, 
 	}
 
 	server := grpc.NewServer()
-	datapace.RegisterExecutionsServiceServer(server, grpcapi.NewServer(svc))
+	executionproto.RegisterExecutionsServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Executions gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

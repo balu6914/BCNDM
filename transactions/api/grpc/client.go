@@ -3,15 +3,15 @@ package grpc
 import (
 	"context"
 
-	"github.com/datapace/datapace"
-
+	commonproto "github.com/datapace/datapace/proto/common"
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )
 
-var _ datapace.TransactionsServiceClient = (*grpcClient)(nil)
+var _ transactionsproto.TransactionsServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
 	createUser endpoint.Endpoint
@@ -19,7 +19,7 @@ type grpcClient struct {
 }
 
 // NewClient returns new gRPC client instance.
-func NewClient(conn *grpc.ClientConn) datapace.TransactionsServiceClient {
+func NewClient(conn *grpc.ClientConn) transactionsproto.TransactionsServiceClient {
 	createUser := kitgrpc.NewClient(
 		conn,
 		"datapace.TransactionsService",
@@ -44,7 +44,7 @@ func NewClient(conn *grpc.ClientConn) datapace.TransactionsServiceClient {
 	}
 }
 
-func (client grpcClient) CreateUser(ctx context.Context, user *datapace.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) CreateUser(ctx context.Context, user *commonproto.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
 	res, err := client.createUser(ctx, createUserReq{id: user.GetValue()})
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (client grpcClient) CreateUser(ctx context.Context, user *datapace.ID, _ ..
 	return &empty.Empty{}, cur.err
 }
 
-func (client grpcClient) Transfer(ctx context.Context, td *datapace.TransferData, _ ...grpc.CallOption) (*empty.Empty, error) {
+func (client grpcClient) Transfer(ctx context.Context, td *transactionsproto.TransferData, _ ...grpc.CallOption) (*empty.Empty, error) {
 	req := transferReq{
 		streamID: td.GetStreamID(),
 		from:     td.GetFrom(),
@@ -72,7 +72,7 @@ func (client grpcClient) Transfer(ctx context.Context, td *datapace.TransferData
 
 func encodeCreateUserRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(createUserReq)
-	return &datapace.ID{Value: req.id}, nil
+	return &commonproto.ID{Value: req.id}, nil
 }
 
 func decodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
@@ -81,7 +81,7 @@ func decodeCreateUserResponse(_ context.Context, grpcRes interface{}) (interface
 
 func encodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(transferReq)
-	return &datapace.TransferData{
+	return &transactionsproto.TransferData{
 		StreamID: req.streamID,
 		From:     req.from,
 		To:       req.to,

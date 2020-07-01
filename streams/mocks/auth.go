@@ -3,8 +3,7 @@ package mocks
 import (
 	"net/http"
 
-	"github.com/datapace/datapace"
-
+	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
 )
 
@@ -30,6 +29,6 @@ func (a authorization) Authorize(r *http.Request) (string, error) {
 	return "", streams.ErrUnauthorizedAccess
 }
 
-func (a authorization) Email(token string) (datapace.UserEmail, error) {
-	return datapace.UserEmail{}, nil
+func (a authorization) Email(token string) (authproto.UserEmail, error) {
+	return authproto.UserEmail{}, nil
 }

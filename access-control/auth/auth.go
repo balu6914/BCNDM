@@ -5,7 +5,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace/datapace"
+	authproto "github.com/datapace/datapace/proto/auth"
+	commonproto "github.com/datapace/datapace/proto/common"
 
 	access "github.com/datapace/datapace/access-control"
 )
@@ -13,11 +14,11 @@ import (
 var _ access.AuthService = (*authService)(nil)
 
 type authService struct {
-	auth datapace.AuthServiceClient
+	auth authproto.AuthServiceClient
 }
 
 // New returns new auth service implementation instance.
-func New(auth datapace.AuthServiceClient) access.AuthService {
+func New(auth authproto.AuthServiceClient) access.AuthService {
 	return authService{auth: auth}
 }
 
@@ -25,7 +26,7 @@ func (as authService) Identify(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	res, err := as.auth.Identify(ctx, &datapace.Token{Value: key})
+	res, err := as.auth.Identify(ctx, &authproto.Token{Value: key})
 	if err != nil {
 		return "", access.ErrUnauthorizedAccess
 	}
@@ -37,7 +38,7 @@ func (as authService) Exists(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	if _, err := as.auth.Exists(ctx, &datapace.ID{Value: id}); err != nil {
+	if _, err := as.auth.Exists(ctx, &commonproto.ID{Value: id}); err != nil {
 		return access.ErrNotFound
 	}
 

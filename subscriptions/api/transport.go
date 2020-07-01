@@ -16,16 +16,17 @@ import (
 
 	"github.com/datapace/datapace"
 
+	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/subscriptions"
 )
 
 var (
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      datapace.AuthServiceClient
+	auth                      authproto.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc subscriptions.Service, ac datapace.AuthServiceClient) http.Handler {
+func MakeHandler(svc subscriptions.Service, ac authproto.AuthServiceClient) http.Handler {
 	auth = ac
 
 	opts := []kithttp.ServerOption{
@@ -85,7 +86,7 @@ func authorize(r *http.Request) (string, error) {
 	defer cancel()
 
 	// TODO: move this code to auth interface in service package root.
-	id, err := auth.Identify(ctx, &datapace.Token{Value: token})
+	id, err := auth.Identify(ctx, &authproto.Token{Value: token})
 	if err != nil {
 		e, ok := status.FromError(err)
 		if ok && e.Code() == codes.Unauthenticated {

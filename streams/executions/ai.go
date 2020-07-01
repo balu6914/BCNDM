@@ -3,9 +3,8 @@ package executions
 import (
 	"context"
 
-	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/errors"
+	executionsproto "github.com/datapace/datapace/proto/executions"
 	"github.com/datapace/datapace/streams"
 )
 
@@ -18,11 +17,11 @@ var (
 )
 
 type executionsService struct {
-	client datapace.ExecutionsServiceClient
+	client executionsproto.ExecutionsServiceClient
 }
 
 // New returns ai service interface instance.
-func New(client datapace.ExecutionsServiceClient) streams.AIService {
+func New(client executionsproto.ExecutionsServiceClient) streams.AIService {
 	return executionsService{
 		client: client,
 	}
@@ -38,7 +37,7 @@ func (es executionsService) CreateAlgorithm(s streams.Stream) error {
 		metadata[k] = val
 	}
 
-	algo := datapace.Algorithm{
+	algo := executionsproto.Algorithm{
 		Id:       s.ID,
 		Name:     s.Name,
 		Metadata: metadata,
@@ -60,7 +59,7 @@ func (es executionsService) CreateDataset(s streams.Stream) error {
 		metadata[k] = val
 	}
 
-	dataset := datapace.Dataset{
+	dataset := executionsproto.Dataset{
 		Id:       s.ID,
 		Metadata: metadata,
 	}

@@ -26,6 +26,7 @@ import (
 	"github.com/datapace/datapace/access-control/mongo"
 	authapi "github.com/datapace/datapace/auth/api/grpc"
 	log "github.com/datapace/datapace/logger"
+	accessproto "github.com/datapace/datapace/proto/access"
 )
 
 const (
@@ -210,7 +211,7 @@ func startGRPCServer(svc access.Service, port string, logger log.Logger, errs ch
 	}
 
 	server := grpc.NewServer()
-	datapace.RegisterAccessServiceServer(server, grpcapi.NewServer(svc))
+	accessproto.RegisterAccessServiceServer(server, grpcapi.NewServer(svc))
 	logger.Info(fmt.Sprintf("Access Control gRPC service started, exposed port %s", port))
 	errs <- server.Serve(listener)
 }

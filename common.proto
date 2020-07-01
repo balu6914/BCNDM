@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package datapace;
-
-message ID {
-    string value = 1;
-}

@@ -6,8 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/datapace/datapace"
-
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	"github.com/datapace/datapace/transactions"
 	grpcapi "github.com/datapace/datapace/transactions/api/grpc"
 	"github.com/datapace/datapace/transactions/mocks"
@@ -36,7 +35,7 @@ func startServer() {
 	svc = newService()
 	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	server := grpc.NewServer()
-	datapace.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
+	transactionsproto.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)
 }
 

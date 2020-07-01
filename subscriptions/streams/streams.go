@@ -4,19 +4,19 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace/datapace"
-
+	commonproto "github.com/datapace/datapace/proto/common"
+	streamsproto "github.com/datapace/datapace/proto/streams"
 	"github.com/datapace/datapace/subscriptions"
 )
 
 var _ subscriptions.StreamsService = (*streamsService)(nil)
 
 type streamsService struct {
-	client datapace.StreamsServiceClient
+	client streamsproto.StreamsServiceClient
 }
 
 // NewService returns instance of streams service client.
-func NewService(client datapace.StreamsServiceClient) subscriptions.StreamsService {
+func NewService(client streamsproto.StreamsServiceClient) subscriptions.StreamsService {
 	return streamsService{client: client}
 }
 
@@ -24,7 +24,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	s, err := ss.client.One(ctx, &datapace.ID{Value: id})
+	s, err := ss.client.One(ctx, &commonproto.ID{Value: id})
 	if err != nil {
 		return subscriptions.Stream{}, err
 	}

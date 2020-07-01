@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/datapace/datapace"
-
+	transactionsproto "github.com/datapace/datapace/proto/transactions"
 	"github.com/datapace/datapace/subscriptions"
 
 	"google.golang.org/grpc/codes"
@@ -15,11 +14,11 @@ import (
 var _ subscriptions.TransactionsService = (*transactionsService)(nil)
 
 type transactionsService struct {
-	client datapace.TransactionsServiceClient
+	client transactionsproto.TransactionsServiceClient
 }
 
 // NewService returns new transactions service instance.
-func NewService(client datapace.TransactionsServiceClient) subscriptions.TransactionsService {
+func NewService(client transactionsproto.TransactionsServiceClient) subscriptions.TransactionsService {
 	return transactionsService{client: client}
 }
 
@@ -27,7 +26,7 @@ func (ts transactionsService) Transfer(streamID, from, to string, value uint64) 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	td := &datapace.TransferData{
+	td := &transactionsproto.TransferData{
 		StreamID: streamID,
 		From:     from,
 		To:       to,
