@@ -26,6 +26,12 @@ const (
 	invalid      = "invalid"
 )
 
+var userForDisable = auth.User{
+	ID:       "246disable",
+	Email:    "disable@example.com",
+	Password: "passwordisabled",
+}
+
 var user = auth.User{
 	ID:        email,
 	Email:     email,
@@ -267,7 +273,13 @@ func TestLogin(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 
-	svc.Register(key, user)
+	_, err := svc.Register(key, user)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	_, err = svc.Register(key, userForDisable)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	userForDisable.Disabled = true
+	err = svc.Update(key, userForDisable)
+	require.Nil(t, err, "unexpected error disabling user: %s", err)
 
 	credentials := user
 	credentials.ID = ""
@@ -292,6 +304,12 @@ func TestLogin(t *testing.T) {
 		status      int
 		res         string
 	}{
+		"login disabled user": {
+			contentType: contentType,
+			req:         toJSON(userForDisable),
+			status:      http.StatusForbidden,
+			res:         "",
+		},
 		"login existing user": {
 			contentType: contentType,
 			req:         data,

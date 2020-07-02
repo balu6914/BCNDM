@@ -109,6 +109,7 @@ type updateReq struct {
 	Phone        string   `json:"phone,omitempty"`
 	Roles        []string `json:"roles,omitempty"`
 	Password     string   `json:"password"`
+	Disabled     bool     `json:"disabled"`
 }
 
 func (req updateReq) validate() error {

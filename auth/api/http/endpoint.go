@@ -67,6 +67,7 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 			Phone:        current.Phone,
 			Roles:        current.Roles,
 			Password:     "",
+			Disabled:     current.Disabled,
 		}
 		if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
 			return updateRes{}, err
@@ -87,6 +88,7 @@ func updateEndpoint(svc auth.Service) endpoint.Endpoint {
 			Address:      updateReq.Address,
 			Phone:        updateReq.Phone,
 			Roles:        updateReq.Roles,
+			Disabled:     updateReq.Disabled,
 		}
 		if err := svc.Update(r.Header.Get("Authorization"), user); err != nil {
 			return updateRes{}, err
@@ -147,6 +149,7 @@ func listEndpoint(svc auth.Service) endpoint.Endpoint {
 				Company:      user.Company,
 				Address:      user.Address,
 				Phone:        user.Phone,
+				Disabled:     user.Disabled,
 			})
 		}
 

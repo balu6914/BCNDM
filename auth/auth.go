@@ -88,7 +88,9 @@ func (as *authService) Login(user User) (string, error) {
 	if err := as.hasher.Compare(user.Password, dbu.Password); err != nil {
 		return "", ErrUnauthorizedAccess
 	}
-
+	if dbu.Disabled == true {
+		return "", ErrUserAccountDisabled
+	}
 	return as.idp.TemporaryKey(dbu.ID, dbu.Roles)
 }
 

@@ -178,6 +178,7 @@ type mongoUser struct {
 	Address      string        `bson:"address,omitempty"`
 	Phone        string        `bson:"phone,omitempty"`
 	Roles        []string      `bson:"roles,omitempty"`
+	Disabled     *bool         `bson:"disabled,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -193,6 +194,7 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 			Address:      user.Address,
 			Phone:        user.Phone,
 			Roles:        user.Roles,
+			Disabled:     &user.Disabled,
 		}, nil
 	}
 
@@ -212,10 +214,15 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		Address:      user.Address,
 		Phone:        user.Phone,
 		Roles:        user.Roles,
+		Disabled:     &user.Disabled,
 	}, nil
 }
 
 func (user mongoUser) toUser() auth.User {
+	disabled := false
+	if user.Disabled != nil {
+		disabled = *user.Disabled
+	}
 	return auth.User{
 		Email:        user.Email,
 		ContactEmail: user.ContactEmail,
@@ -227,5 +234,6 @@ func (user mongoUser) toUser() auth.User {
 		Address:      user.Address,
 		Phone:        user.Phone,
 		Roles:        user.Roles,
+		Disabled:     disabled,
 	}
 }

@@ -15,6 +15,9 @@ var (
 	// when accessing a protected resource.
 	ErrUnauthorizedAccess = errors.New("missing or invalid credentials provided")
 
+	// ErrUserAccountDisabled indicates user account being disabled
+	ErrUserAccountDisabled = errors.New("user account disabled")
+
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound = errors.New("non-existent entity")
 

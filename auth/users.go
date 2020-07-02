@@ -13,6 +13,7 @@ type User struct {
 	Address      string
 	Phone        string
 	Roles        []string
+	Disabled     bool
 }
 
 // UserRepository specifies an account persistence API.

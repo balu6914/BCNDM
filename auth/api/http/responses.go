@@ -67,6 +67,7 @@ type viewRes struct {
 	Company      string `json:"company,omitempty"`
 	Address      string `json:"address,omitempty"`
 	Phone        string `json:"phone,omitempty"`
+	Disabled     bool   `json:"disabled,omitempty"`
 }
 
 func (res viewRes) code() int {

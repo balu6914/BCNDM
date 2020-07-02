@@ -194,6 +194,9 @@ definitions:
           items:
             type: string
         description: An array of roles that user can have. admin role is most significant
+      disabled:
+        type: boolean
+        description: When set to true, prevents user from logging in.
     required:
       - email
       - password
