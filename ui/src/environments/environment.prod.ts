@@ -10,5 +10,6 @@ export const environment = {
   API_EXECUTIONS: '/executions/executions',
   AI_ENABLED: true, // Show/Hide AI menu item in dashboard header
 
-  KUBEFLOW_URL: 'https://kubeflow.datapace.io/_/pipeline/'
+  KUBEFLOW_URL: 'https://kubeflow.datapace.io/_/pipeline/',
+  ADMIN_EMAIL: 'admin@datapace.com'
 };

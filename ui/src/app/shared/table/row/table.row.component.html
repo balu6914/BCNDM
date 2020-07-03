@@ -140,14 +140,19 @@
   <td>{{ row.email }}</td>
   <td>{{ row.first_name }}</td>
   <td>{{ row.last_name }}</td>
+  <td>{{ row.company }}</td>
   <td>{{ row.phone }}</td>
   <td>{{ row.address }}</td>
-  <td>{{ row.company }}</td>
+  <td *ngIf="row.disabled"> Disabled </td>
+  <td *ngIf="!row.disabled"></td>
   <div class="action-wrapper" nowrap class="table--right-aligned">
     <a class="action action--color-1" (click)="openModalEditUser(row)">
       <span class="action__icon action--edit"></span>
     </a>
-    <a class="action action--color-2" (click)="openModalDeleteUser(row)">
+    <a *ngIf="row.disabled" class="action action--color-1" (click)="openModalDeleteUser(row)">
+      <span class="action__icon"></span>
+    </a>
+    <a *ngIf="!row.disabled" class="action action--color-2" (click)="openModalDeleteUser(row)">
       <span class="action__icon action--delete"></span>
     </a>
   </div>

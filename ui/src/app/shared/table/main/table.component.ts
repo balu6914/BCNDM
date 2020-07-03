@@ -52,33 +52,39 @@ export class TableComponent {
     }
   }
 
-  rowDeleted(id) {
+  rowDeleted(rowDeleted: any) {
     // Remove row
     const list: any = this.table.page.content;
     list.forEach( (row, i) => {
-      if (row.id === id) {
-        // Remove row from table
-        this.table.page.content.splice(i, 1);
+      // TODO: Remove thiss check and emit full row for all componets
+      if (row.id === rowDeleted.id) {
+        if (rowDeleted.email !== undefined) {
+          this.deleteEvt.emit(rowDeleted);
+        } else {
+          // Remove row from table
+          this.table.page.content.splice(i, 1);
+          this.deleteEvt.emit(row.id);
+        }
+
         // Emit event to DashboardSellComponent
         // If its delted from details page, go back to list
         if (this.selectedRow && row.id === this.selectedRow.id) {
           this.flip = 'inactive';
         }
-        this.deleteEvt.emit(row.id);
       }
     });
   }
 
-  rowEdited(stream) {
+  rowEdited(rowEdited: any) {
     // Update row values
     const rows: any = this.table.page.content;
     rows.forEach( (row, i) => {
-      if (row.id === stream.id) {
+      if (row.id === rowEdited.id) {
         // Update row table
-        this.table.page.content[i] = stream;
+        this.table.page.content[i] = rowEdited;
         // Emit event to DashboardSellComponent
-        this.editEvt.emit(stream);
-        this.selectedRow = stream;
+        this.editEvt.emit(rowEdited);
+        this.selectedRow = rowEdited;
       }
     });
   }

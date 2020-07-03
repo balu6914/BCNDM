@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 
 import { environment } from 'environments/environment';
 import { UserService } from 'app/common/services/user.service';
+import * as jwt_decode from 'jwt-decode';
 
 @Injectable()
 export class AuthService {
@@ -75,7 +76,10 @@ export class AuthService {
   }
 
   fetchCurrentUser() {
-    return this.http.get(`${environment.API_AUTH}`).map(
+    const jwtDecode = jwt_decode(this.token);
+    const userID = jwtDecode.sub;
+
+    return this.userService.getUser(userID).map(
       (data: any) =>  {
         this.setCurrentUser(data);
         return data;

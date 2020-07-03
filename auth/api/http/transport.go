@@ -40,6 +40,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
+	r.Get("/users/non-partners", kithttp.NewServer(
+		nonPartnersEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Get("/users/:id", kithttp.NewServer(
 		viewEndpoint(svc),
 		decodeIdentity,
@@ -50,13 +57,6 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r.Patch("/users/:id", kithttp.NewServer(
 		updateEndpoint(svc),
 		decodeUpdate,
-		encodeResponse,
-		opts...,
-	))
-
-	r.Get("/users/non-partners", kithttp.NewServer(
-		nonPartnersEndpoint(svc),
-		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))

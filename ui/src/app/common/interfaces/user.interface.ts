@@ -9,5 +9,6 @@ export class User {
     public company?: string,
     public address?: string,
     public phone?: string,
+    public disabled?: boolean,
   ) { }
 }

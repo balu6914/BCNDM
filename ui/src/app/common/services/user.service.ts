@@ -11,12 +11,12 @@ export class UserService {
     private http: HttpClient
   ) { }
 
-  getUser(): Observable<User> {
-    return this.http.get<User>(`${environment.API_AUTH}`);
+  getUser(userID: string): Observable<User> {
+    return this.http.get<User>(`${environment.API_AUTH}/${userID}`);
   }
 
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${environment.API_AUTH}/all`);
+    return this.http.get<User[]>(`${environment.API_AUTH}`);
   }
 
   getNonPartners(): Observable<User[]> {
@@ -31,12 +31,7 @@ export class UserService {
     return this.http.delete(`${environment.API_AUTH}`);
   }
 
-  updateUser(data): Observable<User> {
-    return this.http.put<User>(`${environment.API_AUTH}`, data);
+  updateUser(user: User): Observable<User> {
+    return this.http.patch<User>(`${environment.API_AUTH}/${user.id}`, user);
   }
-
-  updatePassword(data): Observable<User> {
-    return this.http.put<User>(`${environment.API_AUTH}/password`, data);
-  }
-
 }

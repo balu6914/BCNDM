@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+
 import { UserService } from 'app/common/services/user.service';
 import { AuthService } from 'app/auth/services/auth.service';
 import { Query } from 'app/common/interfaces/query.interface';
@@ -8,6 +9,10 @@ import { Table, TableType } from 'app/shared/table/table';
 import { DashboardAdminSignupComponent } from 'app/dashboard/admin/signup/dashboard.admin.signup.component';
 import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
+import { AlertService } from 'app/shared/alerts/services/alert.service';
+
+import { DashboardAdminEditComponent } from 'app/dashboard/admin/edit/dashboard.admin.edit.component';
+import { DashboardAdminDeleteComponent } from 'app/dashboard/admin/delete/dashboard.admin.delete.component';
 
 @Component({
   selector: 'dpc-dashboard-admin',
@@ -20,6 +25,7 @@ export class DashboardAdminComponent implements OnInit {
   users = [];
   table: Table = new Table();
   query = new Query();
+  bsModalRef: BsModalRef;
 
   @ViewChild('tableComponent')
   private tableComponent: TableComponent;
@@ -48,7 +54,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', ''];
+    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', ''];
     this.table.hasDetails = true;
   }
 
@@ -66,12 +72,51 @@ export class DashboardAdminComponent implements OnInit {
       );
   }
 
-  editUser(user: User) {
-    // TODO: edit User
+  editUser(row: User) {
+    const initialState = {
+      user: {
+        id: row.id,
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        phone: row.phone,
+        address: row.address,
+        company: row.company,
+      },
+    };
+
+    // Open DashboardSellDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAdminEditComponent, {initialState})
+    .content.userEdited.subscribe(
+      resp => {
+        const itemIndex = this.table.page.content.findIndex((item: any) => item.id === row.id);
+        this.table.page.content[itemIndex] = resp;
+      }
+    );
   }
 
-  deleteUser(userID: string) {
-    // TODO: delete User
+  deleteUser(row: User) {
+    const initialState = {
+      user: {
+        id: row.id,
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        phone: row.phone,
+        address: row.address,
+        company: row.company,
+        disabled: row.disabled,
+      },
+    };
+
+    // Open DashboardAdminDeleteComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAdminDeleteComponent, {initialState})
+    .content.userDeleted.subscribe(
+      resp => {
+        const itemIndex = this.table.page.content.findIndex((item: any) => item.id === resp.id);
+        this.table.page.content[itemIndex] = resp;
+      }
+    );
   }
 
   fetchUsers() {

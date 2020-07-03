@@ -1,27 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import { Component, OnInit, Input } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { UserService } from 'app/common/services/user.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { User } from 'app/common/interfaces/user.interface';
 
 @Component({
   selector: 'dpc-user-profile-password-update',
   templateUrl: 'dashboard.profile.change.password.component.html',
 })
 export class DashboardProfilePasswordUpdateComponent implements OnInit {
-  public form: FormGroup;
+  form: FormGroup;
   submitted = false;
 
+  @Input() user: User;
   constructor(
-    private fb: FormBuilder,
+    private formBuilder: FormBuilder,
     private userService: UserService,
     private alertService: AlertService,
   ) {}
 
   ngOnInit() {
-    this.form = this.fb.group({
+    this.form = this.formBuilder.group({
       old_password: ['', [Validators.required, Validators.minLength(8)]],
       new_password: ['', [Validators.required, Validators.minLength(8)]],
       re_password: ['', [Validators.required, Validators.minLength(8)]]
@@ -31,28 +31,33 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
     });
   }
 
-    passwordMatchValidator(fg: FormGroup) {
-      // Compare passwords only if minLength is valid
-      if (fg.get('re_password').value.length) {
-        if (fg.get('new_password').value === fg.get('re_password').value) {
-            return null;
-        }
-        fg.controls.re_password.setErrors({'invalid': true});
+  passwordMatchValidator(formGroup: FormGroup) {
+    // Compare passwords only if minLength is valid
+    if (formGroup.get('re_password').value.length) {
+      if (formGroup.get('new_password').value === formGroup.get('re_password').value) {
+        return null;
       }
-
-      // Set form confirm password missmatch
-      return {'missmatch': true };
+      formGroup.controls.re_password.setErrors({'invalid': true});
     }
+
+    // Set form confirm password missmatch
+    return {'missmatch': true };
+  }
 
   onSubmit() {
     this.submitted = true;
 
     if (this.form.valid) {
-      this.userService.updatePassword(this.form.value).subscribe(
+      const updateUserReq = {
+        id: this.user.id,
+        old_password: this.form.value.old_password,
+        new_password: this.form.value.new_password,
+        re_password: this.form.value.re_password,
+      };
+      this.userService.updateUser(updateUserReq).subscribe(
         response => {
           this.alertService.success('You succesfully change your password.');
           this.form.reset();
-          this.submitted = false;
         },
         err => {
           this.alertService.error(`Status: ${err.status} - ${err.statusText}`);

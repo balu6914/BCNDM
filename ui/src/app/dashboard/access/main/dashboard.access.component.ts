@@ -46,53 +46,44 @@ export class DashboardAccessComponent implements OnInit {
 
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
-        // Fetch all registered users
-        this.fetchAllUsers();
-      },
-      err => {
-        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-      }
-    );
-  }
-
-  fetchAllUsers() {
-    this.userService.getAllUsers().subscribe(
-      (result: any) => {
-        this.users = result.users;
-        // Fetch sent and received access requests
+      resp => {
+        this.user = resp;
         this.fetchAccessRequests();
       },
       err => {
-        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+        this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
       }
     );
   }
 
   fetchAccessRequests() {
-    // access requests sent
-    this.accessService.getAllAccessSent().subscribe(
-      (resp: any) => {
-        this.reqsToTable(resp.Requests, 'sent');
+    this.userService.getAllUsers().subscribe(
+      (respUsers: any) => {
+        this.users = respUsers.users;
+
+        // access requests sent
+        this.accessService.getAllAccessSent().subscribe(
+          (resp: any) => {
+            this.reqsToTable(resp.Requests, 'sent');
+          },
+          err => {
+            this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          }
+        );
+        // access requests received
+        this.accessService.getAllAccessReceived().subscribe(
+          (resp: any) => {
+            this.reqsToTable(resp.Requests, 'received');
+          },
+          err => {
+            this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          }
+        );
       },
-      err => {
-        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-      }
-    );
-    // access requests received
-    this.accessService.getAllAccessReceived().subscribe(
-      (resp: any) => {
-        this.reqsToTable(resp.Requests, 'received');
-      },
-      err => {
-        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
-      }
     );
   }
 
   reqsToTable(requests: any, origin: string) {
-    const temp = Object.assign({}, this.table);
     // modify receiver field to show name instead of ID
     requests.forEach( req => {
       const index = this.users.findIndex(
@@ -104,13 +95,13 @@ export class DashboardAccessComponent implements OnInit {
           }
         }
       );
+
+      // Set partner name origin
       req.partner = `${this.users[index].first_name} ${this.users[index].last_name}`;
-      // Set origin
       req.origin = origin;
-      temp.page.content.push(req);
+
+      this.table.page.content.push(req);
     });
-    // Set Access table
-    this.table = temp;
   }
 
   onPageChange(page: number) {
@@ -132,9 +123,6 @@ export class DashboardAccessComponent implements OnInit {
           };
           this.table.page.content.push(row);
         },
-        err => {
-          console.log(err);
-        }
       );
     }
 
@@ -152,7 +140,7 @@ export class DashboardAccessComponent implements OnInit {
            rowToUpdate.state = 'approved';
         },
         err => {
-          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
     }
@@ -167,7 +155,7 @@ export class DashboardAccessComponent implements OnInit {
           rowToUpdate.state = 'revoked';
         },
         err => {
-          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
       );
     }

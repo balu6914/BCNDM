@@ -6,6 +6,6 @@
   </div>
   <div class="box box--centered box--small profile-wrapper">
     <dpc-user-profile-update *ngIf="user" [user]="user"></dpc-user-profile-update>
-    <dpc-user-profile-password-update></dpc-user-profile-password-update>
+    <dpc-user-profile-password-update *ngIf="user" [user]="user"></dpc-user-profile-password-update>
   </div>
 </div>

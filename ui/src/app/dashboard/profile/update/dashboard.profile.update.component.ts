@@ -1,8 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { UserService } from 'app/common/services/user.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
@@ -13,19 +10,18 @@ import { User } from 'app/common/interfaces/user.interface';
   templateUrl: 'dashboard.profile.update.component.html',
 })
 export class DashboardProfileUpdateComponent implements OnInit {
-  @Input() user: User;
-  public form: FormGroup;
+  form: FormGroup;
   submitted = false;
 
+  @Input() user: User;
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
+    private formBuilder: FormBuilder,
     private userService: UserService,
     private alertService: AlertService,
   ) { }
 
   ngOnInit() {
-    this.form = this.fb.group({
+    this.form = this.formBuilder.group({
       contact_email: ['', [Validators.required, Validators.email]],
       first_name: ['', [Validators.required, Validators.maxLength(32)]],
       last_name: ['', [Validators.required, Validators.maxLength(32)]],
@@ -47,7 +43,8 @@ export class DashboardProfileUpdateComponent implements OnInit {
     this.submitted = true;
 
     if (this.form.valid) {
-      const user = {
+      const updateUserReq = {
+        id: this.user.id,
         contact_email: this.form.value.contact_email,
         first_name: this.form.value.first_name,
         last_name: this.form.value.last_name,
@@ -55,15 +52,15 @@ export class DashboardProfileUpdateComponent implements OnInit {
         address: this.form.value.address,
         company: this.form.value.company
       };
-      this.userService.updateUser(user).subscribe(
-        response => {
+      this.userService.updateUser(updateUserReq).subscribe(
+        resp => {
           this.alertService.success('You profile is succesfully updated.');
         },
         err => {
-            // Handle tmp case when user already exists and we don't have error msg on API side yet.
-            this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
-        });
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          this.submitted = false;
+        }
+      );
     }
   }
-
 }

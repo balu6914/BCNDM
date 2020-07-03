@@ -49,16 +49,16 @@ export class DashboardAdminEditComponent implements OnInit {
         address: this.form.value.address,
         phone: this.form.value.phone,
       };
-      /*this.userService.updateUser(user).subscribe(
+      this.userService.updateUser(user).subscribe(
         response => {
           this.userEdited.emit(user);
           this.modalEditUser.hide();
           this.alertService.success(`User successfully edited.`);
         },
         err => {
-          this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
         }
-      );*/
+      );
     }
   }
 }

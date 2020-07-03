@@ -3,8 +3,6 @@
 [color]="'#2196f3'" [trickleSpeed]="250" [thick]="true" [ease]="'linear'"
 ></ng-progress>
 
-
-
 <nav class="topbar js-topbar">
   <div class="container-fluid">
     <div class="topbar__wrapper">
@@ -77,7 +75,7 @@
             <span class="user__toggle-icon"></span>
           </a>
           <div class="dropdown-menu dropdown-menu-right"  *dropdownMenu>
-            <a routerLink="/dashboard/admin"  class="dropdown-item">
+            <a *ngIf="isAdmin" routerLink="/dashboard/admin"  class="dropdown-item">
               <span class="user__icon user__icon--settings"></span>
               Admin
             </a>

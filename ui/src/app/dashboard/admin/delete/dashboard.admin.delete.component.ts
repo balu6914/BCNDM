@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap';
+
+import { User } from 'app/common/interfaces/user.interface';
 import { UserService } from 'app/common/services/user.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 
@@ -10,7 +12,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
   styleUrls: ['./dashboard.admin.delete.component.scss']
 })
 export class DashboardAdminDeleteComponent {
-  user: any;
+  user: User = {};
 
   @Output() userDeleted: EventEmitter<any> = new EventEmitter();
   constructor(
@@ -19,18 +21,24 @@ export class DashboardAdminDeleteComponent {
     public  alertService: AlertService,
   ) {}
 
-
   confirm(): void {
-    /*this.userService.removeUser(this.user.id).subscribe(
-      res => {
-        this.userDeleted.emit(this.user.id);
+    const userUpdateReq: User = {
+      id: this.user.id,
+      disabled: !this.user.disabled,
+    };
+
+    this.userService.updateUser(userUpdateReq).subscribe(
+      response => {
+        this.user.disabled = !this.user.disabled;
+        this.userDeleted.emit(this.user);
         this.modalDeleteUser.hide();
-        this.alertService.success(`User succesfully removed!`);
+        const msg =  this.user.disabled ? 'User Login successfully disabled.' : 'User Login successfully enabled.'
+        this.alertService.success(msg);
       },
       err => {
         this.modalDeleteUser.hide();
         this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
-    });*/
+      }
+    );
   }
-
 }

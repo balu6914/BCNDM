@@ -10,6 +10,7 @@ import { AuthService } from 'app/auth/services/auth.service';
 })
 export class DashboardProfileComponent implements OnInit {
   user: User;
+
   constructor(
     private authService: AuthService,
   ) {}
@@ -17,8 +18,8 @@ export class DashboardProfileComponent implements OnInit {
   ngOnInit() {
     // Fetch current User
     this.authService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
+      resp => {
+        this.user = resp;
       },
       err => {
         console.log(err);
