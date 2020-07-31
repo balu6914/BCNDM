@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/executions/argo"
 	"log"
 	"net"
 	"net/http"
@@ -33,39 +34,43 @@ import (
 )
 
 const (
-	envHTTPPort         = "DATAPACE_EXECUTIONS_HTTP_PORT"
-	envGRPCPort         = "DATAPACE_EXECUTIONS_GRPC_PORT"
-	envDBURL            = "DATAPACE_EXECUTIONS_DB_URL"
-	envDBUser           = "DATAPACE_EXECUTIONS_DB_USER"
-	envDBPass           = "DATAPACE_EXECUTIONS_DB_PASS"
-	envDBName           = "DATAPACE_EXECUTIONS_DB_NAME"
-	envAuthURL          = "DATAPACE_AUTH_URL"
-	envSubscriptionsURL = "DATAPACE_SUBSCRIPTIONS_URL"
-	envWWHCatalogURL    = "DATAPACE_WWH_CATALOG_URL"
-	envWWHDaemonURL     = "DATAPACE_WWH_DAEMON_URL"
-	envWWHToken         = "DATAPACE_WWH_TOKEN"
-	envWWHUsername      = "DATAPACE_WWH_USERNAME"
-	envWWHPassword      = "DATAPACE_WWH_PASSWORD"
-	envKFFlag           = "DATAPACE_KUBEFLOW_ACTIVE"
-	envKFURL            = "DATAPACE_KUBEFLOW_URL"
-	envKFStatusInterval = "DATAPACE_KUBEFLOW_STATUS_INTERVAL"
+	envHTTPPort           = "DATAPACE_EXECUTIONS_HTTP_PORT"
+	envGRPCPort           = "DATAPACE_EXECUTIONS_GRPC_PORT"
+	envDBURL              = "DATAPACE_EXECUTIONS_DB_URL"
+	envDBUser             = "DATAPACE_EXECUTIONS_DB_USER"
+	envDBPass             = "DATAPACE_EXECUTIONS_DB_PASS"
+	envDBName             = "DATAPACE_EXECUTIONS_DB_NAME"
+	envAuthURL            = "DATAPACE_AUTH_URL"
+	envSubscriptionsURL   = "DATAPACE_SUBSCRIPTIONS_URL"
+	envWWHCatalogURL      = "DATAPACE_WWH_CATALOG_URL"
+	envWWHDaemonURL       = "DATAPACE_WWH_DAEMON_URL"
+	envWWHToken           = "DATAPACE_WWH_TOKEN"
+	envWWHUsername        = "DATAPACE_WWH_USERNAME"
+	envWWHPassword        = "DATAPACE_WWH_PASSWORD"
+	envAISystem           = "DATAPACE_AI_SYSTEM"
+	envKFURL              = "DATAPACE_KUBEFLOW_URL"
+	envKFStatusInterval   = "DATAPACE_KUBEFLOW_STATUS_INTERVAL"
+	envArgoURL            = "DATAPACE_ARGO_URL"
+	envArgoStatusInterval = "DATAPACE_KUBEFLOW_STATUS_INTERVAL"
 
-	defHTTPPort         = "8080"
-	defGRPCPort         = "8081"
-	defDBURL            = "0.0.0.0"
-	defDBUser           = ""
-	defDBPass           = ""
-	defDBName           = "executions"
-	defAuthURL          = "localhost:8081"
-	defSubscriptionsURL = "localhost:8086"
-	defWWHCatalogURL    = "http://localhost:31222"
-	defWWHDaemonURL     = "http://localhost:32222"
-	defWWHToken         = ""
-	defWWHUsername      = ""
-	defWWHPassword      = ""
-	defKFFlag           = "true"
-	defKFURL            = "https://ar.k9s.datapace.io"
-	defKFStatusInterval = "10" // in seconds
+	defHTTPPort           = "8080"
+	defGRPCPort           = "8081"
+	defDBURL              = "0.0.0.0"
+	defDBUser             = ""
+	defDBPass             = ""
+	defDBName             = "executions"
+	defAuthURL            = "localhost:8081"
+	defSubscriptionsURL   = "localhost:8086"
+	defWWHCatalogURL      = "http://localhost:31222"
+	defWWHDaemonURL       = "http://localhost:32222"
+	defWWHToken           = ""
+	defWWHUsername        = ""
+	defWWHPassword        = ""
+	defAISystem           = "kubeflow"
+	defKFURL              = "https://ar.k9s.datapace.io"
+	defKFStatusInterval   = "10" // in seconds
+	defArgoURL            = "https://argo.datapace.io"
+	defArgoStatusInterval = "10" // in seconds
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -87,9 +92,11 @@ type config struct {
 	wwhToken         string
 	wwhUsername      string
 	wwhPassword      string
-	kfFlag           bool
+	aiSystem         string
 	kfURL            string
 	kfInterval       time.Duration
+	argoURL          string
+	argoInterval     time.Duration
 }
 
 func main() {
@@ -130,14 +137,14 @@ func main() {
 }
 
 func loadConfig() config {
-	kubeflowFlag := datapace.Env(envKFFlag, defKFFlag)
-	kfFlag, err := strconv.ParseBool(kubeflowFlag)
+	kubeflowStatusInterval := datapace.Env(envKFStatusInterval, defKFStatusInterval)
+	kfStatusInterval, err := strconv.ParseInt(kubeflowStatusInterval, 10, 64)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	kubeflowStatusInterval := datapace.Env(envKFStatusInterval, defKFStatusInterval)
-	kfStatusInterval, err := strconv.ParseInt(kubeflowStatusInterval, 10, 64)
+	argoServerStatusInterval := datapace.Env(envArgoStatusInterval, defArgoStatusInterval)
+	argoStatusInterval, err := strconv.ParseInt(argoServerStatusInterval, 10, 64)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -158,9 +165,11 @@ func loadConfig() config {
 		wwhToken:         datapace.Env(envWWHToken, defWWHToken),
 		wwhUsername:      datapace.Env(envWWHUsername, defWWHUsername),
 		wwhPassword:      datapace.Env(envWWHPassword, defWWHPassword),
-		kfFlag:           kfFlag,
+		aiSystem:         datapace.Env(envAISystem, defAISystem),
 		kfURL:            datapace.Env(envKFURL, defKFURL),
 		kfInterval:       time.Duration(kfStatusInterval) * time.Second,
+		argoURL:          datapace.Env(envArgoURL, defArgoURL),
+		argoInterval:     time.Duration(argoStatusInterval) * time.Second,
 	}
 }
 
@@ -197,10 +206,16 @@ func newService(cfg config, ms *mgo.Session, logger logger.Logger) executions.Se
 	data := mongo.NewDatasetRepository(ms)
 	paths := subscriptions.New(cfg.subscriptionsURL)
 	var ai executions.AIService
-	if cfg.kfFlag {
+	switch cfg.aiSystem {
+	case "kubeflow":
 		ai = kubeflow.New(cfg.kfURL, cfg.kfInterval, logger)
-	} else {
+	case "wwf":
 		ai = wwh.NewAIService(cfg.wwhCatalogURL, cfg.wwhDaemonURL, cfg.wwhToken, cfg.wwhUsername, cfg.wwhPassword)
+	case "argo":
+		ai = argo.New(cfg.argoURL, cfg.argoInterval, logger)
+	default:
+		logger.Error(fmt.Sprintf("Invalid AI system: %s", cfg.aiSystem))
+		os.Exit(1)
 	}
 	svc := executions.NewService(execs, algos, data, ai, paths)
 	svc = api.LoggingMiddleware(svc, logger)

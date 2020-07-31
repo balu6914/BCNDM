@@ -18,6 +18,7 @@ default values.
 | DATAPACE_EXECUTIONS_DB_PASS   | Database password                        |                        |
 | DATAPACE_EXECUTIONS_DB_NAME   | Name of the database used by the service | executions             |
 | DATAPACE_AUTH_URL             | Auth service gRPC URL                    | localhost:8081         |
+| DATAPACE_AI_SYSTEM            | AI system in use (kubeflow,wwf,argo)     | kubeflow               |
 
 ## Deployment
 
@@ -43,3 +44,16 @@ DATAPACE_EXECUTIONS_HTTP_PORT=[Executions service HTTP port] DATAPACE_EXECUTIONS
 
 For more information about service capabilities and its usage, please check out
 the [API documentation](swagger.yml).
+
+## Argo workflows preparation
+
+Argo pipeline example: 
+
+At this moment namespace in use is `default` and template name is `datapace`
+This is example content of the metadata field which is supplied to datapace when new algo is created.
+```
+
+ {
+     "pipeline": "{\"template\":{\"metadata\":{\"name\":\"TEMPLATENAMEHERE\",\"namespace\":\"default\"},\"spec\":{\"templates\":[{\"name\":\"datapace\",\"inputs\":{\"parameters\":[{\"name\":\"datapace_url\"}]},\"container\":{\"name\":\"main\",\"image\":\"docker/whalesay\",\"command\":[\"cowsay\"],\"args\":[\"{{inputs.parameters.datapace_url}}\"]}}]}}}"
+  }
+```
