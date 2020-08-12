@@ -55,7 +55,9 @@ func NewConnection(ctx fabcontext.Client, url string, opts ...options.Opt) (*GRP
 		return nil, err
 	}
 
-	reqCtx, cancel := context.NewRequest(ctx, context.WithTimeout(params.connectTimeout))
+	reqCtx, cancel := context.NewRequest(ctx,
+		context.WithTimeout(params.connectTimeout),
+		context.WithParent(params.parentContext))
 	defer cancel()
 
 	commManager, ok := context.RequestCommManager(reqCtx)
@@ -125,7 +127,7 @@ func newDialOpts(config fab.EndpointConfig, url string, params *params) ([]grpc.
 		dialOpts = append(dialOpts, grpc.WithKeepaliveParams(params.keepAliveParams))
 	}
 
-	dialOpts = append(dialOpts, grpc.WithDefaultCallOptions(grpc.FailFast(params.failFast)))
+	dialOpts = append(dialOpts, grpc.WithDefaultCallOptions(grpc.WaitForReady(!params.failFast)))
 
 	if endpoint.AttemptSecured(url, params.insecure) {
 		tlsConfig, err := comm.TLSConfig(params.certificate, params.hostOverride, config)

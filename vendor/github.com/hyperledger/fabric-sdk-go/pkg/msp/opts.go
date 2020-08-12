@@ -8,6 +8,7 @@ package msp
 
 import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
+	commtls "github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
 	"github.com/pkg/errors"
 )
 
@@ -21,6 +22,7 @@ type IdentityConfigOptions struct {
 	caClientCert
 	caKeyStorePath
 	credentialStorePath
+	tlsCACertPool
 }
 
 type applier func()
@@ -34,22 +36,22 @@ type client interface {
 
 // caConfig interface allows to uniquely override IdentityConfig interface's CAConfig() function
 type caConfig interface {
-	CAConfig(org string) (*msp.CAConfig, bool)
+	CAConfig(caID string) (*msp.CAConfig, bool)
 }
 
 // caServerCerts interface allows to uniquely override IdentityConfig interface's CAServerCerts() function
 type caServerCerts interface {
-	CAServerCerts(org string) ([][]byte, bool)
+	CAServerCerts(caID string) ([][]byte, bool)
 }
 
 // caClientKey interface allows to uniquely override IdentityConfig interface's CAClientKey() function
 type caClientKey interface {
-	CAClientKey(org string) ([]byte, bool)
+	CAClientKey(caID string) ([]byte, bool)
 }
 
 // caClientCert interface allows to uniquely override IdentityConfig interface's CAClientCert() function
 type caClientCert interface {
-	CAClientCert(org string) ([]byte, bool)
+	CAClientCert(caID string) ([]byte, bool)
 }
 
 // caKeyStorePath interface allows to uniquely override IdentityConfig interface's CAKeyStorePath() function
@@ -60,6 +62,11 @@ type caKeyStorePath interface {
 // credentialStorePath interface allows to uniquely override IdentityConfig interface's CredentialStorePath() function
 type credentialStorePath interface {
 	CredentialStorePath() string
+}
+
+// tlsCACertPool interface allows to uniquely override IdentityConfig interface's TLSCACertPool() function
+type tlsCACertPool interface {
+	TLSCACertPool() commtls.CertPool
 }
 
 // BuildIdentityConfigFromOptions will return an IdentityConfig instance pre-built with Optional interfaces
@@ -90,6 +97,7 @@ func UpdateMissingOptsWithDefaultConfig(c *IdentityConfigOptions, d msp.Identity
 	s.set(c.caClientCert, nil, func() { c.caClientCert = d })
 	s.set(c.caKeyStorePath, nil, func() { c.caKeyStorePath = d })
 	s.set(c.credentialStorePath, nil, func() { c.credentialStorePath = d })
+	s.set(c.tlsCACertPool, nil, func() { c.tlsCACertPool = d })
 
 	return c
 }
@@ -111,6 +119,7 @@ func setIdentityConfigWithOptionInterface(c *IdentityConfigOptions, o interface{
 	s.set(c.caClientCert, func() bool { _, ok := o.(caClientCert); return ok }, func() { c.caClientCert = o.(caClientCert) })
 	s.set(c.caKeyStorePath, func() bool { _, ok := o.(caKeyStorePath); return ok }, func() { c.caKeyStorePath = o.(caKeyStorePath) })
 	s.set(c.credentialStorePath, func() bool { _, ok := o.(credentialStorePath); return ok }, func() { c.credentialStorePath = o.(credentialStorePath) })
+	s.set(c.tlsCACertPool, func() bool { _, ok := o.(tlsCACertPool); return ok }, func() { c.tlsCACertPool = o.(tlsCACertPool) })
 
 	if !s.isSet {
 		return errors.Errorf("option %#v is not a sub interface of IdentityConfig, at least one of its functions must be implemented.", o)
