@@ -14,9 +14,10 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/util"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/attrmgr"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
+
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/lib/attrmgr"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/util"
 	"github.com/pkg/errors"
 )
 
@@ -36,7 +37,7 @@ func NewSigner(key core.Key, cert []byte) (*Signer, error) {
 }
 
 // Signer represents a signer
-// Each identity may have multiple signers, currently one ecert and multiple tcerts
+// Each identity may have multiple signers and currently one ecert
 type Signer struct {
 	// Private key
 	key core.Key

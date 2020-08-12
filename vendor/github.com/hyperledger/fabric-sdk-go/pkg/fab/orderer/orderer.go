@@ -20,7 +20,8 @@ import (
 	"google.golang.org/grpc/keepalive"
 	grpcstatus "google.golang.org/grpc/status"
 
-	ab "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protos/orderer"
+	"github.com/hyperledger/fabric-protos-go/common"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
@@ -28,7 +29,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")
@@ -74,7 +74,7 @@ func New(config fab.EndpointConfig, opts ...Option) (*Orderer, error) {
 	if orderer.kap.Time > 0 {
 		grpcOpts = append(grpcOpts, grpc.WithKeepaliveParams(orderer.kap))
 	}
-	grpcOpts = append(grpcOpts, grpc.WithDefaultCallOptions(grpc.FailFast(orderer.failFast)))
+	grpcOpts = append(grpcOpts, grpc.WithDefaultCallOptions(grpc.WaitForReady(!orderer.failFast)))
 	if endpoint.AttemptSecured(orderer.url, orderer.allowInsecure) {
 		//tls config
 		tlsConfig, err := comm.TLSConfig(orderer.tlsCACert, orderer.serverName, config)
@@ -165,7 +165,11 @@ func FromOrdererConfig(ordererCfg *fab.OrdererConfig) Option {
 // by name from the apiconfig.Config supplied to the constructor, and then constructs a new orderer from it
 func FromOrdererName(name string) Option {
 	return func(o *Orderer) error {
-		ordererCfg, found := o.config.OrdererConfig(name)
+		ordererCfg, found, ignoreOrderer := o.config.OrdererConfig(name)
+		if ignoreOrderer {
+			return errors.Errorf("orderer config is ignoring orderer : %s by EntityMatchers", name)
+		}
+
 		if !found {
 			return errors.Errorf("orderer config not found for orderer : %s", name)
 		}

@@ -8,16 +8,19 @@ package mocks
 
 import (
 	"crypto/tls"
+	"path/filepath"
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
+	"github.com/hyperledger/fabric-sdk-go/test/metadata"
 
 	"crypto/x509"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/test/mockfab"
+	commtls "github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
 	"github.com/pkg/errors"
 )
 
@@ -30,8 +33,12 @@ type MockConfig struct {
 	customPeerCfg          *fab.PeerConfig
 	customOrdererCfg       *fab.OrdererConfig
 	customRandomOrdererCfg *fab.OrdererConfig
-	CustomTLSCACertPool    fab.CertPool
+	CustomTLSCACertPool    commtls.CertPool
 	chConfig               map[string]*fab.ChannelEndpointConfig
+}
+
+func getConfigPath() string {
+	return filepath.Join(metadata.GetProjectPath(), "pkg", "core", "config", "testdata")
 }
 
 // NewMockCryptoConfig ...
@@ -73,8 +80,8 @@ func (c *MockConfig) Client() *msp.ClientConfig {
 	}
 
 	if c.mutualTLSEnabled {
-		key := endpoint.TLSConfig{Path: "../../../pkg/core/config/testdata/certs/client_sdk_go-key.pem"}
-		cert := endpoint.TLSConfig{Path: "../../../pkg/core/config/testdata/certs/client_sdk_go.pem"}
+		key := endpoint.TLSConfig{Path: filepath.Join(getConfigPath(), "certs", "client_sdk_go-key.pem")}
+		cert := endpoint.TLSConfig{Path: filepath.Join(getConfigPath(), "certs", "client_sdk_go.pem")}
 
 		err := key.LoadBytes()
 		if err != nil {
@@ -96,7 +103,7 @@ func (c *MockConfig) Client() *msp.ClientConfig {
 // CAConfig not implemented
 func (c *MockConfig) CAConfig(org string) (*msp.CAConfig, bool) {
 	caConfig := msp.CAConfig{
-		CAName: "org1",
+		ID: "org1",
 	}
 
 	return &caConfig, true
@@ -143,7 +150,7 @@ func (c *MockConfig) PeerConfig(nameOrURL string) (*fab.PeerConfig, bool) {
 }
 
 // TLSCACertPool ...
-func (c *MockConfig) TLSCACertPool() fab.CertPool {
+func (c *MockConfig) TLSCACertPool() commtls.CertPool {
 	if c.errorCase {
 		return &mockfab.MockCertPool{Err: errors.New("just to test error scenario")}
 	} else if c.CustomTLSCACertPool != nil {
@@ -175,7 +182,7 @@ func (c *MockConfig) SecurityProviderLibPath() string {
 
 // OrderersConfig returns a list of defined orderers
 func (c *MockConfig) OrderersConfig() []fab.OrdererConfig {
-	oConfig, _ := c.OrdererConfig("")
+	oConfig, _, _ := c.OrdererConfig("")
 	return []fab.OrdererConfig{*oConfig}
 }
 
@@ -200,18 +207,18 @@ func (c *MockConfig) SetCustomRandomOrdererCfg(customRandomOrdererCfg *fab.Order
 }
 
 // OrdererConfig not implemented
-func (c *MockConfig) OrdererConfig(name string) (*fab.OrdererConfig, bool) {
+func (c *MockConfig) OrdererConfig(name string) (*fab.OrdererConfig, bool, bool) {
 	if name == "Invalid" {
-		return nil, false
+		return nil, false, false
 	}
 	if c.customOrdererCfg != nil {
-		return c.customOrdererCfg, true
+		return c.customOrdererCfg, true, false
 	}
 	oConfig := fab.OrdererConfig{
 		URL: "example.com",
 	}
 
-	return &oConfig, true
+	return &oConfig, true, false
 }
 
 // KeyStorePath ...
@@ -288,7 +295,7 @@ func (c *MockConfig) ChannelOrderers(name string) []fab.OrdererConfig {
 		return nil
 	}
 
-	oConfig, _ := c.OrdererConfig("")
+	oConfig, _, _ := c.OrdererConfig("")
 
 	return []fab.OrdererConfig{*oConfig}
 }

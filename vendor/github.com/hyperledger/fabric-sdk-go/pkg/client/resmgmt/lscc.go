@@ -12,9 +12,9 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/txn"
 	"github.com/pkg/errors"
 
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
-	protos_utils "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/utils"
+	"github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
 )
 
 const (
@@ -39,9 +39,10 @@ type chaincodeDeployRequest struct {
 	Name       string
 	Path       string
 	Version    string
+	Lang       pb.ChaincodeSpec_Type
 	Args       [][]byte
 	Policy     *common.SignaturePolicyEnvelope
-	CollConfig []*common.CollectionConfig
+	CollConfig []*pb.CollectionConfig
 }
 
 // createChaincodeDeployProposal creates an instantiate or upgrade chaincode proposal.
@@ -52,15 +53,15 @@ func createChaincodeDeployProposal(txh fab.TransactionHeader, deploy chaincodePr
 	args = append(args, []byte(channelID))
 
 	ccds := &pb.ChaincodeDeploymentSpec{ChaincodeSpec: &pb.ChaincodeSpec{
-		Type: pb.ChaincodeSpec_GOLANG, ChaincodeId: &pb.ChaincodeID{Name: chaincode.Name, Path: chaincode.Path, Version: chaincode.Version},
+		Type: chaincode.Lang, ChaincodeId: &pb.ChaincodeID{Name: chaincode.Name, Path: chaincode.Path, Version: chaincode.Version},
 		Input: &pb.ChaincodeInput{Args: chaincode.Args}}}
-	ccdsBytes, err := protos_utils.Marshal(ccds)
+	ccdsBytes, err := protoutil.Marshal(ccds)
 	if err != nil {
 		return nil, errors.WithMessage(err, "marshal of chaincode deployment spec failed")
 	}
 	args = append(args, ccdsBytes)
 
-	chaincodePolicyBytes, err := protos_utils.Marshal(chaincode.Policy)
+	chaincodePolicyBytes, err := protoutil.Marshal(chaincode.Policy)
 	if err != nil {
 		return nil, errors.WithMessage(err, "marshal of chaincode policy failed")
 	}
@@ -70,7 +71,7 @@ func createChaincodeDeployProposal(txh fab.TransactionHeader, deploy chaincodePr
 	args = append(args, []byte(vscc))
 
 	if chaincode.CollConfig != nil {
-		collConfigBytes, err := proto.Marshal(&common.CollectionConfigPackage{Config: chaincode.CollConfig})
+		collConfigBytes, err := proto.Marshal(&pb.CollectionConfigPackage{Config: chaincode.CollConfig})
 		if err != nil {
 			return nil, errors.WithMessage(err, "marshal of collection policy failed")
 		}
@@ -90,6 +91,7 @@ func createChaincodeDeployProposal(txh fab.TransactionHeader, deploy chaincodePr
 
 	cir := fab.ChaincodeInvokeRequest{
 		ChaincodeID: lscc,
+		Lang:        chaincode.Lang,
 		Fcn:         fcn,
 		Args:        args,
 	}
