@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package datapace;
+option go_package = "github.com/datapace/datapace/proto/terms";
+
+import "google/protobuf/empty.proto";
+
+service TermsService {
+    rpc CreateTerms(Terms) returns (google.protobuf.Empty) {}
+}
+
+message Terms {
+    string id = 1;
+    string streamId = 2;
+    string url = 3;
+    string hash = 4;
+}

@@ -92,14 +92,16 @@ type streamService struct {
 	streams       StreamRepository
 	accessControl AccessControl
 	ai            AIService
+	terms         TermsService
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(streams StreamRepository, accessControl AccessControl, ai AIService) Service {
+func NewService(streams StreamRepository, accessControl AccessControl, ai AIService, terms TermsService) Service {
 	return streamService{
 		streams:       streams,
 		accessControl: accessControl,
 		ai:            ai,
+		terms:         terms,
 	}
 }
 
@@ -125,6 +127,10 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 		if err := ss.ai.CreateAlgorithm(stream); err != nil {
 			return "", errors.Wrap(err, ss.RemoveStream(stream.Owner, id))
 		}
+	}
+
+	if err := ss.terms.CreateTerms(stream); err != nil {
+		return "", err
 	}
 
 	return id, nil

@@ -42,6 +42,7 @@ func newService() streams.Service {
 	repo := mocks.NewStreamRepository()
 	ac := mocks.NewAccessControl([]string{})
 	ai := mocks.NewAIService()
+	terms := mocks.NewTermsService()
 
-	return streams.NewService(repo, ac, ai)
+	return streams.NewService(repo, ac, ai, terms)
 }

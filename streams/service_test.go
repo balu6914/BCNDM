@@ -69,8 +69,9 @@ func newService(partners ...string) streams.Service {
 	repo := mocks.NewStreamRepository()
 	ac := mocks.NewAccessControl(partners)
 	ai := mocks.NewAIService()
+	terms := mocks.NewTermsService()
 
-	return streams.NewService(repo, ac, ai)
+	return streams.NewService(repo, ac, ai, terms)
 }
 
 func pointer(val uint64) *uint64 {

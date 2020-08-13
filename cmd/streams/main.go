@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/streams/terms"
 	"net"
 	"net/http"
 	"os"
@@ -22,6 +23,7 @@ import (
 	httpapi "github.com/datapace/datapace/streams/api/http"
 	"github.com/datapace/datapace/streams/executions"
 	"github.com/datapace/datapace/streams/mongo"
+	termsapi "github.com/datapace/datapace/terms/api/grpc"
 
 	"github.com/datapace/datapace/streams/access"
 
@@ -41,6 +43,7 @@ const (
 	envAuthURL       = "DATAPACE_AUTH_URL"
 	envAccessURL     = "DATAPACE_ACCESS_CONTROL_URL"
 	envExecutionsURL = "DATAPACE_EXECUTIONS_URL"
+	envTermsURL      = "DATAPACE_TERMS_URL"
 
 	defHTTPPort      = "8080"
 	defGRPCPort      = "8081"
@@ -51,6 +54,7 @@ const (
 	defAuthURL       = "localhost:8081"
 	defAccessURL     = "localhost:8081"
 	defExecutionsURL = "localhost:8081"
+	defTermsURL      = "localhost:8081"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -68,6 +72,7 @@ type config struct {
 	AuthURL          string
 	AccessURL        string
 	ExecutionsURL    string
+	TermsURL         string
 }
 
 func main() {
@@ -79,8 +84,9 @@ func main() {
 	authConn := connectToGRPCService(cfg.AuthURL, logger)
 	accessConn := connectToGRPCService(cfg.AccessURL, logger)
 	execConn := connectToGRPCService(cfg.ExecutionsURL, logger)
+	termsConn := connectToGRPCService(cfg.TermsURL, logger)
 
-	svc, auth := newServices(ms, authConn, accessConn, execConn, logger)
+	svc, auth := newServices(ms, authConn, accessConn, execConn, termsConn, logger)
 
 	errs := make(chan error, 2)
 	go startHTTPServer(svc, auth, cfg.HTTPPort, logger, errs)
@@ -110,6 +116,7 @@ func loadConfig() config {
 		AuthURL:          datapace.Env(envAuthURL, defAuthURL),
 		AccessURL:        datapace.Env(envAccessURL, defAccessURL),
 		ExecutionsURL:    datapace.Env(envExecutionsURL, defExecutionsURL),
+		TermsURL:         datapace.Env(envTermsURL, defTermsURL),
 	}
 }
 
@@ -143,7 +150,7 @@ func connectToGRPCService(addr string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newServices(ms *mgo.Session, authConn *grpc.ClientConn, accessConn *grpc.ClientConn, execConn *grpc.ClientConn, logger log.Logger) (streams.Service, streams.Authorization) {
+func newServices(ms *mgo.Session, authConn *grpc.ClientConn, accessConn *grpc.ClientConn, execConn *grpc.ClientConn, termsConn *grpc.ClientConn, logger log.Logger) (streams.Service, streams.Authorization) {
 	repo := mongo.New(ms)
 	acc := accessapi.NewClient(accessConn)
 	accessControl := access.New(acc)
@@ -151,7 +158,10 @@ func newServices(ms *mgo.Session, authConn *grpc.ClientConn, accessConn *grpc.Cl
 	ec := executionsapi.NewClient(execConn)
 	ai := executions.New(ec)
 
-	svc := streams.NewService(repo, accessControl, ai)
+	ta := termsapi.NewClient(termsConn)
+	terms := terms.New(ta)
+
+	svc := streams.NewService(repo, accessControl, ai, terms)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

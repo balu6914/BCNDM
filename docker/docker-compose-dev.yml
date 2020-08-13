@@ -116,6 +116,7 @@ services:
       - DATAPACE_AUTH_URL=datapace-auth:8081
       - DATAPACE_EXECUTIONS_URL=datapace-executions:8089
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
+      - DATAPACE_TERMS_URL=datapace-terms:8093
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
       - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io/
     volumes:
@@ -160,6 +161,39 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
     volumes:
       - ../config/big-query:/big-query
+    networks:
+      - datapace-net
+
+  ###
+  # Terms DB
+  ###
+  datapace-terms-db:
+    image: mongo:latest
+    container_name: datapace-terms-db
+    command: --nojournal
+    ports:
+      - 27020:27017
+    volumes:
+      - ./terms-data:/data/db
+    networks:
+      - datapace-net
+
+  ###
+  # Terms service
+  ###
+  datapace-terms:
+    image: registry.gitlab.com/drasko/datapace-docker/terms:latest
+    container_name: datapace-terms
+    depends_on:
+      - datapace-terms-db
+      - datapace-auth
+    ports:
+      - 8096:8096
+    environment:
+      - DATAPACE_TERMS_HTTP_PORT=8092
+      - DATAPACE_TERMS_GRPC_PORT=8093
+      - DATAPACE_TERMS_DB_URL=datapace-terms-db
+      - DATAPACE_AUTH_URL=datapace-auth:8081
     networks:
       - datapace-net
 
