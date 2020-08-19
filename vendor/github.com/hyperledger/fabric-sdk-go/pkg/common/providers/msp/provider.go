@@ -8,7 +8,6 @@ package msp
 
 import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	commtls "github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
 	logApi "github.com/hyperledger/fabric-sdk-go/pkg/core/logging/api"
 )
 
@@ -26,11 +25,10 @@ type IdentityManagerProvider interface {
 //IdentityConfig contains identity configurations
 type IdentityConfig interface {
 	Client() *ClientConfig
-	CAConfig(caID string) (*CAConfig, bool)
-	CAServerCerts(caID string) ([][]byte, bool)
-	CAClientKey(caID string) ([]byte, bool)
-	CAClientCert(caID string) ([]byte, bool)
-	TLSCACertPool() commtls.CertPool
+	CAConfig(org string) (*CAConfig, bool)
+	CAServerCerts(org string) ([][]byte, bool)
+	CAClientKey(org string) ([]byte, bool)
+	CAClientCert(org string) ([]byte, bool)
 	CAKeyStorePath() string
 	CredentialStorePath() string
 }
@@ -66,7 +64,6 @@ type EnrollCredentials struct {
 
 // CAConfig defines a CA configuration
 type CAConfig struct {
-	ID               string
 	URL              string
 	GRPCOptions      map[string]interface{}
 	Registrar        EnrollCredentials

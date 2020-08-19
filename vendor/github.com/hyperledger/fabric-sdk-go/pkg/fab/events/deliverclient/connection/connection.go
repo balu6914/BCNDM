@@ -12,17 +12,17 @@ import (
 	"io"
 
 	"github.com/golang/protobuf/proto"
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	ab "github.com/hyperledger/fabric-protos-go/orderer"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/crypto"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
+	ab "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protos/orderer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
 	fabcontext "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/comm"
 	clientdisp "github.com/hyperledger/fabric-sdk-go/pkg/fab/events/client/dispatcher"
+	cb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
+	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
+	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/utils"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
@@ -42,21 +42,17 @@ type DeliverConnection struct {
 }
 
 // StreamProvider creates a deliver stream
-type StreamProvider func(pb.DeliverClient) (stream deliverStream, cancel func(), err error)
+type StreamProvider func(pb.DeliverClient) (deliverStream, error)
 
 var (
 	// Deliver creates a Deliver stream
-	Deliver = func(client pb.DeliverClient) (deliverStream, func(), error) {
-		ctx, cancel := context.WithCancel(context.Background())
-		stream, err := client.Deliver(ctx)
-		return stream, cancel, err
+	Deliver = func(client pb.DeliverClient) (deliverStream, error) {
+		return client.Deliver(context.Background())
 	}
 
 	// DeliverFiltered creates a DeliverFiltered stream
-	DeliverFiltered = func(client pb.DeliverClient) (deliverStream, func(), error) {
-		ctx, cancel := context.WithCancel(context.Background())
-		stream, err := client.DeliverFiltered(ctx)
-		return stream, cancel, err
+	DeliverFiltered = func(client pb.DeliverClient) (deliverStream, error) {
+		return client.DeliverFiltered(context.Background())
 	}
 )
 
@@ -65,7 +61,7 @@ func New(ctx fabcontext.Client, chConfig fab.ChannelCfg, streamProvider StreamPr
 	logger.Debugf("Connecting to %s...", url)
 	connect, err := comm.NewStreamConnection(
 		ctx, chConfig,
-		func(grpcconn *grpc.ClientConn) (grpc.ClientStream, func(), error) {
+		func(grpcconn *grpc.ClientConn) (grpc.ClientStream, error) {
 			return streamProvider(pb.NewDeliverClient(grpcconn))
 		},
 		url, opts...,
@@ -147,7 +143,7 @@ func (c *DeliverConnection) createSignedEnvelope(msg proto.Message) (*cb.Envelop
 	var msgVersion int32
 	var epoch uint64
 
-	payloadChannelHeader := protoutil.MakeChannelHeader(cb.HeaderType_DELIVER_SEEK_INFO, msgVersion, c.ChannelConfig().ID(), epoch)
+	payloadChannelHeader := utils.MakeChannelHeader(cb.HeaderType_DELIVER_SEEK_INFO, msgVersion, c.ChannelConfig().ID(), epoch)
 	payloadChannelHeader.TlsCertHash = c.TLSCertHash()
 
 	data, err := proto.Marshal(msg)
@@ -170,8 +166,8 @@ func (c *DeliverConnection) createSignedEnvelope(msg proto.Message) (*cb.Envelop
 		Nonce:   nonce,
 	}
 
-	paylBytes := protoutil.MarshalOrPanic(&cb.Payload{
-		Header: protoutil.MakePayloadHeader(payloadChannelHeader, payloadSignatureHeader),
+	paylBytes := utils.MarshalOrPanic(&cb.Payload{
+		Header: utils.MakePayloadHeader(payloadChannelHeader, payloadSignatureHeader),
 		Data:   data,
 	})
 

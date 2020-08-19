@@ -12,7 +12,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	fab "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	tls0 "github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
 	metrics "github.com/hyperledger/fabric-sdk-go/pkg/fabsdk/metrics"
 )
 
@@ -124,13 +123,12 @@ func (mr *MockEndpointConfigMockRecorder) NetworkPeers() *gomock.Call {
 }
 
 // OrdererConfig mocks base method
-func (m *MockEndpointConfig) OrdererConfig(arg0 string) (*fab.OrdererConfig, bool, bool) {
+func (m *MockEndpointConfig) OrdererConfig(arg0 string) (*fab.OrdererConfig, bool) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OrdererConfig", arg0)
 	ret0, _ := ret[0].(*fab.OrdererConfig)
 	ret1, _ := ret[1].(bool)
-	ret2, _ := ret[2].(bool)
-	return ret0, ret1, ret2
+	return ret0, ret1
 }
 
 // OrdererConfig indicates an expected call of OrdererConfig
@@ -184,10 +182,10 @@ func (mr *MockEndpointConfigMockRecorder) PeersConfig(arg0 interface{}) *gomock.
 }
 
 // TLSCACertPool mocks base method
-func (m *MockEndpointConfig) TLSCACertPool() tls0.CertPool {
+func (m *MockEndpointConfig) TLSCACertPool() fab.CertPool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TLSCACertPool")
-	ret0, _ := ret[0].(tls0.CertPool)
+	ret0, _ := ret[0].(fab.CertPool)
 	return ret0
 }
 

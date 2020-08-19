@@ -12,9 +12,6 @@ import (
 	"regexp"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/common"
-	mb "github.com/hyperledger/fabric-protos-go/msp"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
 	channelConfig "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/channelconfig"
 	imsp "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
@@ -25,6 +22,9 @@ import (
 	contextImpl "github.com/hyperledger/fabric-sdk-go/pkg/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/resource"
+	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
+	mb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
+	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 	"github.com/pkg/errors"
 )
 
@@ -32,7 +32,7 @@ var logger = logging.NewLogger("fabsdk/fab")
 
 //overrideRetryHandler is private and used for unit-tests to test query retry behaviors
 var overrideRetryHandler retry.Handler
-var versionCapabilityPattern = regexp.MustCompile(`^V(\d+(_\d+?)*)$`)
+var versionCapabilityPattern = regexp.MustCompile(`^V(\d+)_(\d+)$`)
 
 // Opts contains options for retrieving channel configuration
 type Opts struct {
@@ -138,16 +138,6 @@ func New(channelID string, options ...Option) (*ChannelConfig, error) {
 	return &ChannelConfig{channelID: channelID, opts: opts}, nil
 }
 
-// QueryBlock returns channel configuration
-func (c *ChannelConfig) QueryBlock(reqCtx reqContext.Context) (*common.Block, error) {
-
-	if c.opts.Orderer != nil {
-		return c.queryBlockFromOrderer(reqCtx)
-	}
-
-	return c.queryBlockFromPeers(reqCtx)
-}
-
 // Query returns channel configuration
 func (c *ChannelConfig) Query(reqCtx reqContext.Context) (fab.ChannelCfg, error) {
 
@@ -159,16 +149,6 @@ func (c *ChannelConfig) Query(reqCtx reqContext.Context) (fab.ChannelCfg, error)
 }
 
 func (c *ChannelConfig) queryPeers(reqCtx reqContext.Context) (*ChannelCfg, error) {
-	block, err := c.queryBlockFromPeers(reqCtx)
-
-	if err != nil {
-		return nil, errors.WithMessage(err, "QueryBlockConfig failed")
-	}
-	return extractConfig(c.channelID, block)
-
-}
-
-func (c *ChannelConfig) queryBlockFromPeers(reqCtx reqContext.Context) (*common.Block, error) {
 	ctx, ok := contextImpl.RequestClientContext(reqCtx)
 	if !ok {
 		return nil, errors.New("failed get client context from reqContext for signPayload")
@@ -208,7 +188,7 @@ func (c *ChannelConfig) queryBlockFromPeers(reqCtx reqContext.Context) (*common.
 	if err != nil {
 		return nil, errors.WithMessage(err, "QueryBlockConfig failed")
 	}
-	return block.(*common.Block), nil
+	return extractConfig(c.channelID, block.(*common.Block))
 
 }
 
@@ -237,17 +217,12 @@ func (c *ChannelConfig) calculateTargetsFromConfig(ctx context.Client) ([]fab.Pr
 
 func (c *ChannelConfig) queryOrderer(reqCtx reqContext.Context) (*ChannelCfg, error) {
 
-	block, err := c.queryBlockFromOrderer(reqCtx)
+	block, err := resource.LastConfigFromOrderer(reqCtx, c.channelID, c.opts.Orderer, resource.WithRetry(c.opts.RetryOpts))
 	if err != nil {
 		return nil, errors.WithMessage(err, "LastConfigFromOrderer failed")
 	}
 
 	return extractConfig(c.channelID, block)
-}
-
-func (c *ChannelConfig) queryBlockFromOrderer(reqCtx reqContext.Context) (*common.Block, error) {
-
-	return resource.LastConfigFromOrderer(reqCtx, c.channelID, c.opts.Orderer, resource.WithRetry(c.opts.RetryOpts))
 }
 
 //resolveOptsFromConfig loads opts from config if not loaded/initialized
@@ -406,9 +381,6 @@ func loadConfig(configItems *ChannelCfg, versionsGroup *common.ConfigGroup, grou
 		return nil
 	}
 
-	versionsGroup.Version = group.Version
-	versionsGroup.ModPolicy = group.ModPolicy
-
 	groups := group.GetGroups()
 	if groups != nil {
 		versionsGroup.Groups = make(map[string]*common.ConfigGroup)
@@ -436,23 +408,61 @@ func loadConfig(configItems *ChannelCfg, versionsGroup *common.ConfigGroup, grou
 		}
 	}
 
-	loadConfigGroupPolicies(versionsGroup, group)
-
-	return nil
+	return loadConfigGroupPolicies(versionsGroup, group)
 }
 
-func loadConfigGroupPolicies(versionsGroup *common.ConfigGroup, group *common.ConfigGroup) {
+func loadConfigGroupPolicies(versionsGroup *common.ConfigGroup, group *common.ConfigGroup) error {
 	policies := group.GetPolicies()
 	if policies != nil {
 		versionsGroup.Policies = make(map[string]*common.ConfigPolicy)
 		for key, configPolicy := range policies {
 			versionsGroup.Policies[key] = &common.ConfigPolicy{}
-
-			versionsGroup.Policies[key].Version = configPolicy.Version
-			versionsGroup.Policies[key].Policy = configPolicy.Policy
-			versionsGroup.Policies[key].ModPolicy = configPolicy.ModPolicy
+			err := loadConfigPolicy(versionsGroup.Policies[key], configPolicy)
+			if err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
+
+}
+
+func loadConfigPolicy(versionsPolicy *common.ConfigPolicy, configPolicy *common.ConfigPolicy) error {
+	versionsPolicy.Version = configPolicy.Version
+	return loadPolicy(configPolicy.Policy)
+}
+
+func loadPolicy(policy *common.Policy) error {
+
+	policyType := common.Policy_PolicyType(policy.Type)
+
+	switch policyType {
+	case common.Policy_SIGNATURE:
+		sigPolicyEnv := &common.SignaturePolicyEnvelope{}
+		err := proto.Unmarshal(policy.Value, sigPolicyEnv)
+		if err != nil {
+			return errors.Wrap(err, "unmarshal signature policy envelope from config failed")
+		}
+		// TODO: Do something with this value
+
+	case common.Policy_MSP:
+		// TODO: Not implemented yet
+
+	case common.Policy_IMPLICIT_META:
+		implicitMetaPolicy := &common.ImplicitMetaPolicy{}
+		err := proto.Unmarshal(policy.Value, implicitMetaPolicy)
+		if err != nil {
+			return errors.Wrap(err, "unmarshal implicit meta policy from config failed")
+		}
+		// TODO: Do something with this value
+	case common.Policy_UNKNOWN:
+		// TODO: Not implemented yet
+
+	default:
+		return errors.Errorf("unknown policy type %v", policyType)
+	}
+	return nil
 }
 
 func loadAnchorPeers(configValue *common.ConfigValue, configItems *ChannelCfg, org string) error {
@@ -517,7 +527,6 @@ func loadCapabilities(configValue *common.ConfigValue, configItems *ChannelCfg, 
 
 func loadConfigValue(configItems *ChannelCfg, key string, versionsValue *common.ConfigValue, configValue *common.ConfigValue, groupName string, org string) error {
 	versionsValue.Version = configValue.Version
-	versionsValue.Value = configValue.Value
 
 	switch key {
 	case channelConfig.AnchorPeersKey:

@@ -27,18 +27,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkinternal/configtxlator/update"
-
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/chconfig"
+	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 
-	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
@@ -47,6 +44,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/resource"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/txn"
+	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 	"github.com/pkg/errors"
 )
 
@@ -72,10 +70,9 @@ type InstantiateCCRequest struct {
 	Name       string
 	Path       string
 	Version    string
-	Lang       pb.ChaincodeSpec_Type
 	Args       [][]byte
 	Policy     *common.SignaturePolicyEnvelope
-	CollConfig []*pb.CollectionConfig
+	CollConfig []*common.CollectionConfig
 }
 
 // InstantiateCCResponse contains response parameters for instantiate chaincode
@@ -88,10 +85,9 @@ type UpgradeCCRequest struct {
 	Name       string
 	Path       string
 	Version    string
-	Lang       pb.ChaincodeSpec_Type
 	Args       [][]byte
 	Policy     *common.SignaturePolicyEnvelope
-	CollConfig []*pb.CollectionConfig
+	CollConfig []*common.CollectionConfig
 }
 
 // UpgradeCCResponse contains response parameters for upgrade chaincode
@@ -114,11 +110,9 @@ type requestOptions struct {
 //SaveChannelRequest holds parameters for save channel request
 type SaveChannelRequest struct {
 	ChannelID         string
-	ChannelConfig     io.Reader // ChannelConfig data source
-	ChannelConfigPath string    // Convenience option to use the named file as ChannelConfig reader
-	// Users that sign channel configuration
-	// deprecated - one entity shouldn't have access to another entities' keys to sign on their behalf
-	SigningIdentities []msp.SigningIdentity
+	ChannelConfig     io.Reader             // ChannelConfig data source
+	ChannelConfigPath string                // Convenience option to use the named file as ChannelConfig reader
+	SigningIdentities []msp.SigningIdentity // Users that sign channel configuration
 }
 
 // SaveChannelResponse contains response parameters for save channel
@@ -620,7 +614,7 @@ func (rc *Client) QueryInstantiatedChaincodes(channelID string, options ...Reque
 //
 // Returns:
 // list of collections config
-func (rc *Client) QueryCollectionsConfig(channelID string, chaincodeName string, options ...RequestOption) (*pb.CollectionConfigPackage, error) {
+func (rc *Client) QueryCollectionsConfig(channelID string, chaincodeName string, options ...RequestOption) (*common.CollectionConfigPackage, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
 		return nil, err
@@ -793,7 +787,7 @@ func (rc *Client) verifyTPSignature(channelService fab.ChannelService, txProposa
 
 // sendCCProposal sends proposal for type  Instantiate, Upgrade
 func (rc *Client) sendCCProposal(reqCtx reqContext.Context, ccProposalType chaincodeProposalType, channelID string, req InstantiateCCRequest, opts requestOptions) (fab.TransactionID, error) {
-	if err := checkRequiredCCProposalParams(channelID, &req); err != nil {
+	if err := checkRequiredCCProposalParams(channelID, req); err != nil {
 		return fab.EmptyTransactionID, err
 	}
 
@@ -868,7 +862,7 @@ func (rc *Client) sendTransactionAndCheckEvent(eventService fab.EventService, tp
 	}
 }
 
-func checkRequiredCCProposalParams(channelID string, req *InstantiateCCRequest) error {
+func checkRequiredCCProposalParams(channelID string, req InstantiateCCRequest) error {
 
 	if channelID == "" {
 		return errors.New("must provide channel ID")
@@ -877,12 +871,6 @@ func checkRequiredCCProposalParams(channelID string, req *InstantiateCCRequest) 
 	if req.Name == "" || req.Version == "" || req.Path == "" || req.Policy == nil {
 		return errors.New("Chaincode name, version, path and policy are required")
 	}
-
-	// Forward compatibility, set Lang to golang by default
-	if req.Lang == 0 || pb.ChaincodeSpec_Type_name[int32(req.Lang)] == "" {
-		req.Lang = pb.ChaincodeSpec_GOLANG
-	}
-
 	return nil
 }
 
@@ -931,21 +919,21 @@ func (rc *Client) SaveChannel(req SaveChannelRequest, options ...RequestOption) 
 
 	if req.ChannelConfigPath != "" {
 		configReader, err1 := os.Open(req.ChannelConfigPath)
-		defer loggedClose(configReader)
 		if err1 != nil {
 			return SaveChannelResponse{}, errors.Wrapf(err1, "opening channel config file failed")
 		}
+		defer loggedClose(configReader)
 		req.ChannelConfig = configReader
 	}
 
 	err = rc.validateSaveChannelRequest(req)
 	if err != nil {
-		return SaveChannelResponse{}, err
+		return SaveChannelResponse{}, errors.WithMessage(err, "reading channel config file failed")
 	}
 
 	logger.Debugf("saving channel: %s", req.ChannelID)
 
-	chConfig, err := extractChConfigTx(req.ChannelConfig)
+	chConfig, err := extractChConfigData(req.ChannelConfig)
 	if err != nil {
 		return SaveChannelResponse{}, errors.WithMessage(err, "extracting channel config from ConfigTx failed")
 	}
@@ -955,36 +943,20 @@ func (rc *Client) SaveChannel(req SaveChannelRequest, options ...RequestOption) 
 		return SaveChannelResponse{}, errors.WithMessage(err, "failed to find orderer for request")
 	}
 
-	txID, err := rc.signAndSubmitChannelConfigTx(
-		req.ChannelID,
-		req.SigningIdentities,
-		opts,
-		chConfig,
-		orderer,
-	)
-	if err != nil {
-		return SaveChannelResponse{}, errors.WithMessage(err, "create channel failed")
-	}
-
-	return SaveChannelResponse{TransactionID: txID}, nil
-}
-
-func (rc *Client) signAndSubmitChannelConfigTx(channelID string, signingIdentities []msp.SigningIdentity, opts requestOptions, chConfigTx []byte, orderer fab.Orderer) (fab.TransactionID, error) {
 	var configSignatures []*common.ConfigSignature
-	var err error
 	if opts.Signatures != nil {
 		configSignatures = opts.Signatures
 	} else {
-		configSignatures, err = rc.getConfigSignatures(signingIdentities, chConfigTx)
+		configSignatures, err = rc.getConfigSignatures(req, chConfig)
 		if err != nil {
-			return "", err
+			return SaveChannelResponse{}, err
 		}
 	}
 
 	request := resource.CreateChannelRequest{
-		Name:       channelID,
+		Name:       req.ChannelID,
 		Orderer:    orderer,
-		Config:     chConfigTx,
+		Config:     chConfig,
 		Signatures: configSignatures,
 	}
 
@@ -993,28 +965,10 @@ func (rc *Client) signAndSubmitChannelConfigTx(channelID string, signingIdentiti
 
 	txID, err := resource.CreateChannel(reqCtx, request, resource.WithRetry(opts.Retry))
 	if err != nil {
-		return "", errors.WithMessage(err, "create channel failed")
-	}
-	return txID, nil
-}
-
-// CalculateConfigUpdate calculates channel config update based on the difference between provided
-// current channel config and proposed new channel config.
-func CalculateConfigUpdate(channelID string, currentConfig, newConfig *common.Config) (*common.ConfigUpdate, error) {
-
-	if channelID == "" || currentConfig == nil || newConfig == nil {
-		return nil, errors.New("must provide channel ID and current and new channel config")
+		return SaveChannelResponse{}, errors.WithMessage(err, "create channel failed")
 	}
 
-	if currentConfig.Sequence != newConfig.Sequence {
-		return nil, errors.New("channel config sequence mismatch")
-	}
-	configUpdate, err := update.Compute(currentConfig, newConfig)
-	if err != nil {
-		return nil, errors.WithMessage(err, "config update computation failed")
-	}
-	configUpdate.ChannelId = channelID
-	return configUpdate, nil
+	return SaveChannelResponse{TransactionID: txID}, nil
 }
 
 func (rc *Client) validateSaveChannelRequest(req SaveChannelRequest) error {
@@ -1025,13 +979,13 @@ func (rc *Client) validateSaveChannelRequest(req SaveChannelRequest) error {
 	return nil
 }
 
-func (rc *Client) getConfigSignatures(signingIdentities []msp.SigningIdentity, chConfig []byte) ([]*common.ConfigSignature, error) {
+func (rc *Client) getConfigSignatures(req SaveChannelRequest, chConfig []byte) ([]*common.ConfigSignature, error) {
 	// Signing user has to belong to one of configured channel organisations
 	// In case that order org is one of channel orgs we can use context user
 	var signers []msp.SigningIdentity
 
-	if len(signingIdentities) > 0 {
-		for _, id := range signingIdentities {
+	if len(req.SigningIdentities) > 0 {
+		for _, id := range req.SigningIdentities {
 			if id != nil {
 				signers = append(signers, id)
 			}
@@ -1045,7 +999,25 @@ func (rc *Client) getConfigSignatures(signingIdentities []msp.SigningIdentity, c
 	return rc.createCfgSigFromIDs(chConfig, signers...)
 }
 
-func extractChConfigTx(channelConfigReader io.Reader) ([]byte, error) {
+func readChConfigData(channelConfigPath string) ([]byte, error) {
+	if channelConfigPath == "" {
+		return nil, errors.New("must provide a channel config path")
+	}
+
+	configReader, err := os.Open(channelConfigPath) // nolint
+	if err != nil {
+		return nil, errors.Wrapf(err, "opening channel config file failed")
+	}
+	defer loggedClose(configReader)
+
+	chConfig, err := extractChConfigData(configReader)
+	if err != nil {
+		return nil, errors.WithMessage(err, "extracting channel config from channel config reader of channelConfigPath failed")
+	}
+	return chConfig, nil
+}
+
+func extractChConfigData(channelConfigReader io.Reader) ([]byte, error) {
 	if channelConfigReader == nil {
 		return nil, errors.New("must provide a non empty channel config file")
 	}
@@ -1064,27 +1036,10 @@ func extractChConfigTx(channelConfigReader io.Reader) ([]byte, error) {
 
 // CreateConfigSignature creates a signature for the given client, custom signers and chConfig from channelConfigPath argument
 //	return ConfigSignature will be signed internally by the SDK. It can be passed to WithConfigSignatures() option
-// Deprecated: this method is deprecated in order to use CreateConfigSignatureFromReader
 func (rc *Client) CreateConfigSignature(signer msp.SigningIdentity, channelConfigPath string) (*common.ConfigSignature, error) {
-	if channelConfigPath == "" {
-		return nil, errors.New("must provide a channel config path")
-	}
-
-	configReader, err := os.Open(channelConfigPath) //nolint
+	chConfig, err := readChConfigData(channelConfigPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "opening channel config file failed")
-	}
-	defer loggedClose(configReader)
-
-	return rc.CreateConfigSignatureFromReader(signer, configReader)
-}
-
-// CreateConfigSignatureFromReader creates a signature for the given client, custom signers and chConfig from io.Reader argument
-//	return ConfigSignature will be signed internally by the SDK. It can be passed to WithConfigSignatures() option
-func (rc *Client) CreateConfigSignatureFromReader(signer msp.SigningIdentity, channelConfig io.Reader) (*common.ConfigSignature, error) {
-	chConfig, err := extractChConfigTx(channelConfig)
-	if err != nil {
-		return nil, errors.WithMessage(err, "extracting channel config failed")
+		return nil, err
 	}
 
 	sigs, err := rc.createCfgSigFromIDs(chConfig, signer)
@@ -1100,36 +1055,17 @@ func (rc *Client) CreateConfigSignatureFromReader(signer msp.SigningIdentity, ch
 }
 
 // CreateConfigSignatureData will prepare a SignatureHeader and the full signing []byte (signingBytes) to be used for signing a Channel Config
-// Deprecated: this method is deprecated in order to use CreateConfigSignatureDataFromReader
-func (rc *Client) CreateConfigSignatureData(signer msp.SigningIdentity, channelConfigPath string) (signatureHeaderData resource.ConfigSignatureData, e error) {
-	if channelConfigPath == "" {
-		e = errors.New("must provide a channel config path")
-		return
-	}
-
-	configReader, err := os.Open(channelConfigPath) //nolint
-	if err != nil {
-		e = errors.Wrapf(err, "opening channel config file failed")
-		return
-	}
-	defer loggedClose(configReader)
-
-	return rc.CreateConfigSignatureDataFromReader(signer, configReader)
-}
-
-// CreateConfigSignatureDataFromReader will prepare a SignatureHeader and the full signing []byte (signingBytes) to be used for signing a Channel Config
 // 	Once SigningBytes have been signed externally (signing signatureHeaderData.SigningBytes using an external tool like OpenSSL), do the following:
 //  1. create a common.ConfigSignature{} instance
 //  2. assign its SignatureHeader field with the returned field 'signatureHeaderData.signatureHeader'
 //  3. assign its Signature field with the generated signature of 'signatureHeaderData.signingBytes' from the external tool
 //  Then use WithConfigSignatures() option to pass this new instance for channel updates
-func (rc *Client) CreateConfigSignatureDataFromReader(signer msp.SigningIdentity, channelConfig io.Reader) (signatureHeaderData resource.ConfigSignatureData, e error) {
-	chConfig, err := extractChConfigTx(channelConfig)
+func (rc *Client) CreateConfigSignatureData(signer msp.SigningIdentity, channelConfigPath string) (signatureHeaderData resource.ConfigSignatureData, e error) {
+	chConfig, err := readChConfigData(channelConfigPath)
 	if err != nil {
-		e = errors.WithMessage(err, "extracting channel config failed")
+		e = err
 		return
 	}
-
 	sigCtx := contextImpl.Client{
 		SigningIdentity: signer,
 		Providers:       rc.ctx,
@@ -1229,41 +1165,6 @@ func loggedClose(c io.Closer) {
 	}
 }
 
-func (rc *Client) getChannelConfig(channelID string, opts requestOptions) (*chconfig.ChannelConfig, error) {
-	orderer, err := rc.requestOrderer(&opts, channelID)
-	if err != nil {
-		return nil, errors.WithMessage(err, "failed to find orderer for request")
-	}
-
-	return chconfig.New(channelID, chconfig.WithOrderer(orderer))
-}
-
-// QueryConfigBlockFromOrderer config returns channel configuration block from orderer. If orderer is not provided using options it will be defaulted to channel orderer (if configured) or random orderer from configuration.
-//  Parameters:
-//  channelID is mandatory channel ID
-//  options holds optional request options
-//
-//  Returns:
-//  channel configuration block
-func (rc *Client) QueryConfigBlockFromOrderer(channelID string, options ...RequestOption) (*common.Block, error) {
-
-	opts, err := rc.prepareRequestOpts(options...)
-	if err != nil {
-		return nil, err
-	}
-
-	channelConfig, err := rc.getChannelConfig(channelID, opts)
-	if err != nil {
-		return nil, errors.WithMessage(err, "QueryConfig failed")
-	}
-
-	reqCtx, cancel := rc.createRequestContext(opts, fab.OrdererResponse)
-	defer cancel()
-
-	return channelConfig.QueryBlock(reqCtx)
-
-}
-
 // QueryConfigFromOrderer config returns channel configuration from orderer. If orderer is not provided using options it will be defaulted to channel orderer (if configured) or random orderer from configuration.
 //  Parameters:
 //  channelID is mandatory channel ID
@@ -1278,7 +1179,12 @@ func (rc *Client) QueryConfigFromOrderer(channelID string, options ...RequestOpt
 		return nil, err
 	}
 
-	channelConfig, err := rc.getChannelConfig(channelID, opts)
+	orderer, err := rc.requestOrderer(&opts, channelID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to find orderer for request")
+	}
+
+	channelConfig, err := chconfig.New(channelID, chconfig.WithOrderer(orderer))
 	if err != nil {
 		return nil, errors.WithMessage(err, "QueryConfig failed")
 	}

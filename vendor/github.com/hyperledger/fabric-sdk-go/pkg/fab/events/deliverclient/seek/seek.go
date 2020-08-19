@@ -9,7 +9,7 @@ package seek
 import (
 	"math"
 
-	ab "github.com/hyperledger/fabric-protos-go/orderer"
+	ab "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protos/orderer"
 )
 
 // Type is the type of Seek request to perform.

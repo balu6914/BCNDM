@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/discovery"
 	discclient "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protos/discovery"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/random"
 	soptions "github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/options"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
@@ -29,6 +29,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazycache"
 	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazyref"
 	"github.com/pkg/errors"
+	grpcCodes "google.golang.org/grpc/codes"
 )
 
 const (
@@ -40,9 +41,26 @@ const (
 
 var logger = logging.NewLogger(moduleName)
 
+var retryableCodes = map[status.Group][]status.Code{
+	status.GRPCTransportStatus: {
+		status.Code(grpcCodes.Unavailable),
+	},
+	status.DiscoveryServerStatus: {
+		status.QueryEndorsers,
+	},
+}
+
+var defaultRetryOpts = retry.Opts{
+	Attempts:       6,
+	InitialBackoff: 500 * time.Millisecond,
+	MaxBackoff:     5 * time.Second,
+	BackoffFactor:  1.75,
+	RetryableCodes: retryableCodes,
+}
+
 // DiscoveryClient is the client to the discovery service
 type DiscoveryClient interface {
-	Send(ctx context.Context, req *fabdiscovery.Request, targets ...fab.PeerConfig) (<-chan fabdiscovery.Response, error)
+	Send(ctx context.Context, req *discclient.Request, targets ...fab.PeerConfig) ([]fabdiscovery.Response, error)
 }
 
 // clientProvider is overridden by unit tests
@@ -61,13 +79,11 @@ type Service struct {
 	chResponseCache *lazycache.Cache
 	retryOpts       retry.Opts
 	errHandler      fab.ErrorHandler
-	peerSorter      soptions.PeerSorter
 }
 
 // New creates a new dynamic selection service using Fabric's Discovery Service
 func New(ctx contextAPI.Client, channelID string, discovery fab.DiscoveryService, opts ...coptions.Opt) (*Service, error) {
-	options := params{retryOpts: getDefaultRetryOpts(ctx, channelID)}
-
+	options := params{retryOpts: defaultRetryOpts}
 	coptions.Apply(&options, opts)
 
 	if options.refreshInterval == 0 {
@@ -95,7 +111,6 @@ func New(ctx contextAPI.Client, channelID string, discovery fab.DiscoveryService
 		discClient:      discoveryClient,
 		retryOpts:       options.retryOpts,
 		errHandler:      options.errHandler,
-		peerSorter:      resolvePeerSorter(channelID, ctx),
 	}
 
 	s.chResponseCache = lazycache.NewWithData(
@@ -143,10 +158,6 @@ func (s *Service) GetEndorsersForChaincode(chaincodes []*fab.ChaincodeCall, opts
 	params := soptions.Params{RetryOpts: s.retryOpts}
 	coptions.Apply(&params, opts)
 
-	if params.PeerSorter == nil {
-		params.PeerSorter = s.peerSorter
-	}
-
 	chResponse, err := s.getChannelResponse(chaincodes, params.RetryOpts)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting channel response for channel [%s]", s.channelID)
@@ -179,8 +190,8 @@ func (s *Service) getEndorsers(chaincodes []*fab.ChaincodeCall, chResponse discc
 		return nil, errors.Wrapf(err, "error getting peers from discovery service for channel [%s]", s.channelID)
 	}
 
-	endpoints, err := chResponse.Endorsers(asInvocationChain(chaincodes), newFilter(s.ctx, peers, peerFilter, sorter))
-	if err != nil && newDiscoveryError(err).IsTransient() {
+	endpoints, err := chResponse.Endorsers(asInvocationChain(chaincodes), newFilter(s.channelID, s.ctx, peers, peerFilter, sorter))
+	if err != nil && newDiscoveryError(err).isTransient() {
 		return nil, status.New(status.DiscoveryServerStatus, int32(status.QueryEndorsers), fmt.Sprintf("error getting endorsers: %s", err), []interface{}{})
 	}
 
@@ -207,7 +218,7 @@ func (s *Service) queryEndorsers(chaincodes []*fab.ChaincodeCall, retryOpts retr
 		return nil, errors.Errorf("no peers configured for channel [%s]", s.channelID)
 	}
 
-	req, err := fabdiscovery.NewRequest().OfChannel(s.channelID).AddEndorsersQuery(asChaincodeInterests(chaincodes))
+	req, err := discclient.NewRequest().OfChannel(s.channelID).AddEndorsersQuery(asChaincodeInterests(chaincodes))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error creating endorser query request")
 	}
@@ -225,15 +236,21 @@ func (s *Service) queryEndorsers(chaincodes []*fab.ChaincodeCall, retryOpts retr
 	return chResponse.(discclient.ChannelResponse), nil
 }
 
-func (s *Service) query(req *fabdiscovery.Request, chaincodes []*fab.ChaincodeCall, targets []fab.PeerConfig) (discclient.ChannelResponse, error) {
+func (s *Service) query(req *discclient.Request, chaincodes []*fab.ChaincodeCall, targets []fab.PeerConfig) (discclient.ChannelResponse, error) {
 	logger.Debugf("Querying Discovery Service for endorsers for chaincodes: %#v on channel [%s]", chaincodes, s.channelID)
 	reqCtx, cancel := reqContext.NewRequest(s.ctx, reqContext.WithTimeout(s.responseTimeout))
 	defer cancel()
 
 	responses, err := s.discClient.Send(reqCtx, req, targets...)
-
 	if err != nil {
-		return nil, errors.Wrapf(err, "error calling discover service send for selection")
+		if len(responses) == 0 {
+			return nil, errors.Wrapf(err, "error calling discover service send for selection")
+		}
+		logger.Warnf("Received %d response(s) and one or more errors from discovery client: %s", len(responses), err)
+	}
+
+	if len(responses) == 0 {
+		return nil, errors.New("no successful response received from any peer")
 	}
 
 	// TODO: In a future patch:
@@ -242,45 +259,32 @@ func (s *Service) query(req *fabdiscovery.Request, chaincodes []*fab.ChaincodeCa
 
 	invocChain := asInvocationChain(chaincodes)
 
-	var respErrors []error
-
-	for response := range responses {
+	var discErrs []DiscoveryError
+	for _, response := range responses {
 		logger.Debugf("Checking response from [%s]...", response.Target())
-
-		if err := response.Error(); err != nil {
-			respErrors = append(respErrors, err)
-			logger.Debugf("... got error response from [%s]: %s", response.Target(), err)
-			continue
-		}
-
 		chResp := response.ForChannel(s.channelID)
 		// Make sure the target didn't return an error
-
-		if _, err := chResp.Endorsers(invocChain, discclient.NoFilter); err != nil {
+		_, err := chResp.Endorsers(invocChain, discclient.NoFilter)
+		if err != nil {
 			logger.Debugf("... got error response from [%s]: %s", response.Target(), err)
-
-			if discoveryErr := newDiscoveryError(err); discoveryErr.IsTransient() {
-				logger.Debugf("Got transient error: %s", discoveryErr)
-				errMsg := fmt.Sprintf("error received from Discovery Server: %s", discoveryErr)
-
-				return nil, status.New(status.DiscoveryServerStatus, int32(status.QueryEndorsers), errMsg, []interface{}{})
-			} else if discoveryErr.IsAccessDenied() {
-				logger.Debugf("Got access denied from target [%s]: %s", response.Target(), discoveryErr)
-			}
-
-			respErrors = append(respErrors, err)
+			discErrs = append(discErrs, newDiscoveryError(err))
 			continue
 		}
-
 		logger.Debugf("... got success response from [%s]", response.Target())
-
-		//got successful response, cancel all outstanding requests
-		cancel()
-
 		return chResp, nil
 	}
 
-	return nil, errors.Wrap(multi.New(respErrors...), "no successful response received from any peer")
+	var errs []error
+	for _, err := range discErrs {
+		if err.isTransient() {
+			logger.Debugf("Got transient error: %s", err)
+			errMsg := fmt.Sprintf("error received from Discovery Server: %s", err)
+			return nil, status.New(status.DiscoveryServerStatus, int32(status.QueryEndorsers), errMsg, []interface{}{})
+		}
+		errs = append(errs, err)
+	}
+
+	return nil, multi.New(errs...)
 }
 
 func (s *Service) getTargets(ctx contextAPI.Client) ([]fab.PeerConfig, error) {
@@ -345,10 +349,6 @@ func asPeer(ctx contextAPI.Client, endpoint *discclient.Peer) (fab.Peer, error) 
 	}, nil
 }
 
-func getDefaultRetryOpts(ctx contextAPI.Client, channelID string) retry.Opts {
-	return ctx.EndpointConfig().ChannelConfig(channelID).Policies.Discovery.RetryOpts
-}
-
 type peerEndpoint struct {
 	fab.Peer
 	blockHeight uint64
@@ -359,21 +359,18 @@ func (p *peerEndpoint) BlockHeight() uint64 {
 }
 
 // DiscoveryError is an error originating at the Discovery service
-type DiscoveryError struct {
-	error
-}
+type DiscoveryError string
 
 func newDiscoveryError(err error) DiscoveryError {
-	return DiscoveryError{err}
+	return DiscoveryError(err.Error())
 }
 
-//IsTransient checks if error is about peer being unable to ding chaincode or endorsement combination wasn't satisfied
-func (e DiscoveryError) IsTransient() bool {
+// Error returns the error message
+func (e DiscoveryError) Error() string {
+	return string(e)
+}
+
+func (e DiscoveryError) isTransient() bool {
 	return strings.Contains(e.Error(), "failed constructing descriptor for chaincodes") ||
 		strings.Contains(e.Error(), "no endorsement combination can be satisfied")
-}
-
-//IsAccessDenied checks if response contains access denied msg
-func (e DiscoveryError) IsAccessDenied() bool {
-	return strings.Contains(e.Error(), AccessDenied)
 }

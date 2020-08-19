@@ -8,7 +8,7 @@ package msp
 
 import (
 	"encoding/hex"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
@@ -32,9 +32,9 @@ func NewFileKeyStore(cryptoConfigMSPPath string) (core.KVStore, error) {
 
 			// TODO: refactor to case insensitive or remove eventually.
 			r := strings.NewReplacer("{userName}", pkk.ID, "{username}", pkk.ID)
-			keyDir := filepath.Join(r.Replace(cryptoConfigMSPPath), "keystore")
+			keyDir := path.Join(r.Replace(cryptoConfigMSPPath), "keystore")
 
-			return filepath.Join(keyDir, hex.EncodeToString(pkk.SKI)+"_sk"), nil
+			return path.Join(keyDir, hex.EncodeToString(pkk.SKI)+"_sk"), nil
 		},
 	}
 	return keyvaluestore.New(opts)
