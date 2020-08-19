@@ -28,9 +28,9 @@ type fabricCAAdapter struct {
 	caClient    *calib.Client
 }
 
-func newFabricCAAdapter(caID string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*fabricCAAdapter, error) {
+func newFabricCAAdapter(orgName string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*fabricCAAdapter, error) {
 
-	caClient, err := createFabricCAClient(caID, cryptoSuite, config)
+	caClient, err := createFabricCAClient(orgName, cryptoSuite, config)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,6 @@ func (c *fabricCAAdapter) Enroll(request *api.EnrollmentRequest) ([]byte, error)
 		Profile: request.Profile,
 		Type:    request.Type,
 		Label:   request.Label,
-		CSR:     createCSRInfo(request.CSR),
 	}
 
 	if len(request.AttrReqs) > 0 {
@@ -83,7 +82,6 @@ func (c *fabricCAAdapter) Reenroll(key core.Key, cert []byte, request *api.Reenr
 		CAName:  c.caClient.Config.CAName,
 		Profile: request.Profile,
 		Label:   request.Label,
-		CSR:     createCSRInfo(request.CSR),
 	}
 	if len(request.AttrReqs) > 0 {
 		attrs := make([]*caapi.AttributeRequest, len(request.AttrReqs))
@@ -151,7 +149,6 @@ func (c *fabricCAAdapter) Revoke(key core.Key, cert []byte, request *api.Revocat
 		Serial: request.Serial,
 		AKI:    request.AKI,
 		Reason: request.Reason,
-		GenCRL: request.GenCRL,
 	}
 
 	registrar, err := c.newIdentity(key, cert)
@@ -534,18 +531,6 @@ func fillAffiliationInfo(info *api.AffiliationInfo, name string, affiliations []
 	return nil
 }
 
-func createCSRInfo(csr *api.CSRInfo) *caapi.CSRInfo {
-	if csr == nil {
-		// csr is not obrigatory, so we can return nil
-		return nil
-	}
-
-	return &caapi.CSRInfo{
-		CN:    csr.CN,
-		Hosts: csr.Hosts,
-	}
-}
-
 func getAllAttributes(attrs []caapi.Attribute) []api.Attribute {
 	attriburtes := []api.Attribute{}
 	for _, attr := range attrs {
@@ -592,16 +577,16 @@ func getIdentityResponses(ca string, responses []caapi.IdentityInfo) []*api.Iden
 	return ret
 }
 
-func createFabricCAClient(caID string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*calib.Client, error) {
+func createFabricCAClient(org string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*calib.Client, error) {
 
 	// Create new Fabric-ca client without configs
 	c := &calib.Client{
 		Config: &calib.ClientConfig{},
 	}
 
-	conf, ok := config.CAConfig(caID)
+	conf, ok := config.CAConfig(org)
 	if !ok {
-		return nil, errors.Errorf("No CA '%s' in the configs", caID)
+		return nil, errors.Errorf("Organization [%s] have no corresponding CA in the configs", org)
 	}
 
 	//set server CAName
@@ -611,26 +596,20 @@ func createFabricCAClient(caID string, cryptoSuite core.CryptoSuite, config msp.
 	//set server name
 	c.Config.ServerName, _ = conf.GRPCOptions["ssl-target-name-override"].(string)
 	//certs file list
-	c.Config.TLS.CertFiles, ok = config.CAServerCerts(caID)
+	c.Config.TLS.CertFiles, ok = config.CAServerCerts(org)
 	if !ok {
-		return nil, errors.Errorf("CA '%s' has no corresponding server certs in the configs", caID)
+		return nil, errors.Errorf("Organization [%s] have no corresponding server certs in the configs", org)
 	}
 
 	// set key file and cert file
-	c.Config.TLS.Client.CertFile, ok = config.CAClientCert(caID)
+	c.Config.TLS.Client.CertFile, ok = config.CAClientCert(org)
 	if !ok {
-		return nil, errors.Errorf("CA '%s' has no corresponding client certs in the configs", caID)
+		return nil, errors.Errorf("Organization [%s] have no corresponding client certs in the configs", org)
 	}
 
-	c.Config.TLS.Client.KeyFile, ok = config.CAClientKey(caID)
+	c.Config.TLS.Client.KeyFile, ok = config.CAClientKey(org)
 	if !ok {
-		return nil, errors.Errorf("CA '%s' has no corresponding client keys in the configs", caID)
-	}
-
-	var err error
-	c.Config.TLS.TlsCertPool, err = config.TLSCACertPool().Get()
-	if err != nil {
-		return nil, errors.Wrap(err, "couldn't load configured cert pool")
+		return nil, errors.Errorf("Organization [%s] have no corresponding client keys in the configs", org)
 	}
 
 	//TLS flag enabled/disabled
@@ -640,7 +619,7 @@ func createFabricCAClient(caID string, cryptoSuite core.CryptoSuite, config msp.
 	//Factory opts
 	c.Config.CSP = cryptoSuite
 
-	err = c.Init()
+	err := c.Init()
 	if err != nil {
 		return nil, errors.Wrap(err, "CA Client init failed")
 	}

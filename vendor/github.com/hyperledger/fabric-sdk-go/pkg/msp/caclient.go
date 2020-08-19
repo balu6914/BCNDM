@@ -23,7 +23,7 @@ var logger = logging.NewLogger("fabsdk/msp")
 // CAClientImpl implements api/msp/CAClient
 type CAClientImpl struct {
 	orgName         string
-	caName          string
+	caName          string // Currently, an organization can be associated with only one CA
 	orgMSPID        string
 	cryptoSuite     core.CryptoSuite
 	identityManager msp.IdentityManager
@@ -32,23 +32,8 @@ type CAClientImpl struct {
 	registrar       msp.EnrollCredentials
 }
 
-// CAClientOption describes a functional parameter for NewCAClient
-type CAClientOption func(*caClientOption) error
-
-type caClientOption struct {
-	caID string
-}
-
-// WithCAInstance allows for specifying optional CA name (within the CA server instance)
-func WithCAInstance(caID string) CAClientOption {
-	return func(o *caClientOption) error {
-		o.caID = caID
-		return nil
-	}
-}
-
 // NewCAClient creates a new CA CAClient instance
-func NewCAClient(orgName string, ctx contextApi.Client, opts ...CAClientOption) (*CAClientImpl, error) {
+func NewCAClient(orgName string, ctx contextApi.Client) (*CAClientImpl, error) {
 
 	if orgName == "" {
 		orgName = ctx.IdentityConfig().Client().Organization
@@ -56,11 +41,6 @@ func NewCAClient(orgName string, ctx contextApi.Client, opts ...CAClientOption) 
 
 	if orgName == "" {
 		return nil, errors.New("organization is missing")
-	}
-
-	options, err := processCAClientOptions(opts...)
-	if err != nil {
-		return nil, err
 	}
 
 	netConfig := ctx.EndpointConfig().NetworkConfig()
@@ -73,17 +53,22 @@ func NewCAClient(orgName string, ctx contextApi.Client, opts ...CAClientOption) 
 		return nil, errors.New("no CAs configured")
 	}
 
-	caID := options.caID
-	if caID == "" {
-		caID = orgConfig.CertificateAuthorities[0]
-	}
-	caConfig, ok := ctx.IdentityConfig().CAConfig(caID)
-	if !ok {
-		return nil, errors.Errorf("error initializing CA [%s]", caID)
-	}
-	adapter, err := newFabricCAAdapter(caID, ctx.CryptoSuite(), ctx.IdentityConfig())
-	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing CA [%s]", caID)
+	var adapter *fabricCAAdapter
+	var registrar msp.EnrollCredentials
+	var err error
+
+	// Currently, an organization can be associated with only one CA
+	caName := orgConfig.CertificateAuthorities[0]
+	caConfig, ok := ctx.IdentityConfig().CAConfig(orgName)
+	if ok {
+		adapter, err = newFabricCAAdapter(orgName, ctx.CryptoSuite(), ctx.IdentityConfig())
+		if err == nil {
+			registrar = caConfig.Registrar
+		} else {
+			return nil, errors.Wrapf(err, "error initializing CA [%s]", caName)
+		}
+	} else {
+		return nil, errors.Errorf("error initializing CA [%s]", caName)
 	}
 
 	identityManager, ok := ctx.IdentityManager(orgName)
@@ -93,27 +78,15 @@ func NewCAClient(orgName string, ctx contextApi.Client, opts ...CAClientOption) 
 
 	mgr := &CAClientImpl{
 		orgName:         orgName,
-		caName:          caConfig.CAName,
+		caName:          caName,
 		orgMSPID:        orgConfig.MSPID,
 		cryptoSuite:     ctx.CryptoSuite(),
 		identityManager: identityManager,
 		userStore:       ctx.UserStore(),
 		adapter:         adapter,
-		registrar:       caConfig.Registrar,
+		registrar:       registrar,
 	}
 	return mgr, nil
-}
-
-func processCAClientOptions(opts ...CAClientOption) (*caClientOption, error) {
-	options := caClientOption{}
-
-	for _, param := range opts {
-		err := param(&options)
-		if err != nil {
-			return nil, errors.WithMessage(err, "failed to create CA Client")
-		}
-	}
-	return &options, nil
 }
 
 // Enroll a registered user in order to receive a signed X509 certificate.
@@ -168,9 +141,9 @@ func (c *CAClientImpl) CreateIdentity(request *api.IdentityRequest) (*api.Identi
 		return nil, errors.New("must provide identity request")
 	}
 
-	// Check required parameters (ID)
-	if request.ID == "" {
-		return nil, errors.New("ID is required")
+	// Checke required parameters (ID and affiliation)
+	if request.ID == "" || request.Affiliation == "" {
+		return nil, errors.New("ID and affiliation are required")
 	}
 
 	registrar, err := c.getRegistrar(c.registrar.EnrollID, c.registrar.EnrollSecret)
@@ -197,9 +170,9 @@ func (c *CAClientImpl) ModifyIdentity(request *api.IdentityRequest) (*api.Identi
 		return nil, errors.New("must provide identity request")
 	}
 
-	// Check required parameters (ID)
-	if request.ID == "" {
-		return nil, errors.New("ID is required")
+	// Checke required parameters (ID and affiliation)
+	if request.ID == "" || request.Affiliation == "" {
+		return nil, errors.New("ID and affiliation are required")
 	}
 
 	registrar, err := c.getRegistrar(c.registrar.EnrollID, c.registrar.EnrollSecret)
@@ -226,7 +199,7 @@ func (c *CAClientImpl) RemoveIdentity(request *api.RemoveIdentityRequest) (*api.
 		return nil, errors.New("must provide remove identity request")
 	}
 
-	// Check required parameters (ID)
+	// Checke required parameters (ID)
 	if request.ID == "" {
 		return nil, errors.New("ID is required")
 	}
@@ -252,7 +225,7 @@ func (c *CAClientImpl) GetIdentity(id, caname string) (*api.IdentityResponse, er
 		return nil, fmt.Errorf("no CAs configured for organization: %s", c.orgName)
 	}
 
-	// Check required parameters (ID and affiliation)
+	// Checke required parameters (ID and affiliation)
 	if id == "" {
 		return nil, errors.New("id is required")
 	}
@@ -389,7 +362,7 @@ func (c *CAClientImpl) GetAffiliation(affiliation, caname string) (*api.Affiliat
 		return nil, fmt.Errorf("no CAs configured for organization: %s", c.orgName)
 	}
 
-	// Check required parameters (affiliation)
+	// Checke required parameters (affiliation)
 	if affiliation == "" {
 		return nil, errors.New("affiliation is required")
 	}
@@ -426,7 +399,7 @@ func (c *CAClientImpl) AddAffiliation(request *api.AffiliationRequest) (*api.Aff
 		return nil, errors.New("must provide affiliation request")
 	}
 
-	// Check required parameters (Name)
+	// Checke required parameters (Name)
 	if request.Name == "" {
 		return nil, errors.New("Name is required")
 	}
@@ -449,7 +422,7 @@ func (c *CAClientImpl) ModifyAffiliation(request *api.ModifyAffiliationRequest) 
 		return nil, errors.New("must provide affiliation request")
 	}
 
-	// Check required parameters (Name and NewName)
+	// Checke required parameters (Name and NewName)
 	if request.Name == "" || request.NewName == "" {
 		return nil, errors.New("Name and NewName are required")
 	}
@@ -472,7 +445,7 @@ func (c *CAClientImpl) RemoveAffiliation(request *api.AffiliationRequest) (*api.
 		return nil, errors.New("must provide remove affiliation request")
 	}
 
-	// Check required parameters (Name)
+	// Checke required parameters (Name)
 	if request.Name == "" {
 		return nil, errors.New("Name is required")
 	}

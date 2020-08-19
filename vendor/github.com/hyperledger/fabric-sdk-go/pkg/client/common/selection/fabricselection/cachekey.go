@@ -6,11 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 package fabricselection
 
-import (
-	"encoding/json"
-
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-)
+import "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+import "encoding/json"
 
 type cacheKey struct {
 	chaincodes []*fab.ChaincodeCall

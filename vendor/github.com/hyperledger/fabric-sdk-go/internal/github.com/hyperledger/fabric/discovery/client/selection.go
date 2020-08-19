@@ -14,8 +14,6 @@ import (
 	"math/rand"
 	"sort"
 	"time"
-
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/gossip/protoext"
 )
 
 // Filter filters and sorts the given endorsers
@@ -104,7 +102,7 @@ func ExcludeByHost(reject func(host string) bool) ExclusionFilter {
 		var internalEndpoint string
 		se := p.AliveMessage.GetSecretEnvelope()
 		if se != nil {
-			internalEndpoint = protoext.InternalEndpoint(se)
+			internalEndpoint = se.InternalEndpoint()
 		}
 		return reject(endpoint) || reject(internalEndpoint)
 	})

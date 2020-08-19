@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package dispatcher
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -129,7 +130,7 @@ func (ed *Dispatcher) HandleConnectEvent(e esdispatcher.Event) {
 	conn, err := ed.connectionProvider(ed.context, ed.chConfig, peer)
 	if err != nil {
 		logger.Warnf("error creating connection: %s", err)
-		evt.ErrCh <- errors.WithMessagef(err, "could not create client conn")
+		evt.ErrCh <- errors.WithMessage(err, fmt.Sprintf("could not create client conn"))
 		return
 	}
 
@@ -308,7 +309,7 @@ func (ed *Dispatcher) disconnect() error {
 	}
 
 	// Send a DisconnectedEvent. This will trigger a reconnect.
-	eventch <- NewDisconnectedEvent(errors.New("event client was forced to disconnect"))
+	eventch <- NewDisconnectedEvent(nil)
 	return nil
 }
 
