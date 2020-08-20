@@ -11,23 +11,24 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/datapace/datapace"
 
+	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/subscriptions"
 )
 
+const resourceType = "subscription"
+
 var (
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      authproto.AuthServiceClient
+	authClient                authproto.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc subscriptions.Service, ac authproto.AuthServiceClient) http.Handler {
-	auth = ac
+	authClient = ac
 
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
@@ -76,28 +77,6 @@ func MakeHandler(svc subscriptions.Service, ac authproto.AuthServiceClient) http
 	return r
 }
 
-func authorize(r *http.Request) (string, error) {
-	token := r.Header.Get("Authorization")
-	if token == "" {
-		return "", subscriptions.ErrUnauthorizedAccess
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	// TODO: move this code to auth interface in service package root.
-	id, err := auth.Identify(ctx, &authproto.Token{Value: token})
-	if err != nil {
-		e, ok := status.FromError(err)
-		if ok && e.Code() == codes.Unauthenticated {
-			return "", subscriptions.ErrUnauthorizedAccess
-		}
-		return "", err
-	}
-
-	return id.GetValue(), nil
-}
-
 func decodeSearch(r *http.Request) (searchSubsReq, error) {
 	q := r.URL.Query()
 
@@ -113,9 +92,17 @@ func decodeSearch(r *http.Request) (searchSubsReq, error) {
 }
 
 func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.CreateBulk),
+		Type:   resourceType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	userID, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, subscriptions.ErrUnauthorizedAccess
 	}
 
 	subs := []subscriptions.Subscription{}
@@ -123,13 +110,14 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 	if err := json.NewDecoder(r.Body).Decode(&subs); err != nil {
 		return nil, err
 	}
+	uid := userID.GetValue()
 
 	for i := range subs {
-		subs[i].UserID = userID
+		subs[i].UserID = uid
 	}
 
 	req := addSubsReq{
-		UserID:        userID,
+		UserID:        uid,
 		UserToken:     r.Header.Get("Authorization"),
 		Subscriptions: subs,
 	}
@@ -138,9 +126,17 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 }
 
 func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Type:   resourceType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	userID, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, subscriptions.ErrUnauthorizedAccess
 	}
 
 	req, err := decodeSearch(r)
@@ -148,15 +144,23 @@ func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, e
 		return nil, err
 	}
 
-	req.UserID = userID
+	req.UserID = userID.GetValue()
 
 	return req, nil
 }
 
 func decodeOwnedSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Type:   resourceType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	userID, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, subscriptions.ErrUnauthorizedAccess
 	}
 
 	req, err := decodeSearch(r)
@@ -164,19 +168,27 @@ func decodeOwnedSubsRequest(_ context.Context, r *http.Request) (interface{}, er
 		return nil, err
 	}
 
-	req.StreamOwner = userID
+	req.StreamOwner = userID.GetValue()
 
 	return req, nil
 }
 
 func decodeViewSubRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Read),
+		Type:   resourceType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	userID, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, subscriptions.ErrUnauthorizedAccess
 	}
 
 	req := viewSubReq{
-		userID:         userID,
+		userID:         userID.GetValue(),
 		subscriptionID: bone.GetValue(r, "id"),
 	}
 	return req, nil

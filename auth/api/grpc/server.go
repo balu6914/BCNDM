@@ -17,9 +17,10 @@ var _ authproto.AuthServiceServer = (*grpcServer)(nil)
 
 type grpcServer struct {
 	authproto.UnimplementedAuthServiceServer
-	identify kitgrpc.Handler
-	email    kitgrpc.Handler
-	exists   kitgrpc.Handler
+	identify  kitgrpc.Handler
+	email     kitgrpc.Handler
+	exists    kitgrpc.Handler
+	authorize kitgrpc.Handler
 }
 
 // NewServer instantiates new Auth gRPC server.
@@ -42,10 +43,17 @@ func NewServer(svc auth.Service) authproto.AuthServiceServer {
 		encodeExistsResponse,
 	)
 
+	authorize := kitgrpc.NewServer(
+		authorizeEndpoint(svc),
+		decodeAuthorizeRequest,
+		encodeIdentifyResponse,
+	)
+
 	return &grpcServer{
-		identify: identify,
-		email:    email,
-		exists:   exists,
+		identify:  identify,
+		email:     email,
+		exists:    exists,
+		authorize: authorize,
 	}
 }
 
@@ -73,6 +81,14 @@ func (s *grpcServer) Exists(ctx context.Context, id *commonproto.ID) (*empty.Emp
 	return res.(*empty.Empty), nil
 }
 
+func (s *grpcServer) Authorize(ctx context.Context, req *authproto.AuthRequest) (*commonproto.ID, error) {
+	_, res, err := s.authorize.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, encodeError(err)
+	}
+	return res.(*commonproto.ID), nil
+}
+
 func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*authproto.Token)
 	return identityReq{req.GetValue()}, nil
@@ -96,6 +112,16 @@ func decodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, e
 func encodeExistsResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(existsRes)
 	return &empty.Empty{}, encodeError(res.err)
+}
+
+func decodeAuthorizeRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*authproto.AuthRequest)
+	return authReq{
+		token:        req.Token,
+		action:       req.Action,
+		resourceType: req.Type,
+		attributes:   req.Attributes,
+	}, nil
 }
 
 func encodeError(err error) error {

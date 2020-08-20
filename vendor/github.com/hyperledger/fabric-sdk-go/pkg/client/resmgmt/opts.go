@@ -11,11 +11,11 @@ import (
 	"io"
 	"time"
 
+	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/comm"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 	"github.com/pkg/errors"
 )
 
@@ -89,7 +89,11 @@ func WithOrdererEndpoint(key string) RequestOption {
 
 	return func(ctx context.Client, opts *requestOptions) error {
 
-		ordererCfg, found := ctx.EndpointConfig().OrdererConfig(key)
+		ordererCfg, found, ignoreOrderer := ctx.EndpointConfig().OrdererConfig(key)
+		if ignoreOrderer {
+			return errors.Errorf("orderer url : %s is explicitly ignored by EntityMatchers config - can't add orderer", key)
+		}
+
 		if !found {
 			return errors.Errorf("orderer not found for url : %s", key)
 		}

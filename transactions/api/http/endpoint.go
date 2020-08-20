@@ -30,7 +30,6 @@ func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-
 		balance, err := svc.Balance(req.userID)
 		if err != nil {
 			return nil, err

@@ -27,14 +27,14 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r := bone.New()
 
 	r.Post("/users", kithttp.NewServer(
-		registrationEndpoint(svc),
+		registerEndpoint(svc),
 		decodeRegister,
 		encodeResponse,
 		opts...,
 	))
 
 	r.Get("/users", kithttp.NewServer(
-		listEndpoint(svc),
+		listUsersEndpoint(svc),
 		decodeIdentity,
 		encodeResponse,
 		opts...,
@@ -48,14 +48,14 @@ func MakeHandler(svc auth.Service) http.Handler {
 	))
 
 	r.Get("/users/:id", kithttp.NewServer(
-		viewEndpoint(svc),
+		viewUserEndpoint(svc),
 		decodeIdentity,
 		encodeResponse,
 		opts...,
 	))
 
 	r.Patch("/users/:id", kithttp.NewServer(
-		updateEndpoint(svc),
+		updateUserEndpoint(svc),
 		decodeUpdate,
 		encodeResponse,
 		opts...,
@@ -64,6 +64,49 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
+		encodeResponse,
+		opts...,
+	))
+
+	// Policies API
+	r.Post("/policies", kithttp.NewServer(
+		addPolicyEndpoint(svc),
+		decodePolicy,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/policies.:id", kithttp.NewServer(
+		viewPolicyEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/policies", kithttp.NewServer(
+		listPoliciesEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Delete("/policies/:id", kithttp.NewServer(
+		removePolicyEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Put("/policies/:policy/users/:user", kithttp.NewServer(
+		attachPolicyEndpoint(svc),
+		decodeAttach,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Delete("/policies/:policy/users/:user", kithttp.NewServer(
+		detachPolicyEndpoint(svc),
+		decodeAttach,
 		encodeResponse,
 		opts...,
 	))
@@ -83,7 +126,6 @@ func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
 		return nil, err
 	}
 	req.key = r.Header.Get("Authorization")
-
 	return req, nil
 }
 
@@ -99,7 +141,15 @@ func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
-	return r, nil
+	req := updateReq{
+		id:  bone.GetValue(r, "id"),
+		key: r.Header.Get("Authorization"),
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
@@ -112,6 +162,30 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 		return nil, err
 	}
 
+	return req, nil
+}
+
+func decodePolicy(_ context.Context, r *http.Request) (interface{}, error) {
+	req := policyRequest{
+		key: r.Header.Get("Authorization"),
+	}
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+func decodeAttach(_ context.Context, r *http.Request) (interface{}, error) {
+	req := attachReq{
+		key: r.Header.Get("Authorization"),
+	}
+	req.policyID = bone.GetValue(r, "policy")
+	req.userID = bone.GetValue(r, "user")
 	return req, nil
 }
 
@@ -137,6 +211,11 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
+	case errInvalidEmail, errInvalidPassword, errInvalidFirstName,
+		errInvalidLastName, errInvalidCompany, errInvalidAddress,
+		errInvalidPolicyRules, errInvalidPolicyVersion:
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 	case auth.ErrUserAccountDisabled:
 		w.WriteHeader(http.StatusForbidden)
 	case auth.ErrMalformedEntity:

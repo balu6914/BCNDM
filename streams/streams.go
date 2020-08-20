@@ -1,6 +1,8 @@
 package streams
 
 import (
+	"strconv"
+
 	"github.com/asaskevich/govalidator"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -65,6 +67,28 @@ type Stream struct {
 	External    bool                   `json:"external,omitempty"`
 	BQ          BigQuery               `json:"bq,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+// Attributes returns auth.Resource attributes.
+func (s Stream) Attributes() map[string]string {
+	return map[string]string{
+		"id":          s.ID,
+		"ownerID":     s.Owner,
+		"visibility":  string(s.Visibility),
+		"name":        s.Name,
+		"type":        s.Type,
+		"description": s.Description,
+		"snippet":     s.Snippet,
+		"url":         s.URL,
+		"price":       strconv.FormatUint(s.Price, 10),
+		"terms":       s.Terms,
+		"external":    strconv.FormatBool(s.External),
+	}
+}
+
+// ResourceType returns auth.Resource type.
+func (s Stream) ResourceType() string {
+	return "stream"
 }
 
 // Page represents paged result for list response.

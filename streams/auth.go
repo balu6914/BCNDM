@@ -3,7 +3,6 @@ package streams
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	log "github.com/datapace/datapace/logger"
@@ -16,9 +15,9 @@ var _ Authorization = (*authService)(nil)
 // be used in transport layer.
 type Authorization interface {
 	// Authorize method is used to authorize http request.
-	Authorize(r *http.Request) (string, error)
+	Authorize(r *authproto.AuthRequest) (string, error)
 	// Email method is used to fetch email and contactEmail for the user.
-	Email(token string) (authproto.UserEmail, error)
+	Email(token string) (*authproto.UserEmail, error)
 }
 
 type authService struct {
@@ -34,29 +33,26 @@ func NewAuthorization(auth authproto.AuthServiceClient, logger log.Logger) Autho
 	}
 }
 
-func (as authService) Authorize(r *http.Request) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+func (as authService) Authorize(r *authproto.AuthRequest) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
-	key := r.Header.Get("Authorization")
-	res, err := as.auth.Identify(ctx, &authproto.Token{Value: key})
+	res, err := as.auth.Authorize(ctx, r)
 	if err != nil {
 		as.logger.Error(fmt.Sprintf("failed to authorize request: %s", err))
 		return "", ErrUnauthorizedAccess
 	}
-
 	return res.GetValue(), nil
 }
 
-func (as authService) Email(token string) (authproto.UserEmail, error) {
+func (as authService) Email(token string) (*authproto.UserEmail, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	res, err := as.auth.Email(ctx, &authproto.Token{Value: token})
 	if err != nil {
 		as.logger.Error(fmt.Sprintf("failed to fetch users emails: %s", err))
-		return authproto.UserEmail{}, ErrUnauthorizedAccess
+		return &authproto.UserEmail{}, ErrUnauthorizedAccess
 	}
 
-	return *res, nil
+	return res, nil
 }

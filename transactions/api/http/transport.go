@@ -14,11 +14,10 @@ import (
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/transactions"
 
+	"github.com/datapace/datapace/auth"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -34,16 +33,21 @@ const (
 	shareScale  = 1000
 )
 
+const (
+	tokenType    = "token"
+	contractType = "contract"
+)
+
 var (
 	errMalformedEntity        = errors.New("malformed entity")
 	errUnauthorizedAccess     = errors.New("missing or invalid credentials provided")
 	errUnsupportedContentType = errors.New("unsupported content type")
-	auth                      authproto.AuthServiceClient
+	authClient                authproto.AuthServiceClient
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc transactions.Service, ac authproto.AuthServiceClient) http.Handler {
-	auth = ac
+	authClient = ac
 
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
@@ -94,13 +98,18 @@ func MakeHandler(svc transactions.Service, ac authproto.AuthServiceClient) http.
 }
 
 func decodeBalanceReq(_ context.Context, r *http.Request) (interface{}, error) {
-	id, err := authorize(r)
-	if err != nil {
-		return nil, err
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Read),
+		Type:   tokenType,
+		Token:  r.Header.Get("Authorization"),
 	}
 
-	req := balanceReq{userID: id}
+	id, err := authClient.Authorize(context.Background(), ar)
+	if err != nil {
+		return nil, errUnauthorizedAccess
+	}
 
+	req := balanceReq{userID: id.GetValue()}
 	return req, nil
 }
 
@@ -108,10 +117,17 @@ func decodeBuyReq(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Buy),
+		Type:   tokenType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 
-	id, err := authorize(r)
+	id, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, errUnauthorizedAccess
 	}
 
 	var req buyReq
@@ -119,7 +135,7 @@ func decodeBuyReq(_ context.Context, r *http.Request) (interface{}, error) {
 		return nil, err
 	}
 
-	req.userID = id
+	req.userID = id.GetValue()
 
 	return req, nil
 }
@@ -128,10 +144,17 @@ func decodeWithdrawReq(_ context.Context, r *http.Request) (interface{}, error) 
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Withdraw),
+		Type:   tokenType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 
-	id, err := authorize(r)
+	id, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, errUnauthorizedAccess
 	}
 
 	var req withdrawReq
@@ -139,7 +162,7 @@ func decodeWithdrawReq(_ context.Context, r *http.Request) (interface{}, error) 
 		return nil, err
 	}
 
-	req.userID = id
+	req.userID = id.GetValue()
 
 	return req, nil
 }
@@ -148,10 +171,14 @@ func decodeCreateContractsReq(_ context.Context, r *http.Request) (interface{}, 
 	if r.Header.Get("Content-Type") != contentType {
 		return nil, errUnsupportedContentType
 	}
-
-	id, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Create),
+		Type:   contractType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	id, err := authClient.Authorize(context.Background(), ar)
 	if err != nil {
-		return nil, err
+		return nil, errUnauthorizedAccess
 	}
 
 	var req createContractsReq
@@ -159,7 +186,7 @@ func decodeCreateContractsReq(_ context.Context, r *http.Request) (interface{}, 
 		return nil, err
 	}
 
-	req.ownerID = id
+	req.ownerID = id.GetValue()
 
 	for i := range req.Items {
 		req.Items[i].Share *= shareScale
@@ -173,9 +200,17 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 		return nil, errUnsupportedContentType
 	}
 
-	id, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Sign),
+		Type:   contractType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	id, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, errUnauthorizedAccess
 	}
 
 	var req signContractReq
@@ -183,15 +218,23 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 		return nil, err
 	}
 
-	req.partnerID = id
+	req.partnerID = id.GetValue()
 
 	return req, nil
 }
 
 func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
-	id, err := authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Read),
+		Type:   contractType,
+		Token:  r.Header.Get("Authorization"),
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	id, err := authClient.Authorize(ctx, ar)
 	if err != nil {
-		return nil, err
+		return nil, errUnauthorizedAccess
 	}
 	pageNo := uintQueryParam(r, page, defPage)
 	limit := uintQueryParam(r, limit, defLimit)
@@ -210,7 +253,7 @@ func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, er
 	}
 
 	req := listContractsReq{
-		userID: id,
+		userID: id.GetValue(),
 		page:   pageNo,
 		limit:  limit,
 		role:   role,
@@ -237,30 +280,8 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
-func authorize(r *http.Request) (string, error) {
-	token := r.Header.Get("Authorization")
-	if token == "" {
-		return "", errUnauthorizedAccess
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	id, err := auth.Identify(ctx, &authproto.Token{Value: token})
-	if err != nil {
-		e, ok := status.FromError(err)
-		if ok && e.Code() == codes.Unauthenticated {
-			return "", errUnauthorizedAccess
-		}
-		return "", err
-	}
-
-	return id.GetValue(), nil
-}
-
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
-
 	switch err {
 	case errMalformedEntity:
 		w.WriteHeader(http.StatusBadRequest)

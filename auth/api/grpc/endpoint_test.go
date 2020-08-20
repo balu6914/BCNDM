@@ -3,6 +3,7 @@ package grpc_test
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -22,6 +23,93 @@ const (
 	invalid = "invalid"
 )
 
+var policies = map[string]auth.Policy{
+	"admin": {
+		Name:    "admin",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.Any,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "policy",
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+			},
+		},
+	},
+	"user": {
+		Name:    "user",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.CreateBulk,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.List,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "user",
+				Condition: auth.SimpleCondition{
+					Key: "id",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "token",
+			},
+		},
+	},
+}
+
+var policiesMu sync.Mutex
+
 var user = auth.User{
 	ID:        email,
 	Email:     email,
@@ -31,7 +119,7 @@ var user = auth.User{
 }
 
 var admin = auth.User{
-	ID:        "admin@example.com",
+	ID:        "admin",
 	Email:     "admin@example.com",
 	Password:  "password",
 	FirstName: "Joe",
@@ -40,6 +128,7 @@ var admin = auth.User{
 	Address:   "address",
 	Phone:     "+1234567890",
 	Roles:     []string{"admin"},
+	Policies:  []auth.Policy{policies["admin"]},
 }
 
 func TestIdentify(t *testing.T) {

@@ -17,7 +17,9 @@ type createRes struct {
 }
 
 func (res createRes) headers() map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"Location": res.ID,
+	}
 }
 
 func (res createRes) code() int {
@@ -44,21 +46,21 @@ func (res tokenRes) empty() bool {
 	return res.Token == ""
 }
 
-type updateRes struct{}
+type okRes struct{}
 
-func (res updateRes) code() int {
+func (res okRes) code() int {
 	return http.StatusOK
 }
 
-func (res updateRes) headers() map[string]string {
+func (res okRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res updateRes) empty() bool {
+func (res okRes) empty() bool {
 	return true
 }
 
-type viewRes struct {
+type viewUserRes struct {
 	ID           string `json:"id"`
 	Email        string `json:"email,omitempty"`
 	ContactEmail string `json:"contact_email,omitempty"`
@@ -70,30 +72,80 @@ type viewRes struct {
 	Disabled     bool   `json:"disabled,omitempty"`
 }
 
-func (res viewRes) code() int {
+func (res viewUserRes) code() int {
 	return http.StatusOK
 }
 
-func (res viewRes) headers() map[string]string {
+func (res viewUserRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res viewRes) empty() bool {
+func (res viewUserRes) empty() bool {
 	return false
 }
 
-type listRes struct {
-	Users []viewRes `json:"users"`
+type listUsersRes struct {
+	Users []viewUserRes `json:"users"`
 }
 
-func (res listRes) code() int {
+func (res listUsersRes) code() int {
 	return http.StatusOK
 }
 
-func (res listRes) headers() map[string]string {
+func (res listUsersRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (res listRes) empty() bool {
+func (res listUsersRes) empty() bool {
 	return false
+}
+
+type viewPolicyRes struct {
+	ID      string `json:"id"`
+	Version string `json:"version,omitempty"`
+	Owner   string `json:"owner"`
+	Name    string `json:"name,omitempty"`
+	Rules   []rule `json:"rules,omitempty"`
+}
+
+func (res viewPolicyRes) code() int {
+	return http.StatusOK
+}
+
+func (res viewPolicyRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res viewPolicyRes) empty() bool {
+	return false
+}
+
+type listPoliciesRes struct {
+	Policies []viewPolicyRes `json:"policies"`
+}
+
+func (res listPoliciesRes) code() int {
+	return http.StatusOK
+}
+
+func (res listPoliciesRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res listPoliciesRes) empty() bool {
+	return false
+}
+
+type removeRes struct{}
+
+func (res removeRes) Code() int {
+	return http.StatusNoContent
+}
+
+func (res removeRes) Headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res removeRes) Empty() bool {
+	return true
 }

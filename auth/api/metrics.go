@@ -35,13 +35,13 @@ func (ms *metricsMiddleware) Register(key string, user auth.User) (string, error
 	return ms.svc.Register(key, user)
 }
 
-func (ms *metricsMiddleware) InitAdmin(user auth.User) error {
+func (ms *metricsMiddleware) InitAdmin(user auth.User, policies map[string]auth.Policy) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "init_admin").Add(1)
 		ms.latency.With("method", "init_admin").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.InitAdmin(user)
+	return ms.svc.InitAdmin(user, policies)
 }
 
 func (ms *metricsMiddleware) Login(user auth.User) (string, error) {
@@ -53,22 +53,22 @@ func (ms *metricsMiddleware) Login(user auth.User) (string, error) {
 	return ms.svc.Login(user)
 }
 
-func (ms *metricsMiddleware) Update(key string, user auth.User) error {
+func (ms *metricsMiddleware) UpdateUser(key string, user auth.User) error {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "update").Add(1)
-		ms.latency.With("method", "update").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "update_user").Add(1)
+		ms.latency.With("method", "update_user").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.Update(key, user)
+	return ms.svc.UpdateUser(key, user)
 }
 
-func (ms *metricsMiddleware) View(key, ID string) (auth.User, error) {
+func (ms *metricsMiddleware) ViewUser(key, ID string) (auth.User, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "view").Add(1)
-		ms.latency.With("method", "view").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "view_user").Add(1)
+		ms.latency.With("method", "view_user").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.View(key, ID)
+	return ms.svc.ViewUser(key, ID)
 }
 
 func (ms *metricsMiddleware) ViewEmail(key string) (auth.User, error) {
@@ -107,6 +107,15 @@ func (ms *metricsMiddleware) Identify(key string) (string, error) {
 	return ms.svc.Identify(key)
 }
 
+func (ms *metricsMiddleware) Authorize(key string, action auth.Action, resource auth.Resource) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "authorize").Add(1)
+		ms.latency.With("method", "authorize").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.Authorize(key, action, resource)
+}
+
 func (ms *metricsMiddleware) Exists(id string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "exists").Add(1)
@@ -114,4 +123,58 @@ func (ms *metricsMiddleware) Exists(id string) error {
 	}(time.Now())
 
 	return ms.svc.Exists(id)
+}
+
+func (ms *metricsMiddleware) AddPolicy(key string, policy auth.Policy) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "add_policy").Add(1)
+		ms.latency.With("method", "add_policy").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.AddPolicy(key, policy)
+}
+
+func (ms *metricsMiddleware) ViewPolicy(key, id string) (auth.Policy, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_policy").Add(1)
+		ms.latency.With("method", "view_policy").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ViewPolicy(key, id)
+}
+
+func (ms *metricsMiddleware) ListPolicies(key string) ([]auth.Policy, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "list_policies").Add(1)
+		ms.latency.With("method", "list_policies").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ListPolicies(key)
+}
+
+func (ms *metricsMiddleware) RemovePolicy(key, id string) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "remove_policy").Add(1)
+		ms.latency.With("method", "remove_policy").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.RemovePolicy(key, id)
+}
+
+func (ms *metricsMiddleware) AttachPolicy(key, userID, policyID string) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "attach_policy").Add(1)
+		ms.latency.With("method", "attach_policy").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.AttachPolicy(key, userID, policyID)
+}
+
+func (ms *metricsMiddleware) DetachPolicy(key, userID, policyID string) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "detach_policy").Add(1)
+		ms.latency.With("method", "detach_policy").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.DetachPolicy(key, userID, policyID)
 }

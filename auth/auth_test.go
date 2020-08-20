@@ -2,6 +2,7 @@ package auth_test
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/datapace/datapace/auth"
@@ -10,7 +11,94 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const wrong string = "wrong-value"
+const wrong = "wrong-value"
+
+var policies = map[string]auth.Policy{
+	"admin": {
+		Name:    "admin",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.Any,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "policy",
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+			},
+		},
+	},
+	"user": {
+		Name:    "user",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.CreateBulk,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.List,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "user",
+				Condition: auth.SimpleCondition{
+					Key: "id",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "token",
+			},
+		},
+	},
+}
+
+var policiesMu sync.Mutex
 
 var user = auth.User{
 	Email:        "user@example.com",
@@ -22,6 +110,7 @@ var user = auth.User{
 	Company:      "company",
 	Address:      "address",
 	Phone:        "+1234567890",
+	Policies:     []auth.Policy{policies["user"]},
 }
 
 var admin = auth.User{
@@ -35,10 +124,11 @@ var admin = auth.User{
 	Address:      "address",
 	Phone:        "+1234567890",
 	Roles:        []string{"admin"},
+	Policies:     []auth.Policy{policies["admin"]},
 }
 
-var nonadmin = auth.User{
-	Email:        "nonadmin@example.com",
+var noAdmin = auth.User{
+	Email:        "noadmin@example.com",
 	ContactEmail: "nonadmin@example.com",
 	Password:     "password",
 	ID:           "nonadmin",
@@ -47,6 +137,7 @@ var nonadmin = auth.User{
 	Company:      "company",
 	Address:      "address",
 	Phone:        "+1234567890",
+	Policies:     []auth.Policy{policies["user"]},
 }
 
 func newService() (auth.Service, string) {
@@ -56,11 +147,12 @@ func newService() (auth.Service, string) {
 
 func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
-	users := mocks.NewUserRepository(hasher, admin)
+	users := mocks.NewUserRepository(hasher, admin, policies, &policiesMu)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
-	svc := auth.New(users, hasher, idp, ts, ac)
+	policies := mocks.NewPolicyRepository(policies, &policiesMu)
+	svc := auth.New(users, policies, hasher, idp, ts, ac)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,
@@ -72,11 +164,11 @@ func TestRegister(t *testing.T) {
 	svc, key, _ := newServiceWithAdmin()
 	invalidUser := user
 	invalidUser.Password = ""
-	_, err := svc.Register(key, nonadmin)
-	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, nonadmin.ID))
+	_, err := svc.Register(key, noAdmin)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, noAdmin.ID))
 	nonadminkey, _ := svc.Login(auth.User{
-		Email:    nonadmin.Email,
-		Password: nonadmin.Password,
+		Email:    noAdmin.Email,
+		Password: noAdmin.Password,
 	})
 	cases := []struct {
 		desc string
@@ -169,7 +261,7 @@ func TestView(t *testing.T) {
 	}
 
 	for desc, tc := range cases {
-		_, err := svc.View(tc.key, tc.id)
+		_, err := svc.ViewUser(tc.key, tc.id)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
 	}
 }
@@ -202,7 +294,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := svc.Update(tc.key, tc.user)
+		err := svc.UpdateUser(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
@@ -235,7 +327,7 @@ func TestUpdatePassword(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := svc.Update(tc.key, tc.user)
+		err := svc.UpdateUser(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }

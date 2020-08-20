@@ -22,6 +22,7 @@ type AuthServiceClient interface {
 	Identify(ctx context.Context, in *Token, opts ...grpc.CallOption) (*common.ID, error)
 	Email(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserEmail, error)
 	Exists(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*empty.Empty, error)
+	Authorize(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*common.ID, error)
 }
 
 type authServiceClient struct {
@@ -59,6 +60,15 @@ func (c *authServiceClient) Exists(ctx context.Context, in *common.ID, opts ...g
 	return out, nil
 }
 
+func (c *authServiceClient) Authorize(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*common.ID, error) {
+	out := new(common.ID)
+	err := c.cc.Invoke(ctx, "/datapace.AuthService/Authorize", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -66,6 +76,7 @@ type AuthServiceServer interface {
 	Identify(context.Context, *Token) (*common.ID, error)
 	Email(context.Context, *Token) (*UserEmail, error)
 	Exists(context.Context, *common.ID) (*empty.Empty, error)
+	Authorize(context.Context, *AuthRequest) (*common.ID, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -81,6 +92,9 @@ func (*UnimplementedAuthServiceServer) Email(context.Context, *Token) (*UserEmai
 }
 func (*UnimplementedAuthServiceServer) Exists(context.Context, *common.ID) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Exists not implemented")
+}
+func (*UnimplementedAuthServiceServer) Authorize(context.Context, *AuthRequest) (*common.ID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Authorize not implemented")
 }
 func (*UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -142,6 +156,24 @@ func _AuthService_Exists_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_Authorize_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Authorize(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datapace.AuthService/Authorize",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Authorize(ctx, req.(*AuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _AuthService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "datapace.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
@@ -157,6 +189,10 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Exists",
 			Handler:    _AuthService_Exists_Handler,
+		},
+		{
+			MethodName: "Authorize",
+			Handler:    _AuthService_Authorize_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

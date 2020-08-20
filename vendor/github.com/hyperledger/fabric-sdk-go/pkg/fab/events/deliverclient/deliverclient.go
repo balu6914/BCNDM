@@ -10,7 +10,7 @@ import (
 	"math"
 	"time"
 
-	ab "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protos/orderer"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
 	fabcontext "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
@@ -103,7 +103,7 @@ func (c *Client) seek() error {
 		return err
 	}
 
-	errch := make(chan error)
+	errch := make(chan error, 1)
 	err1 := c.Submit(dispatcher.NewSeekEvent(seekInfo, errch))
 	if err1 != nil {
 		return err1

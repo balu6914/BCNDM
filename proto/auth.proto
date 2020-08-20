@@ -10,6 +10,14 @@ service AuthService {
     rpc Identify(Token) returns (ID) {}
     rpc Email(Token) returns (UserEmail) {}
     rpc Exists(ID) returns (google.protobuf.Empty) {}
+    rpc Authorize(AuthRequest) returns (ID) {}
+}
+
+message AuthRequest {
+    string token = 1;
+    int64 action = 2;
+    string type = 3;
+    map<string, string> attributes = 4;
 }
 
 message Token {

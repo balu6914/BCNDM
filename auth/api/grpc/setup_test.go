@@ -28,11 +28,12 @@ func TestMain(m *testing.M) {
 
 func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
-	repo := mocks.NewUserRepository(hasher, admin)
+	urepo := mocks.NewUserRepository(hasher, admin, policies, &policiesMu)
+	prepo := mocks.NewPolicyRepository(policies, &policiesMu)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
-	svc := auth.New(repo, hasher, idp, ts, ac)
+	svc := auth.New(urepo, prepo, hasher, idp, ts, ac)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,

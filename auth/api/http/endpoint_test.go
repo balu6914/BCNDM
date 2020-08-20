@@ -3,13 +3,15 @@ package http_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/datapace/datapace/auth"
 	httpapi "github.com/datapace/datapace/auth/api/http"
@@ -26,6 +28,93 @@ const (
 	invalid      = "invalid"
 )
 
+var policies = map[string]auth.Policy{
+	"admin": {
+		Name:    "admin",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.Any,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "policy",
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+			},
+		},
+	},
+	"user": {
+		Name:    "user",
+		Owner:   "admin",
+		Version: "1.0.0",
+		Rules: []auth.Rule{
+			{
+				Action: auth.CreateBulk,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "stream",
+			},
+			{
+				Action: auth.List,
+				Type:   "user",
+			},
+			{
+				Action: auth.Any,
+				Type:   "stream",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "contract",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.List,
+				Type:   "subscription",
+			},
+			{
+				Action: auth.Any,
+				Type:   "subscription",
+				Condition: auth.SimpleCondition{
+					Key: "ownerID",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "user",
+				Condition: auth.SimpleCondition{
+					Key: "id",
+				},
+			},
+			{
+				Action: auth.Any,
+				Type:   "token",
+			},
+		},
+	},
+}
+
+var policiesMu sync.Mutex
+
 var userForDisable = auth.User{
 	ID:       "246disable",
 	Email:    "disable@example.com",
@@ -41,6 +130,7 @@ var user = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Policies:  []auth.Policy{policies["user"]},
 }
 
 var userForUpdate = auth.User{
@@ -52,6 +142,7 @@ var userForUpdate = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Policies:  []auth.Policy{policies["user"]},
 }
 
 var nonAdminForUpdate = auth.User{
@@ -63,10 +154,11 @@ var nonAdminForUpdate = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Policies:  []auth.Policy{policies["user"]},
 }
 
 var admin = auth.User{
-	ID:        "admin@example.com",
+	ID:        "admin",
 	Email:     "admin@example.com",
 	Password:  "password",
 	FirstName: "Joe",
@@ -75,6 +167,7 @@ var admin = auth.User{
 	Address:   "address",
 	Phone:     "+1234567890",
 	Roles:     []string{"admin"},
+	Policies:  []auth.Policy{policies["admin"]},
 }
 
 var nonadmin = auth.User{
@@ -86,16 +179,18 @@ var nonadmin = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Policies:  []auth.Policy{policies["user"]},
 }
 
 func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	hasher := mocks.NewHasher()
-	repo := mocks.NewUserRepository(hasher, admin)
+	urepo := mocks.NewUserRepository(hasher, admin, policies, &policiesMu)
+	prepo := mocks.NewPolicyRepository(policies, &policiesMu)
 	idp := mocks.NewIdentityProvider()
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
 
-	svc := auth.New(repo, hasher, idp, ts, ac)
+	svc := auth.New(urepo, prepo, hasher, idp, ts, ac)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,
@@ -278,7 +373,7 @@ func TestLogin(t *testing.T) {
 	_, err = svc.Register(key, userForDisable)
 	require.Nil(t, err, "unexpected error registering user: %s", err)
 	userForDisable.Disabled = true
-	err = svc.Update(key, userForDisable)
+	err = svc.UpdateUser(key, userForDisable)
 	require.Nil(t, err, "unexpected error disabling user: %s", err)
 
 	credentials := user

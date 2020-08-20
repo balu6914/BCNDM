@@ -5,17 +5,10 @@ docker/fabric/artifacts/**/**
 !docker/fabric/artifacts/.gitkeep
 fabric-ca-db
 build
-auth-data/
-streams-data/
-subscriptions-data/
-transactions-data/
-executions-data/
-access-control-data/
+docker/*-data
 datapace-service-kvs/
 datapace-service-msp/
 elasticsearch-data/
-dproxy-data/
-dproxy-db-data/
 
 # System Files
 .DS_Store

@@ -1,10 +1,14 @@
 package subscriptions
 
 import (
+	"strconv"
 	"time"
 
+	"github.com/datapace/datapace/auth"
 	"gopkg.in/mgo.v2/bson"
 )
+
+var _ auth.Resource = (*Subscription)(nil)
 
 // Subscription represents users purchase of stream.
 type Subscription struct {
@@ -18,6 +22,27 @@ type Subscription struct {
 	StreamURL   string        `json:"stream_url,omitempty"`
 	StreamPrice uint64        `json:"stream_price,omitempty"`
 	StreamName  string        `json:"stream_name,omitempty"`
+}
+
+// Attributes returns authz.Resource attributes.
+func (sub Subscription) Attributes() map[string]string {
+	return map[string]string{
+		"id":          sub.ID.String(),
+		"ownerID":     sub.UserID,
+		"streamID   ": sub.StreamID,
+		"streamOwner": sub.StreamOwner,
+		"hours":       strconv.FormatUint(sub.Hours, 10),
+		"startDate":   sub.StartDate.String(),
+		"endDate":     sub.EndDate.String(),
+		"streamURL":   sub.StreamURL,
+		"streamPrice": strconv.FormatUint(sub.StreamPrice, 10),
+		"streamName":  sub.StreamName,
+	}
+}
+
+// ResourceType returns authz.Resource type.
+func (sub Subscription) ResourceType() string {
+	return "subscription"
 }
 
 const (

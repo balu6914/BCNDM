@@ -112,7 +112,7 @@ func TestCreateSubscription(t *testing.T) {
 			auth:        token,
 			contentType: contentType,
 			body:        body,
-			status:      http.StatusMultiStatus,
+			status:      http.StatusCreated,
 		},
 		{
 			desc:        "create subscriptions with invalid credentials",

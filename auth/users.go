@@ -1,5 +1,7 @@
 package auth
 
+var _ Resource = (*User)(nil)
+
 // User represents a Datapace user account. Each user is identified given its
 // email and password.
 type User struct {
@@ -14,6 +16,26 @@ type User struct {
 	Phone        string
 	Roles        []string
 	Disabled     bool
+	Policies     []Policy
+}
+
+// Attributes returns user's attributes.
+func (u User) Attributes() map[string]string {
+	return map[string]string{
+		"id":           u.ID,
+		"email":        u.Email,
+		"company":      u.Company,
+		"firstName":    u.FirstName,
+		"lastName":     u.LastName,
+		"address":      u.Address,
+		"phone":        u.Phone,
+		"contactEmail": u.ContactEmail,
+	}
+}
+
+// ResourceType returns User type string value.
+func (u User) ResourceType() string {
+	return "user"
 }
 
 // UserRepository specifies an account persistence API.

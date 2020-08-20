@@ -1,6 +1,9 @@
 package transactions
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 // ContractLedger contains contract specific writer API definition.
 type ContractLedger interface {
@@ -44,4 +47,22 @@ type Contract struct {
 	PartnerID  string
 	Share      uint64
 	Signed     bool
+}
+
+// Attributes returns resource attributes.
+func (c Contract) Attributes() map[string]string {
+	return map[string]string{
+		"streamID":   c.StreamID,
+		"streamName": c.StreamName,
+		"startTime":  c.StartTime.String(),
+		"endTime":    c.EndTime.String(),
+		"ownerID":    c.OwnerID,
+		"partnerID":  c.PartnerID,
+		"signed":     strconv.FormatBool(c.Signed),
+	}
+}
+
+// ResourceType returns contract resource type.
+func (c Contract) ResourceType() string {
+	return "contract"
 }

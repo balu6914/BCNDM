@@ -2,15 +2,13 @@ package http
 
 import (
 	"context"
-	"encoding/json"
+
 	"github.com/datapace/datapace/auth"
-	"github.com/go-zoo/bone"
-	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 )
 
-func registrationEndpoint(svc auth.Service) endpoint.Endpoint {
+func registerEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(registerReq)
 		if err := req.validate(); err != nil {
@@ -53,63 +51,32 @@ func loginEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
-func updateEndpoint(svc auth.Service) endpoint.Endpoint {
+func updateUserEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		r := request.(*http.Request)
-		current, err := svc.View(r.Header.Get("Authorization"), bone.GetValue(r, "id"))
-		// Filling updateReq with current user data
-		updateReq := updateReq{
-			ContactEmail: current.ContactEmail,
-			FirstName:    current.FirstName,
-			LastName:     current.LastName,
-			Company:      current.Company,
-			Address:      current.Address,
-			Phone:        current.Phone,
-			Roles:        current.Roles,
-			Password:     "",
-			Disabled:     current.Disabled,
+		req := request.(updateReq)
+		if err := req.validate(); err != nil {
+			return nil, err
 		}
-		if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
-			return updateRes{}, err
+		if err := svc.UpdateUser(req.key, req.toUser()); err != nil {
+			return nil, err
 		}
-
-		if err != nil {
-			return updateRes{}, err
-		}
-
-		user := auth.User{
-			ID:           current.ID,
-			Email:        current.Email,
-			ContactEmail: updateReq.ContactEmail,
-			Password:     updateReq.Password,
-			FirstName:    updateReq.FirstName,
-			LastName:     updateReq.LastName,
-			Company:      updateReq.Company,
-			Address:      updateReq.Address,
-			Phone:        updateReq.Phone,
-			Roles:        updateReq.Roles,
-			Disabled:     updateReq.Disabled,
-		}
-		if err := svc.Update(r.Header.Get("Authorization"), user); err != nil {
-			return updateRes{}, err
-		}
-		return updateRes{}, nil
+		return okRes{}, nil
 	}
 }
 
-func viewEndpoint(svc auth.Service) endpoint.Endpoint {
+func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		user, err := svc.View(req.key, req.ID)
+		user, err := svc.ViewUser(req.key, req.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		res := viewRes{
+		res := viewUserRes{
 			ID:           user.ID,
 			Email:        user.Email,
 			ContactEmail: user.ContactEmail,
@@ -124,7 +91,7 @@ func viewEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
-func listEndpoint(svc auth.Service) endpoint.Endpoint {
+func listUsersEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)
 		if err := req.validate(); err != nil {
@@ -136,11 +103,11 @@ func listEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		res := listRes{
-			Users: []viewRes{},
+		res := listUsersRes{
+			Users: []viewUserRes{},
 		}
 		for _, user := range users {
-			res.Users = append(res.Users, viewRes{
+			res.Users = append(res.Users, viewUserRes{
 				ID:           user.ID,
 				FirstName:    user.FirstName,
 				LastName:     user.LastName,
@@ -169,11 +136,11 @@ func nonPartnersEndpoint(svc auth.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		res := listRes{
-			Users: []viewRes{},
+		res := listUsersRes{
+			Users: []viewUserRes{},
 		}
 		for _, user := range users {
-			res.Users = append(res.Users, viewRes{
+			res.Users = append(res.Users, viewUserRes{
 				ID:        user.ID,
 				FirstName: user.FirstName,
 				LastName:  user.LastName,
@@ -181,5 +148,168 @@ func nonPartnersEndpoint(svc auth.Service) endpoint.Endpoint {
 		}
 
 		return res, nil
+	}
+}
+
+func addPolicyEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(policyRequest)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		policy := auth.Policy{
+			Version: req.Version,
+			Name:    req.Name,
+			Rules:   []auth.Rule{},
+		}
+		for _, r := range req.Rules {
+			rule := auth.Rule{
+				Type:   r.Type,
+				Action: r.Action,
+			}
+			if r.Condition != nil {
+				rule.Condition = auth.SimpleCondition{
+					Key:   r.Condition.Key,
+					Value: r.Condition.Value,
+				}
+			}
+			policy.Rules = append(policy.Rules, rule)
+		}
+
+		id, err := svc.AddPolicy(req.key, policy)
+		if err != nil {
+			return nil, err
+		}
+
+		return createRes{ID: id}, nil
+	}
+}
+
+func viewPolicyEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(identityReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		policy, err := svc.ViewPolicy(req.key, req.ID)
+		if err != nil {
+			return nil, err
+		}
+		res := viewPolicyRes{
+			ID:      policy.ID,
+			Version: policy.Version,
+			Owner:   policy.Owner,
+			Name:    policy.Name,
+			Rules:   []rule{},
+		}
+		for _, r := range policy.Rules {
+			rule := rule{
+				Action: r.Action,
+				Type:   r.Type,
+			}
+			if c, ok := r.Condition.(auth.SimpleCondition); ok {
+				rule.Condition = &condition{
+					Key: c.Key,
+				}
+				if c.Value != "" {
+					rule.Condition.Value = c.Value
+				}
+			}
+			res.Rules = append(res.Rules, rule)
+		}
+
+		return res, nil
+	}
+}
+
+func listPoliciesEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(identityReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		policies, err := svc.ListPolicies(req.key)
+		if err != nil {
+			return nil, err
+		}
+		res := listPoliciesRes{
+			Policies: []viewPolicyRes{},
+		}
+		for _, policy := range policies {
+			p := viewPolicyRes{
+				ID:      policy.ID,
+				Version: policy.Version,
+				Owner:   policy.Owner,
+				Name:    policy.Name,
+				Rules:   []rule{},
+			}
+			for _, r := range policy.Rules {
+				rule := rule{
+					Action: r.Action,
+					Type:   r.Type,
+				}
+				if c, ok := r.Condition.(auth.SimpleCondition); ok {
+					rule.Condition = &condition{
+						Key: c.Key,
+					}
+					if c.Value != "" {
+						rule.Condition.Value = c.Value
+					}
+				}
+				p.Rules = append(p.Rules, rule)
+			}
+
+			res.Policies = append(res.Policies, p)
+		}
+
+		return res, nil
+	}
+}
+
+func removePolicyEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(identityReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.RemovePolicy(req.key, req.ID); err != nil {
+			return nil, err
+		}
+
+		return removeRes{}, nil
+	}
+}
+
+func attachPolicyEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(attachReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.AttachPolicy(req.key, req.policyID, req.userID); err != nil {
+			return nil, err
+		}
+
+		return okRes{}, nil
+	}
+}
+
+func detachPolicyEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(attachReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		if err := svc.DetachPolicy(req.key, req.policyID, req.userID); err != nil {
+			return nil, err
+		}
+
+		return okRes{}, nil
 	}
 }

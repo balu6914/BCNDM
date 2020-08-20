@@ -14,6 +14,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/datapace/datapace"
+	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
 
 	"github.com/datapace/datapace/errors"
@@ -23,6 +24,7 @@ import (
 
 const (
 	defLocType  = "Point"
+	streamType  = "stream"
 	gmailSuffix = "@gmail.com"
 )
 
@@ -88,7 +90,7 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	return r
 }
 
-func checkEmail(userEmail authproto.UserEmail) (string, error) {
+func checkEmail(userEmail *authproto.UserEmail) (string, error) {
 	email := strings.ToLower(userEmail.Email)
 	contactEmail := strings.ToLower(userEmail.ContactEmail)
 	if strings.HasSuffix(email, gmailSuffix) {
@@ -101,16 +103,23 @@ func checkEmail(userEmail authproto.UserEmail) (string, error) {
 }
 
 func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	owner, err := authService.Authorize(r)
-	if err != nil {
-		return nil, err
-	}
-
 	var stream streams.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
 	}
 	defer r.Body.Close()
+
+	ar := &authproto.AuthRequest{
+		Action:     int64(auth.Create),
+		Token:      r.Header.Get("Authorization"),
+		Type:       streamType,
+		Attributes: stream.Attributes(),
+	}
+
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
+	}
 
 	if stream.Location.Type == "" {
 		stream.Location.Type = defLocType
@@ -219,7 +228,12 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 		return nil, streams.ErrWrongType
 	}
 
-	owner, err := authService.Authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.CreateBulk),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +278,12 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 }
 
 func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	owner, err := authService.Authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Update),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +307,12 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeViewStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	owner, err := authService.Authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Read),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +325,12 @@ func decodeViewStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	owner, err := authService.Authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Delete),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +343,12 @@ func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeSearchStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	owner, err := authService.Authorize(r)
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
 	if err != nil {
 		return nil, err
 	}

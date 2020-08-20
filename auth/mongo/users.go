@@ -33,18 +33,15 @@ func (ur *userRepository) Save(user auth.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	session := ur.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(usersCollection)
-
 	if err := collection.Insert(mu); err != nil {
 		if mgo.IsDup(err) {
 			return "", auth.ErrConflict
 		}
 		return "", err
 	}
-
 	return mu.ID.Hex(), nil
 }
 
@@ -95,7 +92,18 @@ func (ur *userRepository) OneByID(id string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return ur.cipher.Decrypt(mu.toUser())
+	policies, err := ur.listPolicies(mu.Policies)
+	if err != nil {
+		return auth.User{}, err
+	}
+
+	u, err := ur.cipher.Decrypt(mu.toUser())
+	if err != nil {
+		return auth.User{}, err
+	}
+
+	u.Policies = policies
+	return u, nil
 }
 
 func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
@@ -111,7 +119,18 @@ func (ur *userRepository) OneByEmail(email string) (auth.User, error) {
 		return auth.User{}, err
 	}
 
-	return ur.cipher.Decrypt(mu.toUser())
+	policies, err := ur.listPolicies(mu.Policies)
+	if err != nil {
+		return auth.User{}, err
+	}
+
+	u, err := ur.cipher.Decrypt(mu.toUser())
+	if err != nil {
+		return auth.User{}, err
+	}
+
+	u.Policies = policies
+	return u, nil
 }
 
 func (ur *userRepository) Remove(id string) error {
@@ -167,6 +186,43 @@ func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 	return users, nil
 }
 
+func (ur *userRepository) listPolicies(ids []string) ([]auth.Policy, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	session := ur.db.Copy()
+	defer session.Close()
+	collection := session.DB(dbName).C(policiesCollection)
+
+	mp := []mongoPolicy{}
+	mongoIds := []bson.ObjectId{}
+	for _, id := range ids {
+		if !bson.IsObjectIdHex(id) {
+			return nil, auth.ErrMalformedEntity
+		}
+		oid := bson.ObjectIdHex(id)
+		mongoIds = append(mongoIds, oid)
+	}
+	q := bson.M{
+		"_id": bson.M{
+			"$in": mongoIds,
+		},
+	}
+	if err := collection.Find(q).All(&mp); err != nil {
+		if err == mgo.ErrNotFound {
+			return []auth.Policy{}, auth.ErrNotFound
+		}
+		return []auth.Policy{}, err
+	}
+
+	ret := []auth.Policy{}
+	for _, p := range mp {
+		ret = append(ret, toPolicy(p))
+	}
+
+	return ret, nil
+}
+
 type mongoUser struct {
 	Email        string        `bson:"email,omitempty"`
 	Password     string        `bson:"password,omitempty"`
@@ -179,35 +235,23 @@ type mongoUser struct {
 	Phone        string        `bson:"phone,omitempty"`
 	Roles        []string      `bson:"roles,omitempty"`
 	Disabled     *bool         `bson:"disabled,omitempty"`
+	Policies     []string      `bson:"policies,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
-	if user.ID == "" {
-		return mongoUser{
-			Email:        user.Email,
-			ContactEmail: user.ContactEmail,
-			Password:     user.Password,
-			ID:           bson.NewObjectId(),
-			FirstName:    user.FirstName,
-			LastName:     user.LastName,
-			Company:      user.Company,
-			Address:      user.Address,
-			Phone:        user.Phone,
-			Roles:        user.Roles,
-			Disabled:     &user.Disabled,
-		}, nil
+	var policies []string
+	n := len(user.Policies)
+	if n > 0 {
+		policies = make([]string, n)
+		for i, p := range user.Policies {
+			policies[i] = p.ID
+		}
 	}
-
-	if !bson.IsObjectIdHex(user.ID) {
-		return mongoUser{}, auth.ErrMalformedEntity
-	}
-
-	id := bson.ObjectIdHex(user.ID)
-	return mongoUser{
+	mu := mongoUser{
 		Email:        user.Email,
 		ContactEmail: user.ContactEmail,
 		Password:     user.Password,
-		ID:           id,
+		ID:           bson.NewObjectId(),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		Company:      user.Company,
@@ -215,7 +259,19 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		Phone:        user.Phone,
 		Roles:        user.Roles,
 		Disabled:     &user.Disabled,
-	}, nil
+		Policies:     policies,
+	}
+	if user.ID == "" {
+		mu.ID = bson.NewObjectId()
+		return mu, nil
+	}
+
+	if !bson.IsObjectIdHex(user.ID) {
+		return mongoUser{}, auth.ErrMalformedEntity
+	}
+
+	mu.ID = bson.ObjectIdHex(user.ID)
+	return mu, nil
 }
 
 func (user mongoUser) toUser() auth.User {

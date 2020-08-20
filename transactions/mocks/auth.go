@@ -44,3 +44,16 @@ func (mac *mockAuthClient) Email(_ context.Context, token *authproto.Token, _ ..
 func (mac *mockAuthClient) Exists(_ context.Context, id *commonproto.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
 	return &empty.Empty{}, nil
 }
+
+func (mac *mockAuthClient) Authorize(ctx context.Context, ar *authproto.AuthRequest, opts ...grpc.CallOption) (*commonproto.ID, error) {
+	mac.mutex.Lock()
+	defer mac.mutex.Unlock()
+
+	key := ar.GetToken()
+	id, ok := mac.users[key]
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "failed to authenticate user from key")
+	}
+
+	return &commonproto.ID{Value: id}, nil
+}

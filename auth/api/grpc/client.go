@@ -15,9 +15,10 @@ import (
 var _ authproto.AuthServiceClient = (*grpcClient)(nil)
 
 type grpcClient struct {
-	identify endpoint.Endpoint
-	email    endpoint.Endpoint
-	exists   endpoint.Endpoint
+	identify  endpoint.Endpoint
+	email     endpoint.Endpoint
+	exists    endpoint.Endpoint
+	authorize endpoint.Endpoint
 }
 
 // NewClient returns new gRPC client instance.
@@ -49,10 +50,20 @@ func NewClient(conn *grpc.ClientConn) authproto.AuthServiceClient {
 		empty.Empty{},
 	).Endpoint()
 
+	authorize := kitgrpc.NewClient(
+		conn,
+		"datapace.AuthService",
+		"Authorize",
+		encodeAuthorizeRequest,
+		decodeIdentifyResponse,
+		commonproto.ID{},
+	).Endpoint()
+
 	return &grpcClient{
-		identify: identify,
-		email:    email,
-		exists:   exists,
+		identify:  identify,
+		email:     email,
+		exists:    exists,
+		authorize: authorize,
 	}
 }
 
@@ -86,6 +97,22 @@ func (client grpcClient) Exists(ctx context.Context, id *commonproto.ID, _ ...gr
 	return &empty.Empty{}, existsRes.err
 }
 
+func (client grpcClient) Authorize(ctx context.Context, ar *authproto.AuthRequest, _ ...grpc.CallOption) (*commonproto.ID, error) {
+	req := authReq{
+		token:        ar.Token,
+		action:       ar.Action,
+		resourceType: ar.Type,
+		attributes:   ar.Attributes,
+	}
+	res, err := client.authorize(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	idRes := res.(identityRes)
+	return &commonproto.ID{Value: idRes.id}, idRes.err
+}
+
 func encodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(identityReq)
 	return &authproto.Token{Value: req.token}, nil
@@ -108,4 +135,15 @@ func encodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, e
 
 func decodeExistsResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	return existsRes{nil}, nil
+}
+
+func encodeAuthorizeRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(authReq)
+	ret := &authproto.AuthRequest{
+		Token:      req.token,
+		Action:     req.action,
+		Type:       req.resourceType,
+		Attributes: req.attributes,
+	}
+	return ret, nil
 }

@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	dbName                   = "datapace-auth"
-	usersCollection          = "users"
-	accessRequestsCollection = "access-requests"
+	dbName             = "datapace-auth"
+	usersCollection    = "users"
+	policiesCollection = "policies"
 )
 
 // Connect creates a connection to the MongoDB instance. A non-nil error
@@ -34,16 +34,30 @@ func Connect(addr string, tout int, socketTout int, db string, user string, pass
 	// Create unique constraint in mongoDB.
 	session := ms.Copy()
 	defer session.Close()
-	collection := session.DB(dbName).C(usersCollection)
+	usersColl := session.DB(dbName).C(usersCollection)
 
-	index := mgo.Index{
+	usersIdx := mgo.Index{
 		Key:        []string{"email"},
 		Unique:     true,
 		DropDups:   false,
 		Background: false,
 		Sparse:     true,
 	}
-	collection.EnsureIndex(index)
+	usersColl.EnsureIndex(usersIdx)
+
+	policiesColl := session.DB(dbName).C(policiesCollection)
+
+	// Use name and owner fields as a unique constraint.
+	// This means that one user can't create many policies
+	// with the same name.
+	policiesIdx := mgo.Index{
+		Key:        []string{"name", "owner"},
+		Unique:     true,
+		DropDups:   false,
+		Background: false,
+		Sparse:     true,
+	}
+	policiesColl.EnsureIndex(policiesIdx)
 
 	return ms, nil
 }

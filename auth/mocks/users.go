@@ -1,8 +1,9 @@
 package mocks
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"sync"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/datapace/datapace/auth"
 )
@@ -10,23 +11,20 @@ import (
 var _ auth.UserRepository = (*userRepositoryMock)(nil)
 
 type userRepositoryMock struct {
-	mu    sync.Mutex
-	users map[string]auth.User
+	mu       sync.Mutex
+	users    map[string]auth.User
+	policyMu *sync.Mutex
+	policies map[string]auth.Policy
 }
 
 // NewUserRepository creates in-memory user repository.
-func NewUserRepository(hasher auth.Hasher, usr auth.User) auth.UserRepository {
+func NewUserRepository(hasher auth.Hasher, usr auth.User, policies map[string]auth.Policy, mu *sync.Mutex) auth.UserRepository {
 	users := make(map[string]auth.User)
 	hash, _ := hasher.Hash(usr.Password)
-	users[usr.Email] = auth.User{
-		ID:       usr.ID,
-		Email:    usr.Email,
-		Password: hash,
-		Roles:    usr.Roles,
-	}
-	return &userRepositoryMock{
-		users: users,
-	}
+	usr.Password = hash
+	urm := &userRepositoryMock{users: users, policies: policies, policyMu: mu}
+	urm.Save(usr)
+	return urm
 }
 
 func (urm *userRepositoryMock) Save(user auth.User) (string, error) {
@@ -52,34 +50,83 @@ func (urm *userRepositoryMock) OneByID(id string) (auth.User, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if u, ok := urm.users[id]; ok {
-		return u, nil
+	u, ok := urm.users[id]
+	if !ok {
+		return auth.User{}, auth.ErrNotFound
+	}
+	urm.policyMu.Lock()
+	defer urm.policyMu.Unlock()
+
+	for _, p := range urm.policies {
+		if p.Owner == u.ID {
+			u.Policies = append(u.Policies, p)
+		}
 	}
 
-	return auth.User{}, auth.ErrNotFound
+	return u, nil
 }
 
 func (urm *userRepositoryMock) OneByEmail(email string) (auth.User, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if u, ok := urm.users[email]; ok {
-		return u, nil
+	u, ok := urm.users[email]
+	if !ok {
+		return auth.User{}, auth.ErrNotFound
 	}
 
-	return auth.User{}, auth.ErrNotFound
+	urm.policyMu.Lock()
+	defer urm.policyMu.Unlock()
+
+	for _, p := range urm.policies {
+		if p.Owner == u.ID {
+			u.Policies = append(u.Policies, p)
+		}
+	}
+
+	return u, nil
 }
 
 func (urm *userRepositoryMock) Update(user auth.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 
-	if _, ok := urm.users[user.ID]; !ok {
+	u, ok := urm.users[user.ID]
+
+	if !ok {
 		return auth.ErrNotFound
 	}
+	if user.Email != "" {
+		u.Email = user.Email
+	}
+	if user.ContactEmail != "" {
+		u.ContactEmail = user.ContactEmail
+	}
+	if user.Password != "" {
+		u.Password = user.Password
+	}
+	if user.FirstName != "" {
+		u.FirstName = user.FirstName
+	}
+	if user.LastName != "" {
+		u.LastName = user.LastName
+	}
+	if user.Company != "" {
+		u.Company = user.Company
+	}
+	if user.Address != "" {
+		u.Address = user.Address
+	}
+	if user.Phone != "" {
+		u.Phone = user.Phone
+	}
+	u.Disabled = user.Disabled
+	if len(user.Policies) != 0 {
+		u.Policies = user.Policies
+	}
 
-	urm.users[user.Email] = user
-	urm.users[urm.users[user.Email].ID] = user
+	urm.users[user.Email] = u
+	urm.users[urm.users[user.Email].ID] = u
 
 	return nil
 }

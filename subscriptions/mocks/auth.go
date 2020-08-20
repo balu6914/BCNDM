@@ -43,3 +43,11 @@ func (svc authClientMock) Email(_ context.Context, in *authproto.Token, opts ...
 func (svc authClientMock) Exists(_ context.Context, id *commonproto.ID, opts ...grpc.CallOption) (*empty.Empty, error) {
 	return &empty.Empty{}, nil
 }
+
+func (svc authClientMock) Authorize(ctx context.Context, ar *authproto.AuthRequest, opts ...grpc.CallOption) (*commonproto.ID, error) {
+	if id, ok := svc.tokens[ar.Token]; ok {
+		return &commonproto.ID{Value: id}, nil
+	}
+
+	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
+}

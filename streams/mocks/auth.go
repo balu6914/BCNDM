@@ -1,8 +1,6 @@
 package mocks
 
 import (
-	"net/http"
-
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
 )
@@ -19,16 +17,15 @@ func NewAuth(users []string) streams.Authorization {
 	}
 }
 
-func (a authorization) Authorize(r *http.Request) (string, error) {
-	key := r.Header.Get("Authorization")
+func (a authorization) Authorize(r *authproto.AuthRequest) (string, error) {
 	for _, id := range a.users {
-		if id == key {
+		if id == r.Token {
 			return id, nil
 		}
 	}
 	return "", streams.ErrUnauthorizedAccess
 }
 
-func (a authorization) Email(token string) (authproto.UserEmail, error) {
-	return authproto.UserEmail{}, nil
+func (a authorization) Email(token string) (*authproto.UserEmail, error) {
+	return &authproto.UserEmail{}, nil
 }

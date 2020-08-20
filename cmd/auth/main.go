@@ -154,7 +154,7 @@ func connectToDB(cfg config, logger log.Logger) *mgo.Session {
 }
 
 func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Logger) {
-	err := svc.InitAdmin(auth.User{
+	user := auth.User{
 		Email:        adminEmail,
 		ContactEmail: adminEmail,
 		Password:     adminPassword,
@@ -165,8 +165,102 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 		Address:      "",
 		Phone:        "",
 		Roles:        []string{"admin"},
-	})
-	if err != nil {
+	}
+
+	policies := map[string]auth.Policy{
+		"admin": {
+			Name:    "admin",
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Any,
+					Type:   "user",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "policy",
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+				},
+			},
+		},
+		"user": {
+			Name:    "user",
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Create,
+					Type:   "stream",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "stream",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.List,
+					Type:   "stream",
+				},
+				{
+					Action: auth.List,
+					Type:   "user",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.List,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "user",
+					Condition: auth.SimpleCondition{
+						Key: "id",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "token",
+				},
+			},
+		},
+	}
+
+	if err := svc.InitAdmin(user, policies); err != nil {
 		logger.Error(fmt.Sprintf("Failed to create admin: %s", err))
 		os.Exit(1)
 	}
@@ -185,12 +279,13 @@ func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {
 func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsServiceClient, asc accessproto.AccessServiceClient, logger log.Logger) auth.Service {
 	cipher := aes.NewCipher([]byte(cfg.encryptionKey))
 	users := mongo.NewUserRepository(ms, cipher)
+	policies := mongo.NewPolicyRepository(ms)
 	hasher := bcrypt.New()
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
 
-	svc := auth.New(users, hasher, idp, ts, ac)
+	svc := auth.New(users, policies, hasher, idp, ts, ac)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

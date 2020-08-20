@@ -28,7 +28,7 @@ func (res addSubsRes) headers() map[string]string {
 }
 
 func (res addSubsRes) code() int {
-	return http.StatusMultiStatus
+	return http.StatusCreated
 }
 
 func (res addSubsRes) empty() bool {

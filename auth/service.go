@@ -5,7 +5,7 @@ import "errors"
 var (
 	// ErrConflict indicates usage of the existing email during account
 	// registration.
-	ErrConflict = errors.New("email already taken")
+	ErrConflict = errors.New("unique index violation")
 
 	// ErrMalformedEntity indicates malformed entity specification (e.g.
 	// invalid username or password).
@@ -34,7 +34,7 @@ type Service interface {
 
 	// InitAdmin creates admin account if it does not exist already. In case of the failed creation, a
 	// non-nil error value is returned.
-	InitAdmin(User) error
+	InitAdmin(User, map[string]Policy) error
 
 	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are
@@ -43,11 +43,11 @@ type Service interface {
 
 	// Update updates user account. In case of the failed update, a
 	// non-nil error value is returned.
-	Update(string, User) error
+	UpdateUser(string, User) error
 
-	// View retrieves data about the client identified with the provided ID
+	// ViewUser retrieves data about the client identified with the provided ID
 	// Key provided must have same ID (user viewing his own data) or admin role.
-	View(string, string) (User, error)
+	ViewUser(string, string) (User, error)
 
 	// ViewEmail provides backwards compatibility for grpc which doesn't support authorization at the moment
 	// It retrieves data about the client identified with the provided
@@ -64,7 +64,29 @@ type Service interface {
 	// actual partners.
 	ListNonPartners(string) ([]User, error)
 
-	// Exists checkes if user with specified id exists. If it doesn't then error
+	// Exists checks if user with specified id exists. If it doesn't then error
 	// is returned.
 	Exists(string) error
+
+	// Authorize authorizes user with provided token for executing
+	// given action over given resource.
+	Authorize(key string, action Action, resource Resource) (string, error)
+
+	// AddPolicy creates a new Policy.
+	AddPolicy(key string, policy Policy) (string, error)
+
+	// ViewPolicy returns a policy with the given ID.
+	ViewPolicy(key, id string) (Policy, error)
+
+	// ListPolicies lists all the policies that belong to the given user.
+	ListPolicies(key string) ([]Policy, error)
+
+	// RemovePolicy removes an existing policy.
+	RemovePolicy(key, id string) error
+
+	// AttachPolicy attaches a policy to the user.
+	AttachPolicy(key, policyID, userID string) error
+
+	// DetachPolicy removes policy from the user.
+	DetachPolicy(key, policyID, userID string) error
 }

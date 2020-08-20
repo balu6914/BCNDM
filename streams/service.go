@@ -129,9 +129,9 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 		}
 	}
 
-	if err := ss.terms.CreateTerms(stream); err != nil {
-		return "", err
-	}
+	// if err := ss.terms.CreateTerms(stream); err != nil {
+	// 	return "", err
+	// }
 
 	return id, nil
 }

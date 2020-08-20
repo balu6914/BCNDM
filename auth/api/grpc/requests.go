@@ -25,3 +25,27 @@ func (req existsReq) validate() error {
 
 	return nil
 }
+
+type authReq struct {
+	token        string
+	action       int64
+	resourceType string
+	attributes   map[string]string
+}
+
+// authRequest implements auth.Resource interface.
+func (ar authReq) Attributes() map[string]string {
+	return ar.attributes
+}
+
+func (ar authReq) ResourceType() string {
+	return ar.resourceType
+}
+
+func (ar authReq) validate() error {
+	if ar.token == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	return nil
+}

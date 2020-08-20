@@ -50,3 +50,18 @@ func existsEndpoint(svc auth.Service) endpoint.Endpoint {
 		return existsRes{}, nil
 	}
 }
+
+func authorizeEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(authReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		id, err := svc.Authorize(req.token, auth.Action(req.action), req)
+		if err != nil {
+			return identityRes{err: err}, err
+		}
+
+		return identityRes{id: id}, nil
+	}
+}
