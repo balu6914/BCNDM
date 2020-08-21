@@ -193,6 +193,14 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 					Action: auth.Any,
 					Type:   "contract",
 				},
+				{
+					Action: auth.Read,
+					Type:   "token",
+				},
+				{
+					Action: auth.List,
+					Type:   "token",
+				},
 			},
 		},
 		"user": {
@@ -215,6 +223,14 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 				{
 					Action: auth.List,
 					Type:   "stream",
+				},
+				{
+					Action: auth.Read,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Read,
+					Type:   "subscription",
 				},
 				{
 					Action: auth.List,
