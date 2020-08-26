@@ -30,6 +30,11 @@ ACCESS_CHAIN_PATH=github.com/chaincode/access-requests
 ACCESS_CHAIN_VER=1.0
 ACCESS_CHAIN_INIT_FN='{"Args":["init"]}'
 
+TERMS_CHAIN_ID=terms
+TERMS_CHAIN_PATH=github.com/chaincode/terms
+TERMS_CHAIN_VER=1.0
+TERMS_CHAIN_INIT_FN='{"Args":["init"]}'
+
 CERT_PATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/msp/tlscacerts/tlsca.datapace.com-cert.pem
 
 LOCATION=$PWD
@@ -104,6 +109,20 @@ peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN
 
 sleep 5
 
+cd $GOPATH/src/github.com/chaincode/terms
+# Install govendor tool
+go get -u github.com/kardianos/govendor
+
+# Fetch deps
+govendor sync
+
+cd $LOCATION
+
+# Install chaincode
+peer chaincode install -n $TERMS_CHAIN_ID -v $TERMS_CHAIN_VER -p $TERMS_CHAIN_PATH
+
+sleep 5
+
 # Init/provision system with DPC
 peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 sleep 30
@@ -120,7 +139,10 @@ sleep 30
 peer chaincode instantiate -o $ORDERER_URL -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -c "$ACCESS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 sleep 30
 
+# Init/provision system with terms
+peer chaincode instantiate -o $ORDERER_URL -n $TERMS_CHAIN_ID -v $TERMS_CHAIN_VER -c "$TERMS_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
+sleep 30
+
 echo $MSG_DONE
 
-sleep 60000
 exit 0

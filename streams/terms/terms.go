@@ -20,7 +20,7 @@ func New(client termsproto.TermsServiceClient) streams.TermsService {
 }
 
 func (ts termsService) CreateTerms(s streams.Stream) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 	_, err := ts.client.CreateTerms(ctx, &termsproto.Terms{
 		StreamId: s.ID,

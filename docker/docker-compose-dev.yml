@@ -26,6 +26,7 @@ services:
       - datapace-auth-db
     ports:
       - "8080:8080"
+      - "8081:8081"
     expose:
       - "8081"
     environment:
@@ -187,15 +188,22 @@ services:
     depends_on:
       - datapace-terms-db
       - datapace-auth
-    ports:
-      - 8096:8096
     environment:
       - DATAPACE_TERMS_HTTP_PORT=8092
       - DATAPACE_TERMS_GRPC_PORT=8093
       - DATAPACE_TERMS_DB_URL=datapace-terms-db
+      - DATAPACE_TERMS_FABRIC_ADMIN=Admin@org1.datapace.com
       - DATAPACE_AUTH_URL=datapace-auth:8081
+      - DATAPACE_CONFIG=/config
+    volumes:
+      - ../config:/config
+      - ./datapace-service-kvs:/tmp/datapace-service-kvs
+      - ./datapace-service-msp:/tmp/datapace-service-msp
     networks:
       - datapace-net
+      - fabric_datapace-bc-net
+    ports:
+      - 8092:8092
 
   ###
   # Executions DB
@@ -237,6 +245,8 @@ services:
       - DATAPACE_KUBEFLOW_ACTIVE=true
       - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io
       - DATAPACE_KUBEFLOW_STATUS_INTERVAL=10
+      - DATAPACE_AI_SYSTEM=argo
+      - DATAPACE_ARGO_URL=https://kubeflow.datapace.io
     networks:
       - datapace-net
 

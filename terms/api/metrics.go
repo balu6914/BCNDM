@@ -27,9 +27,18 @@ func MetricsMiddleware(svc terms.Service, counter metrics.Counter, latency metri
 
 func (mm metricsMiddleware) CreateTerms(terms terms.Terms) (string, error) {
 	defer func(begin time.Time) {
-		mm.counter.With("method", "add_terms").Add(1)
-		mm.latency.With("method", "add_terms").Observe(time.Since(begin).Seconds())
+		mm.counter.With("method", "create_terms").Add(1)
+		mm.latency.With("method", "create_terms").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
 	return mm.svc.CreateTerms(terms)
+}
+
+func (mm metricsMiddleware) ValidateTerms(terms terms.Terms) (bool, error) {
+	defer func(begin time.Time) {
+		mm.counter.With("method", "validate_terms").Add(1)
+		mm.latency.With("method", "validate_terms").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return mm.svc.ValidateTerms(terms)
 }

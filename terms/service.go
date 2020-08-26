@@ -32,13 +32,17 @@ var (
 type Service interface {
 	// CreateTerms creates new Terms.
 	CreateTerms(Terms) (string, error)
+
+	// ValidateTerms validates existing Terms.
+	ValidateTerms(Terms) (bool, error)
 }
 
 var _ Service = (*termsService)(nil)
 
 type termsService struct {
-	auth  authproto.AuthServiceClient
-	terms TermsRepository
+	auth   authproto.AuthServiceClient
+	terms  TermsRepository
+	ledger TermsLedger
 }
 
 func (ts termsService) CreateTerms(t Terms) (string, error) {
@@ -48,13 +52,19 @@ func (ts termsService) CreateTerms(t Terms) (string, error) {
 	}
 	t.TermsHash = hash
 	_, err = ts.terms.Save(t)
+	ts.ledger.CreateTerms(t)
 	return "", err
 }
 
-func New(auth authproto.AuthServiceClient, terms TermsRepository) Service {
+func (ts termsService) ValidateTerms(t Terms) (bool, error) {
+	return ts.ledger.ValidateTerms(t)
+}
+
+func New(auth authproto.AuthServiceClient, terms TermsRepository, ledger TermsLedger) Service {
 	return &termsService{
-		auth:  auth,
-		terms: terms,
+		auth:   auth,
+		terms:  terms,
+		ledger: ledger,
 	}
 }
 
