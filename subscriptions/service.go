@@ -60,6 +60,9 @@ type Service interface {
 	// ViewSubByUserAndStream retrieves subscription by the given user ID and
 	// stream ID.
 	ViewSubByUserAndStream(string, string) (Subscription, error)
+
+	// Report generates PDF report.
+	Report(Query, string) ([]byte, error)
 }
 
 var _ Service = (*subscriptionsService)(nil)

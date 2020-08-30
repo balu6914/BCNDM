@@ -75,3 +75,17 @@ func (lm *loggingMiddleware) ViewSubByUserAndStream(userID, streamID string) (su
 
 	return lm.svc.ViewSubByUserAndStream(userID, streamID)
 }
+
+func (lm *loggingMiddleware) Report(query subscriptions.Query, owner string) (report []byte, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method report took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.Report(query, owner)
+}

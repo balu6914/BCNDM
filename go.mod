@@ -30,6 +30,7 @@ require (
 	github.com/hyperledger/fabric-amcl v0.0.0-20181230093703-5ccba6eab8d6 // indirect
 	github.com/hyperledger/fabric-sdk-go v1.0.0-beta2
 	github.com/jmoiron/sqlx v1.2.0
+	github.com/johnfercher/maroto v0.27.0
 	github.com/lib/pq v1.3.0
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/opencontainers/runc v1.0.0-rc6 // indirect

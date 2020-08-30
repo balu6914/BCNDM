@@ -61,3 +61,12 @@ func (ms *metricsMiddleware) ViewSubByUserAndStream(userID, streamID string) (su
 
 	return ms.svc.ViewSubByUserAndStream(userID, streamID)
 }
+
+func (ms *metricsMiddleware) Report(query subscriptions.Query, owner string) ([]byte, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "report").Add(1)
+		ms.latency.With("method", "report").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.Report(query, owner)
+}

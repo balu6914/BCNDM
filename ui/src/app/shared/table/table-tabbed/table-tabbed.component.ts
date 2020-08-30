@@ -3,6 +3,7 @@ import { Page } from 'app/common/interfaces/page.interface';
 import { Subscription } from 'app/common/interfaces/subscription.interface';
 import { Table, TableType } from 'app/shared/table/table';
 import { StreamSection, StreamsType } from './section.streams';
+import { SubscriptionService } from 'app/common/services/subscription.service';
 
 
 
@@ -22,7 +23,9 @@ export class TableTabbedComponent implements OnInit, OnChanges {
   section: StreamSection = new StreamSection();
   types = StreamsType;
 
-  constructor() { }
+  constructor(
+        private subscriptionService: SubscriptionService,
+  ) { }
 
   ngOnChanges() {
     const table = Object.assign({}, this.table);
@@ -33,10 +36,10 @@ export class TableTabbedComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (this.type === TableType.Dashboard) {
       this.table.tableType = TableType.Dashboard;
-      this.table.headers = ['Stream Name', 'Price Paid', 'Start Date', 'End Date', 'URL'];
+      this.table.headers = ['Stream Name', 'Price Paid', 'Start time', 'End time', 'URL'];
     } else {
       this.table.tableType = TableType.Wallet;
-      this.table.headers = ['Stream Name', 'Type', 'Date', 'Value'];
+      this.table.headers = ['Stream Name', 'Type', 'Date and time', 'Value'];
     }
     this.table.page = new Page<Subscription>(0, 0, 0, []);
   }
@@ -50,4 +53,17 @@ export class TableTabbedComponent implements OnInit, OnChanges {
     this.tabChanged.emit(this.section);
   }
 
+  report() {
+    this.subscriptionService.report(0, 100, this.section.name.toLowerCase()).subscribe(
+      (data: any) => {
+        console.log(data)
+        const a = document.createElement('a')
+        const objectUrl = URL.createObjectURL(data)
+        a.href = objectUrl
+        a.download = 'report.pdf';
+        a.click();
+      },
+      err => console.log(err)
+    );
+  }
 }

@@ -52,20 +52,30 @@ func searchSubsEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		q := subscriptions.Query{
-			Page:        req.Page,
-			Limit:       req.Limit,
-			StreamID:    req.StreamID,
-			StreamOwner: req.StreamOwner,
-			UserID:      req.UserID,
-		}
-
-		page, err := svc.SearchSubscriptions(q)
+		page, err := svc.SearchSubscriptions(req.Query)
 		if err != nil {
 			return nil, err
 		}
 
 		res := searchSubsRes{page}
+		return res, nil
+	}
+}
+
+func reportSubsEndpoint(svc subscriptions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(searchSubsReq)
+
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		resp, err := svc.Report(req.Query, req.owner)
+		if err != nil {
+			return nil, err
+		}
+
+		res := reportResponse(resp)
 		return res, nil
 	}
 }

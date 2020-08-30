@@ -26,6 +26,17 @@ github.com/Nvveen/Gotty
 github.com/asaskevich/govalidator
 # github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973
 github.com/beorn7/perks/quantile
+# github.com/boombuler/barcode v1.0.0
+github.com/boombuler/barcode
+github.com/boombuler/barcode/aztec
+github.com/boombuler/barcode/codabar
+github.com/boombuler/barcode/code128
+github.com/boombuler/barcode/code39
+github.com/boombuler/barcode/datamatrix
+github.com/boombuler/barcode/ean
+github.com/boombuler/barcode/qr
+github.com/boombuler/barcode/twooffive
+github.com/boombuler/barcode/utils
 # github.com/cenkalti/backoff v2.1.1+incompatible
 ## explicit
 github.com/cenkalti/backoff
@@ -141,6 +152,8 @@ github.com/google/certificate-transparency-go/x509/pkix
 ## explicit
 # github.com/google/martian v2.1.0+incompatible
 ## explicit
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
 # github.com/googleapis/gax-go v1.0.3
 ## explicit
 github.com/googleapis/gax-go
@@ -373,6 +386,16 @@ github.com/hyperledger/fabric-sdk-go/test/metadata
 ## explicit
 github.com/jmoiron/sqlx
 github.com/jmoiron/sqlx/reflectx
+# github.com/johnfercher/maroto v0.27.0
+## explicit
+github.com/johnfercher/maroto/internal
+github.com/johnfercher/maroto/pkg/color
+github.com/johnfercher/maroto/pkg/consts
+github.com/johnfercher/maroto/pkg/pdf
+github.com/johnfercher/maroto/pkg/props
+# github.com/jung-kurt/gofpdf v1.4.2
+github.com/jung-kurt/gofpdf
+github.com/jung-kurt/gofpdf/contrib/barcode
 # github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
@@ -456,6 +479,8 @@ github.com/prometheus/procfs/xfs
 ## explicit
 github.com/rubenv/sql-migrate
 github.com/rubenv/sql-migrate/sqlparse
+# github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58
+github.com/ruudk/golang-pdf417
 # github.com/satori/go.uuid v1.2.0
 ## explicit
 github.com/satori/go.uuid

@@ -28,7 +28,7 @@ export class DashboardMainStreamsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.table.tableType = TableType.Dashboard;
-    this.table.headers = ['Stream Name', 'Price Paid', 'Start Date', 'End Date', 'URL'];
+    this.table.headers = ['Stream Name', 'Price Paid', 'Start time', 'End time', 'URL'];
     this.table.page = new Page<Subscription>(0, 0, 0, []);
   }
 

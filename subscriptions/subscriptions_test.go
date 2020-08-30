@@ -37,8 +37,8 @@ var subscription = subscriptions.Subscription{
 func newService(tokens map[string]string) subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
 	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
-		stream1ID: subscriptions.Stream{Price: 10, Owner: user2ID},
-		stream2ID: subscriptions.Stream{Price: 100, Owner: user1ID},
+		stream1ID: {Price: 10, Owner: user2ID},
+		stream2ID: {Price: 100, Owner: user1ID},
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)

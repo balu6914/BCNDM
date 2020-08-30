@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
+	"github.com/datapace/datapace/proto/common"
 	"github.com/datapace/datapace/subscriptions"
 )
 
@@ -57,6 +59,13 @@ func MakeHandler(svc subscriptions.Service, ac authproto.AuthServiceClient) http
 		opts...,
 	))
 
+	r.Get("/subscriptions/report", kithttp.NewServer(
+		reportSubsEndpoint(svc),
+		decodeReportRequest,
+		encodeBinaryResponse,
+		opts...,
+	))
+
 	r.Get("/subscriptions/:id", kithttp.NewServer(
 		viewSubEndpoint(svc),
 		decodeViewSubRequest,
@@ -79,13 +88,37 @@ func MakeHandler(svc subscriptions.Service, ac authproto.AuthServiceClient) http
 
 func decodeSearch(r *http.Request) (searchSubsReq, error) {
 	q := r.URL.Query()
-
 	req := searchSubsReq{
-		Limit: 20,
+		Query: subscriptions.Query{
+			Limit: 20,
+			Page:  20,
+		},
 	}
-
-	if err := searchFields(&req, q); err != nil {
-		return searchSubsReq{}, err
+	for k, v := range q {
+		if len(v) != 0 && v[0] != "" {
+			switch k {
+			case "page":
+				p, err := strconv.ParseUint(v[0], 10, 64)
+				if err != nil {
+					return req, err
+				}
+				req.Page = p
+			case "limit":
+				l, err := strconv.ParseUint(v[0], 10, 64)
+				if err != nil {
+					return req, err
+				}
+				req.Limit = l
+			case "streamId":
+				req.StreamID = v[0]
+			case "startTime":
+				st, err := time.Parse(time.ANSIC, v[0])
+				if err != nil {
+					return req, err
+				}
+				req.StartTime = &st
+			}
+		}
 	}
 
 	return req, nil
@@ -125,7 +158,7 @@ func decodeAddSubRequest(_ context.Context, r *http.Request) (interface{}, error
 	return req, nil
 }
 
-func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func authorize(r *http.Request) (*common.ID, error) {
 	ar := &authproto.AuthRequest{
 		Action: int64(auth.List),
 		Type:   resourceType,
@@ -134,9 +167,13 @@ func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, e
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	userID, err := authClient.Authorize(ctx, ar)
+	return authClient.Authorize(ctx, ar)
+}
+
+func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authorize(r)
 	if err != nil {
-		return nil, subscriptions.ErrUnauthorizedAccess
+		return nil, err
 	}
 
 	req, err := decodeSearch(r)
@@ -145,22 +182,13 @@ func decodeBoughtSubsRequest(_ context.Context, r *http.Request) (interface{}, e
 	}
 
 	req.UserID = userID.GetValue()
-
 	return req, nil
 }
 
 func decodeOwnedSubsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	ar := &authproto.AuthRequest{
-		Action: int64(auth.List),
-		Type:   resourceType,
-		Token:  r.Header.Get("Authorization"),
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	userID, err := authClient.Authorize(ctx, ar)
+	userID, err := authorize(r)
 	if err != nil {
-		return nil, subscriptions.ErrUnauthorizedAccess
+		return nil, err
 	}
 
 	req, err := decodeSearch(r)
@@ -169,7 +197,31 @@ func decodeOwnedSubsRequest(_ context.Context, r *http.Request) (interface{}, er
 	}
 
 	req.StreamOwner = userID.GetValue()
+	return req, nil
+}
 
+func decodeReportRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	userID, err := authorize(r)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := decodeSearch(r)
+	if err != nil {
+		return nil, err
+	}
+	id := userID.GetValue()
+	q := r.URL.Query().Get("type")
+	req.owner = id
+	switch q {
+	case "bought":
+		req.UserID = id
+	case "sold":
+		req.StreamOwner = id
+	default:
+		req.UserID = id
+		req.StreamOwner = id
+	}
 	return req, nil
 }
 
@@ -221,6 +273,23 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	}
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+func encodeBinaryResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	if ar, ok := response.(apiRes); ok {
+		for k, v := range ar.headers() {
+			w.Header().Set(k, v)
+		}
+
+		w.WriteHeader(ar.code())
+
+		if ar.empty() {
+			return nil
+		}
+	}
+	buff := response.(reportResponse)
+	_, err := w.Write(buff)
+	return err
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {

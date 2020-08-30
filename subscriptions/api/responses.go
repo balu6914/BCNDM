@@ -66,3 +66,19 @@ func (res searchSubsRes) code() int {
 func (res searchSubsRes) empty() bool {
 	return false
 }
+
+type reportResponse []byte
+
+func (res reportResponse) headers() map[string]string {
+	return map[string]string{
+		"Content-Type": "application/pdf",
+	}
+}
+
+func (res reportResponse) code() int {
+	return http.StatusOK
+}
+
+func (res reportResponse) empty() bool {
+	return false
+}

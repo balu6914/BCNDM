@@ -1,9 +1,9 @@
 <!-- Dashboard -->
 <tr *ngIf="rowType === types.Dashboard">
   <td>{{ row.stream_name }}</td>
-  <td nowrap>{{ row.stream_price | dpc}}</td>
-  <td nowrap>{{ row.start_date| date }}</td>
-  <td nowrap>{{ row.end_date | date }}</td>
+  <td nowrap>{{ row.stream_price | dpc }}</td>
+  <td nowrap>{{ row.start_date | date: 'medium' }}</td>
+  <td nowrap>{{ row.end_date | date: 'medium' }}</td>
   <td nowrap>
     <div class="action-wrapper">
       <a href="{{row.url || row.stream_url}}" target="_blank" class="btn btn-primary-alt btn-sm">Open</a>
@@ -15,7 +15,7 @@
 <tr *ngIf="rowType === types.Wallet">
   <td>{{ row.stream_name }}</td>
   <td>{{ row.type }}</td>
-  <td nowrap>{{ row.start_date| date }}</td>
+  <td nowrap>{{ row.start_date | date: 'medium' }}</td>
   <div class="value" [ngClass]="row.type === 'Income' ? 'value--plus' : 'value--minus'">
     <td nowrap>{{row.stream_price | dpc | subscriptionType:row.type}}</td>
   </div>
@@ -24,8 +24,8 @@
 <tr *ngIf="rowType === types.Contract">
   <td>{{ row.stream_name}}</td>
   <td nowrap>{{ row.share }} %</td>
-  <td nowrap> {{row.start_time | date: 'MMM d, y'}}</td>
-  <td nowrap> {{row.end_time | date: 'MMM d, y'}}</td>
+  <td nowrap> {{row.start_time | date: 'medium'}}</td>
+  <td nowrap> {{row.end_time | date: 'medium'}}</td>
   <td nowrap>
     <div *ngIf="row.signed && !(row.end_time < currentDate)" class="status-wrapper">
       <span class="status-icon status-icon--signed"></span>

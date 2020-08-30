@@ -22,15 +22,11 @@ type addSubsReq struct {
 }
 
 type searchSubsReq struct {
-	StreamOwner string
-	UserID      string
-	Page        uint64 `alias:"page"`
-	Limit       uint64 `alias:"limit"`
-	StreamID    string `alias:"streamId"`
+	owner string
+	subscriptions.Query
 }
 
 func (req searchSubsReq) validate() error {
-
 	if !bson.IsObjectIdHex(req.UserID) && !bson.IsObjectIdHex(req.StreamOwner) {
 		return subscriptions.ErrMalformedEntity
 	}

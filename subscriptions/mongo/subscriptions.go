@@ -55,7 +55,7 @@ func (sr subscriptionRepository) Search(query subscriptions.Query) (subscription
 	}
 
 	results := []subscription{}
-	q := subscriptions.GenQuery(&query)
+	q := genQuery(query)
 
 	total, err := c.Find(q).Count()
 	if err != nil {
@@ -202,4 +202,29 @@ func toSub(dbSub subscription) subscriptions.Subscription {
 		StreamPrice: dbSub.StreamPrice,
 		StreamName:  dbSub.StreamName,
 	}
+}
+
+func genQuery(q subscriptions.Query) *bson.M {
+	query := bson.M{"active": true}
+	if q.StreamID != "" {
+		query["stream_id"] = q.StreamID
+	}
+	if q.UserID != "" && q.StreamOwner != "" {
+		query["$or"] = []bson.M{
+			{
+				"user_id": q.UserID,
+			},
+			{
+				"stream_owner": q.StreamOwner,
+			},
+		}
+		return &query
+	}
+	if q.UserID != "" {
+		query["user_id"] = q.UserID
+	}
+	if q.StreamOwner != "" {
+		query["stream_owner"] = q.StreamOwner
+	}
+	return &query
 }

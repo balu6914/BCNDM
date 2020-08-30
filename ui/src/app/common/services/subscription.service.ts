@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -30,6 +30,20 @@ export class SubscriptionService {
         .set('page', page.toString())
         .set('limit', limit.toString())
     });
+  }
+
+ report(page: number, limit: number, reqType: string): Observable<any> {
+   var options = {
+     headers: new HttpHeaders({
+        'Accept':'application/pdf'
+     }),
+      params: new HttpParams()
+        .set('page', page.toString())
+        .set('limit', limit.toString())
+        .set('type', reqType),
+     'responseType': 'blob' as 'json'
+  }
+    return this.http.get<any>(`${environment.API_SUBSCRIPTIONS}/report`, options);
   }
 
   add(data) {

@@ -26,34 +26,34 @@ export class BalanceComponent implements OnInit {
     private modalService: BsModalService,
     private balanceService: BalanceService,
     private midpcPipe: MidpcPipe,
-  ) {}
+  ) { }
 
-    // Open BUY tokens dialog
-    onBuyTokensClick() {
-        this.modalRef = this.modalService.show(BalanceAddComponent);
-        // Listen to balance update event
-        this.modalRef.content.balanceUpdate.subscribe(e => {
-          // Fetch updated user balance
-          this.getBalance().then(
-          (response) => {
-              this.modalRef.hide();
-          },
-        ).catch(err => console.log(err));
-        });
-    }
-    // Open Withdraw tokens dialog
-    onWithdrawTokensClick() {
-        this.modalRef = this.modalService.show(BalanceWithdrawComponent);
-        // Listen to balance update event
-        this.modalRef.content.balanceUpdate.subscribe(e => {
-          // Fetch updated user balance
-          this.getBalance().then(
-          (response) => {
-              this.modalRef.hide();
-          },
-        ).catch(err => console.log(err));
-        });
-    }
+  // Open BUY tokens dialog
+  onBuyTokensClick() {
+    this.modalRef = this.modalService.show(BalanceAddComponent);
+    // Listen to balance update event
+    this.modalRef.content.balanceUpdate.subscribe(e => {
+      // Fetch updated user balance
+      this.getBalance().then(
+        (response) => {
+          this.modalRef.hide();
+        },
+      ).catch(err => console.log(err));
+    });
+  }
+  // Open Withdraw tokens dialog
+  onWithdrawTokensClick() {
+    this.modalRef = this.modalService.show(BalanceWithdrawComponent);
+    // Listen to balance update event
+    this.modalRef.content.balanceUpdate.subscribe(e => {
+      // Fetch updated user balance
+      this.getBalance().then(
+        (response) => {
+          this.modalRef.hide();
+        },
+      ).catch(err => console.log(err));
+    });
+  }
 
   ngOnInit() {
     this.authService.getCurrentUser().subscribe(
@@ -85,5 +85,4 @@ export class BalanceComponent implements OnInit {
     });
     return promise;
   }
-
 }
