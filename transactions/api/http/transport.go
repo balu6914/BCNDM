@@ -225,7 +225,7 @@ func decodeSignContractReq(_ context.Context, r *http.Request) (interface{}, err
 
 func decodeListContractsReq(_ context.Context, r *http.Request) (interface{}, error) {
 	ar := &authproto.AuthRequest{
-		Action: int64(auth.Read),
+		Action: int64(auth.List),
 		Type:   contractType,
 		Token:  r.Header.Get("Authorization"),
 	}

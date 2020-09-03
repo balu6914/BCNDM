@@ -8,11 +8,8 @@ import (
 	"net/http"
 
 	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/access-control"
-
 	kithttp "github.com/go-kit/kit/transport/http"
-
 	"github.com/go-zoo/bone"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
