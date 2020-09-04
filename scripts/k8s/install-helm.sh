@@ -11,6 +11,8 @@ ssh $DATAPACEHOSTUSER@$DATAPACEHOSTIP << EOF
   /snap/bin/helm repo add bitnami https://charts.bitnami.com/bitnami
   tar -xf helm.tar.gz
   cd helm/datapace
+  sed -i 's/admin@datapace.local$/$DATAPACEADMIN/g' values.yaml
+  sed -i 's/datapaceadmin$/$DATAPACEADMINPASSWORD/g' values.yaml
   sed -i 's/ui.datapace.local$/$UIHOSTNAME/g' values.yaml
   sed -i 's/dproxy.datapace.local$/$DPROXYHOSTNAME/g' values.yaml
   sed -i 's/ip: 10.0.0.1$/ip: $BCHOSTIP/g' values.yaml

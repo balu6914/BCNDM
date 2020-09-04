@@ -44,6 +44,9 @@ auth:
   suffix: auth
   image:
     name: auth
+  admin:
+    email: admin@datapace.local
+    password: datapaceadmin
   service:
     type: ClusterIP
     port:
@@ -70,6 +73,16 @@ accesscontrol:
     port:
       http: 8090
       grpc: 8091
+
+terms:
+  suffix: terms
+  image:
+    name: terms
+  service:
+    type: ClusterIP
+    port:
+      http: 8092
+      grpc: 8093
 
 streams:
   suffix: streams

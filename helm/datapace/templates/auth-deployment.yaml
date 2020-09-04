@@ -29,6 +29,10 @@ spec:
               value: "{{ include "datapace.fullname" . }}-{{ .Values.accesscontrol.suffix }}:{{ .Values.accesscontrol.service.port.grpc }}"
             - name: DATAPACE_AUTH_SECRET
               value: "datapace"
+            - name: DATAPACE_ADMIN_EMAIL
+              value: "{{ .Values.auth.admin.email }}"
+            - name: DATAPACE_ADMIN_PASSWORD
+              value: "{{ .Values.auth.admin.password }}"
           name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}

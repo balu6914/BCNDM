@@ -35,6 +35,8 @@ spec:
               value: "{{ include "datapace.fullname" . }}-{{ .Values.executions.suffix }}:{{ .Values.executions.service.port.grpc }}"
             - name: DATAPACE_ACCESS_CONTROL_URL
               value: "{{ include "datapace.fullname" . }}-{{ .Values.accesscontrol.suffix }}:{{ .Values.accesscontrol.service.port.grpc }}"
+            - name: DATAPACE_TERMS_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.terms.suffix }}:{{ .Values.terms.service.port.grpc }}"
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /tmp/config/big-query/DigiSense-1987a4981f2e.json
             - name: DATAPACE_KUBEFLOW_URL
