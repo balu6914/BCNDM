@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/datapace/datapace"
 	termsproto "github.com/datapace/datapace/proto/terms"
 	"github.com/datapace/datapace/terms"
 	"github.com/datapace/datapace/transactions"
@@ -38,6 +39,7 @@ func MakeHandler(svc terms.Service) http.Handler {
 		encodeResponse,
 		opts...,
 	))
+	r.GetFunc("/version", datapace.Version())
 	return r
 }
 

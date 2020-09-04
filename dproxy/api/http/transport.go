@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/datapace/datapace"
 	"io"
 	"net/http"
 
@@ -40,6 +41,7 @@ func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy, dProxyRootUr
 		decodeCreateUrl,
 		encodeUrlResponse,
 		opts...))
+	r.GetFunc("/version", datapace.Version())
 	return r
 }
 
