@@ -76,7 +76,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/policies.:id", kithttp.NewServer(
+	r.Get("/policies/:id", kithttp.NewServer(
 		viewPolicyEndpoint(svc),
 		decodeIdentity,
 		encodeResponse,
