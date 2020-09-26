@@ -1,44 +1,54 @@
 package terms
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"crypto/sha256"
+	"fmt"
+	"io"
+	"net/http"
 )
 
-// Terms represents users terms for his stream.
-type Terms struct {
-	ID        bson.ObjectId `json:"id,omitempty"`
-	StreamID  string        `json:"stream_id,omitempty"`
-	TermsURL  string        `json:"terms_url,omitempty"`
-	TermsHash string        `json:"terms_hash,omitempty"`
+var _ Service = (*termsService)(nil)
+
+type termsService struct {
+	terms  TermsRepository
+	ledger TermsLedger
 }
 
-// Validate returns an error if representation is invalid.
-func (sub *Terms) Validate() error {
-	return nil
+func New(terms TermsRepository, ledger TermsLedger) Service {
+	return &termsService{
+		terms:  terms,
+		ledger: ledger,
+	}
 }
 
-// Page represents paged result for list response.
-type Page struct {
-	Page    uint64  `json:"page"`
-	Limit   uint64  `json:"limit"`
-	Total   uint64  `json:"total"`
-	Content []Terms `json:"content"`
+func (ts termsService) CreateTerms(t Terms) (string, error) {
+	hash, err := makeHash(t)
+	if err != nil {
+		return "", err
+	}
+	t.TermsHash = hash
+	_, err = ts.terms.Save(t)
+	if err != nil {
+		return "", err
+	}
+	err = ts.ledger.CreateTerms(t)
+	return hash, err
 }
 
-// TermsRepository specifies a Terms persistence API.
-type TermsRepository interface {
-	// Save persists terms.
-	Save(Terms) (string, error)
-
-	// One retrieves Terms by its ID.
-	One(string) (Terms, error)
+func (ts termsService) ValidateTerms(t Terms) (bool, error) {
+	return ts.ledger.ValidateTerms(t)
 }
 
-// TermsLedger specifies access terms writer API.
-type TermsLedger interface {
-	// CreateTerms creates new terms for stream.
-	CreateTerms(Terms) error
-
-	// ValidateTerms validates terms for stream.
-	ValidateTerms(Terms) (bool, error)
+func makeHash(t Terms) (string, error) {
+	resp, err := http.Get(t.TermsURL)
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", ErrNotFound
+	}
+	defer resp.Body.Close()
+	hash := sha256.New()
+	io.Copy(hash, resp.Body)
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }

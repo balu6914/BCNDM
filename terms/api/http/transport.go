@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/datapace/datapace"
+	authproto "github.com/datapace/datapace/proto/auth"
 	termsproto "github.com/datapace/datapace/proto/terms"
 	"github.com/datapace/datapace/terms"
 	"github.com/datapace/datapace/transactions"
@@ -26,7 +27,7 @@ var (
 	termsClient               termsproto.TermsServiceClient
 )
 
-func MakeHandler(svc terms.Service) http.Handler {
+func MakeHandler(svc terms.Service, auth authproto.AuthServiceClient) http.Handler {
 
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),

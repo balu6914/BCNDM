@@ -16,9 +16,9 @@ const (
 	chanID           = "datapacechannel"
 )
 
-var _ t.TermsLedger = (*createTermsLedger)(nil)
+var _ t.TermsLedger = (*termsLedger)(nil)
 
-type createTermsLedger struct {
+type termsLedger struct {
 	sdk       *fabsdk.FabricSDK
 	admin     string
 	org       string
@@ -28,7 +28,7 @@ type createTermsLedger struct {
 
 // NewTermsLedger returns Fabric instance of terms ledger.
 func NewTermsLedger(sdk *fabsdk.FabricSDK, admin, org, chaincode string, logger log.Logger) t.TermsLedger {
-	return createTermsLedger{
+	return termsLedger{
 		sdk:       sdk,
 		admin:     admin,
 		org:       org,
@@ -37,16 +37,16 @@ func NewTermsLedger(sdk *fabsdk.FabricSDK, admin, org, chaincode string, logger 
 	}
 }
 
-func (ctl createTermsLedger) CreateTerms(terms t.Terms) error {
-	ctx := ctl.sdk.ChannelContext(
+func (tl termsLedger) CreateTerms(terms t.Terms) error {
+	ctx := tl.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(ctl.admin),
-		fabsdk.WithOrg(ctl.org),
+		fabsdk.WithUser(tl.admin),
+		fabsdk.WithOrg(tl.org),
 	)
 
 	client, err := channel.New(ctx)
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
 		return err
 	}
 
@@ -58,32 +58,32 @@ func (ctl createTermsLedger) CreateTerms(terms t.Terms) error {
 
 	data, err := json.Marshal(req)
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to serialize create terms request: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to serialize create terms request: %s", err))
 		return err
 	}
 
 	_, err = client.Execute(channel.Request{
-		ChaincodeID: ctl.chaincode,
+		ChaincodeID: tl.chaincode,
 		Fcn:         createTermsFcn,
 		Args:        [][]byte{data},
 	})
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to execute terms chaincode: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to execute terms chaincode: %s", err))
 		return err
 	}
 	return nil
 }
 
-func (ctl createTermsLedger) ValidateTerms(terms t.Terms) (bool, error) {
-	ctx := ctl.sdk.ChannelContext(
+func (tl termsLedger) ValidateTerms(terms t.Terms) (bool, error) {
+	ctx := tl.sdk.ChannelContext(
 		chanID,
-		fabsdk.WithUser(ctl.admin),
-		fabsdk.WithOrg(ctl.org),
+		fabsdk.WithUser(tl.admin),
+		fabsdk.WithOrg(tl.org),
 	)
 
 	client, err := channel.New(ctx)
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
 		return false, err
 	}
 
@@ -95,21 +95,21 @@ func (ctl createTermsLedger) ValidateTerms(terms t.Terms) (bool, error) {
 
 	data, err := json.Marshal(req)
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to serialize validate terms request: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to serialize validate terms request: %s", err))
 		return false, err
 	}
 	resp, err := client.Execute(channel.Request{
-		ChaincodeID: ctl.chaincode,
+		ChaincodeID: tl.chaincode,
 		Fcn:         validateTermsFcn,
 		Args:        [][]byte{data},
 	})
 	if err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to validate terms chaincode: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to validate terms chaincode: %s", err))
 		return false, err
 	}
 	var res validationRes
 	if err := json.Unmarshal(resp.Payload, &res); err != nil {
-		ctl.logger.Warn(fmt.Sprintf("failed to deserialize terms validation payload: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to deserialize terms validation payload: %s", err))
 		return false, err
 	}
 	return res.Valid, nil

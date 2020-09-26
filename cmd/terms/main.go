@@ -83,10 +83,10 @@ func main() {
 	auth := authapi.NewClient(aconn)
 	sdk := newFabricSDK(cfg.fabricConfigFile, logger)
 	defer sdk.Close()
-	svc := newService(cfg, auth, ms, sdk, logger)
+	svc := newService(cfg, ms, sdk, logger)
 	errs := make(chan error, 2)
 	go startGRPCServer(svc, cfg.grpcPort, logger, errs)
-	go startHTTPServer(svc, cfg.httpPort, logger, errs)
+	go startHTTPServer(svc, auth, cfg.httpPort, logger, errs)
 	err := <-errs
 	logger.Error(fmt.Sprintf("Terms service terminated: %s", err))
 }
@@ -137,7 +137,7 @@ func newGRPCConn(addr string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(cfg config, auth authproto.AuthServiceClient, ms *mgo.Session, sdk *fabsdk.FabricSDK, logger log.Logger) terms.Service {
+func newService(cfg config, ms *mgo.Session, sdk *fabsdk.FabricSDK, logger log.Logger) terms.Service {
 	tl := fabric.NewTermsLedger(
 		sdk,
 		cfg.fabricOrgAdmin,
@@ -147,7 +147,7 @@ func newService(cfg config, auth authproto.AuthServiceClient, ms *mgo.Session, s
 	)
 	repo := mongo.NewTermsRepository(ms)
 
-	svc := terms.New(auth, repo, tl)
+	svc := terms.New(repo, tl)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
@@ -182,10 +182,10 @@ func startGRPCServer(svc terms.Service, port string, logger log.Logger, errs cha
 	errs <- server.Serve(listener)
 }
 
-func startHTTPServer(svc terms.Service, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(svc terms.Service, auth authproto.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Streams service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, auth))
 }
 
 func newFabricSDK(configFile string, logger log.Logger) *fabsdk.FabricSDK {
