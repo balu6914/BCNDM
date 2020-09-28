@@ -1,0 +1,37 @@
+swagger: "2.0"
+info:
+  title: Go Terns service
+  description: HTTP API for terms service.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /streams/{StreamID}/terms/{TermsHash}:
+    get:
+      summary: Validates terms hash for a given stream id
+      parameters:
+        - $ref: '#/parameters/StreamId'
+        - $ref: '#/parameters/TermsHash'
+      responses:
+        200:
+          description: Terms hash is valid.
+        500:
+          $ref: "#/responses/ServiceError"
+parameters:
+  StreamID:
+    name: StreamId
+    description: Stream id.
+    in: path
+    type: string
+    required: true
+  TermsHash:
+    name: TermsHash
+    description: Hash string of terms.
+    in: path
+    type: string
+    required: true
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
