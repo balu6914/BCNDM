@@ -298,10 +298,6 @@ services:
     container_name: datapace-dproxy
     environment:
       - DATAPACE_DPROXY_DB_HOST=datapace-dproxy-db
-      - DATAPACE_DPROXY_DB_PORT=5432
-      - DATAPACE_DPROXY_DB_USER=dproxy
-      - DATAPACE_DPROXY_DB_PASS=dproxy
-      - DATAPACE_DPROXY_DB_=dproxy
       - DATAPACE_LOCAL_FS_ROOT=/data
     depends_on:
       - datapace-dproxy-db
@@ -314,14 +310,13 @@ services:
       - datapace-net
 
   datapace-dproxy-db:
-    image: postgres:10.8-alpine
+    image: mongo:latest
     container_name: datapace-dproxy-db
-    environment:
-      - POSTGRES_USER=dproxy
-      - POSTGRES_PASSWORD=dproxy
-      - POSTGRES_DB=dproxy
+    command: --nojournal
+    ports:
+      - 27021:27017
     volumes:
-      - ./dproxy-db-data:/var/lib/postgresql/data
+      - ./dproxy-data:/data/db
     networks:
       - datapace-net
 

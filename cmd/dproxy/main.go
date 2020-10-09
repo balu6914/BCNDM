@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/dproxy/persistence"
+	"github.com/datapace/datapace/errors"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,11 +15,11 @@ import (
 	"github.com/datapace/datapace/dproxy/api"
 	httpapi "github.com/datapace/datapace/dproxy/api/http"
 	"github.com/datapace/datapace/dproxy/jwt"
+	"github.com/datapace/datapace/dproxy/persistence/mongo"
 	"github.com/datapace/datapace/dproxy/persistence/postgres"
 	"github.com/datapace/datapace/logger"
 	log "github.com/datapace/datapace/logger"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/jmoiron/sqlx"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -27,10 +29,11 @@ const (
 	defHTTPPort       = "8087"
 	defJWTSecret      = "examplesecret"
 	defLocalFsRoot    = "/tmp/test"
-	defDBHost         = "localhost"
-	defDBPort         = "5432"
-	defDBUser         = "dproxy"
-	defDBPass         = "dproxy"
+	defDBType         = "mongo"
+	defDBHost         = "0.0.0.0"
+	defDBPort         = "27017"
+	defDBUser         = ""
+	defDBPass         = ""
 	defDBName         = "dproxy"
 	defDBSSLMode      = "disable"
 	defDBSSLCert      = ""
@@ -44,6 +47,7 @@ const (
 	envHTTPPort       = "DATAPACE_PROXY_HTTP_PORT"
 	envJWTSecret      = "DATAPACE_JWT_SECRET"
 	envLocalFsRoot    = "DATAPACE_LOCAL_FS_ROOT"
+	envDBType         = "DATAPACE_DPROXY_DB_TYPE"
 	envDBHost         = "DATAPACE_DPROXY_DB_HOST"
 	envDBPort         = "DATAPACE_DPROXY_DB_PORT"
 	envDBUser         = "DATAPACE_DPROXY_DB_USER"
@@ -66,13 +70,19 @@ type config struct {
 	dbConfig       postgres.Config
 	fsPathPrefix   string
 	httpPathPrefix string
+	dbType         string
 }
 
 func main() {
 	cfg := loadConfig()
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
-	svc := newService(cfg.jwtSecret, cfg.dbConfig, logger)
+	eventsRepository, err := connectToEventsRepository()
+	if err != nil {
+		logger.Error(fmt.Sprintf("An error occured while connecting to events repository: %s. Exiting.", err))
+		os.Exit(1)
+	}
+	svc := newService(cfg.jwtSecret, eventsRepository, logger)
 	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
 	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
 	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
@@ -81,15 +91,13 @@ func main() {
 		signal.Notify(c, syscall.SIGINT)
 		errs <- fmt.Errorf("%s", <-c)
 	}()
-	err := <-errs
+	err = <-errs
 	logger.Error(fmt.Sprintf("Proxy service terminated: %s", err))
 }
 
-func newService(jwtSecret string, dbConfig postgres.Config, logger log.Logger) dproxy.Service {
+func newService(jwtSecret string, eventsRepository persistence.EventRepository, logger log.Logger) dproxy.Service {
 	tokenService := jwt.NewService(jwtSecret)
-	db := connectToDB(dbConfig, logger)
-	eventsRepo := postgres.NewEventsRepository(db)
-	svc := dproxy.NewService(tokenService, eventsRepo)
+	svc := dproxy.NewService(tokenService, eventsRepository)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,
@@ -109,34 +117,53 @@ func newService(jwtSecret string, dbConfig postgres.Config, logger log.Logger) d
 	return svc
 }
 
-func connectToDB(dbConfig postgres.Config, logger logger.Logger) *sqlx.DB {
-	db, err := postgres.Connect(dbConfig)
-	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to connect to postgres: %s", err))
-		os.Exit(1)
+func connectToEventsRepository() (persistence.EventRepository, error) {
+	dbType := datapace.Env(envDBType, defDBType)
+	var eventsRepo persistence.EventRepository
+	switch dbType {
+	case "postgres":
+		dbConfig := postgres.Config{
+			Host:        datapace.Env(envDBHost, defDBHost),
+			Port:        datapace.Env(envDBPort, defDBPort),
+			User:        datapace.Env(envDBUser, defDBUser),
+			Pass:        datapace.Env(envDBPass, defDBPass),
+			Name:        datapace.Env(envDBName, defDBName),
+			SSLMode:     datapace.Env(envDBSSLMode, defDBSSLMode),
+			SSLCert:     datapace.Env(envDBSSLCert, defDBSSLCert),
+			SSLKey:      datapace.Env(envDBSSLKey, defDBSSLKey),
+			SSLRootCert: datapace.Env(envDBSSLRootCert, defDBSSLRootCert),
+		}
+		db, err := postgres.Connect(dbConfig)
+		if err != nil {
+			return nil, err
+		}
+		eventsRepo = postgres.NewEventsRepository(db)
+	case "mongo":
+		ms, err := mongo.Connect(
+			datapace.Env(envDBHost, defDBHost)+":"+datapace.Env(envDBPort, defDBPort),
+			5000,
+			5000,
+			datapace.Env(envDBName, defDBName),
+			datapace.Env(envDBUser, defDBUser),
+			datapace.Env(envDBPass, defDBPass),
+		)
+		if err != nil {
+			return nil, err
+		}
+		eventsRepo = mongo.NewEventsRepository(ms)
+	default:
+		return nil, errors.New("unknown database type")
 	}
-	return db
+	return eventsRepo, nil
 }
 
 func loadConfig() config {
-	dbConfig := postgres.Config{
-		Host:        datapace.Env(envDBHost, defDBHost),
-		Port:        datapace.Env(envDBPort, defDBPort),
-		User:        datapace.Env(envDBUser, defDBUser),
-		Pass:        datapace.Env(envDBPass, defDBPass),
-		Name:        datapace.Env(envDBName, defDBName),
-		SSLMode:     datapace.Env(envDBSSLMode, defDBSSLMode),
-		SSLCert:     datapace.Env(envDBSSLCert, defDBSSLCert),
-		SSLKey:      datapace.Env(envDBSSLKey, defDBSSLKey),
-		SSLRootCert: datapace.Env(envDBSSLRootCert, defDBSSLRootCert),
-	}
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
 		httpPort:       datapace.Env(envHTTPPort, defHTTPPort),
 		jwtSecret:      datapace.Env(envJWTSecret, defJWTSecret),
 		localFsRoot:    datapace.Env(envLocalFsRoot, defLocalFsRoot),
-		dbConfig:       dbConfig,
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 	}

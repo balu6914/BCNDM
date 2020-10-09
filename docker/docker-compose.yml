@@ -225,14 +225,11 @@ services:
       - datapace-net
 
   datapace-dproxy-db:
-    image: postgres:10.8-alpine
+    image: mongo:latest
     container_name: datapace-dproxy-db
-    environment:
-      - POSTGRES_USER=dproxy
-      - POSTGRES_PASSWORD=dproxy
-      - POSTGRES_DB=dproxy
+    command: --nojournal
     volumes:
-      - ./dproxy-db-data:/var/lib/postgresql/data
+      - ./dproxy-data:/data/db
     networks:
       - datapace-net
 

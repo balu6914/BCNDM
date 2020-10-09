@@ -13,6 +13,7 @@ var (
 	ErrTokenParsingFailed = errors.New("token parsing failed")
 	ErrMalformedEntity    = errors.New("malformed entity specification")
 	ErrQuotaExceeded      = errors.New("quota exceeded")
+	ErrConflict           = errors.New("entity already exists")
 )
 
 type Service interface {
