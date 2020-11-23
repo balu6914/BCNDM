@@ -9,6 +9,12 @@
           "server-hostname": "peer0.org1.datapace.com",
           "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/peers/peer0.org1.datapace.com/tls/ca.crt"
         },
+      "peer2": {
+          "requests": "grpcs://peer1.org1.datapace.com:7051",
+          "events": "grpcs://peer1.org1.datapace.com:7053",
+          "server-hostname": "peer1.org1.datapace.com",
+          "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/peers/peer1.org1.datapace.com/tls/ca.crt"
+        },
       "admin": {
           "key": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/keystore",
           "cert": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/signcerts"

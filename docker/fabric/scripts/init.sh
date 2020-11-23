@@ -10,6 +10,8 @@ ORDERER_URL=orderer.datapace.com:7050
 
 CHANNEL_ID=datapacechannel
 
+PEERS=(0 1)
+
 TOKEN_CHAIN_ID=token
 TOKEN_CHAIN_PATH=github.com/chaincode/token
 TOKEN_CHAIN_VER=1.0
@@ -53,77 +55,81 @@ MSG_DONE="
 
 peer channel create -o $ORDERER_URL  -c $CHANNEL_ID -f $CHANNEL_PATH  --tls --cafile $CERT_PATH
 
-# now we will join the channel and start the chain with datapacechannel.block serving as the
+# Now we will loop over all peers from Datapce Org and join the channel and install all chaincodes. Then start the chain with datapacechannel.block serving as the
 # channel's first block (i.e. the genesis block)
-peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
+
+for peer in ${PEERS[@]}
+do
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer channel join -b $CHANNEL_BLOCK -o $ORDERER_URL
+
+       sleep 5 
+
+       cd $GOPATH/src/github.com/chaincode/token
+       # Install govendor tool
+       go get -u github.com/kardianos/govendor
+
+       # Fetch deps
+       govendor sync
+
+       cd $LOCATION
+
+       # Install chaincode
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer chaincode install -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -p $TOKEN_CHAIN_PATH
+
+       cd $GOPATH/src/github.com/chaincode/system-fee
+       # Install govendor tool
+       go get -u github.com/kardianos/govendor
+
+       # Fetch deps
+       govendor sync
+
+       cd $LOCATION
+
+       # Install chaincode
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer chaincode install -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -p $FEE_CHAIN_PATH
+
+       cd $GOPATH/src/github.com/chaincode/contracts
+       # Install govendor tool
+       go get -u github.com/kardianos/govendor
+
+       # Fetch deps
+       govendor sync
+
+       cd $LOCATION
+
+       # Install chaincode
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer chaincode install -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -p $CONTRACTS_CHAIN_PATH
+
+       cd $GOPATH/src/github.com/chaincode/access-requests
+       # Install govendor tool
+       go get -u github.com/kardianos/govendor
+
+       # Fetch deps
+       govendor sync
+
+       cd $LOCATION
+
+       # Install chaincode
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN_PATH
+
+       sleep 5
+
+       cd $GOPATH/src/github.com/chaincode/terms
+       # Install govendor tool
+       go get -u github.com/kardianos/govendor
+
+       # Fetch deps
+       govendor sync
+
+       cd $LOCATION
+
+       # Install chaincode
+       CORE_PEER_ADDRESS=peer$peer.org1.datapace.com:7051 peer chaincode install -n $TERMS_CHAIN_ID -v $TERMS_CHAIN_VER -p $TERMS_CHAIN_PATH
+done
 
 sleep 5
 
-cd $GOPATH/src/github.com/chaincode/token
-# Install govendor tool
-go get -u github.com/kardianos/govendor
-
-# Fetch deps
-govendor sync
-
-cd $LOCATION
-
-# Install chaincode
-peer chaincode install -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -p $TOKEN_CHAIN_PATH
-
-cd $GOPATH/src/github.com/chaincode/system-fee
-# Install govendor tool
-go get -u github.com/kardianos/govendor
-
-# Fetch deps
-govendor sync
-
-cd $LOCATION
-
-# Install chaincode
-peer chaincode install -n $FEE_CHAIN_ID -v $FEE_CHAIN_VER -p $FEE_CHAIN_PATH
-
-cd $GOPATH/src/github.com/chaincode/contracts
-# Install govendor tool
-go get -u github.com/kardianos/govendor
-
-# Fetch deps
-govendor sync
-
-cd $LOCATION
-
-# Install chaincode
-peer chaincode install -n $CONTRACTS_CHAIN_ID -v $CONTRACTS_CHAIN_VER -p $CONTRACTS_CHAIN_PATH
-
-cd $GOPATH/src/github.com/chaincode/access-requests
-# Install govendor tool
-go get -u github.com/kardianos/govendor
-
-# Fetch deps
-govendor sync
-
-cd $LOCATION
-
-# Install chaincode
-peer chaincode install -n $ACCESS_CHAIN_ID -v $ACCESS_CHAIN_VER -p $ACCESS_CHAIN_PATH
-
-sleep 5
-
-cd $GOPATH/src/github.com/chaincode/terms
-# Install govendor tool
-go get -u github.com/kardianos/govendor
-
-# Fetch deps
-govendor sync
-
-cd $LOCATION
-
-# Install chaincode
-peer chaincode install -n $TERMS_CHAIN_ID -v $TERMS_CHAIN_VER -p $TERMS_CHAIN_PATH
-
-sleep 5
-
-# Init/provision system with DPC
+# Instantiate all chaincodes 
 peer chaincode instantiate -o $ORDERER_URL -n $TOKEN_CHAIN_ID -v $TOKEN_CHAIN_VER -c "$TOKEN_CHAIN_INIT_FN" -C $CHANNEL_ID --tls --cafile $CERT_PATH
 sleep 30
 

@@ -87,6 +87,26 @@ channels:
         # Default: true
         eventSource: true
 
+      peer1.org1.datapace.com:
+        # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
+        # have the chaincode installed. The app can also use this property to decide which peers
+        # to send the chaincode install request. Default: true
+        endorsingPeer: true
+
+        # [Optional]. will this peer be sent query proposals? The peer must have the chaincode
+        # installed. The app can also use this property to decide which peers to send the
+        # chaincode install request. Default: true
+        chaincodeQuery: true
+
+        # [Optional]. will this peer be sent query proposals that do not require chaincodes, like
+        # queryBlock(), queryTransaction(), etc. Default: true
+        ledgerQuery: true
+
+        # [Optional]. will this peer be the target of the SDK's listener registration? All peers can
+
+        # Default: true
+        eventSource: true
+
 # List of participating organizations in this network
 organizations:
   org1:
@@ -94,6 +114,7 @@ organizations:
     cryptoPath: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp"
     peers:
       - peer0.org1.datapace.com
+      - peer1.org1.datapace.com
     certificateAuthorities:
       - ca.org1.datapace.com
 
@@ -122,6 +143,17 @@ peers:
     tlsCACerts:
       path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
 
+  peer1.org1.datapace.com:
+    # this URL is used to send endorsement and query requests
+    url: grpcs://peer1.org1.datapace.com:7051
+    # this URL is used to connect the EventHub and registering event listeners
+    eventUrl: grpcs://peer1.org1.datapace.com:7053
+    # These parameters should be set in coordination with the keepalive policy on the server
+    grpcOptions:
+      ssl-target-name-override: peer1.org1.datapace.com
+      grpc.http2.keepalive_time: 15
+    tlsCACerts:
+      path: "${DATAPACE_CONFIG}/crypto-config/peerOrganizations/org1.datapace.com/tlsca/tlsca.org1.datapace.com-cert.pem"
 
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows certificate management to be done via REST APIs.
 certificateAuthorities:
@@ -146,6 +178,11 @@ entityMatchers:
       eventUrlSubstitutionExp: 'peer0.org1.datapace.com:7053'
       sslTargetOverrideUrlSubstitutionExp: peer0.org1.datapace.com
       mappedHost: peer0.org1.datapace.com
+    - pattern: (\w+).org1.datapace.(\w+)
+      urlSubstitutionExp: 'peer1.org1.datapace.com:7051'
+      eventUrlSubstitutionExp: 'peer1.org1.datapace.com:7053'
+      sslTargetOverrideUrlSubstitutionExp: peer1.org1.datapace.com
+      mappedHost: peer1.org1.datapace.com
   orderer:
     - pattern: (\w+).datapace.(\w+)
       urlSubstitutionExp: orderer.datapace.com:7050

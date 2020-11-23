@@ -22,6 +22,6 @@ PeerOrgs:
   Domain: org1.datapace.com
   EnableNodeOUs: false
   Template:
-    Count: 1
+    Count: 2
   Users:
     Count: 1

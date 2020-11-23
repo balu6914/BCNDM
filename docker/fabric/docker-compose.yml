@@ -33,6 +33,20 @@ services:
       # Our network is called "datapace-net"
       - datapace-bc-net
 
+  peer1.org1.datapace.com:
+    # Container name – same as the peer name
+    container_name: peer1.org1.datapace.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      # Refers to peer name
+      service: peer1.org1.datapace.com
+    ports:
+      - "8051:7051"
+      - "8053:7053"
+    networks:
+      # Our network is called "datapace-net"
+      - datapace-bc-net
+
   # Fabric-ca for org1
   ca.org1.datapace.com:
     container_name: ca.org1.datapace.com

@@ -138,7 +138,6 @@ services:
       - ./subscriptions-data:/data/db
     networks:
       - datapace-net
-
   ###
   # Subscriptions service
   ###

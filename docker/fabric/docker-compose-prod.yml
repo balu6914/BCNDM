@@ -18,6 +18,14 @@ services:
         fluentd-address: ${LOGSERVER}:24224
         tag: docker.{{.ID}}
 
+  peer1.org1.datapace.com:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOGSERVER}:24224
+        tag: docker.{{.ID}}
+
+
   # Fabric-ca for org1
   ca.org1.datapace.com:
     logging:
