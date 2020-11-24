@@ -224,18 +224,21 @@ func (ur *userRepository) listPolicies(ids []string) ([]auth.Policy, error) {
 }
 
 type mongoUser struct {
-	Email        string        `bson:"email,omitempty"`
-	Password     string        `bson:"password,omitempty"`
-	ContactEmail string        `bson:"contact_email,omitempty"`
-	ID           bson.ObjectId `bson:"_id,omitempty"`
-	FirstName    string        `bson:"first_name,omitempty"`
-	LastName     string        `bson:"last_name,omitempty"`
-	Company      string        `bson:"company,omitempty"`
-	Address      string        `bson:"address,omitempty"`
-	Phone        string        `bson:"phone,omitempty"`
-	Roles        []string      `bson:"roles,omitempty"`
-	Disabled     *bool         `bson:"disabled,omitempty"`
-	Policies     []string      `bson:"policies,omitempty"`
+	Email           string        `bson:"email,omitempty"`
+	Password        string        `bson:"password,omitempty"`
+	ContactEmail    string        `bson:"contact_email,omitempty"`
+	ID              bson.ObjectId `bson:"_id,omitempty"`
+	FirstName       string        `bson:"first_name,omitempty"`
+	LastName        string        `bson:"last_name,omitempty"`
+	Company         string        `bson:"company,omitempty"`
+	Address         string        `bson:"address,omitempty"`
+	Phone           string        `bson:"phone,omitempty"`
+	Roles           []string      `bson:"roles,omitempty"`
+	Disabled        *bool         `bson:"disabled,omitempty"`
+	Policies        []string      `bson:"policies,omitempty"`
+	Attempt         int           `bson:"attempt,omitempty"`
+	Locked          *bool         `bson:"locked,omitempty"`
+	PasswordHistory []string      `bson:"password_history",omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -247,19 +250,23 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 			policies[i] = p.ID
 		}
 	}
+
 	mu := mongoUser{
-		Email:        user.Email,
-		ContactEmail: user.ContactEmail,
-		Password:     user.Password,
-		ID:           bson.NewObjectId(),
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		Company:      user.Company,
-		Address:      user.Address,
-		Phone:        user.Phone,
-		Roles:        user.Roles,
-		Disabled:     &user.Disabled,
-		Policies:     policies,
+		Email:           user.Email,
+		ContactEmail:    user.ContactEmail,
+		Password:        user.Password,
+		ID:              bson.NewObjectId(),
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Company:         user.Company,
+		Address:         user.Address,
+		Phone:           user.Phone,
+		Roles:           user.Roles,
+		Disabled:        &user.Disabled,
+		Policies:        policies,
+		Locked:          &user.Locked,
+		Attempt:         user.Attempt,
+		PasswordHistory: user.PasswordHistory,
 	}
 	if user.ID == "" {
 		mu.ID = bson.NewObjectId()
@@ -279,17 +286,25 @@ func (user mongoUser) toUser() auth.User {
 	if user.Disabled != nil {
 		disabled = *user.Disabled
 	}
+	locked := false
+	if user.Locked != nil {
+		locked = *user.Locked
+	}
+	
 	return auth.User{
-		Email:        user.Email,
-		ContactEmail: user.ContactEmail,
-		Password:     user.Password,
-		ID:           user.ID.Hex(),
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		Company:      user.Company,
-		Address:      user.Address,
-		Phone:        user.Phone,
-		Roles:        user.Roles,
-		Disabled:     disabled,
+		Email:           user.Email,
+		ContactEmail:    user.ContactEmail,
+		Password:        user.Password,
+		ID:              user.ID.Hex(),
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Company:         user.Company,
+		Address:         user.Address,
+		Phone:           user.Phone,
+		Roles:           user.Roles,
+		Disabled:        disabled,
+		Locked:          locked,
+		Attempt:         user.Attempt,
+		PasswordHistory: user.PasswordHistory,
 	}
 }

@@ -32,6 +32,7 @@ export class TableComponent {
 
   @Input() table: Table = new Table();
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
+  @Output() lockEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
   @Output() pageChanged = new EventEmitter<number>();
   @Output() hoverRow: EventEmitter<any> = new EventEmitter();
@@ -85,6 +86,20 @@ export class TableComponent {
         // Emit event to DashboardSellComponent
         this.editEvt.emit(rowEdited);
         this.selectedRow = rowEdited;
+      }
+    });
+  }
+
+  rowLocked(rowLocked: any) {
+    // Update row values
+    const rows: any = this.table.page.content;
+    rows.forEach( (row, i) => {
+      if (row.id === rowLocked.id) {
+        // Update row table
+        this.table.page.content[i] = rowLocked;
+        // Emit event to DashboardSellComponent
+        this.lockEvt.emit(rowLocked);
+        this.selectedRow = rowLocked;
       }
     });
   }

@@ -8,6 +8,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 import { User } from 'app/common/interfaces/user.interface';
 import { UserService } from 'app/common/services/user.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { CustomValidators } from 'app/common/validators/customvalidators';
 
 @Component({
   selector: 'dpc-dashboard-admin-signup',
@@ -33,7 +34,16 @@ export class DashboardAdminSignupComponent implements OnInit {
     this.errorMsg = null;
     this.form = this.formBuilder.group({
       email:      ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
-      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
+      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32),
+        // 2. check whether the entered password has a number
+        CustomValidators.patternValidator(/\d/, { hasNumber: true }),
+        // 3. check whether the entered password has upper case letter
+        CustomValidators.patternValidator(/[A-Z]/, { hasCapitalCase: true }),
+        // 4. check whether the entered password has a lower-case letter
+        CustomValidators.patternValidator(/[a-z]/, { hasSmallCase: true }),
+        // 5. check whether the entered password has a special character
+        CustomValidators.patternValidator(/[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { hasSpecialCharacters: true })
+      ]],
       confirm:    ['', [Validators.required]],
       first_name: ['', [Validators.maxLength(32)]],
       last_name:  ['', [Validators.maxLength(32)]],

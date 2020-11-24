@@ -128,6 +128,7 @@ type updateReq struct {
 	Roles        *[]string `json:"roles,omitempty"`
 	Password     *string   `json:"password"`
 	Disabled     *bool     `json:"disabled"`
+	Locked       *bool     `json:"locked"`
 }
 
 func (req updateReq) validate() error {
@@ -156,6 +157,9 @@ func (req updateReq) toUser() auth.User {
 	}
 	if req.Disabled != nil {
 		ret.Disabled = *req.Disabled
+	}
+	if req.Locked != nil {
+		ret.Locked = *req.Locked
 	}
 	if req.FirstName != nil {
 		ret.FirstName = *req.FirstName

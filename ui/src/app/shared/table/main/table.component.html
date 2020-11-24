@@ -29,6 +29,7 @@
                                    (rowSelected)="showRowDetails($event)"
                                    (deleteEvt)="rowDeleted($event)"
                                    (editEvt)="rowEdited($event)"
+                                   (lockEvt)="rowLocked($event)"
                                    (contractSigned)="onContractSigned($event)"
                                    (checkboxChangedEvt)="onCheckboxChangedEvt($event)"
                                    (accessApproved)="onAccessApproved($event)"
@@ -90,7 +91,8 @@
                              [rowType]="table.tableType"
                              (backClicked)="flip = 'inactive'"
                              (deleteEvt)="rowDeleted($event)"
-                             (editEvt)="rowEdited($event)">
+                             (editEvt)="rowEdited($event)"
+                             (lockEvt)="rowLocked($event)">
       </dpc-table-row-details>
     </div>
   </div>

@@ -216,6 +216,13 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		errInvalidPolicyRules, errInvalidPolicyVersion:
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
+		// Add new error status user locked, password history presence
+	case auth.ErrUserAccountLocked:
+		w.WriteHeader(http.StatusLocked)
+		w.Write([]byte(err.Error()))
+	case auth.ErrUserPasswordHistory:
+		w.WriteHeader(http.StatusAlreadyReported)
+		w.Write([]byte(err.Error()))
 	case auth.ErrUserAccountDisabled:
 		w.WriteHeader(http.StatusForbidden)
 	case auth.ErrMalformedEntity:

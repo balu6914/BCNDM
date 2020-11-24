@@ -256,6 +256,12 @@ transition: $transition-base;
 &--edit {
   background-image: url('../img/icons/edit.svg');
 }
+&--unlock {
+  background-image: url('../img/icons/lock.svg');
+}
+&--lock {
+  background-image: url('../img/icons/lock_open.svg');
+}
 &--delete {
   background-image: url('../img/icons/delete.svg');
 }

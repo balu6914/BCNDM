@@ -5,18 +5,21 @@ var _ Resource = (*User)(nil)
 // User represents a Datapace user account. Each user is identified given its
 // email and password.
 type User struct {
-	Email        string
-	ContactEmail string
-	Password     string
-	ID           string
-	FirstName    string
-	LastName     string
-	Company      string
-	Address      string
-	Phone        string
-	Roles        []string
-	Disabled     bool
-	Policies     []Policy
+	Email           string
+	ContactEmail    string
+	Password        string
+	ID              string
+	FirstName       string
+	LastName        string
+	Company         string
+	Address         string
+	Phone           string
+	Roles           []string
+	Disabled        bool
+	Policies        []Policy
+	Locked          bool
+	Attempt         int
+	PasswordHistory []string
 }
 
 // Attributes returns user's attributes.

@@ -13,6 +13,7 @@ import { AlertService } from 'app/shared/alerts/services/alert.service';
 
 import { DashboardAdminEditComponent } from 'app/dashboard/admin/edit/dashboard.admin.edit.component';
 import { DashboardAdminDeleteComponent } from 'app/dashboard/admin/delete/dashboard.admin.delete.component';
+import { DashboardAdminLockComponent } from 'app/dashboard/admin/lock/dashboard.admin.lock.component';
 
 @Component({
   selector: 'dpc-dashboard-admin',
@@ -54,7 +55,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', ''];
+    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', ''];
     this.table.hasDetails = true;
   }
 
@@ -90,6 +91,31 @@ export class DashboardAdminComponent implements OnInit {
     .content.userEdited.subscribe(
       resp => {
         const itemIndex = this.table.page.content.findIndex((item: any) => item.id === row.id);
+        this.table.page.content[itemIndex] = resp;
+      }
+    );
+  }
+
+  lockUser(row: User) {
+    const initialState = {
+      user: {
+        id: row.id,
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        phone: row.phone,
+        address: row.address,
+        company: row.company,
+        disabled: row.disabled,
+        locked: row.locked,
+      },
+    };
+
+    // Open DashboardAdminLockComponent as Modal
+    this.bsModalRef = this.modalService.show(DashboardAdminLockComponent, {initialState})
+    .content.userLocked.subscribe(
+      resp => {
+        const itemIndex = this.table.page.content.findIndex((item: any) => item.id === resp.id);
         this.table.page.content[itemIndex] = resp;
       }
     );

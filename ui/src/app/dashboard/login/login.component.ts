@@ -39,7 +39,11 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/dashboard']);
         },
         err => {
-          this.errorMsg = 'Invalid Credentials.';
+          if ( err.status === 423) {
+            this.errorMsg = 'User Locked Please contact administrator.';
+          } else {
+            this.errorMsg = 'Invalid Credentials.';
+          }
         }
       );
     }

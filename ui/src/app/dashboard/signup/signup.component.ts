@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
@@ -7,6 +8,7 @@ import 'rxjs/add/observable/throw';
 import { User } from 'app/common/interfaces/user.interface';
 import { UserService } from 'app/common/services/user.service';
 import { AuthService } from 'app/auth/services/auth.service';
+import { CustomValidators } from 'app/common/validators/customvalidators';
 
 @Component({
   selector: 'dpc-signup-form',
@@ -33,7 +35,16 @@ export class SignupComponent implements OnInit {
     this.errorMsg = null;
     this.form = this.fb.group({
       email:      ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
-      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
+      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32),
+                // 2. check whether the entered password has a number
+                CustomValidators.patternValidator(/\d/, { hasNumber: true }),
+                // 3. check whether the entered password has upper case letter
+                CustomValidators.patternValidator(/[A-Z]/, { hasCapitalCase: true }),
+                // 4. check whether the entered password has a lower-case letter
+                CustomValidators.patternValidator(/[a-z]/, { hasSmallCase: true }),
+                // 5. check whether the entered password has a special character
+                CustomValidators.patternValidator(/[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { hasSpecialCharacters: true })
+      ]],
       confirm:    ['', [Validators.required]],
       first_name: ['', [Validators.maxLength(32)]],
       last_name:  ['', [Validators.maxLength(32)]],

@@ -1,40 +1,10 @@
 {
-  "network-config": {
-    "org1": {
-      "name": "peerOrg1",
-      "mspid": "Org1MSP",
-      "peer1": {
-          "requests": "grpcs://peer0.org1.datapace.com:7051",
-          "events": "grpcs://peer0.org1.datapace.com:7053",
-          "server-hostname": "peer0.org1.datapace.com",
-          "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/peers/peer0.org1.datapace.com/tls/ca.crt"
+        "network-configs": {
+                "datapace-network": {
+                        "name": "datapacenetwork",
+                        "profile": "./connection-profile/connectionprofile.json"
+                }
         },
-      "peer2": {
-          "requests": "grpcs://peer1.org1.datapace.com:7051",
-          "events": "grpcs://peer1.org1.datapace.com:7053",
-          "server-hostname": "peer1.org1.datapace.com",
-          "tls_cacerts": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/peers/peer1.org1.datapace.com/tls/ca.crt"
-        },
-      "admin": {
-          "key": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/keystore",
-          "cert": "/blockchain-explorer/examples/net1/crypto-network/crypto-config/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/signcerts"
-        }
-    }
-  },
-    "channel": "datapacechannel",
-    "orderers":[
-    {
-      "mspid": "OrdererMSP",
-      "server-hostname":"orderer.datapace.com",
-      "requests":"grpcs://orderer.datapace.com:7050",
-      "tls_cacerts":"/blockchain-explorer/examples/net1/crypto-network/crypto-config/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/tls/ca.crt"
-    }
-    ],
-    "keyValueStore": "/tmp/fabric-client-kvs",
-    "configtxgenToolPath": "/home/ubuntu/github.com/datapace/datapace/bin",
-    "SYNC_START_DATE_FORMAT":"YYYY/MM/DD",
-    "syncStartDate":"2019/01/01",
-    "eventWaitTime": "30000",
-    "license": "Apache-2.0",
-    "version": "1.1"
+        "license": "Apache-2.0"
 }
+

@@ -117,6 +117,7 @@ func listUsersEndpoint(svc auth.Service) endpoint.Endpoint {
 				Address:      user.Address,
 				Phone:        user.Phone,
 				Disabled:     user.Disabled,
+				Locked:       user.Locked,
 			})
 		}
 

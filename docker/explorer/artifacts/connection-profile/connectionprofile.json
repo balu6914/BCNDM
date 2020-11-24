@@ -1,0 +1,76 @@
+{
+	"name": "datapace-network",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminUser": "central_admin",
+		"adminPassword": "central2019",
+		"enableAuthentication": false,
+		"organization": "Org1",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"datapacechannel": {
+			"peers": {
+				"peer0.org1.datapace.com": {}
+				"peer1.org1.datapace.com": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"Org1": {
+			"mspid": "Org1MSP",
+			"fullpath": true,
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/keystore/6cc3d354fe72db823c1f23a1625d47caba6133b4da75c5dba2217429a076349f_sk"
+			},
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/org1.datapace.com/users/Admin@org1.datapace.com/msp/signcerts/Admin@org1.datapace.com-cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.org1.datapace.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/org1.datapace.com/peers/peer0.org1.datapace.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.org1.datapace.com:7051",
+			"eventUrl": "grpcs://peer0.org1.datapace.com:7053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer0.org1.datapace.com"
+			}
+		},
+		"peer1.org1.datapace.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peer0rganizations/org1.datapace.com/peers/peer1.org1.datapace.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer1.org1.datapace.com:7051",
+			"eventUrl": "grpcs://peer1.org1.datapace.com:7053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer1.org1.datapace.com"
+			}
+		},
+      		"orderers": {
+        		"orderer.datapace.com": {
+          		"url": "grpcs://orderer.datapace.com:7050",
+		        "tls_cacerts":"/tmp/crypto/ordererOrganizations/datapace.com/orderers/orderer.datapace.com/tls/ca.crt"
+        		}
+      		}
+	}
+}

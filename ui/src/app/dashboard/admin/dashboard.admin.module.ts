@@ -9,6 +9,7 @@ import { DashboardAdminComponent } from './dashboard.admin.component';
 import { DashboardAdminSignupComponent } from './signup/dashboard.admin.signup.component';
 import { DashboardAdminEditComponent } from './edit/dashboard.admin.edit.component';
 import { DashboardAdminDeleteComponent } from './delete/dashboard.admin.delete.component';
+import { DashboardAdminLockComponent } from './lock/dashboard.admin.lock.component';
 
 import { CommonAppModule } from 'app/common/common.module';
 import { SharedModule } from 'app/shared/shared.module';
@@ -30,11 +31,13 @@ import { SharedModule } from 'app/shared/shared.module';
     DashboardAdminSignupComponent,
     DashboardAdminEditComponent,
     DashboardAdminDeleteComponent,
+    DashboardAdminLockComponent,
   ],
   entryComponents: [
     DashboardAdminSignupComponent,
     DashboardAdminEditComponent,
     DashboardAdminDeleteComponent,
+    DashboardAdminLockComponent,
   ],
 })
 export class DashboardAdminModule { }

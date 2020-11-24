@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserService } from 'app/common/services/user.service';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { User } from 'app/common/interfaces/user.interface';
+import { CustomValidators } from 'app/common/validators/customvalidators';
 
 @Component({
   selector: 'dpc-user-profile-password-update',
@@ -23,7 +24,16 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
   ngOnInit() {
     this.form = this.formBuilder.group({
       old_password: ['', [Validators.required, Validators.minLength(8)]],
-      new_password: ['', [Validators.required, Validators.minLength(8)]],
+      new_password: ['', [Validators.required, Validators.minLength(8),
+        // 2. check whether the entered password has a number
+        CustomValidators.patternValidator(/\d/, { hasNumber: true }),
+        // 3. check whether the entered password has upper case letter
+        CustomValidators.patternValidator(/[A-Z]/, { hasCapitalCase: true }),
+        // 4. check whether the entered password has a lower-case letter
+        CustomValidators.patternValidator(/[a-z]/, { hasSmallCase: true }),
+        // 5. check whether the entered password has a special character
+        CustomValidators.patternValidator(/[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { hasSpecialCharacters: true })
+      ]],
       re_password: ['', [Validators.required, Validators.minLength(8)]]
     },
     {
@@ -51,7 +61,8 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
       const updateUserReq = {
         id: this.user.id,
         old_password: this.form.value.old_password,
-        new_password: this.form.value.new_password,
+        // change new_password to password feild so API call take intor account the new password to update
+        password: this.form.value.new_password,
         re_password: this.form.value.re_password,
       };
       this.userService.updateUser(updateUserReq).subscribe(

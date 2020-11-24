@@ -5,6 +5,7 @@ import (
 )
 
 const version = "1.0.0"
+const nbAttempet = 5
 
 var _ Service = (*authService)(nil)
 
@@ -79,6 +80,8 @@ func (as *authService) Register(key string, user User) (string, error) {
 	}
 
 	user.Password = hash
+	// Add new password to history
+	user.PasswordHistory = append(user.PasswordHistory, user.Password)
 
 	if len(user.Policies) == 0 {
 		policy, err := as.policies.OneByName(owner, "user")
@@ -107,13 +110,22 @@ func (as *authService) Login(user User) (string, error) {
 		return "", ErrUnauthorizedAccess
 	}
 
+	if dbu.Attempt >= nbAttempet && dbu.Locked != false {
+		dbu.Locked = true
+		as.users.Update(dbu)
+		return "", ErrUserAccountLocked
+	}
 	if err := as.hasher.Compare(user.Password, dbu.Password); err != nil {
+		dbu.Attempt = dbu.Attempt + 1
+		as.users.Update(dbu)
 		return "", ErrUnauthorizedAccess
 	}
 	if dbu.Disabled {
 		return "", ErrUserAccountDisabled
 	}
-
+	// Reset number of attempt with wrong password
+	dbu.Attempt = 0
+	as.users.Update(dbu)
 	return as.idp.TemporaryKey(dbu.ID, dbu.Roles)
 }
 
@@ -135,7 +147,18 @@ func (as *authService) UpdateUser(key string, user User) error {
 		if err != nil {
 			return ErrMalformedEntity
 		}
+		// Check if password is already used in the Last 5 passwords
+		for _, hpassword := range u.PasswordHistory {
+			if err := as.hasher.Compare(user.Password, hpassword); err != nil {
+				return ErrUserPasswordHistory
+			}
+		}
 		user.Password = hash
+		user.PasswordHistory = u.PasswordHistory
+		if len(user.PasswordHistory) > 5 {
+			user.PasswordHistory = user.PasswordHistory[1:]
+		}
+		user.PasswordHistory = append(user.PasswordHistory, user.Password)
 	}
 	if user.ContactEmail != "" && !govalidator.IsEmail(user.ContactEmail) {
 		return ErrMalformedEntity

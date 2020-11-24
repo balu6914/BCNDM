@@ -32,6 +32,18 @@
             <div *ngIf="form.controls.password.errors.minlength || form.controls.password.errors.maxlength">
               Password must be 8-16 characters.
             </div>
+            <div *ngIf="form.controls.password.errors.hasNumber">
+              Password must contain at least 1 Number.
+            </div>
+            <div *ngIf="form.controls.password.errors.hasCapitalCase">
+              Password must contain at least upper case characters.
+            </div>
+            <div *ngIf="form.controls.password.errors.hasSmallCase">
+              Password must contain at least  lower case characters.
+            </div>
+            <div *ngIf="form.controls.password.errors.hasSpecialCharacters">
+              Password must contain at least special characters.
+            </div>
           </div>
         </div>
       </div>

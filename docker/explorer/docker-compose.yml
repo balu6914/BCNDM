@@ -1,37 +1,48 @@
-version: '2'
+
+# SPDX-License-Identifier: Apache-2.0
+version: '2.1'
+
+volumes:
+  expgdata:
+  walletstore:
 
 networks:
-  fabric_datapace-bc-net:
-    external: true
-  bc-explorer-net:
-    driver: bridge
+  explorer.datapace.com:
+    external:
+      name: fabric_datapace-bc-net
 
 services:
 
-  explorer-db:
-    image: postgres
-    container_name: fabric-explorer-db
-    ports:
-      - "5532:5432"
+  explorerdb.mynetwork.com:
+    image: hyperledger/explorer-db:latest
+    container_name: explorerdb.explorer.datapace.com
+    hostname: explorerdb.explorer.datapace.com
+    environment:
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWORD=password
     volumes:
-      - ../explorer/artifacts/explorerpg.sql:/docker-entrypoint-initdb.d/explorerpg.sql
-      - ../explorer/artifacts/updatepg.sql:/docker-entrypoint-initdb.d/updatepg.sql
+      - ./postgreSQL/db/createdb.sh:/docker-entrypoint-initdb.d/createdb.sh
+      - ../expgdata:/var/lib/postgresql/data
     networks:
-      - bc-explorer-net
+      - explorer.datapace.com
 
-  explorer:
-    image: datapace/hyperledger-explorer
-    container_name: fabric-explorer
-    hostname: explorer
-    restart: always
+  explorer.mynetwork.com:
+    image: hyperledger/explorer:1.0.0-rc1
+    container_name: explorer.explorer.datapace.com
+    hostname: explorer.explorer.datapace.com
+    environment:
+      - DATABASE_HOST=explorerdb.explorer.datapace.com
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWD=password
+      - DISCOVERY_AS_LOCALHOST=false
     volumes:
-      - ../explorer/artifacts/config.json:/blockchain-explorer/app/platform/fabric/config.json
-      - ../explorer/artifacts/pgconfig.json:/blockchain-explorer/app/persistence/postgreSQL/db/pgconfig.json
-      - ../../config/crypto-config:/blockchain-explorer/examples/net1/crypto-network/crypto-config
+      - ../explorer/artifacts/config.json:/opt/explorer/app/platform/fabric/config.json
+      - ../explorer/artifacts/connection-profile:/opt/explorer/app/platform/fabric/connection-profile
+      - ../explorer/artifacts/pgconfig.json:/opt/app/persistence/postgreSQL/db/pgconfig.json
+      - ../../config/crypto-config:/tmp/crypto
+    command: sh -c "sleep 16&& node /opt/explorer/main.js && tail -f /dev/null"
     ports:
-      - "9090:8080"
+      - 9090:8080
     networks:
-      - fabric_datapace-bc-net
-      - bc-explorer-net
-    depends_on:
-      - explorer-db
+      - explorer.datapace.com

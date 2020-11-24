@@ -10,5 +10,6 @@ export class User {
     public address?: string,
     public phone?: string,
     public disabled?: boolean,
+    public locked?: boolean,
   ) { }
 }

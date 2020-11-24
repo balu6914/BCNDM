@@ -18,6 +18,12 @@ var (
 	// ErrUserAccountDisabled indicates user account being disabled
 	ErrUserAccountDisabled = errors.New("user account disabled")
 
+	// ErrUserAccountLocked indicates user account being locked
+	ErrUserAccountLocked = errors.New("user account locked")
+
+	// ErrUserPasswordHistory indicates user password exists already in last 5 password history
+	ErrUserPasswordHistory = errors.New("password exists in the last 5 password history")
+
 	// ErrNotFound indicates a non-existent entity request.
 	ErrNotFound = errors.New("non-existent entity")
 

@@ -145,6 +145,8 @@
   <td>{{ row.address }}</td>
   <td *ngIf="row.disabled"> Disabled </td>
   <td *ngIf="!row.disabled"></td>
+  <td *ngIf="row.locked"> Locked </td>
+  <td *ngIf="!row.locked"></td>
   <div class="action-wrapper" nowrap class="table--right-aligned">
     <a class="action action--color-1" (click)="openModalEditUser(row)">
       <span class="action__icon action--edit"></span>
@@ -154,6 +156,12 @@
     </a>
     <a *ngIf="!row.disabled" class="action action--color-2" (click)="openModalDeleteUser(row)">
       <span class="action__icon action--delete"></span>
+    </a>
+    <a *ngIf="!row.locked" class="action action--color-1" (click)="openModalLockedUser(row)">
+      <span class="action__icon action--lock"></span>
+    </a>
+    <a *ngIf="row.locked" class="action action--color-1" (click)="openModalLockedUser(row)">
+      <span class="action__icon action--unlock"></span>
     </a>
   </div>
 </tr>

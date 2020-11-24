@@ -37,6 +37,7 @@ export class TableRowComponent implements OnInit {
   @Input() rowMarked: any;
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
+  @Output() lockEvt: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
   @Output() checkboxChangedEvt: EventEmitter<any> = new EventEmitter();
@@ -238,5 +239,9 @@ export class TableRowComponent implements OnInit {
 
   openModalDeleteUser(row: any) {
     this.deleteEvt.emit(row);
+  }
+
+  openModalLockedUser(row: any) {
+    this.lockEvt.emit(row);
   }
 }

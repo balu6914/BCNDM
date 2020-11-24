@@ -70,6 +70,7 @@ type viewUserRes struct {
 	Address      string `json:"address,omitempty"`
 	Phone        string `json:"phone,omitempty"`
 	Disabled     bool   `json:"disabled,omitempty"`
+	Locked       bool   `json:"locked,omitempty"`
 }
 
 func (res viewUserRes) code() int {
