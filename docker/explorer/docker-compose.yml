@@ -23,6 +23,9 @@ services:
       - DATABASE_PASSWORD=password
     volumes:
       - ./postgreSQL/db/createdb.sh:/docker-entrypoint-initdb.d/createdb.sh
+      - ./postgreSQL/db/explorerpg.sql:/opt/explorerpg.sql
+      - ./postgreSQL/db/updatepg.sql:/opt/updatepg.sql
+      - ./postgreSQL/db/processenv.js:/opt/processenv.js
       - ../expgdata:/var/lib/postgresql/data
     networks:
       - explorer.datapace.com
