@@ -9,6 +9,8 @@ docker/*-data
 datapace-service-kvs/
 datapace-service-msp/
 elasticsearch-data/
+docker/expgdata/
+docker/walletstore/
 
 # System Files
 .DS_Store

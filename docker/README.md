@@ -16,12 +16,11 @@ Make sure that you have all Fabric prerequisites and development tools installed
 ```
 go get github.com/hyperledger/fabric
 cd $GOPATH/src/github.com/hyperledger/fabric
-git checkout d423beb9c68fe3d9c3ccf11d35d55a0c12ac3260
-make -j 16 cryptogen
-make -j 16 configtxgen
+git checkout v2.2.0
+make cryptogen
+make configtxgen
 cp .build/bin/* $GOBIN
 ```
-> Note that `git checkout release-1.4` won't work because fabric releases include patches after being tagged.
 
 Make sure that `$GOBIN` is in your `PATH`.
 
@@ -30,7 +29,7 @@ Now you should be able to use tools globally, for example:
 ```
 $ cryptogen version
 cryptogen:
- Version: 1.4
+ Version: 2.2.0
  Go version: go1.10.1
  OS/Arch: linux/amd64
 ```

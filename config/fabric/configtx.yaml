@@ -20,38 +20,32 @@
 Capabilities:
     # Channel capabilities apply to both the orderers and the peers and must be
     # supported by both.  Set the value of the capability to true to require it.
-    Global: &ChannelCapabilities
-        #V1_3: true
-        # (V1_2 not defined in fabric)
-        # Note: older ones are superceded, e.g. V1_3 capabilities include V1_1.
-        # Thus, those like V1_1 need not be set if V1_3 or later is set true.
-        # But keep them, to allow disabling V1_3 when bringing up a new test
-        # network, if desired, possibly in anticipation of an upgrade test.
-        V1_1: true
+    Channel: &ChannelCapabilities
+        # V2.0 for Channel is a catchall flag for behavior which has been
+        # determined to be desired for all orderers and peers running at the v2.0.0
+        # level, but which would be incompatible with orderers and peers from
+        # prior releases.
+        # Prior to enabling V2.0 channel capabilities, ensure that all
+        # orderers and peers on a channel are at v2.0.0 or later.
+        V2_0: true
 
-    # Orderer capabilities apply only to the orderers, and may be safely
-    # manipulated without concern for upgrading peers.  Set the value of the
-    # capability to true to require it.
     Orderer: &OrdererCapabilities
-        # (V1_3 not defined in fabric)
-        # (V1_2 not defined in fabric)
-        V1_1: true
+        # V1.1 for Orderer is a catchall flag for behavior which has been
+        # determined to be desired for all orderers running at the v1.1.x
+        # level, but which would be incompatible with orderers from prior releases.
+        # Prior to enabling V2.0 orderer capabilities, ensure that all
+        # orderers on a channel are at v2.0.0 or later.
+        V2_0: true
 
     # Application capabilities apply only to the peer network, and may be safely
     # manipulated without concern for upgrading orderers.  Set the value of the
     # capability to true to require it.
     Application: &ApplicationCapabilities
-        V1_3: true
-        V1_2: true
-        # Note: older ones are superceded, e.g. V1_2 capabilities include V1_1.
-        # Thus, older ones like V1_1 need not be set if we set V1_2 or later.
-        # But keep them all; that would allow tester to override and disable
-        # newer ones like Capabilities.Global.V1_3 and
-        # Capabilities.Application.V1_3 when bringing up a new test network,
-        # if desired, possibly in anticipation of an upgrade test.
-        V1_1: true
-
-
+        # V2.0 for Application enables the new non-backwards compatible
+        # features and fixes of fabric v2.0.
+        # Prior to enabling V2.0 orderer capabilities, ensure that all
+        # orderers on a channel are at v2.0.0 or later.
+        V2_0: true
 ################################################################################
 #
 #   Section: Organizations
@@ -75,6 +69,15 @@ Organizations:
           Admins:
               Type: Signature
               Rule: "OR('OrdererMSP.admin')"
+          Endorsement:
+               Type: Signature
+               Rule: "OR('OrdererMSP.member')"
+          # BlockValidation specifies what signatures must be included in the block
+          # from the orderer for the peer to validate it.
+          BlockValidation:
+               Type: ImplicitMeta
+               Rule: "ANY Writers"
+
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
     - &Org1
@@ -94,7 +97,9 @@ Organizations:
           Admins:
               Type: Signature
               Rule: "OR('Org1MSP.admin')"
-
+          Endorsement:
+              Type: Signature
+              Rule: "OR('Org1MSP.member')"
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
@@ -152,6 +157,11 @@ Orderer: &OrdererDefaults
         Admins:
             Type: ImplicitMeta
             Rule: "MAJORITY Admins"
+        # BlockValidation specifies what signatures must be included in the block
+        # from the orderer for the peer to validate it.
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
 
     Capabilities:
         <<: *OrdererCapabilities
@@ -202,6 +212,21 @@ Application: &ApplicationDefaults
       #
       # User's can override these defaults with their own policy mapping by defining the
       # mapping under ACLs in their channel definition
+       #---New Lifecycle System Chaincode (_lifecycle) function to policy mapping for access control--#
+
+      # ACL policy for _lifecycle's "CheckCommitReadiness" function
+      _lifecycle/CheckCommitReadiness: /Channel/Application/Writers
+
+      # ACL policy for _lifecycle's "CommitChaincodeDefinition" function
+      _lifecycle/CommitChaincodeDefinition: /Channel/Application/Writers
+
+      # ACL policy for _lifecycle's "QueryChaincodeDefinition" function
+      _lifecycle/QueryChaincodeDefinition: /Channel/Application/Readers
+
+      # ACL policy for _lifecycle's "QueryChaincodeDefinitions" function
+      lifecycle/QueryChaincodeDefinitions: /Channel/Application/Readers
+
+      #---Lifecycle System Chaincode (lscc) function to policy mapping for access control---#
 
       #---Lifecycle System Chaincode (lscc) function to policy mapping for access control---#
 
@@ -261,6 +286,7 @@ Application: &ApplicationDefaults
       # ACL policy for sending filtered block events
       event/FilteredBlock: /Channel/Application/Readers
 
+
   # Organizations is the list of orgs which are defined as participants on
   # the application side of the network
    Organizations:
@@ -269,6 +295,12 @@ Application: &ApplicationDefaults
   # For Application policies, their canonical path is
   #   /Channel/Application/<PolicyName>
    Policies: &ApplicationDefaultPolicies
+      LifecycleEndorsement:
+           Type: ImplicitMeta
+           Rule: "MAJORITY Endorsement"
+      Endorsement:
+           Type: ImplicitMeta
+           Rule: "MAJORITY Endorsement"
       Readers:
           Type: ImplicitMeta
           Rule: "ANY Readers"
@@ -296,6 +328,7 @@ Application: &ApplicationDefaults
 Profiles:
 
     DatapaceOrdererGenesis:
+        <<: *ChannelDefaults
         Capabilities:
           <<: *ChannelCapabilities
         Orderer:
@@ -321,9 +354,10 @@ Profiles:
 
     DatapaceChannel:
         Consortium: DatapaceConsortium
+        <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Org1
+                - <<: *Org1
             Capabilities:
               <<: *ApplicationCapabilities

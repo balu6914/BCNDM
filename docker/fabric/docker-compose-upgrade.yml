@@ -8,10 +8,11 @@ services:
   # Fabric tools
   cli-upgrade:
     container_name: cli-upgrade
-    image: hyperledger/fabric-tools:1.4
+    image: hyperledger/fabric-tools:2.2
     tty: true
     environment:
       - GOPATH=/opt/gopath
+      - GOBIN=/opt/gopath/bin
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=DEBUG
       - CORE_PEER_ID=cli
