@@ -213,6 +213,10 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 					Type:   "stream",
 				},
 				{
+					Action: auth.Create,
+					Type:   "contract",
+				},
+				{
 					Action: auth.CreateBulk,
 					Type:   "stream",
 				},
