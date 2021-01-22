@@ -278,16 +278,6 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 }
 
 func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	ar := &authproto.AuthRequest{
-		Action: int64(auth.Update),
-		Token:  r.Header.Get("Authorization"),
-		Type:   streamType,
-	}
-	owner, err := authService.Authorize(ar)
-	if err != nil {
-		return nil, err
-	}
-
 	var stream streams.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
 		return nil, err
@@ -296,6 +286,17 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 
 	if stream.Location.Type == "" {
 		stream.Location.Type = defLocType
+	}
+
+	ar := &authproto.AuthRequest{
+		Action:     int64(auth.Update),
+		Token:      r.Header.Get("Authorization"),
+		Type:       streamType,
+		Attributes: stream.Attributes(),
+	}
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
 	}
 
 	req := updateStreamReq{
@@ -325,18 +326,8 @@ func decodeViewStreamRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeRemoveStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	ar := &authproto.AuthRequest{
-		Action: int64(auth.Delete),
-		Token:  r.Header.Get("Authorization"),
-		Type:   streamType,
-	}
-	owner, err := authService.Authorize(ar)
-	if err != nil {
-		return nil, err
-	}
-
 	req := removeStreamReq{
-		owner: owner,
+		owner: r.Header.Get("Authorization"),
 		id:    bone.GetValue(r, "id"),
 	}
 	return req, nil

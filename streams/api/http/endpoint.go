@@ -3,6 +3,8 @@ package http
 import (
 	"context"
 
+	"github.com/datapace/datapace/auth"
+	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
 
 	"github.com/go-kit/kit/endpoint"
@@ -97,12 +99,42 @@ func viewStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 func removeStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(removeStreamReq)
-
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
 
-		if err := svc.RemoveStream(req.owner, req.id); err != nil {
+		token := req.owner
+		ar := &authproto.AuthRequest{
+			Action: int64(auth.Read),
+			Token:  token,
+			Type:   streamType,
+		}
+
+		ownerID, err := authService.Authorize(ar)
+		if err != nil {
+			return nil, err
+		}
+
+		// Fetch the stream so that attributes can be used for
+		// the authorization.
+		stream, err := svc.ViewStream(req.id, ownerID)
+		if err != nil {
+			return nil, err
+		}
+
+		ar = &authproto.AuthRequest{
+			Action:     int64(auth.Delete),
+			Token:      token,
+			Type:       streamType,
+			Attributes: stream.Attributes(),
+		}
+
+		ownerID, err = authService.Authorize(ar)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := svc.RemoveStream(ownerID, req.id); err != nil {
 			return nil, err
 		}
 
