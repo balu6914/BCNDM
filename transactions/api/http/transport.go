@@ -60,6 +60,12 @@ func MakeHandler(svc transactions.Service, ac authproto.AuthServiceClient) http.
 		encodeResponse,
 		opts...,
 	))
+	r.Get("/tokens/:id", kithttp.NewServer(
+		balanceEndpoint(svc),
+		decodeBalanceReq,
+		encodeResponse,
+		opts...,
+	))
 	r.Post("/tokens/buy", kithttp.NewServer(
 		buyEndpoint(svc),
 		decodeBuyReq,
@@ -110,6 +116,8 @@ func decodeBalanceReq(_ context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	req := balanceReq{userID: id.GetValue()}
+	req.ID = bone.GetValue(r, "id")
+
 	return req, nil
 }
 

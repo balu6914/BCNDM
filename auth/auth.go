@@ -1,11 +1,20 @@
 package auth
 
 import (
+	"fmt"
+	"regexp"
+
 	"github.com/asaskevich/govalidator"
 )
-
-const version = "1.0.0"
-const nbAttempet = 5
+const( 
+ 	version = "1.0.0"
+ 	nbAttempet = 5
+ 	numbers = `[0-9]{1}`
+ 	lowerLetters = `[a-z]{1}`
+ 	capitalLetters = `[A-Z]{1}`
+ 	symbol = `[!@#~$%^&*()+|_]{1}`
+	minPasswordLength = 9
+)
 
 var _ Service = (*authService)(nil)
 
@@ -67,10 +76,33 @@ func (as *authService) InitAdmin(user User, policies map[string]Policy) error {
 	return nil
 }
 
+//The password strength must be letter length + number + sign, 9 digits or more
+func CheckPasswordLevel(ps string) error {
+	if len(ps) < minPasswordLength {
+		return fmt.Errorf("password len is < ", minPasswordLength)
+	}
+	if matched, err := regexp.MatchString(numbers, ps); !matched || err != nil {
+		return fmt.Errorf("password need num :%v", err)
+	}
+	if matched, err := regexp.MatchString(lowerLetters, ps); !matched || err != nil {
+		return fmt.Errorf("password need a_z :%v", err)
+	}
+	if matched, err := regexp.MatchString(capitalLetters, ps); !matched || err != nil {
+		return fmt.Errorf("password need A_Z :%v", err)
+	}
+	if matched, err := regexp.MatchString(symbol, ps); !matched || err != nil {
+		return fmt.Errorf("password need symbol :%v", err)
+	}
+	return nil
+}
+
 func (as *authService) Register(key string, user User) (string, error) {
 	owner, err := as.Authorize(key, Create, user)
 
 	if err != nil {
+		return "", err
+	}
+	if err := CheckPasswordLevel(user.Password); err != nil {
 		return "", err
 	}
 
@@ -110,7 +142,10 @@ func (as *authService) Login(user User) (string, error) {
 		return "", ErrUnauthorizedAccess
 	}
 
-	if dbu.Attempt >= nbAttempet && dbu.Locked != false {
+	if dbu.Locked {
+		return "", ErrUserAccountLocked
+	}
+	if dbu.Attempt >= nbAttempet && dbu.Locked != true {
 		dbu.Locked = true
 		as.users.Update(dbu)
 		return "", ErrUserAccountLocked

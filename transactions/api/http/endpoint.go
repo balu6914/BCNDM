@@ -16,6 +16,9 @@ func buyEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
+		if req.FundID != "" {
+			req.userID = req.FundID
+		}
 		if err := svc.BuyTokens(req.userID, req.Amount); err != nil {
 			return nil, err
 		}
@@ -29,6 +32,9 @@ func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 		req := request.(balanceReq)
 		if err := req.validate(); err != nil {
 			return nil, err
+		}
+		if req.ID != "" {
+			req.userID = req.ID
 		}
 		balance, err := svc.Balance(req.userID)
 		if err != nil {
@@ -45,7 +51,9 @@ func withdrawEndpoint(svc transactions.Service) endpoint.Endpoint {
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-
+		if req.FundID != "" {
+			req.userID = req.FundID
+		}
 		if err := svc.WithdrawTokens(req.userID, req.Amount); err != nil {
 			return nil, err
 		}
