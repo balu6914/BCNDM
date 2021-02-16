@@ -201,6 +201,14 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 					Action: auth.List,
 					Type:   "token",
 				},
+				{
+					Action: auth.Buy,
+					Type:   "token",
+				},
+				{
+					Action: auth.Withdraw,
+					Type:   "token",
+				},
 			},
 		},
 		"user": {
