@@ -8,6 +8,7 @@ import (
 
 type balanceReq struct {
 	userID string
+	ID     string
 }
 
 func (req balanceReq) validate() error {
@@ -20,6 +21,7 @@ func (req balanceReq) validate() error {
 
 type buyReq struct {
 	userID string
+	FundID string `json:"fund_id"`
 	Amount uint64 `json:"amount"`
 }
 
@@ -33,6 +35,7 @@ func (req buyReq) validate() error {
 
 type withdrawReq struct {
 	userID string
+	FundID string `json:"fund_id"`
 	Amount uint64 `json:"amount"`
 }
 
