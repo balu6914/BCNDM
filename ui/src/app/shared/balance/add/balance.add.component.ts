@@ -5,6 +5,7 @@ import { BalanceService } from 'app/shared/balance/balance.service';
 import { Balance } from 'app/common/interfaces/balance.interface';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { MidpcPipe } from 'app/common/pipes/converter.pipe';
+import { User } from 'app/common/interfaces/user.interface';
 
 @Component({
   selector: 'dpc-balance-add',
@@ -15,9 +16,10 @@ export class BalanceAddComponent implements OnInit {
   form: FormGroup;
   errorMsg: String;
   processing: Boolean;
-  @Output()
+  user: User;
+
   // Emit event when we successfully buy more token , to get updated balance.
-  balanceUpdate = new EventEmitter();
+  @Output() balanceUpdate = new EventEmitter();
 
   constructor(
     public  modalAddTokens: BsModalRef,
@@ -41,6 +43,7 @@ export class BalanceAddComponent implements OnInit {
       // Convert to miDPC
       const toMidpcAmount =  {
         amount: this.midpcPipe.transform(form.amount),
+        fund_id: this.user.id,
       };
       this.balanceService.buy(toMidpcAmount).subscribe(
         response => {

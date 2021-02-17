@@ -19,7 +19,7 @@ import { CommonAppModule } from './common/common.module';
 import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-
+import { BalanceComponent } from './shared/balance/balance.component';
 
 @NgModule({
   imports: [
@@ -41,6 +41,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
     AppComponent,
     NoContentComponent,
     HeaderComponent,
+  ],
+  exports: [
+    BalanceComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

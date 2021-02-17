@@ -25,6 +25,7 @@ import { BalanceWithdrawComponent } from './withdraw/balance.withdraw.component'
     BalanceComponent,
   ],
   entryComponents: [
+    BalanceComponent,
     BalanceAddComponent,
     BalanceWithdrawComponent,
   ]

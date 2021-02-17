@@ -18,6 +18,7 @@ import { TableType } from 'app/shared/table/table';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
 import { Access } from 'app/common/interfaces/access.interface';
 import { Execution } from 'app/common/interfaces/execution.interface';
+import { BalanceComponent } from 'app/shared/balance/balance.component';
 
 @Component({
   selector: 'dpc-table-row',
@@ -37,6 +38,7 @@ export class TableRowComponent implements OnInit {
   @Input() rowMarked: any;
   @Output() deleteEvt: EventEmitter<any> = new EventEmitter();
   @Output() editEvt: EventEmitter<any> = new EventEmitter();
+  @Output() walletEvt: EventEmitter<any> = new EventEmitter();
   @Output() lockEvt: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<Stream | Subscription>();
   @Output() contractSigned: EventEmitter<any> = new EventEmitter();
@@ -235,6 +237,20 @@ export class TableRowComponent implements OnInit {
 
   openModalEditUser(row: any) {
     this.editEvt.emit(row);
+  }
+
+  openModalWalletUser(row: any) {
+    const initialState = {
+      user: row,
+    };
+
+    this.bsModalRef = this.modalService.show(BalanceComponent, {initialState});
+    this.bsModalRef.content.balanceUpdate.subscribe(
+      balance => {
+        this.row.balance = balance;
+        this.bsModalRef.hide();
+      }
+    );
   }
 
   openModalDeleteUser(row: any) {

@@ -11,5 +11,6 @@ export class User {
     public phone?: string,
     public disabled?: boolean,
     public locked?: boolean,
+    public balance?: number,
   ) { }
 }

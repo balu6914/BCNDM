@@ -20,12 +20,17 @@ export class BalanceService {
     return this.http.get<Balance>(`${environment.API_TOKENS}`);
   }
 
+  getBalance(userID: string) {
+    return this.http.get<Balance>(`${environment.API_TOKENS}/${userID}`);
+  }
+
   buy(data: any) {
     return this.http.post(`${environment.API_TOKENS}/buy`, data);
   }
   withdraw(data: any) {
     return this.http.post(`${environment.API_TOKENS}/withdraw`, data);
   }
+
   // Balance Message Buss will broadcast notification about balance value changes
   changed(value: Balance) {
     this._balance.next(value);

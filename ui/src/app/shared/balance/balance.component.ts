@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
@@ -21,6 +21,8 @@ export class BalanceComponent implements OnInit {
   user: User;
 
   @Input() showWalletKey: boolean;
+  @Output() balanceUpdate = new EventEmitter();
+
   constructor(
     private authService: AuthService,
     private modalService: BsModalService,
@@ -30,59 +32,63 @@ export class BalanceComponent implements OnInit {
 
   // Open BUY tokens dialog
   onBuyTokensClick() {
-    this.modalRef = this.modalService.show(BalanceAddComponent);
+    const initialState = {
+      user: this.user,
+    };
+
+    this.modalRef = this.modalService.show(BalanceAddComponent, {initialState});
     // Listen to balance update event
     this.modalRef.content.balanceUpdate.subscribe(e => {
       // Fetch updated user balance
-      this.getBalance().then(
-        (response) => {
-          this.modalRef.hide();
-        },
-      ).catch(err => console.log(err));
+      this.getBalance(this.user.id);
+      this.modalRef.hide();
     });
   }
   // Open Withdraw tokens dialog
   onWithdrawTokensClick() {
-    this.modalRef = this.modalService.show(BalanceWithdrawComponent);
+    const initialState = {
+      user: this.user,
+    };
+
+    this.modalRef = this.modalService.show(BalanceWithdrawComponent, {initialState});
     // Listen to balance update event
     this.modalRef.content.balanceUpdate.subscribe(e => {
       // Fetch updated user balance
-      this.getBalance().then(
-        (response) => {
-          this.modalRef.hide();
-        },
-      ).catch(err => console.log(err));
+      this.getBalance(this.user.id);
+      this.modalRef.hide();
     });
   }
 
   ngOnInit() {
-    this.authService.getCurrentUser().subscribe(
-      data => {
-        this.user = data;
-        this.getBalance();
-      },
-      err => {
-        console.log(err);
-      }
-    );
-  }
-
-  getBalance() {
-    const promise = new Promise((resolve, reject) => {
-      this.balanceService.get().subscribe(
-        (result: any) => {
-          this.balance.amount = result.balance;
-          // TODO remove this Mock of fiatAmount when we add this info on API side
-          this.balance.fiatAmount = this.balance.amount;
-          // Publish new balance data to balance message buss
-          this.balanceService.changed(this.balance);
-          resolve();
+    // Get balance if used as modal or fetch user if not
+    if (this.user !== undefined) {
+      this.getBalance(this.user.id);
+    } else {
+      this.authService.getCurrentUser().subscribe(
+        data => {
+          this.user = data;
+          this.getBalance(this.user.id);
         },
         err => {
-          console.error('Error fetching user balance ', err);
-          reject();
-        });
-    });
-    return promise;
+          console.log(err);
+        },
+      );
+    }
+  }
+
+  getBalance(userID) {
+    this.balanceService.getBalance(userID).subscribe(
+      (result: any) => {
+        this.balance.amount = result.balance;
+        // TODO remove this Mock of fiatAmount when we add this info on API side
+        this.balance.fiatAmount = this.balance.amount;
+        // Publish new balance data to balance message buss
+        this.balanceService.changed(this.balance);
+
+        this.balanceUpdate.emit(result.balance);
+      },
+      err => {
+        console.error('Error fetching user balance ', err);
+      });
   }
 }

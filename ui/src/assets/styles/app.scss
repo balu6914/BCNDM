@@ -253,6 +253,9 @@ transition: $transition-base;
   background-repeat: no-repeat;
   background-position: 50% 50%;
 }
+&--euro {
+  background-image: url('../img/icons/euro.svg');
+}
 &--edit {
   background-image: url('../img/icons/edit.svg');
 }

@@ -10,6 +10,7 @@ import { DashboardAdminSignupComponent } from 'app/dashboard/admin/signup/dashbo
 import { User } from 'app/common/interfaces/user.interface';
 import { TableComponent } from 'app/shared/table/main/table.component';
 import { AlertService } from 'app/shared/alerts/services/alert.service';
+import { BalanceService } from 'app/shared/balance/balance.service';
 
 import { DashboardAdminEditComponent } from 'app/dashboard/admin/edit/dashboard.admin.edit.component';
 import { DashboardAdminDeleteComponent } from 'app/dashboard/admin/delete/dashboard.admin.delete.component';
@@ -36,6 +37,7 @@ export class DashboardAdminComponent implements OnInit {
     private userService: UserService,
     private modalService: BsModalService,
     public alertService: AlertService,
+    private balanceService: BalanceService,
   ) {
   }
 
@@ -55,7 +57,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', ''];
+    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', 'Balance', ''];
     this.table.hasDetails = true;
   }
 
@@ -148,7 +150,16 @@ export class DashboardAdminComponent implements OnInit {
   fetchUsers() {
     this.userService.getAllUsers().subscribe(
       (resp: any) => {
-        this.table.page.content = resp.users;
+        if (resp.users.length > 0) {
+          resp.users.forEach((u: User) => {
+            this.balanceService.getBalance(u.id).subscribe(
+              (respBalance: any) => {
+                u.balance = respBalance.balance;
+                this.table.page.content.push(u);
+              },
+            );
+          });
+        }
       },
       err => {
         console.log(err);

@@ -147,7 +147,11 @@
   <td *ngIf="!row.disabled"></td>
   <td *ngIf="row.locked"> Locked </td>
   <td *ngIf="!row.locked"></td>
+  <td>{{ row.balance | dpc }}</td>
   <div class="action-wrapper" nowrap class="table--right-aligned">
+    <a class="action action--color-1" (click)="openModalWalletUser(row)">
+      <span class="action__icon action--euro"></span>
+    </a>
     <a class="action action--color-1" (click)="openModalEditUser(row)">
       <span class="action__icon action--edit"></span>
     </a>
