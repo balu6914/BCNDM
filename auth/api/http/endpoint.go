@@ -85,6 +85,7 @@ func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 			Company:      user.Company,
 			Address:      user.Address,
 			Phone:        user.Phone,
+			Roles:        user.Roles,
 		}
 
 		return res, nil

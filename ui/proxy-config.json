@@ -1,12 +1,5 @@
 {
-  "/auth/users/*": {
-    "target": "http://localhost:8080",
-    "secure": false,
-    "pathRewrite": {
-      "^/auth": ""
-    }
-  },
-  "/auth/tokens/*": {
+  "/auth/*": {
     "target": "http://localhost:8080",
     "secure": false,
     "pathRewrite": {

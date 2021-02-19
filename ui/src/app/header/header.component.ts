@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ISubscription } from 'rxjs/Subscription';
 
 import { AuthService } from 'app/auth/services/auth.service';
+import { UserService } from 'app/common/services/user.service';
 import { BalanceService } from 'app/shared/balance/balance.service';
 import { Balance } from 'app/common/interfaces/balance.interface';
 import { environment } from 'environments/environment';
@@ -25,6 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private balanceService: BalanceService,
   ) {
     this.aiEnabled = environment.AI_ENABLED;
@@ -46,10 +48,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
             resp => {
               this.user = resp;
 
-              // Show admin page link in profile menu
-              if (this.user.email === environment.ADMIN_EMAIL) {
-                this.isAdmin = true;
-              }
+              // If User roles include 'admin' enable the admin page link in the profile menu
+              this.userService.getUser(this.user.id).subscribe(
+                respUser => {
+                  if (respUser.roles !== undefined && respUser.roles.includes('admin')) {
+                    this.isAdmin = true;
+                  } else {
+                    this.isAdmin = false;
+                  }
+                },
+              );
 
               // Get user balance
               this.getBalance();

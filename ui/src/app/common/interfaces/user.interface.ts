@@ -12,5 +12,6 @@ export class User {
     public disabled?: boolean,
     public locked?: boolean,
     public balance?: number,
+    public roles?: string[],
   ) { }
 }

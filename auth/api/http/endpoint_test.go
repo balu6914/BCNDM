@@ -118,13 +118,13 @@ var policiesMu sync.Mutex
 var userForDisable = auth.User{
 	ID:       "246disable",
 	Email:    "disable@example.com",
-	Password: "passwordisabled",
+	Password: "Pass1234!",
 }
 
 var user = auth.User{
 	ID:        email,
 	Email:     email,
-	Password:  "password",
+	Password:  "Pass1234!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
@@ -136,7 +136,7 @@ var user = auth.User{
 var userForUpdate = auth.User{
 	ID:        "123update",
 	Email:     "update@example.com",
-	Password:  "password",
+	Password:  "Pass5678!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
@@ -148,7 +148,7 @@ var userForUpdate = auth.User{
 var nonAdminForUpdate = auth.User{
 	ID:        "nonadmin333update",
 	Email:     "nonadminforupdate@example.com",
-	Password:  "password",
+	Password:  "Pass1234!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
@@ -160,7 +160,7 @@ var nonAdminForUpdate = auth.User{
 var admin = auth.User{
 	ID:        "admin",
 	Email:     "admin@example.com",
-	Password:  "password",
+	Password:  "Pass1234!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
@@ -173,7 +173,7 @@ var admin = auth.User{
 var nonadmin = auth.User{
 	ID:        "nonadmin@example.com",
 	Email:     "nonadmin@example.com",
-	Password:  "password",
+	Password:  "Pass1234!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
@@ -258,7 +258,7 @@ func TestRegister(t *testing.T) {
 	invalidData := toJSON(auth.User{})
 	invalidEmailData := toJSON(auth.User{
 		Email:     invalid,
-		Password:  "pass",
+		Password:  "Pass1234!",
 		FirstName: "John",
 		LastName:  "Doe",
 	})
@@ -383,7 +383,7 @@ func TestLogin(t *testing.T) {
 
 	nonexistentUser := auth.User{
 		Email:    "nonexistent.user@email.com",
-		Password: "pass",
+		Password: "Pass1234!",
 	}
 	nonexistentData := toJSON(nonexistentUser)
 
@@ -610,12 +610,6 @@ func TestView(t *testing.T) {
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", desc, err))
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", desc, tc.status, res.StatusCode))
 	}
-}
-
-type testUpdatePassswordReq struct {
-	NewPassword string `json:"new_password"`
-	RePassword  string `json:"re_password,omitempty"`
-	OldPassword string `json:"old_password,omitempty"`
 }
 
 type testUpdateReq struct {
