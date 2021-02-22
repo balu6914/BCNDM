@@ -3,6 +3,7 @@ package mongo
 import (
 	"strings"
 
+	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
 
 	"gopkg.in/mgo.v2"
@@ -16,6 +17,8 @@ const (
 	errMsg     = "Some of the URLs already exist in the database."
 	msgMark    = "\""
 )
+
+var errFormatUUID = errors.New("invalid uuid format")
 
 var _ streams.StreamRepository = (*streamRepository)(nil)
 
@@ -217,6 +220,11 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 
 	dbs := dbStream{}
 
+	if !bson.IsObjectIdHex(id) {
+		return streams.Stream{}, errFormatUUID
+	}
+
+	// It's valid, calling bson.ObjectIdHex() will not panic...
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	_id := bson.ObjectIdHex(id)
 	if err := c.Find(bson.M{"_id": _id}).One(&dbs); err != nil {
