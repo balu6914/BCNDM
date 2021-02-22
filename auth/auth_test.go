@@ -103,7 +103,7 @@ var policiesMu sync.Mutex
 var user = auth.User{
 	Email:        "user@example.com",
 	ContactEmail: "user@example.com",
-	Password:     "password",
+	Password:     "Pass1234!",
 	ID:           "1",
 	FirstName:    "first",
 	LastName:     "last",
@@ -116,7 +116,7 @@ var user = auth.User{
 var admin = auth.User{
 	Email:        "admin@example.com",
 	ContactEmail: "admin@example.com",
-	Password:     "password",
+	Password:     "Pass1234!",
 	ID:           "admin",
 	FirstName:    "first",
 	LastName:     "last",
@@ -130,7 +130,7 @@ var admin = auth.User{
 var noAdmin = auth.User{
 	Email:        "noadmin@example.com",
 	ContactEmail: "nonadmin@example.com",
-	Password:     "password",
+	Password:     "Pass1234!",
 	ID:           "nonadmin",
 	FirstName:    "first",
 	LastName:     "last",
@@ -163,7 +163,7 @@ func newServiceWithAdmin() (auth.Service, string, auth.User) {
 func TestRegister(t *testing.T) {
 	svc, key, _ := newServiceWithAdmin()
 	invalidUser := user
-	invalidUser.Password = ""
+	invalidUser.Password = "wrong"
 	_, err := svc.Register(key, noAdmin)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, noAdmin.ID))
 	nonadminkey, _ := svc.Login(auth.User{
@@ -192,7 +192,7 @@ func TestRegister(t *testing.T) {
 			desc: "register user with invalid data",
 			key:  key,
 			user: invalidUser,
-			err:  auth.ErrMalformedEntity,
+			err:  auth.ErrPassLength,
 		},
 		{
 			desc: "register existing user",
@@ -213,20 +213,21 @@ func TestView(t *testing.T) {
 	uv := auth.User{
 		ID:       "testv",
 		Email:    "testview@example.com",
-		Password: "testpass",
+		Password: "Pass1234!",
 	}
 	uv2 := auth.User{
 		ID:       "testv2",
 		Email:    "testview2@example.com",
-		Password: "testpass2",
+		Password: "Pass1234!",
 	}
 	id, err := svc.Register(k, uv)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, uv.ID))
 	_, err = svc.Register(k, uv2)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, uv2.ID))
 	key, err := svc.Login(uv)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, uv2.ID))
 	key2, err := svc.Login(uv2)
-	_ = err
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while loogin user %s", err, uv2.ID))
 
 	cases := map[string]struct {
 		key string
@@ -301,10 +302,12 @@ func TestUpdate(t *testing.T) {
 
 func TestUpdatePassword(t *testing.T) {
 	svc, k := newService()
+
+	user.Password = "Pass2222!"
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
-	key, _ := svc.Login(user)
-	user.Password = "newpassword"
+	key, err := svc.Login(user)
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, user.ID))
 
 	cases := []struct {
 		desc string

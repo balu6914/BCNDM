@@ -654,7 +654,7 @@ func TestRemoveStream(t *testing.T) {
 			desc:   "remove a nonexisting stream",
 			auth:   validKey,
 			id:     bson.NewObjectId().Hex(),
-			status: http.StatusNoContent,
+			status: http.StatusNotFound,
 		},
 	}
 	for _, tc := range cases {

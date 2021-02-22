@@ -6,14 +6,28 @@ import (
 
 	"github.com/asaskevich/govalidator"
 )
-const( 
- 	version = "1.0.0"
- 	nbAttempet = 5
- 	numbers = `[0-9]{1}`
- 	lowerLetters = `[a-z]{1}`
- 	capitalLetters = `[A-Z]{1}`
- 	symbol = `[!@#~$%^&*()+|_]{1}`
+
+const (
+	version           = "1.0.0"
+	nbAttempet        = 5
+	numbers           = `[0-9]{1}`
+	lowerLetters      = `[a-z]{1}`
+	capitalLetters    = `[A-Z]{1}`
+	symbol            = `[!@#~$%^&*()+|_]{1}`
 	minPasswordLength = 9
+)
+
+var (
+	// ErrPassLength indicates that password lenght is lower-than minPasswordLength
+	ErrPassLength = fmt.Errorf("password length is lower than %d", minPasswordLength)
+	// ErrPassContainNum indicates that password don't contain a number
+	ErrPassContainNum = fmt.Errorf("password must contain at least a number")
+	// ErrPassContainLowCase indicates that password don't contain a character between a and z
+	ErrPassContainLowCase = fmt.Errorf("password must contain a character between a and z")
+	// ErrPassContainUpCase indicates that password don't contain a character between a and z
+	ErrPassContainUpCase = fmt.Errorf("password must contain a character between A and Z")
+	// ErrPassContainSymbol indicates that password don't contain a symbol
+	ErrPassContainSymbol = fmt.Errorf("password must contain a symbol")
 )
 
 var _ Service = (*authService)(nil)
@@ -76,22 +90,22 @@ func (as *authService) InitAdmin(user User, policies map[string]Policy) error {
 	return nil
 }
 
-//The password strength must be letter length + number + sign, 9 digits or more
+// CheckPasswordLevel validate all password regex
 func CheckPasswordLevel(ps string) error {
 	if len(ps) < minPasswordLength {
-		return fmt.Errorf("password len is < ", minPasswordLength)
+		return ErrPassLength
 	}
 	if matched, err := regexp.MatchString(numbers, ps); !matched || err != nil {
-		return fmt.Errorf("password need num :%v", err)
+		return ErrPassContainNum
 	}
 	if matched, err := regexp.MatchString(lowerLetters, ps); !matched || err != nil {
-		return fmt.Errorf("password need a_z :%v", err)
+		return ErrPassContainLowCase
 	}
 	if matched, err := regexp.MatchString(capitalLetters, ps); !matched || err != nil {
-		return fmt.Errorf("password need A_Z :%v", err)
+		return ErrPassContainUpCase
 	}
 	if matched, err := regexp.MatchString(symbol, ps); !matched || err != nil {
-		return fmt.Errorf("password need symbol :%v", err)
+		return ErrPassContainSymbol
 	}
 	return nil
 }
