@@ -61,17 +61,18 @@ func (res okRes) empty() bool {
 }
 
 type viewUserRes struct {
-	ID           string   `json:"id"`
-	Email        string   `json:"email,omitempty"`
-	ContactEmail string   `json:"contact_email,omitempty"`
-	FirstName    string   `json:"first_name"`
-	LastName     string   `json:"last_name"`
-	Company      string   `json:"company,omitempty"`
-	Address      string   `json:"address,omitempty"`
-	Phone        string   `json:"phone,omitempty"`
-	Disabled     bool     `json:"disabled,omitempty"`
-	Locked       bool     `json:"locked,omitempty"`
-	Roles        []string `json:"roles,omitempty"`
+	ID           string        `json:"id"`
+	Email        string        `json:"email,omitempty"`
+	ContactEmail string        `json:"contact_email,omitempty"`
+	FirstName    string        `json:"first_name"`
+	LastName     string        `json:"last_name"`
+	Company      string        `json:"company,omitempty"`
+	Address      string        `json:"address,omitempty"`
+	Phone        string        `json:"phone,omitempty"`
+	Disabled     bool          `json:"disabled,omitempty"`
+	Locked       bool          `json:"locked,omitempty"`
+	Role         string        `json:"role,omitempty"`
+	Policies     []interface{} `json:"policies,omitempty"`
 }
 
 func (res viewUserRes) code() int {

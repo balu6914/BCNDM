@@ -21,7 +21,7 @@ type jwtIdentityProvider struct {
 }
 
 type CustomClaims struct {
-	Roles []string `json:"roles"`
+	Role string `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -30,12 +30,12 @@ func New(secret string) auth.IdentityProvider {
 	return &jwtIdentityProvider{}
 }
 
-func (idp *jwtIdentityProvider) TemporaryKey(id string, roles []string) (string, error) {
+func (idp *jwtIdentityProvider) TemporaryKey(id string, role string) (string, error) {
 	now := time.Now().UTC()
 	exp := now.Add(duration)
 
 	claims := CustomClaims{
-		roles,
+		role,
 		jwt.StandardClaims{
 			Subject:   id,
 			Issuer:    issuer,
@@ -47,7 +47,7 @@ func (idp *jwtIdentityProvider) TemporaryKey(id string, roles []string) (string,
 	return idp.jwt(claims)
 }
 
-func (idp *jwtIdentityProvider) Roles(key string) ([]string, error) {
+func (idp *jwtIdentityProvider) Role(key string) (string, error) {
 	token, err := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, auth.ErrUnauthorizedAccess
@@ -55,28 +55,24 @@ func (idp *jwtIdentityProvider) Roles(key string) ([]string, error) {
 
 		return []byte(idp.secret), nil
 	})
-	var roles []string
 	if err != nil || !token.Valid {
-		return roles, auth.ErrUnauthorizedAccess
+		return "", auth.ErrUnauthorizedAccess
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return roles, auth.ErrUnauthorizedAccess
+		return "", auth.ErrUnauthorizedAccess
 	}
-	if _, ok := claims["roles"]; !ok {
-		return roles, nil
+	r, ok := claims["role"]
+	if !ok {
+		return "", nil
 	}
-	var rr []interface{}
-	if rr, ok = claims["roles"].([]interface{}); !ok {
-		return roles, nil
+
+	if rr, ok := r.(string); !ok {
+		return rr, nil
 	}
-	for _, v := range rr {
-		if r, ok := v.(string); ok {
-			roles = append(roles, r)
-		}
-	}
-	return roles, nil
+
+	return "", nil
 }
 
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {

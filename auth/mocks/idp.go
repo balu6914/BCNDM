@@ -16,19 +16,19 @@ func NewIdentityProvider() auth.IdentityProvider {
 	return &identityProviderMock{}
 }
 
-func (idp *identityProviderMock) TemporaryKey(id string, roles []string) (string, error) {
+func (idp *identityProviderMock) TemporaryKey(id string, role string) (string, error) {
 	if id == "" {
 		return "", auth.ErrUnauthorizedAccess
 	}
-	if len(roles) > 0 {
-		return id + "|" + strings.Join(roles, "|"), nil
+	if role != "" {
+		return id + "|" + role, nil
 	}
 	return id, nil
 
 }
 
 func (idp *identityProviderMock) PermanentKey(id string) (string, error) {
-	return idp.TemporaryKey(id, []string{})
+	return idp.TemporaryKey(id, "")
 }
 
 func (idp *identityProviderMock) Identity(key string) (string, error) {
@@ -36,15 +36,15 @@ func (idp *identityProviderMock) Identity(key string) (string, error) {
 		return "", auth.ErrUnauthorizedAccess
 	}
 	parts := strings.Split(key, "|")
-	return idp.TemporaryKey(parts[0], nil)
+	return idp.TemporaryKey(parts[0], "")
 }
 
-func (idp *identityProviderMock) Roles(key string) ([]string, error) {
+func (idp *identityProviderMock) Role(key string) (string, error) {
 	parts := strings.Split(key, "|")
 	l := len(parts)
-	var roles []string
+	var role string
 	if l > 1 {
-		roles = parts[1:]
+		role = parts[1]
 	}
-	return roles, nil
+	return role, nil
 }

@@ -36,12 +36,12 @@ func (prm *policyRepositoryMock) OneByID(id string) (auth.Policy, error) {
 	return auth.Policy{}, auth.ErrNotFound
 }
 
-func (prm *policyRepositoryMock) OneByName(owner, name string) (auth.Policy, error) {
+func (prm *policyRepositoryMock) OneByName(name string) (auth.Policy, error) {
 	prm.mu.Lock()
 	defer prm.mu.Unlock()
 
 	for _, p := range prm.policies {
-		if p.Owner == owner && p.Name == name {
+		if p.Name == name {
 			return p, nil
 		}
 	}

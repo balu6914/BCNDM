@@ -51,7 +51,7 @@ func Connect(addr string, tout int, socketTout int, db string, user string, pass
 	// This means that one user can't create many policies
 	// with the same name.
 	policiesIdx := mgo.Index{
-		Key:        []string{"name", "owner"},
+		Key:        []string{"name"},
 		Unique:     true,
 		DropDups:   false,
 		Background: false,

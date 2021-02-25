@@ -125,6 +125,9 @@ func decodeRegister(_ context.Context, r *http.Request) (interface{}, error) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
+	if req.Role == "" {
+		req.Role = auth.UserRole
+	}
 	req.key = r.Header.Get("Authorization")
 	return req, nil
 }
@@ -247,6 +250,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			w.WriteHeader(http.StatusBadRequest)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 		}
 	}
 }

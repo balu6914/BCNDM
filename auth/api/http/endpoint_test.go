@@ -119,6 +119,7 @@ var userForDisable = auth.User{
 	ID:       "246disable",
 	Email:    "disable@example.com",
 	Password: "Pass1234!",
+	Role:     auth.UserRole,
 }
 
 var user = auth.User{
@@ -130,6 +131,7 @@ var user = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
 }
 
@@ -142,6 +144,7 @@ var userForUpdate = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
 }
 
@@ -154,6 +157,7 @@ var nonAdminForUpdate = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
 }
 
@@ -166,7 +170,7 @@ var admin = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
-	Roles:     []string{"admin"},
+	Role:      auth.AdminRole,
 	Policies:  []auth.Policy{policies["admin"]},
 }
 
@@ -179,6 +183,7 @@ var nonadmin = auth.User{
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
+	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
 }
 
@@ -379,7 +384,7 @@ func TestLogin(t *testing.T) {
 	credentials := user
 	credentials.ID = ""
 	data := toJSON(credentials)
-	tokenData := toJSON(map[string]string{"token": user.Email})
+	tokenData := toJSON(map[string]string{"token": user.Email + "|" + user.Role})
 
 	nonexistentUser := auth.User{
 		Email:    "nonexistent.user@email.com",

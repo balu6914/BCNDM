@@ -22,7 +22,7 @@ func LoggingMiddleware(svc auth.Service, logger log.Logger) auth.Service {
 
 func (lm *loggingMiddleware) Register(key string, user auth.User) (ID string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method register for user %s took %s to complete", user.Email, time.Since(begin))
+		message := fmt.Sprintf("Method register for user %s with role %s took %s to complete", user.Email, user.Role, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return

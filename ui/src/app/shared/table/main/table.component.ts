@@ -54,9 +54,8 @@ export class TableComponent {
   }
 
   rowDeleted(rowDeleted: any) {
-    // Remove row
     const list: any = this.table.page.content;
-    list.forEach( (row, i) => {
+    list.forEach((row, i) => {
       // TODO: Remove thiss check and emit full row for all componets
       if (row.id === rowDeleted.id) {
         if (rowDeleted.email !== undefined) {

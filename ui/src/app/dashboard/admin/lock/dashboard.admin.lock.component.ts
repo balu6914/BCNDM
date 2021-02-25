@@ -29,8 +29,7 @@ export class DashboardAdminLockComponent {
 
     this.userService.updateUser(userUpdateReq).subscribe(
       response => {
-        this.user.locked = !this.user.locked;
-        this.userLocked.emit(this.user);
+        this.userLocked.emit(userUpdateReq.locked);
         this.modalLockedUser.hide();
         const msg =  this.user.locked ? 'User successfully Locked.' : 'User successfully unlocked.';
         this.alertService.success(msg);

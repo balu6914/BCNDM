@@ -1,5 +1,11 @@
 package auth
 
+// Role constants
+const (
+	AdminRole = "admin"
+	UserRole  = "user"
+)
+
 // Policy consists of rules and constranits to validate Resource against.
 type Policy struct {
 	ID          string
@@ -67,7 +73,7 @@ type PolicyRepository interface {
 	OneByID(id string) (Policy, error)
 
 	// OneByName retrieves the Policy by its name.
-	OneByName(owner, name string) (Policy, error)
+	OneByName(name string) (Policy, error)
 
 	// List returns all the policies that belong to the owner.
 	List(owner string) ([]Policy, error)

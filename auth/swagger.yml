@@ -48,32 +48,6 @@ paths:
           description: Email is already taken.
         500:
           $ref: "#/responses/ServiceError"
-    put:
-      summary: Updates user info
-      description: |
-        Update is performed by replacing the current resource data with values
-        provided in a request payload. Resource's unique identifier will not be
-        affected.
-      tags:
-        - users
-      parameters:
-        - name: user
-          description: JSON-formatted document describing the new user.
-          in: body
-          schema:
-            $ref: "#/definitions/User"
-          required: true
-      responses:
-        200:
-          description: User updated.
-        400:
-          description: Failed due to malformed JSON.
-        403:
-          description: Missing or invalid access token provided.
-        404:
-          description: User does not exist.
-        500:
-          $ref: "#/responses/ServiceError"
   /users/{id}:
     get:
       summary: Retrieves user info. User can retrieve info for it's own ID contained in token. Admin can retrieve infor for any ID.
@@ -82,10 +56,10 @@ paths:
       parameters:
         - $ref: "#/parameters/Authorization"
         - name: id
-            description: User ID.
-            in: path
-            type: string
-            required: true
+          description: User ID.
+          in: path
+          type: string
+          required: true
       responses:
         200:
           description: User data retrieved.
@@ -96,10 +70,7 @@ paths:
         500:
           $ref: "#/responses/ServiceError"
     patch:
-      summary: Updates user attributes for user id. User with Admin role can update any user attributes, while user without it can update only his attributes (but not roles).
-      Update is performed by replacing the current resource data with values
-      provided in a request payload. Resource's unique identifier (User id) will not be
-      affected.
+      summary: Updates user attributes for user id. User with Admin role can update any user attributes, while user without it can update only his attributes (but not roles). Update is performed by replacing the current resource data with values provided in a request payload. Resource's unique identifier (User id) will not be affected.
       tags:
         - users
       parameters:
@@ -110,11 +81,11 @@ paths:
           type: string
           required: true
         - name: user
-            description: JSON-formatted document describing the updated user fields.
-            in: body
-            schema:
-              $ref: "#/definitions/User"
-            required: true
+          description: JSON-formatted document describing the updated user fields.
+          in: body
+          schema:
+            $ref: "#/definitions/User"
+          required: true
       responses:
         200:
           description: User data updated.
@@ -151,7 +122,7 @@ paths:
           description: JSON-formatted document containing user credentials.
           in: body
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/Credentials"
           required: true
       responses:
         201:
@@ -163,7 +134,136 @@ paths:
             Failed due to malformed JSON or using an invalid credentials.
         500:
           $ref: "#/responses/ServiceError"
-
+  /policies:
+    post:
+      summary: Create a new policy.
+      description: |
+        Creates a new policy.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: policy
+          description: JSON-formatted document containing policy
+          in: body
+          schema:
+            $ref: "#/definitions/Policy"
+          required: true
+      responses:
+        201:
+          description: Policy created successfully
+          schema:
+            $ref: "#/parameters/ID"
+        400:
+          description: |
+            Failed due to malformed JSON or using an invalid credentials.
+        500:
+          $ref: "#/responses/ServiceError"
+    get:
+      summary: List policies owned by the user
+      description: |
+        Lists policies owned by the user identified using provided Authorization token.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Policies retieved successfully.
+          schema:
+            $ref: "#/definitions/Policies"
+        400:
+          description: |
+            Failed due to malformed JSON or using an invalid credentials.
+        500:
+          $ref: "#/responses/ServiceError"
+  /policies/{id}:
+    get:
+      summary: Retrieve a policy by ID
+      description: Retrieve policy with the provided ID owned by the user identified using provided Authorization token.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: Policy ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Policies retieved successfully.
+          schema:
+            $ref: "#/definitions/Policy"
+        400:
+          description: |
+            Failed due to malformed JSON or using an invalid credentials.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Remove a policy by ID
+      description: Remove policy with the provided ID owned by the user identified using provided Authorization token.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: Policy ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: Policy removed.
+          schema:
+            $ref: "#/definitions/Policy"
+        500:
+          $ref: "#/responses/ServiceError"
+  /policies/{policy}/users/{user}:
+    put:
+      summary: Attach the policy to the user.
+      description: Attach the policy with the provided ID to the user identified by the ID.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: policy
+          description: Policy ID.
+          in: path
+          type: string
+          required: true
+        - name: user
+          description: User ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Policy attached successfully.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Detach the policy from the user.
+      description: Detach the policy with the provided ID to the user identified by the ID.
+      tags:
+        - policies
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: policy
+          description: Policy ID.
+          in: path
+          type: string
+          required: true
+        - name: user
+          description: User ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: Policy detached successfully.
+        500:
+          $ref: "#/responses/ServiceError"
 parameters:
   Authorization:
     name: Authorization
@@ -171,10 +271,16 @@ parameters:
     in: header
     type: string
     required: true
+  ID:
+    name: Location
+    description: URL location to of the created entity.
+    in: header
+    type: string
+    required: true
 
 responses:
   ServiceError:
-    description: Unexpected server-side error occured.
+    description: Unexpected server-side error ocurred.
 
 definitions:
   User:
@@ -189,14 +295,24 @@ definitions:
         type: string
         format: password
         description: Free-form account password used for acquiring auth token(s).
-      roles:
-        type: array
-          items:
-            type: string
-        description: An array of roles that user can have. admin role is most significant
       disabled:
         type: boolean
         description: When set to true, prevents user from logging in.
+    required:
+      - email
+      - password
+  Credentials:
+    type: object
+    properties:
+      email:
+        type: string
+        format: email
+        example: "test@example.com"
+        description: User's email address will be used as its unique identifier
+      password:
+        type: string
+        format: password
+        description: Free-form account password used for acquiring auth token(s).
     required:
       - email
       - password
@@ -208,3 +324,41 @@ definitions:
         description: Generated access token.
     required:
       - token
+  Rule:
+    type: object
+    description: Policy rule
+    properties:
+      action:
+        type: integer
+        enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        description: |
+          Each enum value represemts one of the possible values [Any, Create, CreateBulk, Read, Update, Delete, Write, List, Buy, Withdraw, Sign]
+      type:
+        type: string
+        description: Represnts the entity the rule aplies to. For example, a Stream.
+      condition:
+        type: object
+        properties:
+          key:
+            type: string
+            description: An object key to be matched when evaluating key.
+          value:
+            type: string
+            description: Expected value of the matched key.
+  Policy:
+    type: object
+    properties:
+      version:
+        type: string
+        description: Version of the policy
+      name:
+        type: string
+        description: Unique name of the policy
+      rules:
+        type: array
+        items:
+          $ref: '#/definitions/Rule'
+  Policies:
+    type: array
+    items:
+      $ref: '#/definitions/Policy'

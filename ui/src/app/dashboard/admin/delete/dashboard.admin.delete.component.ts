@@ -29,10 +29,9 @@ export class DashboardAdminDeleteComponent {
 
     this.userService.updateUser(userUpdateReq).subscribe(
       response => {
-        this.user.disabled = !this.user.disabled;
-        this.userDeleted.emit(this.user);
+        this.userDeleted.emit(userUpdateReq.disabled);
         this.modalDeleteUser.hide();
-        const msg =  this.user.disabled ? 'User Login successfully disabled.' : 'User Login successfully enabled.'
+        const msg =  this.user.disabled ? 'User Login successfully disabled.' : 'User Login successfully enabled.';
         this.alertService.success(msg);
       },
       err => {

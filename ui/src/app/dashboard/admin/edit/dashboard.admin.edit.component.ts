@@ -60,6 +60,8 @@ export class DashboardAdminEditComponent implements OnInit {
           address: this.form.value.address,
           phone: this.form.value.phone,
           password: this.form.value.password,
+          balance: this.user.balance,
+          role: this.user.role,
         };
 
       this.userService.updateUser(user).subscribe(

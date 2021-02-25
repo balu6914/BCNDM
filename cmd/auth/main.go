@@ -164,7 +164,7 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 		Company:      "",
 		Address:      "",
 		Phone:        "",
-		Roles:        []string{"admin"},
+		Role:         auth.AdminRole,
 	}
 
 	policies := map[string]auth.Policy{

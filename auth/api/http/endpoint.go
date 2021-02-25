@@ -24,7 +24,7 @@ func registerEndpoint(svc auth.Service) endpoint.Endpoint {
 			Company:      req.Company,
 			Address:      req.Address,
 			Phone:        req.Phone,
-			Roles:        req.Roles,
+			Role:         req.Role,
 		}
 		id, err := svc.Register(req.key, user)
 		return createRes{ID: id}, err
@@ -75,6 +75,10 @@ func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 		if err != nil {
 			return nil, err
 		}
+		var policies []interface{}
+		for _, p := range user.Policies {
+			policies = append(policies, p)
+		}
 
 		res := viewUserRes{
 			ID:           user.ID,
@@ -85,7 +89,8 @@ func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 			Company:      user.Company,
 			Address:      user.Address,
 			Phone:        user.Phone,
-			Roles:        user.Roles,
+			Role:         user.Role,
+			Policies:     policies,
 		}
 
 		return res, nil
@@ -119,6 +124,7 @@ func listUsersEndpoint(svc auth.Service) endpoint.Endpoint {
 				Phone:        user.Phone,
 				Disabled:     user.Disabled,
 				Locked:       user.Locked,
+				Role:         user.Role,
 			})
 		}
 

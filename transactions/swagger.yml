@@ -26,23 +26,40 @@ paths:
           description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
-  /tokens/buy:
-    post:
-      summary: Purcheses tokens for user
+  /tokens/:id:
+    get:
+      summary: Retrives any user balance while using admin account.
       tags:
         - tokens
       parameters:
         - $ref: "#/parameters/Authorization"
-        - name: amount
-          description: |
-            JSON-formatted request specifying amount of tokens to be purchesed.
-          in: body
-          schema:
-            $ref: "#/definitions/Amount"
-          required: true
       responses:
         200:
-          description: User purchesed tokens successfully.
+          description: Users balance retrieved.
+          schema:
+            $ref: "#/definitions/Balance"
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
+  /tokens/buy:
+    post:
+      summary: Purchases tokens for user
+      tags:
+        - tokens
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: BuyWithdrawInfo
+          description: |
+            JSON-formatted request specifying the user ID and the token amount.
+          in: body
+          schema:
+            $ref: "#/definitions/BuyWithdrawInfo"
+      responses:
+        200:
+          description: User purchased tokens successfully.
         400:
           description: Failed due to malformed JSON.
         403:
@@ -58,13 +75,12 @@ paths:
         - tokens
       parameters:
         - $ref: "#/parameters/Authorization"
-        - name: amount
+        - name: BuyWithdrawInfo
           description: |
-            JSON-formatted request specifying amount of tokens to be withdrawed.
+            JSON-formatted request specifying the user ID and the token amount.
           in: body
           schema:
-            $ref: "#/definitions/Amount"
-          required: true
+            $ref: "#/definitions/BuyWithdrawInfo"
       responses:
         200:
           description: User withdrawed tokens successfully.
@@ -76,7 +92,6 @@ paths:
           description: Missing or invalid content type.
         500:
           $ref: "#/responses/ServiceError"
-
 parameters:
   Authorization:
     name: Authorization
@@ -90,6 +105,17 @@ responses:
     description: Unexpected server-side error occured.
 
 definitions:
+  BuyWithdrawInfo:
+    type: object
+    properties:
+      amount:
+        type: integer
+        description: The required amount of tokens.
+      fund_id:
+        type: string
+        description: User ID.
+    required:
+      - amount
   Balance:
     type: object
     properties:
@@ -98,11 +124,3 @@ definitions:
         description: Current balance.
     required:
       - balance
-  Amount:
-    type: object
-    properties:
-      amount:
-        type: integer
-        description: Amount for purchese.
-    required:
-      - amount

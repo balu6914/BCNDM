@@ -123,7 +123,7 @@ var admin = auth.User{
 	Company:      "company",
 	Address:      "address",
 	Phone:        "+1234567890",
-	Roles:        []string{"admin"},
+	Role:         "admin",
 	Policies:     []auth.Policy{policies["admin"]},
 }
 
@@ -214,11 +214,13 @@ func TestView(t *testing.T) {
 		ID:       "testv",
 		Email:    "testview@example.com",
 		Password: "Pass1234!",
+		Role:     auth.UserRole,
 	}
 	uv2 := auth.User{
 		ID:       "testv2",
 		Email:    "testview2@example.com",
 		Password: "Pass1234!",
+		Role:     auth.UserRole,
 	}
 	id, err := svc.Register(k, uv)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, uv.ID))
@@ -227,7 +229,7 @@ func TestView(t *testing.T) {
 	key, err := svc.Login(uv)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, uv2.ID))
 	key2, err := svc.Login(uv2)
-	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while loogin user %s", err, uv2.ID))
+	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, uv2.ID))
 
 	cases := map[string]struct {
 		key string

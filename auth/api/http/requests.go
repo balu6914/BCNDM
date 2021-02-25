@@ -10,14 +10,14 @@ import (
 
 // User validation errors
 var (
-	errInvalidEmail     = errors.New("invalid user email")
-	errInvalidPassword  = errors.New("invalid password length")
-	errInvalidFirstName = errors.New("invalid first name length")
-	errInvalidLastName  = errors.New("invalid last name length")
-	errInvalidCompany   = errors.New("invalid company name length")
-	errInvalidPhone     = errors.New("invalid phone number length")
-	errInvalidAddress   = errors.New("invalid address length")
-
+	errInvalidEmail         = errors.New("invalid user email")
+	errInvalidPassword      = errors.New("invalid password length")
+	errInvalidFirstName     = errors.New("invalid first name length")
+	errInvalidLastName      = errors.New("invalid last name length")
+	errInvalidCompany       = errors.New("invalid company name length")
+	errInvalidPhone         = errors.New("invalid phone number length")
+	errInvalidAddress       = errors.New("invalid address length")
+	errInvalidRole          = errors.New("invalid role")
 	errInvalidPolicyRules   = errors.New("invalid policy rules list")
 	errInvalidPolicyVersion = errors.New("invalid policy version")
 )
@@ -28,15 +28,15 @@ type apiReq interface {
 
 type registerReq struct {
 	key          string
-	Email        string   `json:"email"`
-	Password     string   `json:"password"`
-	ContactEmail string   `json:"contact_email,omitempty"`
-	FirstName    string   `json:"first_name,omitempty"`
-	LastName     string   `json:"last_name,omitempty"`
-	Company      string   `json:"company,omitempty"`
-	Address      string   `json:"address,omitempty"`
-	Phone        string   `json:"phone,omitempty"`
-	Roles        []string `json:"roles,omitempty"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	ContactEmail string `json:"contact_email,omitempty"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
+	Company      string `json:"company,omitempty"`
+	Address      string `json:"address,omitempty"`
+	Phone        string `json:"phone,omitempty"`
+	Role         string `json:"role,omitempty"`
 }
 
 const (
@@ -79,6 +79,10 @@ func (req registerReq) validate() error {
 		return errInvalidAddress
 	}
 
+	if req.Role != auth.UserRole && req.Role != auth.AdminRole {
+		return errInvalidRole
+	}
+
 	if !govalidator.IsEmail(req.Email) {
 		return errInvalidEmail
 	}
@@ -119,16 +123,16 @@ func (req identityReq) validate() error {
 type updateReq struct {
 	key          string
 	id           string
-	ContactEmail *string   `json:"contact_email,omitempty"`
-	FirstName    *string   `json:"first_name,omitempty"`
-	LastName     *string   `json:"last_name,omitempty"`
-	Company      *string   `json:"company,omitempty"`
-	Address      *string   `json:"address,omitempty"`
-	Phone        *string   `json:"phone,omitempty"`
-	Roles        *[]string `json:"roles,omitempty"`
-	Password     *string   `json:"password"`
-	Disabled     *bool     `json:"disabled"`
-	Locked       *bool     `json:"locked"`
+	ContactEmail *string `json:"contact_email,omitempty"`
+	FirstName    *string `json:"first_name,omitempty"`
+	LastName     *string `json:"last_name,omitempty"`
+	Company      *string `json:"company,omitempty"`
+	Address      *string `json:"address,omitempty"`
+	Phone        *string `json:"phone,omitempty"`
+	Role         *string `json:"role,omitempty"`
+	Password     *string `json:"password"`
+	Disabled     *bool   `json:"disabled"`
+	Locked       *bool   `json:"locked"`
 }
 
 func (req updateReq) validate() error {
@@ -172,6 +176,9 @@ func (req updateReq) toUser() auth.User {
 	}
 	if req.Phone != nil {
 		ret.Phone = *req.Phone
+	}
+	if req.Role != nil {
+		ret.Role = *req.Role
 	}
 	return ret
 }

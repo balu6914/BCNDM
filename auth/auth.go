@@ -2,7 +2,13 @@ package auth
 
 import (
 	"fmt"
+	"io"
+	"math/rand"
 	"regexp"
+	"sync"
+	"time"
+
+	ulid "github.com/oklog/ulid/v2"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -32,6 +38,19 @@ var (
 
 var _ Service = (*authService)(nil)
 
+type entropy struct {
+	mu sync.Mutex
+	t  time.Time
+	r  io.Reader
+}
+
+func (e *entropy) Read(p []byte) (n int, err error) {
+	e.mu.Lock()
+	n, err = e.r.Read(p)
+	e.mu.Unlock()
+	return
+}
+
 type authService struct {
 	users    UserRepository
 	hasher   Hasher
@@ -39,10 +58,14 @@ type authService struct {
 	ts       TransactionsService
 	policies PolicyRepository
 	access   AccessControl
+	entropy  *entropy
 }
 
 // New instantiates the domain service implementation.
 func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl) Service {
+	t := time.Now()
+	mt := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
+	e := &entropy{r: mt, t: t}
 	return &authService{
 		users:    users,
 		hasher:   hasher,
@@ -50,6 +73,7 @@ func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp Ide
 		ts:       ts,
 		access:   access,
 		policies: policies,
+		entropy:  e,
 	}
 }
 
@@ -69,7 +93,7 @@ func (as *authService) InitAdmin(user User, policies map[string]Policy) error {
 	if err != nil {
 		return err
 	}
-	policy := policies["admin"]
+	policy := policies[AdminRole]
 	// Save policy. Use admin as an owner.
 	// There is no need to check if the policy exists,
 	// because Name and Owner fields are used as a compound index.
@@ -81,7 +105,7 @@ func (as *authService) InitAdmin(user User, policies map[string]Policy) error {
 	if err := as.policies.Attach(pid, uid); err != nil {
 		return err
 	}
-	up := policies["user"]
+	up := policies[UserRole]
 	up.Owner = uid
 	if _, err := as.policies.Save(up); err != nil {
 		return err
@@ -111,7 +135,7 @@ func CheckPasswordLevel(ps string) error {
 }
 
 func (as *authService) Register(key string, user User) (string, error) {
-	owner, err := as.Authorize(key, Create, user)
+	_, err := as.Authorize(key, Create, user)
 
 	if err != nil {
 		return "", err
@@ -129,8 +153,9 @@ func (as *authService) Register(key string, user User) (string, error) {
 	// Add new password to history
 	user.PasswordHistory = append(user.PasswordHistory, user.Password)
 
+	// If there is no User policy, attach one depending on the role.
 	if len(user.Policies) == 0 {
-		policy, err := as.policies.OneByName(owner, "user")
+		policy, err := as.policies.OneByName(user.Role)
 		if err != nil {
 			return "", err
 		}
@@ -175,7 +200,7 @@ func (as *authService) Login(user User) (string, error) {
 	// Reset number of attempt with wrong password
 	dbu.Attempt = 0
 	as.users.Update(dbu)
-	return as.idp.TemporaryKey(dbu.ID, dbu.Roles)
+	return as.idp.TemporaryKey(dbu.ID, dbu.Role)
 }
 
 // Update updates existing user. Key(token) supplied needs to either have admin role or
@@ -186,10 +211,17 @@ func (as *authService) UpdateUser(key string, user User) error {
 	if err != nil {
 		return err
 	}
-
 	if _, err := as.Authorize(key, Update, u); err != nil {
 		return ErrUnauthorizedAccess
 	}
+	if user.Role != "" {
+		p, err := as.policies.OneByName(user.Role)
+		if err != nil {
+			return err
+		}
+		user.Policies = []Policy{p}
+	}
+
 	// If password supplied, hash it
 	if user.Password != "" {
 		hash, err := as.hasher.Hash(user.Password)

@@ -61,14 +61,14 @@ func (pr *policyRepository) OneByID(id string) (auth.Policy, error) {
 	return toPolicy(mp), nil
 }
 
-func (pr *policyRepository) OneByName(owner, name string) (auth.Policy, error) {
+func (pr *policyRepository) OneByName(name string) (auth.Policy, error) {
 	session := pr.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(policiesCollection)
 
 	mp := mongoPolicy{}
 	if err := collection.Find(
-		bson.M{"$and": []bson.M{{"name": name, "owner": owner}}}).One(&mp); err != nil {
+		bson.M{"name": name}).One(&mp); err != nil {
 		if err == mgo.ErrNotFound {
 			return auth.Policy{}, auth.ErrNotFound
 		}

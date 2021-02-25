@@ -67,6 +67,7 @@ export class DashboardAdminComponent implements OnInit {
       .content.userCreated.subscribe(
         user => {
           // Add created user to the table
+          user.balance = 0;
           this.table.page.content.push(user);
         },
         err => {
@@ -85,6 +86,8 @@ export class DashboardAdminComponent implements OnInit {
         phone: row.phone,
         address: row.address,
         company: row.company,
+        balance: row.balance,
+        role: row.role,
       },
     };
 
@@ -110,6 +113,8 @@ export class DashboardAdminComponent implements OnInit {
         company: row.company,
         disabled: row.disabled,
         locked: row.locked,
+        balance: row.balance,
+        role: row.role,
       },
     };
 
@@ -118,7 +123,8 @@ export class DashboardAdminComponent implements OnInit {
     .content.userLocked.subscribe(
       resp => {
         const itemIndex = this.table.page.content.findIndex((item: any) => item.id === resp.id);
-        this.table.page.content[itemIndex] = resp;
+        row.locked = resp;
+        this.table.page.content[itemIndex] = row;
       }
     );
   }
@@ -134,6 +140,8 @@ export class DashboardAdminComponent implements OnInit {
         address: row.address,
         company: row.company,
         disabled: row.disabled,
+        balance: row.balance,
+        role: row.role,
       },
     };
 
@@ -142,7 +150,8 @@ export class DashboardAdminComponent implements OnInit {
     .content.userDeleted.subscribe(
       resp => {
         const itemIndex = this.table.page.content.findIndex((item: any) => item.id === resp.id);
-        this.table.page.content[itemIndex] = resp;
+        row.disabled = resp;
+        this.table.page.content[itemIndex] = row;
       }
     );
   }

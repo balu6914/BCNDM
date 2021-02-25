@@ -233,12 +233,12 @@ type mongoUser struct {
 	Company         string        `bson:"company,omitempty"`
 	Address         string        `bson:"address,omitempty"`
 	Phone           string        `bson:"phone,omitempty"`
-	Roles           []string      `bson:"roles,omitempty"`
+	Role            string        `bson:"role,omitempty"`
 	Disabled        *bool         `bson:"disabled,omitempty"`
 	Policies        []string      `bson:"policies,omitempty"`
 	Attempt         int           `bson:"attempt,omitempty"`
 	Locked          *bool         `bson:"locked,omitempty"`
-	PasswordHistory []string      `bson:"password_history",omitempty"`
+	PasswordHistory []string      `bson:"password_history,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -261,7 +261,7 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		Company:         user.Company,
 		Address:         user.Address,
 		Phone:           user.Phone,
-		Roles:           user.Roles,
+		Role:            user.Role,
 		Disabled:        &user.Disabled,
 		Policies:        policies,
 		Locked:          &user.Locked,
@@ -290,7 +290,7 @@ func (user mongoUser) toUser() auth.User {
 	if user.Locked != nil {
 		locked = *user.Locked
 	}
-	
+
 	return auth.User{
 		Email:           user.Email,
 		ContactEmail:    user.ContactEmail,
@@ -301,7 +301,7 @@ func (user mongoUser) toUser() auth.User {
 		Company:         user.Company,
 		Address:         user.Address,
 		Phone:           user.Phone,
-		Roles:           user.Roles,
+		Role:            user.Role,
 		Disabled:        disabled,
 		Locked:          locked,
 		Attempt:         user.Attempt,

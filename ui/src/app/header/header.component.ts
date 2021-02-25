@@ -48,16 +48,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
             resp => {
               this.user = resp;
 
-              // If User roles include 'admin' enable the admin page link in the profile menu
-              this.userService.getUser(this.user.id).subscribe(
-                respUser => {
-                  if (respUser.roles !== undefined && respUser.roles.includes('admin')) {
-                    this.isAdmin = true;
-                  } else {
-                    this.isAdmin = false;
-                  }
-                },
-              );
+              if (this.user.role === 'admin') {
+                this.isAdmin = true;
+              } else {
+                this.isAdmin = false;
+              }
 
               // Get user balance
               this.getBalance();

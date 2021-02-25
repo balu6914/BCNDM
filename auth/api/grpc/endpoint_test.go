@@ -113,26 +113,28 @@ var policiesMu sync.Mutex
 var user = auth.User{
 	ID:        email,
 	Email:     email,
-	Password:  "password",
+	Password:  "Password123!",
 	FirstName: "Joe",
 	LastName:  "Doe",
+	Role:      auth.UserRole,
 }
 
 var admin = auth.User{
 	ID:        "admin",
 	Email:     "admin@example.com",
-	Password:  "password",
+	Password:  "Password123?!",
 	FirstName: "Joe",
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
 	Phone:     "+1234567890",
-	Roles:     []string{"admin"},
+	Role:      auth.AdminRole,
 	Policies:  []auth.Policy{policies["admin"]},
 }
 
 func TestIdentify(t *testing.T) {
-	svc.Register(k, user)
+	_, err := svc.Register(k, user)
+	require.Nil(t, err, fmt.Sprintf("Expected to successfully register user: %s", err))
 
 	authAddr := fmt.Sprintf("localhost:%d", port)
 	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())
