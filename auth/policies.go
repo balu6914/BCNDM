@@ -2,8 +2,10 @@ package auth
 
 // Role constants
 const (
-	AdminRole = "admin"
-	UserRole  = "user"
+	AdminRole       = "admin"
+	AdminUserRole   = "admin_user"
+	AdminWalletRole = "admin_wallet"
+	UserRole        = "user"
 )
 
 // Policy consists of rules and constranits to validate Resource against.

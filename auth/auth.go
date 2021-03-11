@@ -105,10 +105,14 @@ func (as *authService) InitAdmin(user User, policies map[string]Policy) error {
 	if err := as.policies.Attach(pid, uid); err != nil {
 		return err
 	}
-	up := policies[UserRole]
-	up.Owner = uid
-	if _, err := as.policies.Save(up); err != nil {
-		return err
+
+	// Remove Admin policy because it's already saved.
+	delete(policies, AdminRole)
+	for _, p := range policies {
+		p.Owner = uid
+		if _, err := as.policies.Save(p); err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -36,14 +36,19 @@ func Connect(addr string, tout int, socketTout int, db string, user string, pass
 	defer session.Close()
 	usersColl := session.DB(dbName).C(usersCollection)
 
-	usersIdx := mgo.Index{
-		Key:        []string{"email"},
-		Unique:     true,
-		DropDups:   false,
-		Background: false,
-		Sparse:     true,
+	// Ensure unique index for each unique attribute
+	for _, key := range []string{"email"} {
+		usersIdx := mgo.Index{
+			Key:        []string{key},
+			Unique:     true,
+			DropDups:   false,
+			Background: false,
+			Sparse:     true,
+		}
+		if err := usersColl.EnsureIndex(usersIdx); err != nil {
+			return nil, err
+		}
 	}
-	usersColl.EnsureIndex(usersIdx)
 
 	policiesColl := session.DB(dbName).C(policiesCollection)
 

@@ -79,7 +79,8 @@ func (req registerReq) validate() error {
 		return errInvalidAddress
 	}
 
-	if req.Role != auth.UserRole && req.Role != auth.AdminRole {
+	if req.Role != auth.UserRole && req.Role != auth.AdminRole &&
+		req.Role != auth.AdminWalletRole && req.Role != auth.AdminUserRole {
 		return errInvalidRole
 	}
 
@@ -139,10 +140,12 @@ func (req updateReq) validate() error {
 	if req.id == "" {
 		return auth.ErrMalformedEntity
 	}
+
 	if req.ContactEmail != nil && (!govalidator.IsEmail(*req.ContactEmail) ||
 		len(*req.ContactEmail) > maxEmailLength) {
 		return auth.ErrMalformedEntity
 	}
+
 	return nil
 }
 

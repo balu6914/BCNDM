@@ -48,7 +48,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
             resp => {
               this.user = resp;
 
-              if (this.user.role === 'admin') {
+              if (this.user.role === 'admin' ||
+                this.user.role === 'admin_user' ||
+                this.user.role === 'admin_wallet') {
                 this.isAdmin = true;
               } else {
                 this.isAdmin = false;

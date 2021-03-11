@@ -168,13 +168,95 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 	}
 
 	policies := map[string]auth.Policy{
-		"admin": {
-			Name:    "admin",
+		auth.AdminRole: {
+			Name:    auth.AdminRole,
 			Owner:   user.ID,
 			Version: "1.0.0",
 			Rules: []auth.Rule{
 				{
 					Action: auth.Any,
+					Type:   "user",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "policy",
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+				},
+				{
+					Action: auth.Read,
+					Type:   "token",
+				},
+				{
+					Action: auth.List,
+					Type:   "token",
+				},
+				{
+					Action: auth.Buy,
+					Type:   "token",
+				},
+				{
+					Action: auth.Withdraw,
+					Type:   "token",
+				},
+			},
+		},
+		auth.AdminUserRole: {
+			Name:    auth.AdminUserRole,
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Any,
+					Type:   "user",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "policy",
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+				},
+				{
+					Action: auth.Read,
+					Type:   "token",
+				},
+				{
+					Action: auth.List,
+					Type:   "token",
+				},
+			},
+		},
+		auth.AdminWalletRole: {
+			Name:    auth.AdminWalletRole,
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Read,
+					Type:   "user",
+				},
+				{
+					Action: auth.List,
 					Type:   "user",
 				},
 				{

@@ -57,7 +57,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Email', 'Name', 'Last Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', 'Balance', ''];
+    this.table.headers = ['Role', 'Email', 'Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', 'Balance', ''];
     this.table.hasDetails = true;
   }
 
@@ -66,8 +66,8 @@ export class DashboardAdminComponent implements OnInit {
     this.modalService.show(DashboardAdminSignupComponent)
       .content.userCreated.subscribe(
         user => {
-          // Add created user to the table
           user.balance = 0;
+          // Add created user to the table
           this.table.page.content.push(user);
         },
         err => {

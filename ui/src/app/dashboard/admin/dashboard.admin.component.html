@@ -3,7 +3,7 @@
     <h1 class="page-title">
         Admin
     </h1>
-    <div class="action-buttons">
+    <div *ngIf="admin.role == 'admin' || admin.role == 'admin_user'" class="action-buttons">
       <p class="action-buttons__item">
         <button type="button" class="btn btn-primary btn-media" (click)="openModalSignup()">
             <span class="btn-media__icon btn-media__icon--add">

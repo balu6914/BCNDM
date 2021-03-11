@@ -137,9 +137,9 @@
   </td>
 </tr>
 <tr *ngIf="rowType === types.Users">
+  <td>{{ row.role }}</td>
   <td>{{ row.email }}</td>
-  <td>{{ row.first_name }}</td>
-  <td>{{ row.last_name }}</td>
+  <td>{{ row.first_name }} {{ row.last_name }}</td>
   <td>{{ row.company }}</td>
   <td>{{ row.phone }}</td>
   <td>{{ row.address }}</td>
@@ -150,22 +150,34 @@
   <td *ngIf="!row.locked"></td>
   <td>{{ row.balance | dpc }}</td>
   <div class="action-wrapper" nowrap class="table--right-aligned">
-    <a class="action action--color-1" (click)="openModalWalletUser(row)">
+    <a *ngIf="user.role == 'admin' || (row.role != 'admin' && user.role == 'admin_wallet')"
+       class="action action--color-1"
+       (click)="openModalWalletUser(row)">
       <span class="action__icon action--euro"></span>
     </a>
-    <a class="action action--color-1" (click)="openModalEditUser(row)">
-      <span class="action__icon action--edit"></span>
+    <a *ngIf="user.role == 'admin' || (row.role != 'admin' && user.role == 'admin_user')"
+       class="action action--color-1"
+       (click)="openModalEditUser(row)">
+       <span class="action__icon action--edit"></span>
     </a>
-    <a *ngIf="row.disabled" class="action action--color-1" (click)="openModalDeleteUser(row)">
+    <a *ngIf="row.disabled && row.role != 'admin' && (user.role == 'admin' || user.role == 'admin_user')"
+       class="action action--color-1"
+       (click)="openModalDeleteUser(row)">
       <span class="action__icon"></span>
     </a>
-    <a *ngIf="!row.disabled" class="action action--color-2" (click)="openModalDeleteUser(row)">
+    <a *ngIf="!row.disabled && row.role != 'admin' && (user.role == 'admin' || user.role == 'admin_user')"
+       class="action action--color-2"
+       (click)="openModalDeleteUser(row)">
       <span class="action__icon action--delete"></span>
     </a>
-    <a *ngIf="!row.locked" class="action action--color-1" (click)="openModalLockedUser(row)">
+    <a *ngIf="!row.locked && row.role != 'admin' && (user.role == 'admin' || user.role == 'admin_user')"
+       class="action action--color-1"
+       (click)="openModalLockedUser(row)">
       <span class="action__icon action--lock"></span>
     </a>
-    <a *ngIf="row.locked" class="action action--color-1" (click)="openModalLockedUser(row)">
+    <a *ngIf="row.locked && row.role != 'admin' && (user.role == 'admin' || user.role == 'admin_user')"
+       class="action action--color-1"
+       (click)="openModalLockedUser(row)">
       <span class="action__icon action--unlock"></span>
     </a>
   </div>

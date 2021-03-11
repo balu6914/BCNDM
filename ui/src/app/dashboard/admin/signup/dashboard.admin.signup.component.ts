@@ -33,6 +33,7 @@ export class DashboardAdminSignupComponent implements OnInit {
   ngOnInit() {
     this.errorMsg = null;
     this.form = this.formBuilder.group({
+      role:       ['user', [Validators.required]],
       email:      ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
       password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32),
         // 2. check whether the entered password has a number
@@ -74,6 +75,7 @@ export class DashboardAdminSignupComponent implements OnInit {
 
     if (this.form.valid) {
       const user: User = {
+        role: this.form.value.role,
         email: this.form.value.email,
         password: this.form.value.password,
         first_name: this.form.value.first_name,
