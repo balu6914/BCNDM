@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	port            = 8080
+	port            = 8000
 	secret          = "secret"
 	owner           = "owner"
 	balance         = 42
@@ -32,7 +32,11 @@ func TestMain(m *testing.M) {
 
 func startServer() {
 	svc = newService()
-	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return
+	}
+
 	server := grpc.NewServer()
 	streamsproto.RegisterStreamsServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	termsproto "github.com/datapace/datapace/proto/terms"
 	"github.com/datapace/datapace/terms"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"

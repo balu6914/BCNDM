@@ -2,6 +2,7 @@ package terms
 
 import (
 	"errors"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,6 +22,9 @@ var (
 
 	// ErrFailedCreateTerms indicates that creation of terms failed.
 	ErrFailedCreateTerms = errors.New("failed to create terms")
+
+	// ErrFailedFetchTermsURL indicates that  terms url is not reachable.
+	ErrFailedFetchTermsURL = errors.New("failed to get terms url")
 )
 
 // Service specifies an API that must be fullfiled by the domain service

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	port            = 8080
+	port            = 8000
 	id1             = "5281b83afbb7f35cb62d0834"
 	id2             = "5281b83afbb7f35cb62d0835"
 	secret          = "secret"
@@ -33,7 +33,11 @@ func TestMain(m *testing.M) {
 
 func startServer() {
 	svc = newService()
-	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return
+	}
+
 	server := grpc.NewServer()
 	transactionsproto.RegisterTransactionsServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)

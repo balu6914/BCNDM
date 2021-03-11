@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/datapace/datapace"
 	authproto "github.com/datapace/datapace/proto/auth"
 	termsproto "github.com/datapace/datapace/proto/terms"
@@ -11,8 +14,6 @@ import (
 	"github.com/datapace/datapace/transactions"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
-	"io"
-	"net/http"
 )
 
 const (

@@ -26,12 +26,18 @@ func (ts termsService) CreateTerms(t Terms) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	t.TermsHash = hash
 	_, err = ts.terms.Save(t)
 	if err != nil {
 		return "", err
 	}
+
 	err = ts.ledger.CreateTerms(t)
+	if err != nil {
+		return "", err
+	}
+
 	return hash, err
 }
 
@@ -42,12 +48,13 @@ func (ts termsService) ValidateTerms(t Terms) (bool, error) {
 func makeHash(t Terms) (string, error) {
 	resp, err := http.Get(t.TermsURL)
 	if err != nil {
-		return "", err
+		return "", ErrFailedFetchTermsURL
 	}
 	if resp.StatusCode != http.StatusOK {
 		return "", ErrNotFound
 	}
 	defer resp.Body.Close()
+
 	hash := sha256.New()
 	io.Copy(hash, resp.Body)
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil

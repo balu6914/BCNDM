@@ -2,11 +2,13 @@ package terms_test
 
 import (
 	"fmt"
-	"github.com/datapace/datapace/terms"
-	"github.com/datapace/datapace/terms/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/datapace/datapace/terms"
+	"github.com/datapace/datapace/terms/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -42,7 +44,7 @@ func TestCreateTerms(t *testing.T) {
 		name    string
 		args    args
 		want    string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "create valid terms",
@@ -50,8 +52,8 @@ func TestCreateTerms(t *testing.T) {
 				StreamID: "123",
 				TermsURL: srv.URL,
 			}},
-			want:    "",
-			wantErr: false,
+			want:    "585ad1a6ba2354ddb8c58613689c0ca9e8a91af25f13d9cd1b6e4b7f95240ad2",
+			wantErr: nil,
 		},
 		{
 			name: "try to get non existing terms",
@@ -60,7 +62,7 @@ func TestCreateTerms(t *testing.T) {
 				TermsURL: srv.URL + "/nonexisting",
 			}},
 			want:    "",
-			wantErr: true,
+			wantErr: terms.ErrNotFound,
 		},
 		{
 			name: "try to get non reachable terms",
@@ -69,19 +71,14 @@ func TestCreateTerms(t *testing.T) {
 				TermsURL: "http://localhost:66000",
 			}},
 			want:    "",
-			wantErr: true,
+			wantErr: terms.ErrFailedFetchTermsURL,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := svc.CreateTerms(tt.args.t)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CreateTerms() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("CreateTerms() got = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.wantErr, err, fmt.Sprintf("CreateTerms() error = %v, wantErr %v", err, tt.wantErr))
+			assert.Equal(t, tt.want, got, fmt.Sprintf("CreateTerms() got = %v, want %v", got, tt.want))
 		})
 	}
 }

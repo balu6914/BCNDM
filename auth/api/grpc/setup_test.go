@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const port = 8081
+const port = 8000
 
 var svc auth.Service
 var k string
@@ -47,7 +47,11 @@ func newService() (auth.Service, string) {
 }
 
 func startGRPCServer(svc auth.Service, port int) {
-	listener, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return
+	}
+
 	server := grpc.NewServer()
 	authproto.RegisterAuthServiceServer(server, grpcapi.NewServer(svc))
 	go server.Serve(listener)

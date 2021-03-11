@@ -32,6 +32,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/johnfercher/maroto v0.27.0
 	github.com/lib/pq v1.3.0
+	github.com/oklog/ulid/v2 v2.0.2
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/opencontainers/runc v1.0.0-rc6 // indirect
 	github.com/ory/dockertest v3.3.4+incompatible
