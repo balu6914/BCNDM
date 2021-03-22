@@ -146,3 +146,7 @@ func (urm *userRepositoryMock) Remove(id string) error {
 func (urm *userRepositoryMock) AllExcept([]string) ([]auth.User, error) {
 	return nil, nil
 }
+
+func (urm *userRepositoryMock) RetrieveAll(auth.AdminFilters) ([]auth.User, error) {
+	return nil, nil
+}

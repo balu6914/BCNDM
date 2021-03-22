@@ -278,7 +278,29 @@ func (as *authService) ListUsers(key string) ([]User, error) {
 	if _, err := as.Authorize(key, List, User{}); err != nil {
 		return []User{}, err
 	}
-	users, err := as.users.AllExcept([]string{})
+
+	role, err := as.idp.Role(key)
+	if err != nil {
+		return []User{}, err
+	}
+
+	var filters AdminFilters
+	switch role {
+	case AdminRole:
+		filters.Roles = []string{UserRole, AdminUserRole, AdminWalletRole}
+		filters.Locked = true
+		filters.Disabled = true
+	case AdminUserRole:
+		filters.Roles = []string{UserRole}
+		filters.Locked = true
+		filters.Disabled = true
+	case AdminWalletRole:
+		filters.Roles = []string{UserRole}
+	default:
+		return []User{}, ErrUnauthorizedAccess
+	}
+
+	users, err := as.users.RetrieveAll(filters)
 	if err != nil {
 		return []User{}, err
 	}

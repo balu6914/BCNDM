@@ -22,6 +22,12 @@ type User struct {
 	PasswordHistory []string
 }
 
+type AdminFilters struct {
+	Roles    []string
+	Locked   bool
+	Disabled bool
+}
+
 // Attributes returns user's attributes.
 func (u User) Attributes() map[string]string {
 	return map[string]string{
@@ -62,4 +68,7 @@ type UserRepository interface {
 
 	// List all users that are not in the specified list.
 	AllExcept([]string) ([]User, error)
+
+	// RetrieveAll retrieves a list with all users filtered by admin role.
+	RetrieveAll(filers AdminFilters) ([]User, error)
 }

@@ -154,6 +154,63 @@ func (ur *userRepository) Remove(id string) error {
 	return nil
 }
 
+func (ur *userRepository) RetrieveAll(filters auth.AdminFilters) ([]auth.User, error) {
+	session := ur.db.Copy()
+	defer session.Close()
+	collection := session.DB(dbName).C(usersCollection)
+
+	// Create roles filters
+	var mRoles []bson.M
+	for _, r := range filters.Roles {
+		role := bson.M{
+			"role": r,
+		}
+		mRoles = append(mRoles, role)
+	}
+
+	// Create status filters
+	var mStatus []bson.M
+	if !filters.Locked {
+		locked := bson.M{
+			"locked": bson.M{"$eq": false},
+		}
+		mStatus = append(mStatus, locked)
+	}
+	if !filters.Disabled {
+		disabled := bson.M{
+			"disabled": bson.M{"$eq": false},
+		}
+		mStatus = append(mStatus, disabled)
+	}
+
+	// Create final Mongo filter with roles and status
+	q := bson.M{
+		"$or": mRoles,
+	}
+	if !filters.Locked || !filters.Disabled {
+		q = bson.M{
+			"$or":  mRoles,
+			"$and": mStatus,
+		}
+	}
+
+	mu := []mongoUser{}
+	if err := collection.Find(q).All(&mu); err != nil {
+		return nil, err
+	}
+
+	users := []auth.User{}
+	for _, u := range mu {
+		du, err := ur.cipher.Decrypt(u.toUser())
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, du)
+	}
+
+	return users, nil
+}
+
 func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 	session := ur.db.Copy()
 	defer session.Close()
@@ -163,12 +220,12 @@ func (ur *userRepository) AllExcept(plist []string) ([]auth.User, error) {
 	for _, user := range plist {
 		ids = append(ids, bson.ObjectIdHex(user))
 	}
-
 	q := bson.M{
 		"_id": bson.M{
 			"$nin": ids,
 		},
 	}
+
 	mu := []mongoUser{}
 	if err := collection.Find(q).All(&mu); err != nil {
 		return nil, err

@@ -68,11 +68,12 @@ func (idp *jwtIdentityProvider) Role(key string) (string, error) {
 		return "", nil
 	}
 
-	if rr, ok := r.(string); !ok {
-		return rr, nil
+	rr, ok := r.(string)
+	if !ok {
+		return "", nil
 	}
 
-	return "", nil
+	return rr, nil
 }
 
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {

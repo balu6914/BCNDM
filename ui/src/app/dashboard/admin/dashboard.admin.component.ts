@@ -22,7 +22,7 @@ import { DashboardAdminLockComponent } from 'app/dashboard/admin/lock/dashboard.
   styleUrls: ['./dashboard.admin.component.scss']
 })
 export class DashboardAdminComponent implements OnInit {
-  admin: User;
+  admin: User = {};
   temp = [];
   users = [];
   table: Table = new Table();
