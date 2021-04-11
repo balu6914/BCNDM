@@ -421,10 +421,26 @@ func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsSe
 	return svc
 }
 
+//TODO: Remove Access Control Decorator
+func accessControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
+}
+
 func startHTTPServer(svc auth.Service, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Users HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc))
+	//TODO: Remove Access Control Wrapper
+	errs <- http.ListenAndServe(p, accessControl(httpapi.MakeHandler(svc)))
 }
 
 func startGRPCServer(svc auth.Service, port string, logger log.Logger, errs chan error) {

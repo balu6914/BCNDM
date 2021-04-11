@@ -5,6 +5,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 
 import { SignupComponent } from 'app/dashboard/signup/signup.component';
 import { LoginComponent } from 'app/dashboard/login/login.component';
+import { RecoverComponent } from 'app/dashboard/recover/recover.component';
 import { AuthLoggedinGuardService as AuthGuard } from 'app/auth/guardians/auth.loggedin.guardian';
 
 // Define our Application Routes
@@ -17,6 +18,11 @@ const routes: Routes = [
   {
     path: 'signup',
     component: SignupComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'recover',
+    component: RecoverComponent,
     canActivate: [AuthGuard]
   },
   // Not found page

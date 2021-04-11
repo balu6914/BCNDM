@@ -3,9 +3,10 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
+// TODO: Remove fake testing path
 export const environment = {
   production: false,
-  API_AUTH : '/auth/users',
+  API_AUTH : 'http://localhost:8080/users',
   API_AUTH_TOKENS: '/auth/tokens',
   API_AUTH_POLICIES: '/auth/policies',
   API_ACCESS_CONTROL: '/access-control/access-requests',

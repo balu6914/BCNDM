@@ -5,21 +5,23 @@ var _ Resource = (*User)(nil)
 // User represents a Datapace user account. Each user is identified given its
 // email and password.
 type User struct {
-	Email           string
-	ContactEmail    string
-	Password        string
-	ID              string
-	FirstName       string
-	LastName        string
-	Company         string
-	Address         string
-	Phone           string
-	Role            string
-	Disabled        bool
-	Policies        []Policy
-	Locked          bool
-	Attempt         int
-	PasswordHistory []string
+	Email                     string
+	ContactEmail              string
+	Password                  string
+	ID                        string
+	FirstName                 string
+	LastName                  string
+	Company                   string
+	Address                   string
+	Phone                     string
+	Role                      string
+	Disabled                  bool
+	Policies                  []Policy
+	Locked                    bool
+	Attempt                   int
+	PasswordHistory           []string
+	PasswordResetToken        string
+	PasswordResetTokenExpires int64
 }
 
 type AdminFilters struct {
@@ -59,6 +61,9 @@ type UserRepository interface {
 
 	// Retrieves user by its Email.
 	OneByEmail(string) (User, error)
+
+	// Retrieves user by its Recovery Token.
+	OneByRecoveryToken(string) (User, error)
 
 	// Updates user by its unique identifier.
 	Update(User) error

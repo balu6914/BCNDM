@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-
 	"github.com/datapace/datapace/auth"
 
 	"github.com/asaskevich/govalidator"
@@ -105,6 +104,57 @@ func (req credentialsReq) validate() error {
 		return auth.ErrMalformedEntity
 	}
 
+	return nil
+}
+
+type recoverReq struct {
+	Email string `json:"email"`
+}
+
+func (req recoverReq) validate() error {
+	if req.Email == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if !govalidator.IsEmail(req.Email) {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type recoveryTokenReq struct {
+	token string
+}
+
+func (req recoveryTokenReq) validate() error {
+	if req.token == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	if !govalidator.IsAlphanumeric(req.token) {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type recoveryPasswordReq struct {
+	token    string
+	Password string `json:"password"`
+}
+
+func (req recoveryPasswordReq) validate() error {
+	if req.token == "" {
+		return auth.ErrMalformedEntity
+	}
+	if !govalidator.IsAlphanumeric(req.token) {
+		return auth.ErrMalformedEntity
+	}
+	if req.Password == "" || len(req.Password) < minPasswordLength ||
+		len(req.Password) > maxPasswordLength {
+		return errInvalidPassword
+	}
 	return nil
 }
 

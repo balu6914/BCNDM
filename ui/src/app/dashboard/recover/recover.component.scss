@@ -1,0 +1,55 @@
+@import '_vars.scss';
+@import "~bootstrap/scss/bootstrap";
+
+/*
+  Sign In
+  Forgot Password
+  Sign Up
+*/
+
+.box {
+  width: 370px;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fff;
+  padding: 1rem;
+  box-shadow: 0px 4px 32px 0px rgba(220,226,230,1);
+  .col-form-label {
+    font-size: 12px;
+    color: #8291A7;
+    padding-right: 0;
+    @include media-breakpoint-up(sm) {
+      //text-align: right;
+    }
+  }
+  .col-form-label-2-rows {
+    @include media-breakpoint-up(sm) {
+      line-height: 1;
+    }
+  }
+  .btn {
+    margin-bottom: 15px;
+  }
+}
+.box__title {
+}
+.form-control {
+  font-weight: $font-weight-base;
+}
+.box__forgot {
+  font-size: 12px;
+  text-align: right;
+}
+.box__forgot-link {
+  color: #8291A7;
+}
+.box__action {
+  font-size: 12px;
+  margin-bottom: 0;
+  font-weight: $font-weight-semi-bold;
+  text-align: center;
+}
+.box__action-link--dark {
+  color: $body-color;
+}

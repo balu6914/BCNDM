@@ -34,4 +34,16 @@ export class UserService {
   updateUser(user: User): Observable<User> {
     return this.http.patch<User>(`${environment.API_AUTH}/${user.id}`, user);
   }
+
+  sendRecoveryToken(email: string) {
+    return this.http.post(`${environment.API_AUTH}/recover`, {'email': email});
+  }
+
+  setNewPassword(password: string, token: string) {
+    return this.http.patch(`${environment.API_AUTH}/recover/` + token, {'password': password});
+  }
+
+  validateRecoveryToken(token: string) {
+    return this.http.get(`${environment.API_AUTH}/recover/` + token);
+  }
 }
