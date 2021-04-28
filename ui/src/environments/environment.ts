@@ -6,7 +6,7 @@
 // TODO: Remove fake testing path
 export const environment = {
   production: false,
-  API_AUTH : 'http://localhost:8080/users',
+  API_AUTH : '/auth/users',
   API_AUTH_TOKENS: '/auth/tokens',
   API_AUTH_POLICIES: '/auth/policies',
   API_ACCESS_CONTROL: '/access-control/access-requests',
