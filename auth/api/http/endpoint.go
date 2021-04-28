@@ -83,7 +83,7 @@ func validateRecoveryTokenEndpoint(svc auth.Service) endpoint.Endpoint {
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-		if err := svc.ValidateRecoveryToken(req.token); err != nil {
+		if err := svc.ValidateRecoveryToken(req.token, req.id); err != nil {
 			return nil, err
 		}
 		return okRes{}, nil
@@ -96,7 +96,7 @@ func updatePasswordEndpoint(svc auth.Service) endpoint.Endpoint {
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-		if err := svc.UpdatePassword(req.token, req.Password); err != nil {
+		if err := svc.UpdatePassword(req.token, req.id, req.Password); err != nil {
 			return nil, err
 		}
 		return okRes{}, nil

@@ -89,7 +89,7 @@ func (lm *loggingMiddleware) RecoverPassword(email string) (err error) {
 }
 
 //TODO: change all texts to be unique
-func (lm *loggingMiddleware) ValidateRecoveryToken(token string) (err error) {
+func (lm *loggingMiddleware) ValidateRecoveryToken(token string, id string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method validate_recovery_token for token %s took %s to complete", token, time.Since(begin))
 		if err != nil {
@@ -99,11 +99,11 @@ func (lm *loggingMiddleware) ValidateRecoveryToken(token string) (err error) {
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.ValidateRecoveryToken(token)
+	return lm.svc.ValidateRecoveryToken(token, id)
 }
 
 //TODO: change all texts to be unique
-func (lm *loggingMiddleware) UpdatePassword(token string, password string) (err error) {
+func (lm *loggingMiddleware) UpdatePassword(token string, id string, password string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method update_password for token %s took %s to complete", token, time.Since(begin))
 		if err != nil {
@@ -113,7 +113,7 @@ func (lm *loggingMiddleware) UpdatePassword(token string, password string) (err 
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.UpdatePassword(token, password)
+	return lm.svc.UpdatePassword(token, id, password)
 }
 
 func (lm *loggingMiddleware) ViewUser(key, ID string) (user auth.User, err error) {

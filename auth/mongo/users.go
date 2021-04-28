@@ -139,7 +139,7 @@ func (ur *userRepository) OneByRecoveryToken(token string) (auth.User, error) {
 	collection := session.DB(dbName).C(usersCollection)
 
 	mu := mongoUser{}
-	if err := collection.Find(bson.M{"password_reset_token": token}).One(&mu); err != nil {
+	if err := collection.Find(bson.M{"password_reset_secret": token}).One(&mu); err != nil {
 		if err == mgo.ErrNotFound {
 			return auth.User{}, auth.ErrNotFound
 		}
@@ -302,23 +302,22 @@ func (ur *userRepository) listPolicies(ids []string) ([]auth.Policy, error) {
 }
 
 type mongoUser struct {
-	Email                     string        `bson:"email,omitempty"`
-	Password                  string        `bson:"password,omitempty"`
-	ContactEmail              string        `bson:"contact_email,omitempty"`
-	ID                        bson.ObjectId `bson:"_id,omitempty"`
-	FirstName                 string        `bson:"first_name,omitempty"`
-	LastName                  string        `bson:"last_name,omitempty"`
-	Company                   string        `bson:"company,omitempty"`
-	Address                   string        `bson:"address,omitempty"`
-	Phone                     string        `bson:"phone,omitempty"`
-	Role                      string        `bson:"role,omitempty"`
-	Disabled                  *bool         `bson:"disabled,omitempty"`
-	Policies                  []string      `bson:"policies,omitempty"`
-	Attempt                   int           `bson:"attempt,omitempty"`
-	Locked                    *bool         `bson:"locked,omitempty"`
-	PasswordHistory           []string      `bson:"password_history,omitempty"`
-	PasswordResetToken        string        `bson:"password_reset_token"`
-	PasswordResetTokenExpires int64         `bson:"password_reset_token_expires"`
+	Email               string        `bson:"email,omitempty"`
+	Password            string        `bson:"password,omitempty"`
+	ContactEmail        string        `bson:"contact_email,omitempty"`
+	ID                  bson.ObjectId `bson:"_id,omitempty"`
+	FirstName           string        `bson:"first_name,omitempty"`
+	LastName            string        `bson:"last_name,omitempty"`
+	Company             string        `bson:"company,omitempty"`
+	Address             string        `bson:"address,omitempty"`
+	Phone               string        `bson:"phone,omitempty"`
+	Role                string        `bson:"role,omitempty"`
+	Disabled            *bool         `bson:"disabled,omitempty"`
+	Policies            []string      `bson:"policies,omitempty"`
+	Attempt             int           `bson:"attempt,omitempty"`
+	Locked              *bool         `bson:"locked,omitempty"`
+	PasswordHistory     []string      `bson:"password_history,omitempty"`
+	PasswordResetSecret string        `bson:"password_reset_secret"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -332,23 +331,22 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 	}
 
 	mu := mongoUser{
-		Email:                     user.Email,
-		ContactEmail:              user.ContactEmail,
-		Password:                  user.Password,
-		ID:                        bson.NewObjectId(),
-		FirstName:                 user.FirstName,
-		LastName:                  user.LastName,
-		Company:                   user.Company,
-		Address:                   user.Address,
-		Phone:                     user.Phone,
-		Role:                      user.Role,
-		Disabled:                  &user.Disabled,
-		Policies:                  policies,
-		Locked:                    &user.Locked,
-		Attempt:                   user.Attempt,
-		PasswordHistory:           user.PasswordHistory,
-		PasswordResetToken:        user.PasswordResetToken,
-		PasswordResetTokenExpires: user.PasswordResetTokenExpires,
+		Email:               user.Email,
+		ContactEmail:        user.ContactEmail,
+		Password:            user.Password,
+		ID:                  bson.NewObjectId(),
+		FirstName:           user.FirstName,
+		LastName:            user.LastName,
+		Company:             user.Company,
+		Address:             user.Address,
+		Phone:               user.Phone,
+		Role:                user.Role,
+		Disabled:            &user.Disabled,
+		Policies:            policies,
+		Locked:              &user.Locked,
+		Attempt:             user.Attempt,
+		PasswordHistory:     user.PasswordHistory,
+		PasswordResetSecret: user.PasswordResetSecret,
 	}
 	if user.ID == "" {
 		mu.ID = bson.NewObjectId()
@@ -374,21 +372,20 @@ func (user mongoUser) toUser() auth.User {
 	}
 
 	return auth.User{
-		Email:                     user.Email,
-		ContactEmail:              user.ContactEmail,
-		Password:                  user.Password,
-		ID:                        user.ID.Hex(),
-		FirstName:                 user.FirstName,
-		LastName:                  user.LastName,
-		Company:                   user.Company,
-		Address:                   user.Address,
-		Phone:                     user.Phone,
-		Role:                      user.Role,
-		Disabled:                  disabled,
-		Locked:                    locked,
-		Attempt:                   user.Attempt,
-		PasswordHistory:           user.PasswordHistory,
-		PasswordResetToken:        user.PasswordResetToken,
-		PasswordResetTokenExpires: user.PasswordResetTokenExpires,
+		Email:               user.Email,
+		ContactEmail:        user.ContactEmail,
+		Password:            user.Password,
+		ID:                  user.ID.Hex(),
+		FirstName:           user.FirstName,
+		LastName:            user.LastName,
+		Company:             user.Company,
+		Address:             user.Address,
+		Phone:               user.Phone,
+		Role:                user.Role,
+		Disabled:            disabled,
+		Locked:              locked,
+		Attempt:             user.Attempt,
+		PasswordHistory:     user.PasswordHistory,
+		PasswordResetSecret: user.PasswordResetSecret,
 	}
 }

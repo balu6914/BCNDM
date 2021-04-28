@@ -26,6 +26,7 @@ export class RecoverComponent implements OnInit {
   tokenSent = false;
   tokenReceived = false;
   token: string;
+  id: string;
   tokenChecking = false;
   tokenValid = false;
   tokenChecked = false;
@@ -51,7 +52,8 @@ export class RecoverComponent implements OnInit {
     });
     this.activatedRoute.queryParams.subscribe(params => {
       this.token = params['token'];
-      if (this.token && this.token.length) {
+      this.id = params['id'];
+      if (this.token && this.token.length && this.id && this.id.length) {
         this.tokenReceived = true;
         this.validateRecoveryToken();
       }
@@ -60,7 +62,7 @@ export class RecoverComponent implements OnInit {
 
    validateRecoveryToken () {
      this.tokenChecking = true;
-     this.userService.validateRecoveryToken(this.token).subscribe(
+     this.userService.validateRecoveryToken(this.token , this.id).subscribe(
        response => {
          console.log(response);
          this.tokenValid = true;
@@ -100,7 +102,7 @@ export class RecoverComponent implements OnInit {
     if (this.passwordForm.valid) {
       const password = this.passwordForm.value.password;
 
-      this.userService.setNewPassword(password, this.token).subscribe(
+      this.userService.setNewPassword(password, this.id, this.token).subscribe(
         response => {
           console.log(response);
           this.passwordChanged = true;

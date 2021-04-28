@@ -62,22 +62,22 @@ func (ms *metricsMiddleware) RecoverPassword(email string) error {
 	return ms.svc.RecoverPassword(email)
 }
 
-func (ms *metricsMiddleware) ValidateRecoveryToken(token string) error {
+func (ms *metricsMiddleware) ValidateRecoveryToken(token string, id string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "validate_recovery_token").Add(1)
 		ms.latency.With("method", "validate_recovery_token").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.ValidateRecoveryToken(token)
+	return ms.svc.ValidateRecoveryToken(token, id)
 }
 
-func (ms *metricsMiddleware) UpdatePassword(token string, password string) error {
+func (ms *metricsMiddleware) UpdatePassword(token string, id string, password string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "update_password").Add(1)
 		ms.latency.With("method", "update_password").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.UpdatePassword(token, password)
+	return ms.svc.UpdatePassword(token, id, password)
 }
 
 func (ms *metricsMiddleware) UpdateUser(key string, user auth.User) error {

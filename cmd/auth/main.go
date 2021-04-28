@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/auth/mail"
+	"github.com/datapace/datapace/auth/recovery"
 	"net"
 	"net/http"
 	"os"
@@ -46,6 +48,12 @@ const (
 	envEncryptionKey    = "DATAPACE_ENCRYPTION_KEY"
 	envAdminEmail       = "DATAPACE_ADMIN_EMAIL"
 	envAdminPassword    = "DATAPACE_ADMIN_PASSWORD"
+	envSmtpIdentity     = "DATAPACE_SMTP_IDENTITY"
+	envSmtpURL          = "DATAPACE_SMTP_URL"
+	envSmtpHost         = "DATAPACE_SMTP_HOST"
+	envSmtpUser         = "DATAPACE_SMTP_USER"
+	envSmtpPassword     = "DATAPACE_SMTP_PASSWORD"
+	envSmtpFrom         = "DATAPACE_SMTP_FROM"
 
 	defHTTPPort         = "8080"
 	defGRPCPort         = "8081"
@@ -59,6 +67,12 @@ const (
 	defEncryptionKey    = "AES256Key-32Characters1234567890"
 	defAdminEmail       = "admin@datapace.localhost"
 	defAdminPassword    = "datapaceadmin"
+	defSmtpIdentity     = ""
+	defSmtpURL          = "smtp.mailtrap.io:25"
+	defSmtpHost         = "smtp.mailtrap.io"
+	defSmtpUser         = "3b29d66d776ccc"
+	defSmtpPassword     = "8bfabd687f207b"
+	defSmtpFrom         = "noreply@datapace.io"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -79,6 +93,12 @@ type config struct {
 	encryptionKey    string
 	adminEmail       string
 	adminPassword    string
+	smtpIdentity     string
+	smtpURL          string
+	smtpHost         string
+	smtpUser         string
+	smtpPassword     string
+	smtpFrom         string
 }
 
 func main() {
@@ -133,6 +153,12 @@ func loadConfig() config {
 		encryptionKey:    datapace.Env(envEncryptionKey, defEncryptionKey),
 		adminEmail:       datapace.Env(envAdminEmail, defAdminEmail),
 		adminPassword:    datapace.Env(envAdminPassword, defAdminPassword),
+		smtpIdentity:     datapace.Env(envSmtpIdentity, defSmtpIdentity),
+		smtpURL:          datapace.Env(envSmtpURL, defSmtpURL),
+		smtpHost:         datapace.Env(envSmtpHost, defSmtpHost),
+		smtpUser:         datapace.Env(envSmtpUser, defSmtpUser),
+		smtpPassword:     datapace.Env(envSmtpPassword, defSmtpPassword),
+		smtpFrom:         datapace.Env(envSmtpFrom, defSmtpFrom),
 	}
 }
 
@@ -399,8 +425,10 @@ func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsSe
 	idp := jwt.New(cfg.secret)
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
+	rc := recovery.New()
+	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom)
 
-	svc := auth.New(users, policies, hasher, idp, ts, ac)
+	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

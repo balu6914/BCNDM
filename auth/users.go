@@ -20,7 +20,7 @@ type User struct {
 	Locked                    bool
 	Attempt                   int
 	PasswordHistory           []string
-	PasswordResetToken        string
+	PasswordResetSecret       string
 	PasswordResetTokenExpires int64
 }
 
@@ -61,9 +61,6 @@ type UserRepository interface {
 
 	// Retrieves user by its Email.
 	OneByEmail(string) (User, error)
-
-	// Retrieves user by its Recovery Token.
-	OneByRecoveryToken(string) (User, error)
 
 	// Updates user by its unique identifier.
 	Update(User) error

@@ -2,9 +2,9 @@ package http
 
 import (
 	"errors"
-	"github.com/datapace/datapace/auth"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/datapace/datapace/auth"
+	"regexp"
 )
 
 // User validation errors
@@ -125,14 +125,20 @@ func (req recoverReq) validate() error {
 
 type recoveryTokenReq struct {
 	token string
+	id    string
 }
 
 func (req recoveryTokenReq) validate() error {
-	if req.token == "" {
+	if req.token == "" || req.id == "" {
 		return auth.ErrMalformedEntity
 	}
 
-	if !govalidator.IsAlphanumeric(req.token) {
+	tokenIsJWT, err := regexp.Match("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$", []byte(req.token))
+	if err != nil {
+		return err
+	}
+
+	if !govalidator.IsHexadecimal(req.id) || !tokenIsJWT {
 		return auth.ErrMalformedEntity
 	}
 
@@ -142,13 +148,15 @@ func (req recoveryTokenReq) validate() error {
 type recoveryPasswordReq struct {
 	token    string
 	Password string `json:"password"`
+	id       string
 }
 
 func (req recoveryPasswordReq) validate() error {
-	if req.token == "" {
-		return auth.ErrMalformedEntity
+	tokenIsJWT, err := regexp.Match("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$", []byte(req.token))
+	if err != nil {
+		return err
 	}
-	if !govalidator.IsAlphanumeric(req.token) {
+	if req.token == "" || !tokenIsJWT {
 		return auth.ErrMalformedEntity
 	}
 	if req.Password == "" || len(req.Password) < minPasswordLength ||

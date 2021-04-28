@@ -3,15 +3,15 @@ package auth
 import (
 	"bytes"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"io"
 	"math/rand"
-	"net/smtp"
 	"reflect"
 	"regexp"
 	"sync"
 	"time"
 
-	ulid "github.com/oklog/ulid/v2"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -60,6 +60,8 @@ func (e *entropy) Read(p []byte) (n int, err error) {
 
 type authService struct {
 	users    UserRepository
+	recovery RecoverTokenService
+	mailsvc  MailService
 	hasher   Hasher
 	idp      IdentityProvider
 	ts       TransactionsService
@@ -72,6 +74,7 @@ const latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01233456789"
 
 func randomString(size int) reflect.Value {
 	var buffer bytes.Buffer
+	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < size; i++ {
 		buffer.WriteString(string(latin[rand.Intn(len(latin))]))
 	}
@@ -80,12 +83,14 @@ func randomString(size int) reflect.Value {
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl) Service {
+func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl, recovery RecoverTokenService, mailsvc MailService) Service {
 	t := time.Now()
 	mt := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
 	e := &entropy{r: mt, t: t}
 	return &authService{
 		users:    users,
+		recovery: recovery,
+		mailsvc:  mailsvc,
 		hasher:   hasher,
 		idp:      idp,
 		ts:       ts,
@@ -232,10 +237,6 @@ func (as *authService) CheckAndHashPassword(storedUser User, newUser *User) erro
 	}
 	// Check if password is already used in the Last 5 passwords
 	for _, hpassword := range storedUser.PasswordHistory {
-		//TODO: Please review here
-		//If hash of new password is considered equal to hash of old password, then passwords are equal.
-		//Compare() function returns "ErrMismatchedHashAndPassword" if passwords are different.
-		//So, if error is not thrown, then new password was already used. Changed condition to "err == nil" instead of "!= nil"
 		if err := as.hasher.Compare(newUser.Password, hpassword); err == nil {
 			return ErrUserPasswordHistory
 		}
@@ -294,78 +295,77 @@ func (as *authService) UpdateUser(key string, user User) error {
 	return as.users.Update(user)
 }
 
+type ResetPasswordClaims struct {
+	StandardClaims jwt.StandardClaims
+	ID             string
+}
+
+func (r ResetPasswordClaims) Valid() error {
+	return r.StandardClaims.Valid()
+}
+
 func (as *authService) RecoverPassword(email string) error {
 	user, err := as.users.OneByEmail(email)
 	if err != nil {
 		return err
 	} else {
-		token := randomString(32).String()
-		user.PasswordResetToken = token
-		user.PasswordResetTokenExpires = time.Now().Unix() + 1800
+		secret := randomString(32).String()
+		user.PasswordResetSecret = secret
+		tokenString, err := as.recovery.CreateTokenString(user.ID, secret)
+		if err != nil {
+			return err
+		}
 
 		_ = as.users.Update(user)
 
-		//TODO: Change SMTP account to real one.
-		server := "smtp.mailtrap.io:25"
-		auth := smtp.PlainAuth("", "3b29d66d776ccc", "8bfabd687f207b", "smtp.mailtrap.io")
+		templateData := map[string]interface{}{
+			"Token": tokenString,
+			"ID":    user.ID,
+		}
+		mailErr := as.mailsvc.SendEmailAsHTML(email, "Datapace password recovery.", "auth/mail/templates/mail.html", templateData)
+		if mailErr != nil {
+			return mailErr
+		}
+	}
+	return nil
+}
 
-		from := "noreply@datapace.io"
-		to := []string{email}
-		header := "To:" + email + "\r\n" +
-			"From:" + from + "\r\n" +
-			"Subject: Datapase password recovery\n"
-		mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-
-		//TODO: Change recovery link to real one or add env. variable here
-		body := "<html><body><h2>Follow the link to reset your password!</h2>" +
-			"<a href='https://datapace.io/recover/?token=" + token + "'>https://datapace.io/recover/?token=" + token + "</a>" +
-			"<p>Link is valid for 30 minutes.</p>" +
-			"</body></html>"
-		msg := []byte(header + mime + body)
-
-		err := smtp.SendMail(server, auth, from, to, msg)
-
+func (as *authService) ValidateRecoveryToken(token string, id string) error {
+	user, err := as.users.OneByID(id)
+	if err != nil {
+		return ErrNotFound
+	} else {
+		_, err := as.recovery.ParseToken(token, user.PasswordResetSecret)
 		if err != nil {
-			return ErrMailNotSent
+			return err
 		}
+		return nil
 	}
-
 	return nil
 }
 
-func (as *authService) ValidateRecoveryToken(token string) error {
-	if user, err := as.users.OneByRecoveryToken(token); err != nil {
-		return err
+func (as *authService) UpdatePassword(token string, id string, password string) error {
+	storedUser, err := as.users.OneByID(id)
+	if err != nil {
+		return ErrNotFound
 	} else {
-		if time.Now().Unix() > user.PasswordResetTokenExpires {
-			return ErrPasswordRecoveryExpired
+		_, err := as.recovery.ParseToken(token, storedUser.PasswordResetSecret)
+		if err != nil {
+			return err
+		}
+		newUser := storedUser
+		newUser.Password = password
+		checkErr := as.CheckAndHashPassword(storedUser, &newUser)
+		if checkErr != nil {
+			return checkErr
+		}
+		newUser.PasswordResetSecret = ""
+		updErr := as.users.Update(newUser)
+		if updErr != nil {
+			return updErr
 		}
 	}
 
-	return nil
-}
-
-func (as *authService) UpdatePassword(token string, password string) error {
-	if storedUser, err := as.users.OneByRecoveryToken(token); err != nil {
-		return err
-	} else {
-		if time.Now().Unix() > storedUser.PasswordResetTokenExpires {
-			return ErrPasswordRecoveryExpired
-		} else {
-			newUser := storedUser
-			newUser.Password = password
-			err := as.CheckAndHashPassword(storedUser, &newUser)
-			if err != nil {
-				return err
-			}
-			newUser.PasswordResetToken = ""
-			newUser.PasswordResetTokenExpires = 0
-			updErr := as.users.Update(newUser)
-			if updErr != nil {
-				return updErr
-			}
-		}
-	}
 	return nil
 }
 

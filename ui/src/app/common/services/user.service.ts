@@ -39,11 +39,11 @@ export class UserService {
     return this.http.post(`${environment.API_AUTH}/recover`, {'email': email});
   }
 
-  setNewPassword(password: string, token: string) {
-    return this.http.patch(`${environment.API_AUTH}/recover/` + token, {'password': password});
+  setNewPassword(password: string, id: string, token: string) {
+    return this.http.patch(`${environment.API_AUTH}/recover/` + token + `/` + id, {'password': password});
   }
 
-  validateRecoveryToken(token: string) {
-    return this.http.get(`${environment.API_AUTH}/recover/` + token);
+  validateRecoveryToken(token: string, id: string) {
+    return this.http.get(`${environment.API_AUTH}/recover/` + token + `/` + id);
   }
 }

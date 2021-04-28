@@ -57,12 +57,12 @@ type Service interface {
 
 	// ValidateRecoveryToken checks if token is valid and not expired.
 	// In case that such token doesn't exist or is expired, a non-nil error value is returned.
-	ValidateRecoveryToken(string) error
+	ValidateRecoveryToken(string, string) error
 
 	// UpdatePassword changes the password of a user that the password recovery token is assigned to.
 	// Sets the password provided via request along with the valid token.
 	// In case that the token is expired/invalid or password doesn't match length criteria, a non-nil error value is returned.
-	UpdatePassword(string, string) error
+	UpdatePassword(string, string, string) error
 
 	// ViewUser retrieves data about the client identified with the provided ID
 	// Key provided must have same ID (user viewing his own data) or admin role.
