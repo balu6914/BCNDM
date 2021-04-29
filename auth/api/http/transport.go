@@ -68,7 +68,7 @@ func MakeHandler(svc auth.Service) http.Handler {
 
 	r.Get("/users/recover/:token/:id", kithttp.NewServer(
 		validateRecoveryTokenEndpoint(svc),
-		decodeRecoverToken,
+		decodeRecoveryToken,
 		encodeResponse,
 		opts...,
 	))
@@ -187,8 +187,7 @@ func decodeRecover(_ context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
-func decodeRecoverToken(_ context.Context, r *http.Request) (interface{}, error) {
-
+func decodeRecoveryToken(_ context.Context, r *http.Request) (interface{}, error) {
 	req := recoveryTokenReq{
 		token: bone.GetValue(r, "token"),
 		id:    bone.GetValue(r, "id"),

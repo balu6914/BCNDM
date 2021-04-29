@@ -38,7 +38,6 @@ func (r ResetPasswordClaims) Valid() error {
 }
 
 func (r RecoverTokenService) CreateTokenString(id string, secret string) (string, error) {
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, ResetPasswordClaims{
 		StandardClaims: jwt.StandardClaims{
 			Id:        uuid.NewV4().String(),

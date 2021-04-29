@@ -1,12 +1,10 @@
 package auth
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"io"
 	"math/rand"
-	"reflect"
 	"regexp"
 	"sync"
 	"time"
@@ -70,16 +68,15 @@ type authService struct {
 	entropy  *entropy
 }
 
-const latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01233456789"
+var symbols = []rune("01233456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func randomString(size int) reflect.Value {
-	var buffer bytes.Buffer
+func randomString(n int) string {
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < size; i++ {
-		buffer.WriteString(string(latin[rand.Intn(len(latin))]))
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = symbols[rand.Intn(len(symbols))]
 	}
-	s := buffer.String()
-	return reflect.ValueOf(s)
+	return string(b)
 }
 
 // New instantiates the domain service implementation.
@@ -230,7 +227,7 @@ func (as *authService) Login(user User) (string, error) {
 	return as.idp.TemporaryKey(dbu.ID, dbu.Role)
 }
 
-func (as *authService) CheckAndHashPassword(storedUser User, newUser *User) error {
+func (as *authService) checkAndHashPassword(storedUser User, newUser *User) error {
 	hash, err := as.hasher.Hash(newUser.Password)
 	if err != nil {
 		return ErrMalformedEntity
@@ -272,7 +269,7 @@ func (as *authService) UpdateUser(key string, user User) error {
 
 	// If password supplied, hash it and check against latest 5 passwords
 	if user.Password != "" {
-		err := as.CheckAndHashPassword(u, &user)
+		err := as.checkAndHashPassword(u, &user)
 		if err != nil {
 			return err
 		}
@@ -308,25 +305,29 @@ func (as *authService) RecoverPassword(email string) error {
 	user, err := as.users.OneByEmail(email)
 	if err != nil {
 		return err
-	} else {
-		secret := randomString(32).String()
-		user.PasswordResetSecret = secret
-		tokenString, err := as.recovery.CreateTokenString(user.ID, secret)
-		if err != nil {
-			return err
-		}
-
-		_ = as.users.Update(user)
-
-		templateData := map[string]interface{}{
-			"Token": tokenString,
-			"ID":    user.ID,
-		}
-		mailErr := as.mailsvc.SendEmailAsHTML(email, "Datapace password recovery.", "auth/mail/templates/mail.html", templateData)
-		if mailErr != nil {
-			return mailErr
-		}
 	}
+
+	secret := randomString(32)
+	user.PasswordResetSecret = secret
+	tokenString, err := as.recovery.CreateTokenString(user.ID, secret)
+	if err != nil {
+		return err
+	}
+
+	updateErr := as.users.Update(user)
+	if updateErr != nil {
+		return updateErr
+	}
+
+	templateData := map[string]interface{}{
+		"Token": tokenString,
+		"ID":    user.ID,
+	}
+	mailErr := as.mailsvc.SendEmailAsHTML(email, "Datapace password recovery.", "auth/mail/templates/passwordRecovery.html", templateData)
+	if mailErr != nil {
+		return mailErr
+	}
+
 	return nil
 }
 
@@ -334,13 +335,12 @@ func (as *authService) ValidateRecoveryToken(token string, id string) error {
 	user, err := as.users.OneByID(id)
 	if err != nil {
 		return ErrNotFound
-	} else {
-		_, err := as.recovery.ParseToken(token, user.PasswordResetSecret)
-		if err != nil {
-			return err
-		}
-		return nil
 	}
+	_, parseErr := as.recovery.ParseToken(token, user.PasswordResetSecret)
+	if parseErr != nil {
+		return parseErr
+	}
+
 	return nil
 }
 
@@ -348,22 +348,21 @@ func (as *authService) UpdatePassword(token string, id string, password string) 
 	storedUser, err := as.users.OneByID(id)
 	if err != nil {
 		return ErrNotFound
-	} else {
-		_, err := as.recovery.ParseToken(token, storedUser.PasswordResetSecret)
-		if err != nil {
-			return err
-		}
-		newUser := storedUser
-		newUser.Password = password
-		checkErr := as.CheckAndHashPassword(storedUser, &newUser)
-		if checkErr != nil {
-			return checkErr
-		}
-		newUser.PasswordResetSecret = ""
-		updErr := as.users.Update(newUser)
-		if updErr != nil {
-			return updErr
-		}
+	}
+	_, parseErr := as.recovery.ParseToken(token, storedUser.PasswordResetSecret)
+	if parseErr != nil {
+		return parseErr
+	}
+	newUser := storedUser
+	newUser.Password = password
+	checkErr := as.checkAndHashPassword(storedUser, &newUser)
+	if checkErr != nil {
+		return checkErr
+	}
+	newUser.PasswordResetSecret = ""
+	updErr := as.users.Update(newUser)
+	if updErr != nil {
+		return updErr
 	}
 
 	return nil

@@ -31,7 +31,6 @@ func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, 
 }
 
 func (ms *MailService) SendEmailAsHTML(to string, subject string, templatePath string, templateData map[string]interface{}) error {
-
 	auth := smtp.PlainAuth(ms.smtpIdentity, ms.smtpUser, ms.smtpPassword, ms.smtpHost)
 
 	header := "To:" + to + "\r\n" + "From:" + ms.smtpFrom + "\r\n" + "Subject:" + subject

@@ -112,10 +112,6 @@ type recoverReq struct {
 }
 
 func (req recoverReq) validate() error {
-	if req.Email == "" {
-		return auth.ErrMalformedEntity
-	}
-
 	if !govalidator.IsEmail(req.Email) {
 		return auth.ErrMalformedEntity
 	}

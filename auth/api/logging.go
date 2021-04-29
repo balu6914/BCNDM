@@ -74,7 +74,6 @@ func (lm *loggingMiddleware) UpdateUser(key string, user auth.User) (err error) 
 	return lm.svc.UpdateUser(key, user)
 }
 
-//TODO: change all texts to be unique
 func (lm *loggingMiddleware) RecoverPassword(email string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method recover_password for email %s took %s to complete", email, time.Since(begin))
@@ -88,7 +87,6 @@ func (lm *loggingMiddleware) RecoverPassword(email string) (err error) {
 	return lm.svc.RecoverPassword(email)
 }
 
-//TODO: change all texts to be unique
 func (lm *loggingMiddleware) ValidateRecoveryToken(token string, id string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method validate_recovery_token for token %s took %s to complete", token, time.Since(begin))
@@ -102,7 +100,6 @@ func (lm *loggingMiddleware) ValidateRecoveryToken(token string, id string) (err
 	return lm.svc.ValidateRecoveryToken(token, id)
 }
 
-//TODO: change all texts to be unique
 func (lm *loggingMiddleware) UpdatePassword(token string, id string, password string) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method update_password for token %s took %s to complete", token, time.Since(begin))
