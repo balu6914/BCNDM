@@ -17,9 +17,10 @@ type MailService struct {
 	smtpUser     string
 	smtpPassword string
 	smtpFrom     string
+	frontendURL  string
 }
 
-func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string) auth.MailService {
+func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string, frontendURL string) auth.MailService {
 	return &MailService{
 		smtpIdentity,
 		smtpHost,
@@ -27,21 +28,22 @@ func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, 
 		smtpUser,
 		smtpPassword,
 		smtpFrom,
+		frontendURL,
 	}
 }
 
 func (ms *MailService) SendEmailAsHTML(to string, subject string, templatePath string, templateData map[string]interface{}) error {
 	auth := smtp.PlainAuth(ms.smtpIdentity, ms.smtpUser, ms.smtpPassword, ms.smtpHost)
-
 	header := "To:" + to + "\r\n" + "From:" + ms.smtpFrom + "\r\n" + "Subject:" + subject
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
 	mailTemplate, parsingErr := template.ParseFiles(templatePath)
 	if parsingErr != nil {
 		return parsingErr
 	}
+
 	body := bytes.Buffer{}
 	body.Write([]byte(fmt.Sprintf("%s\n%s\n\n", header, mime)))
-
+	templateData["FrontendURL"] = ms.frontendURL
 	templateErr := mailTemplate.Execute(&body, templateData)
 	if templateErr != nil {
 		return templateErr

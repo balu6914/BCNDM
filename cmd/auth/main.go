@@ -54,6 +54,7 @@ const (
 	envSmtpUser         = "DATAPACE_SMTP_USER"
 	envSmtpPassword     = "DATAPACE_SMTP_PASSWORD"
 	envSmtpFrom         = "DATAPACE_SMTP_FROM"
+	envFrontendURL      = "DATAPACE_FRONTEND_URL"
 
 	defHTTPPort         = "8080"
 	defGRPCPort         = "8081"
@@ -73,6 +74,7 @@ const (
 	defSmtpUser         = "3b29d66d776ccc"
 	defSmtpPassword     = "8bfabd687f207b"
 	defSmtpFrom         = "noreply@datapace.io"
+	defFrontendURL      = "https://datapace.io"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
@@ -99,6 +101,7 @@ type config struct {
 	smtpUser         string
 	smtpPassword     string
 	smtpFrom         string
+	frontendURL      string
 }
 
 func main() {
@@ -159,6 +162,7 @@ func loadConfig() config {
 		smtpUser:         datapace.Env(envSmtpUser, defSmtpUser),
 		smtpPassword:     datapace.Env(envSmtpPassword, defSmtpPassword),
 		smtpFrom:         datapace.Env(envSmtpFrom, defSmtpFrom),
+		frontendURL:      datapace.Env(envFrontendURL, defFrontendURL),
 	}
 }
 
@@ -426,7 +430,7 @@ func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsSe
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
 	rc := recovery.New()
-	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom)
+	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom, cfg.frontendURL)
 
 	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	svc = api.LoggingMiddleware(svc, logger)

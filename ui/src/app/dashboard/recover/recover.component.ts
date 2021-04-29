@@ -108,6 +108,9 @@ export class RecoverComponent implements OnInit {
           this.passwordChanged = true;
         },
         err => {
+          this.errorMsg = 'Invalid token!';
+          this.tokenChecking = false;
+          this.tokenChecked = true;
           console.log(err);
         }
       );
