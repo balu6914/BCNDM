@@ -19,12 +19,12 @@ var (
 	ErrTokenParsingFailed = errors.New("token parsing failed")
 )
 
-var _ auth.RecoverTokenService = (*RecoverTokenService)(nil)
+var _ auth.RecoveryTokenProvider = (*RecoverTokenService)(nil)
 
 type RecoverTokenService struct {
 }
 
-func New() auth.RecoverTokenService {
+func New() auth.RecoveryTokenProvider {
 	return &RecoverTokenService{}
 }
 

@@ -11,16 +11,17 @@ import (
 var _ auth.MailService = (*MailService)(nil)
 
 type MailService struct {
-	smtpIdentity string
-	smtpHost     string
-	smtpURL      string
-	smtpUser     string
-	smtpPassword string
-	smtpFrom     string
-	frontendURL  string
+	smtpIdentity      string
+	smtpHost          string
+	smtpURL           string
+	smtpUser          string
+	smtpPassword      string
+	smtpFrom          string
+	frontendURL       string
+	mailTemplatesPath string
 }
 
-func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string, frontendURL string) auth.MailService {
+func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string, frontendURL string, mailTemplatesPath string) auth.MailService {
 	return &MailService{
 		smtpIdentity,
 		smtpHost,
@@ -29,14 +30,15 @@ func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, 
 		smtpPassword,
 		smtpFrom,
 		frontendURL,
+		mailTemplatesPath,
 	}
 }
 
-func (ms *MailService) SendEmailAsHTML(to string, subject string, templatePath string, templateData map[string]interface{}) error {
+func (ms *MailService) SendEmail(to string, subject string, templateName string, templateData map[string]interface{}) error {
 	auth := smtp.PlainAuth(ms.smtpIdentity, ms.smtpUser, ms.smtpPassword, ms.smtpHost)
 	header := "To:" + to + "\r\n" + "From:" + ms.smtpFrom + "\r\n" + "Subject:" + subject
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
-	mailTemplate, parsingErr := template.ParseFiles(templatePath)
+	mailTemplate, parsingErr := template.ParseFiles(ms.mailTemplatesPath + templateName)
 	if parsingErr != nil {
 		return parsingErr
 	}

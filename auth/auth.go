@@ -58,7 +58,7 @@ func (e *entropy) Read(p []byte) (n int, err error) {
 
 type authService struct {
 	users    UserRepository
-	recovery RecoverTokenService
+	recovery RecoveryTokenProvider
 	mailsvc  MailService
 	hasher   Hasher
 	idp      IdentityProvider
@@ -80,7 +80,7 @@ func randomString(n int) string {
 }
 
 // New instantiates the domain service implementation.
-func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl, recovery RecoverTokenService, mailsvc MailService) Service {
+func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl, recovery RecoveryTokenProvider, mailsvc MailService) Service {
 	t := time.Now()
 	mt := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
 	e := &entropy{r: mt, t: t}
@@ -314,8 +314,7 @@ func (as *authService) RecoverPassword(email string) error {
 		return err
 	}
 
-	updateErr := as.users.Update(user)
-	if updateErr != nil {
+	if updateErr := as.users.Update(user); updateErr != nil {
 		return updateErr
 	}
 
@@ -323,8 +322,10 @@ func (as *authService) RecoverPassword(email string) error {
 		"Token": tokenString,
 		"ID":    user.ID,
 	}
-	mailErr := as.mailsvc.SendEmailAsHTML(email, "Datapace password recovery.", "auth/mail/templates/passwordRecovery.html", templateData)
-	if mailErr != nil {
+	templateName := "passwordRecovery.html"
+	emailSubject := "Datapace password recovery."
+
+	if mailErr := as.mailsvc.SendEmail(email, emailSubject, templateName, templateData); mailErr != nil {
 		return mailErr
 	}
 
@@ -355,17 +356,11 @@ func (as *authService) UpdatePassword(token string, id string, password string) 
 	}
 	newUser := storedUser
 	newUser.Password = password
-	checkErr := as.checkAndHashPassword(storedUser, &newUser)
-	if checkErr != nil {
+	if checkErr := as.checkAndHashPassword(storedUser, &newUser); checkErr != nil {
 		return checkErr
 	}
 	newUser.PasswordResetSecret = ""
-	updErr := as.users.Update(newUser)
-	if updErr != nil {
-		return updErr
-	}
-
-	return nil
+	return as.users.Update(newUser)
 }
 
 func (as *authService) ViewUser(key, userID string) (User, error) {

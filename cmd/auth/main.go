@@ -36,72 +36,75 @@ import (
 )
 
 const (
-	envHTTPPort         = "DATAPACE_AUTH_HTTP_PORT"
-	envGRPCPort         = "DATAPACE_AUTH_GRPC_PORT"
-	envDBURL            = "DATAPACE_AUTH_DB_URL"
-	envDBUser           = "DATAPACE_AUTH_DB_USER"
-	envDBPass           = "DATAPACE_AUTH_DB_PASS"
-	envDBName           = "DATAPACE_AUTH_DB_NAME"
-	envTransactionsURL  = "DATAPACE_TRANSACTIONS_URL"
-	envAccessControlURL = "DATAPACE_ACCESS_CONTROL_URL"
-	envSecret           = "DATAPACE_AUTH_SECRET"
-	envEncryptionKey    = "DATAPACE_ENCRYPTION_KEY"
-	envAdminEmail       = "DATAPACE_ADMIN_EMAIL"
-	envAdminPassword    = "DATAPACE_ADMIN_PASSWORD"
-	envSmtpIdentity     = "DATAPACE_SMTP_IDENTITY"
-	envSmtpURL          = "DATAPACE_SMTP_URL"
-	envSmtpHost         = "DATAPACE_SMTP_HOST"
-	envSmtpUser         = "DATAPACE_SMTP_USER"
-	envSmtpPassword     = "DATAPACE_SMTP_PASSWORD"
-	envSmtpFrom         = "DATAPACE_SMTP_FROM"
-	envFrontendURL      = "DATAPACE_FRONTEND_URL"
+	envHTTPPort          = "DATAPACE_AUTH_HTTP_PORT"
+	envGRPCPort          = "DATAPACE_AUTH_GRPC_PORT"
+	envDBURL             = "DATAPACE_AUTH_DB_URL"
+	envDBUser            = "DATAPACE_AUTH_DB_USER"
+	envDBPass            = "DATAPACE_AUTH_DB_PASS"
+	envDBName            = "DATAPACE_AUTH_DB_NAME"
+	envTransactionsURL   = "DATAPACE_TRANSACTIONS_URL"
+	envAccessControlURL  = "DATAPACE_ACCESS_CONTROL_URL"
+	envSecret            = "DATAPACE_AUTH_SECRET"
+	envEncryptionKey     = "DATAPACE_ENCRYPTION_KEY"
+	envAdminEmail        = "DATAPACE_ADMIN_EMAIL"
+	envAdminPassword     = "DATAPACE_ADMIN_PASSWORD"
+	envSmtpIdentity      = "DATAPACE_SMTP_IDENTITY"
+	envSmtpURL           = "DATAPACE_SMTP_URL"
+	envSmtpHost          = "DATAPACE_SMTP_HOST"
+	envSmtpUser          = "DATAPACE_SMTP_USER"
+	envSmtpPassword      = "DATAPACE_SMTP_PASSWORD"
+	envSmtpFrom          = "DATAPACE_SMTP_FROM"
+	envFrontendURL       = "DATAPACE_FRONTEND_URL"
+	envMailTemplatesPath = "DATAPACE_MAIL_TEMPLATES_PATH"
 
-	defHTTPPort         = "8080"
-	defGRPCPort         = "8081"
-	defDBURL            = "0.0.0.0"
-	defDBUser           = ""
-	defDBPass           = ""
-	defDBName           = "auth"
-	defTransactionsURL  = "localhost:8081"
-	defAccessControlURL = "localhost:8081"
-	defSecret           = "github.com/datapace/datapace"
-	defEncryptionKey    = "AES256Key-32Characters1234567890"
-	defAdminEmail       = "admin@datapace.localhost"
-	defAdminPassword    = "datapaceadmin"
-	defSmtpIdentity     = ""
-	defSmtpURL          = "smtp.mailtrap.io:25"
-	defSmtpHost         = "smtp.mailtrap.io"
-	defSmtpUser         = "3b29d66d776ccc"
-	defSmtpPassword     = "8bfabd687f207b"
-	defSmtpFrom         = "noreply@datapace.io"
-	defFrontendURL      = "https://datapace.io"
+	defHTTPPort          = "8080"
+	defGRPCPort          = "8081"
+	defDBURL             = "0.0.0.0"
+	defDBUser            = ""
+	defDBPass            = ""
+	defDBName            = "auth"
+	defTransactionsURL   = "localhost:8081"
+	defAccessControlURL  = "localhost:8081"
+	defSecret            = "github.com/datapace/datapace"
+	defEncryptionKey     = "AES256Key-32Characters1234567890"
+	defAdminEmail        = "admin@datapace.localhost"
+	defAdminPassword     = "datapaceadmin"
+	defSmtpIdentity      = ""
+	defSmtpURL           = "smtp.mailtrap.io:25"
+	defSmtpHost          = "smtp.mailtrap.io"
+	defSmtpUser          = "3b29d66d776ccc"
+	defSmtpPassword      = "8bfabd687f207b"
+	defSmtpFrom          = "noreply@datapace.io"
+	defFrontendURL       = "https://datapace.io"
+	defMailTemplatesPath = "auth/mail/templates/"
 
 	dbConnectTimeout = 5000
 	dbSocketTimeout  = 5000
 )
 
 type config struct {
-	httpPort         string
-	grpcPort         string
-	dbURL            string
-	dbUser           string
-	dbPass           string
-	dbName           string
-	dbConnectTimeout int
-	dbSocketTimeout  int
-	transactionsURL  string
-	accessControlURL string
-	secret           string
-	encryptionKey    string
-	adminEmail       string
-	adminPassword    string
-	smtpIdentity     string
-	smtpURL          string
-	smtpHost         string
-	smtpUser         string
-	smtpPassword     string
-	smtpFrom         string
-	frontendURL      string
+	httpPort          string
+	grpcPort          string
+	dbURL             string
+	dbUser            string
+	dbPass            string
+	dbName            string
+	dbConnectTimeout  int
+	dbSocketTimeout   int
+	transactionsURL   string
+	accessControlURL  string
+	secret            string
+	encryptionKey     string
+	adminEmail        string
+	adminPassword     string
+	smtpIdentity      string
+	smtpURL           string
+	smtpHost          string
+	smtpUser          string
+	smtpPassword      string
+	smtpFrom          string
+	frontendURL       string
+	mailTemplatesPath string
 }
 
 func main() {
@@ -142,27 +145,28 @@ func main() {
 
 func loadConfig() config {
 	return config{
-		httpPort:         datapace.Env(envHTTPPort, defHTTPPort),
-		grpcPort:         datapace.Env(envGRPCPort, defGRPCPort),
-		dbURL:            datapace.Env(envDBURL, defDBURL),
-		dbUser:           datapace.Env(envDBUser, defDBUser),
-		dbPass:           datapace.Env(envDBPass, defDBPass),
-		dbName:           datapace.Env(envDBName, defDBName),
-		dbConnectTimeout: dbConnectTimeout,
-		dbSocketTimeout:  dbSocketTimeout,
-		transactionsURL:  datapace.Env(envTransactionsURL, defTransactionsURL),
-		accessControlURL: datapace.Env(envAccessControlURL, defAccessControlURL),
-		secret:           datapace.Env(envSecret, defSecret),
-		encryptionKey:    datapace.Env(envEncryptionKey, defEncryptionKey),
-		adminEmail:       datapace.Env(envAdminEmail, defAdminEmail),
-		adminPassword:    datapace.Env(envAdminPassword, defAdminPassword),
-		smtpIdentity:     datapace.Env(envSmtpIdentity, defSmtpIdentity),
-		smtpURL:          datapace.Env(envSmtpURL, defSmtpURL),
-		smtpHost:         datapace.Env(envSmtpHost, defSmtpHost),
-		smtpUser:         datapace.Env(envSmtpUser, defSmtpUser),
-		smtpPassword:     datapace.Env(envSmtpPassword, defSmtpPassword),
-		smtpFrom:         datapace.Env(envSmtpFrom, defSmtpFrom),
-		frontendURL:      datapace.Env(envFrontendURL, defFrontendURL),
+		httpPort:          datapace.Env(envHTTPPort, defHTTPPort),
+		grpcPort:          datapace.Env(envGRPCPort, defGRPCPort),
+		dbURL:             datapace.Env(envDBURL, defDBURL),
+		dbUser:            datapace.Env(envDBUser, defDBUser),
+		dbPass:            datapace.Env(envDBPass, defDBPass),
+		dbName:            datapace.Env(envDBName, defDBName),
+		dbConnectTimeout:  dbConnectTimeout,
+		dbSocketTimeout:   dbSocketTimeout,
+		transactionsURL:   datapace.Env(envTransactionsURL, defTransactionsURL),
+		accessControlURL:  datapace.Env(envAccessControlURL, defAccessControlURL),
+		secret:            datapace.Env(envSecret, defSecret),
+		encryptionKey:     datapace.Env(envEncryptionKey, defEncryptionKey),
+		adminEmail:        datapace.Env(envAdminEmail, defAdminEmail),
+		adminPassword:     datapace.Env(envAdminPassword, defAdminPassword),
+		smtpIdentity:      datapace.Env(envSmtpIdentity, defSmtpIdentity),
+		smtpURL:           datapace.Env(envSmtpURL, defSmtpURL),
+		smtpHost:          datapace.Env(envSmtpHost, defSmtpHost),
+		smtpUser:          datapace.Env(envSmtpUser, defSmtpUser),
+		smtpPassword:      datapace.Env(envSmtpPassword, defSmtpPassword),
+		smtpFrom:          datapace.Env(envSmtpFrom, defSmtpFrom),
+		frontendURL:       datapace.Env(envFrontendURL, defFrontendURL),
+		mailTemplatesPath: datapace.Env(envMailTemplatesPath, defMailTemplatesPath),
 	}
 }
 
@@ -430,7 +434,7 @@ func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsSe
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
 	rc := recovery.New()
-	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom, cfg.frontendURL)
+	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom, cfg.frontendURL, cfg.mailTemplatesPath)
 
 	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	svc = api.LoggingMiddleware(svc, logger)

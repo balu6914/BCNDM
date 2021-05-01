@@ -2,9 +2,9 @@ package auth
 
 import "github.com/dgrijalva/jwt-go"
 
-// RecoverTokenService specifies an API for password recovery via security
+// RecoveryTokenProvider specifies an API for password recovery via security
 // tokens.
-type RecoverTokenService interface {
+type RecoveryTokenProvider interface {
 	// CreateTokenString generates the recovery token string.
 	CreateTokenString(string, string) (string, error)
 
