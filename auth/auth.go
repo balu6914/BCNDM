@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"io"
 	"math/rand"
 	"regexp"
@@ -290,15 +289,6 @@ func (as *authService) UpdateUser(key string, user User) error {
 		return ErrMalformedEntity
 	}
 	return as.users.Update(user)
-}
-
-type ResetPasswordClaims struct {
-	StandardClaims jwt.StandardClaims
-	ID             string
-}
-
-func (r ResetPasswordClaims) Valid() error {
-	return r.StandardClaims.Valid()
 }
 
 func (as *authService) RecoverPassword(email string) error {
