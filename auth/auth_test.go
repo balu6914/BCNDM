@@ -277,9 +277,15 @@ func TestUpdate(t *testing.T) {
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
+<<<<<<< HEAD
 	user2 := user
 	user2.ContactEmail = "new@email.com"
 	user2.Password = ""
+=======
+	user.ContactEmail = "new@email.com"
+	// setting Password to "" to avoid password update that will trigger the "last 5 passwords check"
+	user.Password = ""
+>>>>>>> ba4fefc4 (Fix tests. (previously passed due to incorrect handling of "last 5 passwords"))
 
 	cases := []struct {
 		desc string
@@ -331,7 +337,7 @@ func TestUpdatePassword(t *testing.T) {
 		{
 			desc: "update user password invalid credentials",
 			key:  "",
-			user: user,
+			user: user2,
 			err:  auth.ErrUnauthorizedAccess,
 		},
 	}
