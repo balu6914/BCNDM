@@ -2,8 +2,10 @@ package auth_test
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/datapace/datapace/auth"
 	"github.com/datapace/datapace/auth/mocks"
@@ -96,6 +98,17 @@ var policies = map[string]auth.Policy{
 			},
 		},
 	},
+}
+
+var symbols = []rune("01233456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = symbols[rand.Intn(len(symbols))]
+	}
+	return string(b)
 }
 
 var policiesMu sync.Mutex
@@ -277,15 +290,9 @@ func TestUpdate(t *testing.T) {
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
-<<<<<<< HEAD
 	user2 := user
 	user2.ContactEmail = "new@email.com"
 	user2.Password = ""
-=======
-	user.ContactEmail = "new@email.com"
-	// setting Password to "" to avoid password update that will trigger the "last 5 passwords check"
-	user.Password = ""
->>>>>>> ba4fefc4 (Fix tests. (previously passed due to incorrect handling of "last 5 passwords"))
 
 	cases := []struct {
 		desc string
