@@ -152,7 +152,10 @@ func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
 	policies := mocks.NewPolicyRepository(policies, &policiesMu)
-	svc := auth.New(users, policies, hasher, idp, ts, ac)
+	rc := mocks.NewRecoveryService()
+	mailsvc := mocks.NewMailService()
+
+	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,
