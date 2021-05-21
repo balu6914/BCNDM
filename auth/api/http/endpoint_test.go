@@ -115,11 +115,19 @@ var policies = map[string]auth.Policy{
 
 var policiesMu sync.Mutex
 
-var userForDisable = auth.User{
+var userForUpdateDisable = auth.User{
+	ID:       "246disable",
+	Email:    "disable@example.com",
+	Password: "Pass2347!",
+	Role:     auth.UserRole,
+}
+
+var userForLoginDisabled = auth.User{
 	ID:       "246disable",
 	Email:    "disable@example.com",
 	Password: "Pass1234!",
 	Role:     auth.UserRole,
+	Disabled: true,
 }
 
 var user = auth.User{
@@ -377,7 +385,7 @@ func TestLogin(t *testing.T) {
 
 	_, err := svc.Register(key, user)
 	require.Nil(t, err, "unexpected error registering user: %s", err)
-	_, err = svc.Register(key, userForDisable)
+	_, err = svc.Register(key, userForUpdateDisable)
 	require.Nil(t, err, "unexpected error registering user: %s", err)
 	userForDisable2 := userForDisable
 	userForDisable2.Disabled = true
@@ -410,7 +418,7 @@ func TestLogin(t *testing.T) {
 	}{
 		"login disabled user": {
 			contentType: contentType,
-			req:         toJSON(userForDisable),
+			req:         toJSON(userForLoginDisabled),
 			status:      http.StatusForbidden,
 			res:         "",
 		},
