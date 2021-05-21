@@ -312,10 +312,9 @@ func (as *authService) RecoverPassword(email string) error {
 		"Token": tokenString,
 		"ID":    user.ID,
 	}
-	templateName := "passwordRecovery.html"
 	emailSubject := "Datapace password recovery."
 
-	if mailErr := as.mailsvc.SendEmail(email, emailSubject, templateName, templateData); mailErr != nil {
+	if mailErr := as.mailsvc.SendRecoveryEmail(email, emailSubject, templateData); mailErr != nil {
 		return mailErr
 	}
 

@@ -11,17 +11,17 @@ import (
 var _ auth.MailService = (*mailService)(nil)
 
 type mailService struct {
-	smtpIdentity      string
-	smtpHost          string
-	smtpURL           string
-	smtpUser          string
-	smtpPassword      string
-	smtpFrom          string
-	frontendURL       string
-	mailTemplatesPath string
+	smtpIdentity    string
+	smtpHost        string
+	smtpURL         string
+	smtpUser        string
+	smtpPassword    string
+	smtpFrom        string
+	frontendURL     string
+	passRecoveryTpl string
 }
 
-func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string, frontendURL string, mailTemplatesPath string) auth.MailService {
+func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, smtpPassword string, smtpFrom string, frontendURL string, passRecoveryTpl string) auth.MailService {
 	return &mailService{
 		smtpIdentity,
 		smtpHost,
@@ -30,15 +30,15 @@ func New(smtpIdentity string, smtpURL string, smtpHost string, smtpUser string, 
 		smtpPassword,
 		smtpFrom,
 		frontendURL,
-		mailTemplatesPath,
+		passRecoveryTpl,
 	}
 }
 
-func (ms *mailService) SendEmail(to string, subject string, templateName string, templateData map[string]interface{}) error {
+func (ms *mailService) SendRecoveryEmail(to string, subject string, templateData map[string]interface{}) error {
 	auth := smtp.PlainAuth(ms.smtpIdentity, ms.smtpUser, ms.smtpPassword, ms.smtpHost)
 	header := "To:" + to + "\r\n" + "From:" + ms.smtpFrom + "\r\n" + "Subject:" + subject
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
-	mailTemplate, parsingErr := template.ParseFiles(ms.mailTemplatesPath + templateName)
+	mailTemplate, parsingErr := template.ParseFiles(ms.passRecoveryTpl)
 	if parsingErr != nil {
 		return parsingErr
 	}
