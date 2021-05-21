@@ -2,14 +2,11 @@ package auth_test
 
 import (
 	"fmt"
-	"math/rand"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/datapace/datapace/auth"
 	"github.com/datapace/datapace/auth/mocks"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -98,17 +95,6 @@ var policies = map[string]auth.Policy{
 			},
 		},
 	},
-}
-
-var symbols = []rune("01233456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func randomString(n int) string {
-	rand.Seed(time.Now().UnixNano())
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = symbols[rand.Intn(len(symbols))]
-	}
-	return string(b)
 }
 
 var policiesMu sync.Mutex
@@ -334,22 +320,26 @@ func TestUpdatePassword(t *testing.T) {
 		key  string
 		user auth.User
 		err  error
+		pass string
 	}{
 		{
 			desc: "update user password",
 			key:  key,
 			user: user,
 			err:  nil,
+			pass: "Pass2222!1",
 		},
 		{
 			desc: "update user password invalid credentials",
 			key:  "",
-			user: user2,
+			user: user,
 			err:  auth.ErrUnauthorizedAccess,
+			pass: "Pass2222!2",
 		},
 	}
 
 	for _, tc := range cases {
+		tc.user.Password = tc.pass
 		err := svc.UpdateUser(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
