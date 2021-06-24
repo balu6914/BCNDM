@@ -288,19 +288,8 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 		stream.Location.Type = defLocType
 	}
 
-	ar := &authproto.AuthRequest{
-		Action:     int64(auth.Update),
-		Token:      r.Header.Get("Authorization"),
-		Type:       streamType,
-		Attributes: stream.Attributes(),
-	}
-	owner, err := authService.Authorize(ar)
-	if err != nil {
-		return nil, err
-	}
-
 	req := updateStreamReq{
-		owner:  owner,
+		owner:  r.Header.Get("Authorization"),
 		id:     bone.GetValue(r, "id"),
 		stream: stream,
 	}

@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-
 	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
@@ -54,18 +53,53 @@ func updateStreamEndpoint(svc streams.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateStreamReq)
 
-		if req.stream.Owner == "" {
-			req.stream.Owner = req.owner
+		//populating stream.ID with value extracted from request URL as there should be no duality here.
+		req.stream.ID = req.id
+
+		//TODO: As we have JWT token with sub (userID), we need just to extract it and use instead of additional auth calls.
+		token := req.owner
+		ar := &authproto.AuthRequest{
+			Action: int64(auth.Read),
+			Token:  token,
+			Type:   streamType,
+		}
+
+		// Getting user id through Auth module.
+		ownerID, err := authService.Authorize(ar)
+		if err != nil {
+			return nil, err
+		}
+
+		// Assign received ID to req.owner instead of JWT token
+		req.owner = ownerID
+
+		// Fetch stream from DB that has owner field populated so that
+		// we can use it to authorize Update request.
+		referenceStream, err := svc.ViewStream(req.id, req.owner)
+		if err != nil {
+			return nil, err
+		}
+
+		//Assign owner received from database to request stream.
+		req.stream.Owner = referenceStream.Owner
+
+		// Now authorizing user to allow update operation on stream from DB.
+		// User id will be provided by Auth service, stream from database (referenceStream) will be checked if user (token bearer) can update it.
+		ar = &authproto.AuthRequest{
+			Action:     int64(auth.Update),
+			Token:      token,
+			Type:       streamType,
+			Attributes: referenceStream.Attributes(),
+		}
+		ownerID, err = authService.Authorize(ar)
+		if err != nil {
+			return nil, err
 		}
 
 		// Need to set owner before the validation because
 		// stream.Validate() won't pass otherwise.
 		if err := req.validate(); err != nil {
 			return nil, err
-		}
-
-		if req.stream.ID == "" {
-			req.stream.ID = req.id
 		}
 
 		if err := svc.UpdateStream(req.stream); err != nil {

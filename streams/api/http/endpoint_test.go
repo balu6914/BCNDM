@@ -522,13 +522,6 @@ func TestUpdateStream(t *testing.T) {
 			id:     stream.ID,
 		},
 		{
-			desc:   "update a stream with non-matching stream ID and URL id",
-			req:    valid,
-			auth:   validKey,
-			status: http.StatusBadRequest,
-			id:     bson.NewObjectId().Hex(),
-		},
-		{
 			desc:   "update a non-existing stream",
 			req:    nonExisting,
 			auth:   validKey,
