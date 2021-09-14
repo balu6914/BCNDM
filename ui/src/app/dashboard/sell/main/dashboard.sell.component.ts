@@ -95,7 +95,7 @@ export class DashboardSellComponent implements OnInit {
           if (err.status === 400) {
             this.alertService.error(`Error with streams file format`);
           } else {
-            this.alertService.error(`Status: ${err} - ${err.statusText}`);
+            this.alertService.error(`Status: ${err.status} - ${err.error.message}`);
           }
         }
       );
