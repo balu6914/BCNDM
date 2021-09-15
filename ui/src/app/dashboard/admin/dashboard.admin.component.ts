@@ -57,7 +57,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Role', 'Email', 'Name', 'Phone', 'Address', 'Company', 'Account Login', 'Status', 'Balance', ''];
+    this.table.headers = ['Role', 'Email', 'Name', 'Company', 'Phone', 'Address', 'Account Login', 'Status', 'Balance', ''];
     this.table.hasDetails = true;
   }
 
