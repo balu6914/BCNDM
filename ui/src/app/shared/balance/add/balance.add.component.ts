@@ -31,7 +31,14 @@ export class BalanceAddComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      'amount': ['', Validators.required],
+      'amount': [
+        '',
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.max(100)
+        ],
+      ]
     });
     this.processing = false;
   }
