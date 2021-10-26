@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	issuer   = "github.com/datapace/datapace"
-	duration = 10 * time.Hour
+	issuer   = "datapace"
+	duration = 1 * time.Hour
 )
 
 var _ auth.IdentityProvider = (*jwtIdentityProvider)(nil)
