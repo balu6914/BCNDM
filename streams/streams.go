@@ -100,10 +100,10 @@ type Page struct {
 }
 
 const (
-	maxNameLength        = 32
+	maxNameLength        = 256
 	maxTypeLength        = 32
-	maxDescriptionLength = 256
-	maxSnippetLength     = 256
+	maxDescriptionLength = 2048
+	maxSnippetLength     = 2048
 	maxURLLength         = 2048
 	minPrice             = 0
 	minLongitude         = -180
