@@ -298,10 +298,12 @@ services:
     environment:
       - DATAPACE_DPROXY_DB_HOST=datapace-dproxy-db
       - DATAPACE_LOCAL_FS_ROOT=/data
+      - DATAPACE_DPROXY_ENCRYPTION_KEY=W0JD00gEAGUDV6UI0+16iVRx8p+PQx79ahGlBwhWz/g=
     depends_on:
       - datapace-dproxy-db
     volumes:
       - ./dproxy-data:/data
+
     ports:
       - "8087:8087"
     restart: on-failure

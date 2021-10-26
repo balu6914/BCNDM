@@ -1,22 +1,22 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
-	"github.com/datapace/datapace/dproxy/persistence"
-	"github.com/datapace/datapace/errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/datapace/datapace"
-
 	"github.com/datapace/datapace/dproxy"
 	"github.com/datapace/datapace/dproxy/api"
 	httpapi "github.com/datapace/datapace/dproxy/api/http"
 	"github.com/datapace/datapace/dproxy/jwt"
+	"github.com/datapace/datapace/dproxy/persistence"
 	"github.com/datapace/datapace/dproxy/persistence/mongo"
 	"github.com/datapace/datapace/dproxy/persistence/postgres"
+	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/logger"
 	log "github.com/datapace/datapace/logger"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -41,6 +41,7 @@ const (
 	defDBSSLRootCert  = ""
 	defFSPathPrefix   = "/fs"
 	defHTTPPathPrefix = "/http"
+	defEncKey         = ""
 
 	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
 	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
@@ -59,6 +60,7 @@ const (
 	envDBSSLRootCert  = "DATAPACE_DPROXY_DB_SSL_ROOT_CERT"
 	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
 	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
+	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
 )
 
 type config struct {
@@ -71,6 +73,7 @@ type config struct {
 	fsPathPrefix   string
 	httpPathPrefix string
 	dbType         string
+	encKey         string
 }
 
 func main() {
@@ -79,10 +82,15 @@ func main() {
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
 	if err != nil {
-		logger.Error(fmt.Sprintf("An error occured while connecting to events repository: %s. Exiting.", err))
+		logger.Error(fmt.Sprintf("An error occurred while connecting to events repository: %s. Exiting.", err))
 		os.Exit(1)
 	}
-	svc := newService(cfg.jwtSecret, eventsRepository, logger)
+	key, err := base64.StdEncoding.DecodeString(cfg.encKey)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Error reading AES key: %s", err))
+		os.Exit(1)
+	}
+	svc := newService(cfg.jwtSecret, eventsRepository, key, logger)
 	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
 	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
 	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
@@ -95,9 +103,9 @@ func main() {
 	logger.Error(fmt.Sprintf("Proxy service terminated: %s", err))
 }
 
-func newService(jwtSecret string, eventsRepository persistence.EventRepository, logger log.Logger) dproxy.Service {
+func newService(jwtSecret string, eventsRepository persistence.EventRepository, key []byte, logger log.Logger) dproxy.Service {
 	tokenService := jwt.NewService(jwtSecret)
-	svc := dproxy.NewService(tokenService, eventsRepository)
+	svc := dproxy.NewService(tokenService, eventsRepository, key)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,
@@ -166,6 +174,7 @@ func loadConfig() config {
 		localFsRoot:    datapace.Env(envLocalFsRoot, defLocalFsRoot),
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
+		encKey:         datapace.Env(envEncKey, defEncKey),
 	}
 }
 

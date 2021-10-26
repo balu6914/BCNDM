@@ -36,26 +36,26 @@ default values.
 
 As a persistence backend, dProxy can use either mongo or postgres databases.
 
-| Variable                             | Description                                                                                    | Default                |
-|--------------------------------------|------------------------------------------------------------------------------------------------|------------------------|
-| DATAPACE_PROXY_HTTP_PORT             | Reverse proxy HTTP port                                                                        | 9090                   |
-| DATAPACE_JWT_SECRET                  | Reverse proxy JWT secret                                                                       | examplesecret          |
-| DATAPACE_LOCAL_FS_ROOT               | Local filesystem directory which serves as root directory when serving local files             | /tmp/test              |
-| DATAPACE_DPROXY_DB_TYPE              | dProxy database type (mongo or postgres)                                                       | mongo                  |
-| DATAPACE_DPROXY_DB_HOST              | dProxy database host                                                                           | 0.0.0.0                |
-| DATAPACE_DPROXY_DB_PORT              | dProxy database port                                                                           | 27017                  |
-| DATAPACE_DPROXY_DB_USER              | dProxy database username                                                                       |                        |
-| DATAPACE_DPROXY_DB_PASS              | dProxy database password                                                                       |                        |
-| DATAPACE_DPROXY_DB                   | dProxy database name                                                                           | dproxy                 |
-| DATAPACE_DPROXY_DB_SSL_MODE          | dProxy database ssl switch                                                                     | disable                |
-| DATAPACE_DPROXY_DB_SSL_CERT          | dProxy database certificate                                                                    |                        |
-| DATAPACE_DPROXY_DB_SSL_KEY           | dProxy database private key                                                                    |                        |
-| DATAPACE_DPROXY_DB_SSL_ROOT_CERT     | dProxy database root certificate                                                               |                        |
-| DATAPACE_DPROXY_FS_PATH_PREFIX       | the prefix in the generated URL by dproxy that indicates dproxy should fetch a file            | /fs                    |
-| DATAPACE_DPROXY_HTTP_PATH_PREFIX     | the prefix in the generated URL by dproxy that indicates dproxy should fetch a http resource   | /http                  |
-| DATAPACE_PROXY_HTTP_PROTO            | protocol that will be put in generated URL                                                     | http                   |
-| DATAPACE_PROXY_HTTP_HOST             | host that will be put in the generated URL                                                     | localhost              |
-
+| Variable                            | Description                                                                                  | Default       |
+| ----------------------------------- | -------------------------------------------------------------------------------------------- | ------------- |
+| DATAPACE_PROXY_HTTP_PORT            | Reverse proxy HTTP port                                                                      | 9090          |
+| DATAPACE_JWT_SECRET                 | Reverse proxy JWT secret                                                                     | examplesecret |
+| DATAPACE_LOCAL_FS_ROOT              | Local filesystem directory which serves as root directory when serving local files           | /tmp/test     |
+| DATAPACE_DPROXY_DB_TYPE             | dProxy database type (mongo or postgres)                                                     | mongo         |
+| DATAPACE_DPROXY_DB_HOST             | dProxy database host                                                                         | 0.0.0.0       |
+| DATAPACE_DPROXY_DB_PORT             | dProxy database port                                                                         | 27017         |
+| DATAPACE_DPROXY_DB_USER             | dProxy database username                                                                     |               |
+| DATAPACE_DPROXY_DB_PASS             | dProxy database password                                                                     |               |
+| DATAPACE_DPROXY_DB                  | dProxy database name                                                                         | dproxy        |
+| DATAPACE_DPROXY_DB_SSL_MODE         | dProxy database ssl switch                                                                   | disable       |
+| DATAPACE_DPROXY_DB_SSL_CERT         | dProxy database certificate                                                                  |               |
+| DATAPACE_DPROXY_DB_SSL_KEY          | dProxy database private key                                                                  |               |
+| DATAPACE_DPROXY_DB_SSL_ROOT_CERT    | dProxy database root certificate                                                             |               |
+| DATAPACE_DPROXY_FS_PATH_PREFIX      | the prefix in the generated URL by dproxy that indicates dproxy should fetch a file          | /fs           |
+| DATAPACE_DPROXY_HTTP_PATH_PREFIX    | the prefix in the generated URL by dproxy that indicates dproxy should fetch a http resource | /http         |
+| DATAPACE_PROXY_HTTP_PROTO           | protocol that will be put in generated URL                                                   | http          |
+| DATAPACE_PROXY_HTTP_HOST            | host that will be put in the generated URL                                                   | localhost     |
+| DATAPACE_DPROXY_ENCRYPTION_KEY_PATH | key for URL encryption                                                                       |               |
 
 
 The service itself is distributed as Docker container. You can find a Docker composition

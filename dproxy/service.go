@@ -33,22 +33,32 @@ type TokenService interface {
 }
 
 type dService struct {
+	aesKey       []byte
 	tokenService TokenService
 	eventsRepo   persistence.EventRepository
 }
 
 var _ Service = (*dService)(nil)
 
-func NewService(tokenService TokenService, eventsRepo persistence.EventRepository) Service {
-	return &dService{tokenService: tokenService, eventsRepo: eventsRepo}
+func NewService(tokenService TokenService, eventsRepo persistence.EventRepository, key []byte) Service {
+	return &dService{
+		tokenService: tokenService,
+		eventsRepo:   eventsRepo,
+		aesKey:       key,
+	}
 }
 
 func (d *dService) CreateToken(url string, ttl, maxCalls int) (string, error) {
+	url, err := encrypt(d.aesKey, url)
+	if err != nil {
+		return "", err
+	}
 	return d.tokenService.Create(url, ttl, maxCalls)
 }
 
 func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	t, err := d.tokenService.Parse(tokenString)
+
 	calls, err := d.eventsRepo.Accumulate(persistence.Event{Time: time.Now(), Initiator: t.Uid()})
 	if err != nil {
 		return "", err
@@ -56,5 +66,10 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	if t.MaxCalls() != 0 && calls > t.MaxCalls() {
 		return "", ErrQuotaExceeded
 	}
-	return t.Url(), err
+	url, err := decrypt(d.aesKey, t.Url())
+	if err != nil {
+		return "", err
+	}
+
+	return url, err
 }
