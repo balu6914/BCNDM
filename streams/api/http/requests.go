@@ -24,7 +24,7 @@ type addStreamReq struct {
 	stream streams.Stream
 }
 
-func (req addStreamReq) validate() error {
+func (req *addStreamReq) validate() error {
 	if req.stream.Owner != "" && req.stream.Owner != req.owner {
 		return streams.ErrMalformedData
 	}

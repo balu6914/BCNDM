@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"net/url"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -127,6 +128,13 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
+	var err error
+	if s.Terms, err = url.PathUnescape(s.Terms); err != nil {
+		return ErrMalformedData
+	}
+	if s.URL, err = url.PathUnescape(s.URL); err != nil {
+		return ErrMalformedData
+	}
 	if !s.External && len(s.URL) > maxURLLength {
 		return ErrMalformedData
 	}

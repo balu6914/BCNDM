@@ -77,8 +77,8 @@ export class DashboardAiEditComponent implements OnInit {
         type: this.editData.type,
         description: this.form.value.description,
         snippet: this.form.value.snippet,
-        url: this.form.value.url,
-        terms: this.form.value.terms,
+        url: encodeURIComponent(this.form.value.url),
+        terms: encodeURIComponent(this.form.value.terms),
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
           'type': 'Point',

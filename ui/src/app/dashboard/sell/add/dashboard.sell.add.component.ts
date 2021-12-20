@@ -99,7 +99,7 @@ export class DashboardSellAddComponent implements OnInit {
           ]
         },
         external: this.external,
-        terms: this.form.value.terms,
+        terms: encodeURIComponent(this.form.value.terms),
       };
       if (this.external) {
         stream.bq = new BigQuery(
@@ -109,7 +109,7 @@ export class DashboardSellAddComponent implements OnInit {
           this.form.value.fields
         );
       } else {
-        stream.url = this.form.value.url;
+        stream.url = encodeURIComponent(this.form.value.url);
       }
 
       this.streamService.addStream(stream).subscribe(
