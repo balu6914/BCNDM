@@ -1,0 +1,17 @@
+{{- if .Values.explorer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hl-explorer-lb
+  labels:
+    name: hl-explorer-lb
+    component: hl-explorer
+spec:
+  type: LoadBalancer
+  selector:
+    app: explorer
+  ports:
+  - protocol: TCP
+    port: 8080
+    name: explorer
+{{- end }}

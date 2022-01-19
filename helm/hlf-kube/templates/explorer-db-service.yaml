@@ -1,0 +1,19 @@
+{{- if .Values.explorer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hl-explorer-db
+  labels:
+    name: hl-explorer-db
+    component: hl-explorer
+    fqdn: explorer.datapace.com
+    addToHostAliases: "true"    
+spec:
+  type: ClusterIP
+  selector:
+    app: explorer
+  ports:
+  - protocol: TCP
+    port: 5432
+    name: db
+{{- end }}

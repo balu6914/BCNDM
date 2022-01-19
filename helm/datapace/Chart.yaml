@@ -1,6 +1,6 @@
 apiVersion: v2
 name: datapace
-description: A Helm chart for Datapace
+description: Helm chart for Datapace deployment. More at https://github.com/datapace/datapace.
 type: application
 version: 0.1.0
 appVersion: 0.1.0

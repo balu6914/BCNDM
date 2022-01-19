@@ -1,0 +1,73 @@
+network:
+  # used by init script to create genesis block and by peer-org-flow to parse consortiums
+  genesisProfile: DatapaceOrdererGenesis
+  # used by init script to create genesis block 
+  systemChannelID: datapacesyschannel
+  channelProfile: DatapaceChannel
+
+  # defines which organizations will join to which channels
+  channels:
+    - name: datapacechannel
+      # all peers in these organizations will join the channel
+      orgs: [Org1]
+
+  # defines which chaincodes will be installed to which organizations
+  chaincodes:
+    - name: contracts
+      folder: contracts
+      version: "1.0"
+      language: golang
+      orgs: [Org1]
+      init: '{"Args":["init"]}'
+      channels:
+      - name: datapacechannel
+        orgs: [Org1]
+        policy: OR('Org1MSP.admin','Org1MSP.member')
+
+    - name: access
+      folder: access-requests
+      version: "1.0"
+      language: golang
+      orgs: [Org1]
+      init: '{"Args":["init"]}'
+      channels:
+      - name: datapacechannel
+        orgs: [Org1]
+        policy: OR('Org1MSP.admin','Org1MSP.member')
+
+    - name: terms
+      folder: terms
+      version: "1.0"
+      language: golang
+      orgs: [Org1]
+      init: '{"Args":["init"]}'
+      channels:
+      - name: datapacechannel
+        orgs: [Org1]
+        policy: OR('Org1MSP.admin','Org1MSP.member')
+   
+    - name: fee
+      folder: system-fee
+      version: "1.0"
+      language: golang
+      orgs: [Org1]
+      init: '{"Args":["init","{\"owner\": \"Admin@org1.datapace.com\", \"value\": 10000}"]}'
+      channels:
+      - name: datapacechannel
+        orgs: [Org1]
+        policy: OR('Org1MSP.admin','Org1MSP.member')
+
+    - name: token
+      folder: token
+      version: "1.0"
+      language: golang
+      # chaincode will be installed to all peers in these organizations
+      orgs: [Org1]
+      init: '{"Args":["init","{\"name\": \"Datapace Token\", \"symbol\": \"DPC\", \"decimals\": 8, \"totalSupply\": 100000000000000}"]}'
+      # at which channels are we instantiating/upgrading chaincode?
+      channels:
+      - name: datapacechannel
+        # chaincode will be instantiated/upgraded using the first peer in the first organization
+        # chaincode will be invoked on all peers in these organizations
+        orgs: [Org1]
+        policy: OR('Org1MSP.admin','Org1MSP.member')

@@ -1,0 +1,187 @@
+{{- if .Values.explorer.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hl-explorer
+spec:
+  replicas: 1
+  serviceName: hl-explorer
+  selector:
+    matchLabels:
+      app: explorer
+  volumeClaimTemplates:
+  {{- if $.Values.explorer.persistence.enabled }}
+  - metadata:
+      name: explorer-wallet
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: {{ $.Values.persistence.storageClass }}
+      resources:
+        requests:
+          storage: {{ $.Values.explorer.persistence.size }}
+  {{- end }}
+  {{- if $.Values.explorer.db.persistence.enabled }}
+  - metadata:
+      name: explorerdb-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: {{ $.Values.persistence.storageClass }}
+      resources:
+        requests:
+          storage: {{ $.Values.explorer.db.persistence.size }}
+  {{- end }}
+
+  template:
+    metadata:
+      labels:
+        app: explorer
+    spec:
+      volumes:
+      {{- range $i, $org := $.Values.PeerOrgs }}
+      - name: hlfpeer-{{ $org.Name | lower }}-adminmsp
+        secret:
+          secretName: hlf-peer--{{ $org.Name | lower }}--admin-msp
+      {{- range $peerIndex := until ($org.Template.Count | int) }}
+      {{- $peer := (printf "peer%s" ($peerIndex | toString)) }}
+      - name: {{ $peer }}-{{ $org.Name | lower }}-tls
+        secret:
+          secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
+      {{- end }} {{- /* Peers */ -}}
+      {{- end }} {{- /* Orgs */ -}}
+
+      {{- if not $.Values.explorer.persistence.enabled }}
+      - name: explorer-wallet
+        emptyDir: {}
+      {{- end }}
+      {{- if not $.Values.explorer.db.persistence.enabled }}
+      - name: explorerdb-data
+        emptyDir: {}
+      {{- end }}
+      - name: explorerconfig
+        configMap:
+          name: hl-explorer-configs
+          items:
+          - key: config.json
+            path: config.json
+          - key: explorerpg.sql
+            path: explorerpg.sql
+          - key: pgconfig.json
+            path: pgconfig.json
+          - key: connectionprofile.json
+            path: connectionprofile.json
+          - key: updatepg.sql
+            path: updatepg.sql
+      - name: explorer-db-configs
+        configMap:
+          name: hl-explorer-db-configs
+          items:
+          - key: createdb.sh
+            path: createdb.sh
+          - key: explorerpg.sql
+            path: explorerpg.sql
+          - key: processenv.js
+            path: processenv.js
+          - key: updatepg.sql
+            path: updatepg.sql
+
+      {{- if $.Values.hostAliases }}
+      hostAliases:
+      {{- range $i, $alias := $.Values.hostAliases }}
+      - ip: {{ $alias.ip }}
+        hostnames: {{ $alias.hostnames }}
+      {{- end }}
+      {{- end }}{{""}}
+
+      containers:
+      - name: db
+        {{- if $.Values.hyperledger.registry }}
+        image: {{ $.Values.hyperledger.registry }}/explorer-db:{{ $.Values.hyperledger.version.explorerdb }}
+        {{- else }}
+        image: hyperledger/explorer-db:{{ $.Values.hyperledger.version.explorerdb }}
+        {{- end }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+        {{- if $.Values.explorer.db.persistence.enabled }}
+        - mountPath: /var/lib/postgresql
+          subPath: data
+          name: explorerdb-data
+        {{- end }}
+        - mountPath: /docker-entrypoint-initdb.d/createdb.sh
+          name: explorer-db-configs
+          subPath: createdb.sh
+        - mountPath: /opt/explorerpg.sql
+          name: explorer-db-configs
+          subPath: explorerpg.sql
+        - mountPath: /opt/updatepg.sql
+          name: explorer-db-configs
+          subPath: updatepg.sql
+        - mountPath: /opt/processenv.js
+          name: explorer-db-configs
+          subPath: processenv.js
+        env:
+        - name: DATABASE_DATABASE
+          value: fabricexplorer
+        - name: DATABASE_USERNAME
+          value: hppoc
+        - name: DATABASE_PASSWORD
+          value: password
+
+      - name: explorer
+        {{- if $.Values.hyperledger.registry }}
+        image: {{ $.Values.hyperledger.registry }}/explorer:{{ $.Values.hyperledger.version.explorer }}
+        {{- else }}
+        image: hyperledger/explorer:{{ $.Values.hyperledger.version.explorer }}
+        {{- end }}
+        volumeMounts:
+        {{- range $i, $org := $.Values.PeerOrgs }}
+        - mountPath: /config/fabric/{{ $org.Name | lower }}/msp
+          name: hlfpeer-{{ $org.Name | lower }}-adminmsp
+        {{- range $peerIndex := until ($org.Template.Count | int) }}
+        {{- $peer := (printf "peer%s" ($peerIndex | toString)) }}
+        - mountPath: /config/fabric/{{ $org.Name | lower }}/{{ $peer }}/tls 
+          name: {{ $peer }}-{{ $org.Name | lower }}-tls
+        {{- end }}
+        {{- end }}
+        {{- if $.Values.explorer.persistence.enabled }}
+        - mountPath: /opt/explorer/wallet
+          name: explorer-wallet
+        {{- end }}
+        - mountPath: /opt/explorer/app/platform/fabric/config.json
+          name: explorerconfig
+          subPath: config.json
+        - mountPath: /opt/explorer/app/platform/fabric/connection-profile/connectionprofile.json
+          subPath: connectionprofile.json
+          name: explorerconfig
+        - mountPath: /opt/app/persistence/postgreSQL/db/pgconfig.json
+          name: explorerconfig
+          subPath: pgconfig.json
+        env:
+        - name: DATABASE_HOST
+          value: hl-explorer-db
+        - name: DATABASE_USERNAME
+          value: hppoc
+        - name: DATABASE_PASSWD
+          value: password
+        - name: LOG_LEVEL_APP
+          value: debug
+        - name: LOG_LEVEL_DB
+          value: debug
+        - name: DISCOVERY_AS_LOCALHOST
+          value: "false"
+        - name: LOG_LEVEL_CONSOLE
+          value: info
+        - name: LOG_CONSOLE_STDOUT
+          value: "true"
+{{- end }}

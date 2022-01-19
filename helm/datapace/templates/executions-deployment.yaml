@@ -13,6 +13,9 @@ spec:
       labels:
         app: {{ include "datapace.fullname" . }}
         component: {{ .Values.executions.suffix }}
+        {{- if .Values.defaults.enableNKSLogging }}
+        nks-elk: enabled
+        {{- end }}
     spec:
       imagePullSecrets:
         - name: registrykey

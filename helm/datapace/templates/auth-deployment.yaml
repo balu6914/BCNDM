@@ -13,6 +13,15 @@ spec:
       labels:
         app: {{ include "datapace.fullname" . }}
         component: {{ .Values.auth.suffix }}
+        {{- if .Values.defaults.enableNKSLogging }}
+        nks-elk: enabled
+        {{- end }}
+      {{- if .Values.auth.operations.enabled }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '{{ .Values.auth.service.port.http }}'
+      {{- end }}
     spec:
       imagePullSecrets:
         - name: registrykey

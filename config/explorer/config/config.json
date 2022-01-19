@@ -1,0 +1,10 @@
+{
+        "network-configs": {
+                "datapace-network": {
+                        "name": "datapacenetwork",
+                        "profile": "./connection-profile/connectionprofile.json"
+                }
+        },
+        "license": "Apache-2.0"
+}
+

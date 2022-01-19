@@ -19,6 +19,7 @@ imageCredentials:
 
 defaults:
   logLevel: "info"
+  enableNKSLogging: true
   image:
     pullPolicy: "IfNotPresent"
     repository: "registry.gitlab.com/drasko/datapace-docker"
@@ -41,12 +42,14 @@ dproxy:
     tls: []
 
 auth:
+  operations:
+    enabled: true
   suffix: auth
   image:
     name: auth
   admin:
-    email: admin@datapace.local
-    password: datapaceadmin
+    email: admin@datapace.com
+    password: datapace
   service:
     type: ClusterIP
     port:
@@ -54,6 +57,8 @@ auth:
       grpc: 8081
 
 transactions:
+  operations: 
+    enabled: true
   suffix: transactions
   image:
     name: transactions
@@ -65,6 +70,8 @@ transactions:
       grpc: 8083
 
 accesscontrol:
+  operations:
+    enabled: true
   suffix: accesscontrol
   image:
     name: access-control
@@ -105,6 +112,8 @@ executions:
       grpc: 8089
 
 subscriptions:
+  operations:
+    enabled: true
   suffix: subscriptions
   image:
     name: subscriptions
@@ -136,6 +145,13 @@ postgresql:
 mongodb:
   nameOverride: datapace-mongodb
   usePassword: false
+  metrics:
+    enabled: true
+    containerPort: 9216
+    service:
+      port: 9216
+    serviceMonitor:
+      enabled: true
 
 bc:
   ip: 10.0.0.1

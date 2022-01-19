@@ -13,6 +13,9 @@ spec:
       labels:
         app: {{ include "datapace.fullname" . }}
         component: {{ .Values.streams.suffix }}
+        {{- if .Values.defaults.enableNKSLogging }}
+        nks-elk: enabled
+        {{- end }}
     spec:
       imagePullSecrets:
         - name: registrykey
@@ -61,9 +64,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: config
-              mountPath: "/tmp/config"
+            - name: hlf-config
+              mountPath: "/tmp/config/fabric"
       volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: config
+        - name: hlf-config
+          configMap:
+            name: hlf-config

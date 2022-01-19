@@ -13,6 +13,9 @@ spec:
       labels:
         app: {{ include "datapace.fullname" . }}
         component: {{ .Values.terms.suffix }}
+        {{- if .Values.defaults.enableNKSLogging }}
+        nks-elk: enabled
+        {{- end }}
     spec:
       imagePullSecrets:
         - name: registrykey
@@ -57,21 +60,61 @@ spec:
               mountPath: "/tmp/datapace-service-kvs"
             - name: msp
               mountPath: "/tmp/datapace-service-msp"
-            - name: config
-              mountPath: "/tmp/config"
+            - name: hlf-config
+              mountPath: "/tmp/config/fabric"
+            {{- range $i, $org := $.Values.PeerOrgs }}
+            - name: peer-{{ $org.Name | lower }}-tlsca
+              mountPath: "/tmp/config/crypto-config/peerOrganizations/{{ $org.Domain }}/tlsca"
+            - name: peer-{{ $org.Name | lower }}-admin-msp
+              mountPath: "/tmp/config/crypto-config/peerOrganizations/{{ $org.Domain }}/users/Admin@{{ $org.Domain }}/msp"
+            {{- end }}
+            {{- range $i, $org := $.Values.OrdererOrgs }}
+            {{- range $i, $host := $org.Specs }}
+            - name: orderer-{{ $org.Name | lower }}-{{ $host.Hostname | lower }}-tlsca
+              mountPath: "/tmp/config/crypto-config/ordererOrganizations/{{ $org.Domain }}/tlsca"
+            {{- end }}
+            {{- end }}
       volumes:
-        - name: kvs
-          persistentVolumeClaim:
-            claimName: kvs
-        - name: msp
-          persistentVolumeClaim:
-            claimName: msp
-        - name: config
-          persistentVolumeClaim:
-            claimName: config
+        {{- range $i, $org := $.Values.PeerOrgs }}
+      - name: peer-{{ $org.Name | lower }}-tlsca
+        secret:
+          secretName: hlf-ca--{{ $org.Name | lower }}-tlsca
+      - name: peer-{{ $org.Name | lower }}-admin-msp
+        secret:
+          secretName: hlf-peer--{{ $org.Name | lower }}--admin-msp
+          items:
+          - key: cert.pem
+            path: signcerts/Admin@{{ $org.Domain}}-cert.pem
+          - key: key.pem
+            path: keystore/priv_sk
+          - key: cacert.pem
+            path: cacerts/ca.{{ $org.Domain }}-cert.pem
+          - key: tlscacert.pem
+            path: tlscacerts/tlsca.{{ $org.Domain }}-cert.pem
+          - key: admincert.pem
+            path: admincerts/Admin@{{ $org.Domain }}-cert.pem
+      {{- end }}
+      {{- range $i, $org := $.Values.OrdererOrgs }}
+      {{- range $i, $host := $org.Specs }}
+      - name: orderer-{{ $org.Name | lower }}-{{ $host.Hostname | lower }}-tlsca
+        secret:
+          secretName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}-tlsca
+      {{- end }}
+      {{- end }}
+      - name: hlf-config
+        configMap:
+          name: hlf-config
+      - name: kvs
+        persistentVolumeClaim:
+          claimName: terms-kvs
+      - name: msp
+        persistentVolumeClaim:
+          claimName: terms-msp
+
+      {{- if $.Values.hostAliases }}
       hostAliases:
-        - ip: {{ .Values.bc.ip }}
-          hostnames:
-          {{- range .Values.bc.hostnames }}
-          - {{ . | quote }}
-          {{- end }}
+      {{- range $i, $alias := $.Values.hostAliases }}
+      - ip: {{ $alias.ip }}
+        hostnames: {{ $alias.hostnames }}
+      {{- end }}
+      {{- end }}{{""}}

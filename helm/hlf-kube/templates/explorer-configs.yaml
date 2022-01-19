@@ -1,0 +1,9 @@
+{{- if .Values.explorer.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hl-explorer-configs
+  labels:
+data:
+  {{- (.Files.Glob "explorer/config/*").AsConfig | nindent 2 }}
+{{- end }}

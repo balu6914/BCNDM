@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	keyToken       = "__token"
+	keyToken       = "token"
 	indexBalance   = "cn~balance"
 	indexAllowance = "cn~allowance"
 )

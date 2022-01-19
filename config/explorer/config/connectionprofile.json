@@ -1,0 +1,67 @@
+{
+	"name": "datapace-network",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminUser": "central_admin",
+		"adminPassword": "central2019",
+		"enableAuthentication": true,
+		"adminCredential": {
+			"id": "central_admin",
+			"password": "central2019"
+		},
+		"organization": "Org1MSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"datapacechannel": {
+			"peers": {
+				"peer0.org1.datapace.com": {},
+				"peer1.org1.datapace.com": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"Org1MSP": {
+			"mspid": "Org1MSP",
+			"fullpath": true,
+			"adminPrivateKey": {
+				"path": "/config/fabric/org1/msp/key.pem"
+			},
+			"peers": ["peer0.org1.datapace.com", "peer1.org1.datapace.com"],
+			"signedCert": {
+				"path": "/config/fabric/org1/msp/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.org1.datapace.com": {
+			"tlsCACerts": {
+				"path": "/config/fabric/org1/peer0/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.org1.datapace.com:7051"
+		},
+		"peer1.org1.datapace.com": {
+			"tlsCACerts": {
+				"path": "/config/fabric/org1/peer1/tls/ca.crt"
+			},
+			"url": "grpcs://peer1.org1.datapace.com:7051"
+		}
+	}
+}

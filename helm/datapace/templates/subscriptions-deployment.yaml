@@ -13,6 +13,15 @@ spec:
       labels:
         app: {{ include "datapace.fullname" . }}
         component: {{ .Values.subscriptions.suffix }}
+        {{- if .Values.defaults.enableNKSLogging }}
+        nks-elk: enabled
+        {{- end }}
+      {{- if .Values.subscriptions.operations.enabled }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '{{ .Values.subscriptions.service.port.http }}'
+      {{- end }}
     spec:
       imagePullSecrets:
         - name: registrykey
@@ -57,9 +66,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: config
-              mountPath: "/tmp/config"
+            - name: hlf-config
+              mountPath: "/tmp/config/fabric"
       volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: config
+        - name: hlf-config
+          configMap:
+            name: hlf-config
