@@ -22,9 +22,6 @@ for chaincode in $chaincodes; do
   currentChaincodePtr=$((currentChaincodePtr+1))
   dir=`yq .network.chaincodes["$currentChaincodePtr"].folder config/fabric/network.yaml | sed 's/"//g'`
   echo "creating ${CHAINCODE_FOLDER}/${chaincode}_1.0.tar.gz"
-  #peer lifecycle chaincode package ${CHAINCODE_FOLDER}/${chaincode}_1.0.tar.gz --path chaincode/${chaincode}/ --lang golang --label ${chaincode}_1.0 
-  #zip -r ${CHAINCODE_FOLDER}/$chaincode.zip chaincode/${dir}
-  #tar cv chaincode/${dir}/ | gzip --best > ${CHAINCODE_FOLDER}/${chaincode}.tar.gz
-  tar -cvzf ${CHAINCODE_FOLDER}/$chaincode.tar -C chaincode ${dir}/ --exclude=vendor
+  tar --exclude='vendor' -C chaincode -cvzf ${CHAINCODE_FOLDER}/$chaincode.tar ${dir}/
 done
 
