@@ -110,7 +110,7 @@ services:
         - ../../config/crypto-config:/opt/gopath/crypto
         - ./artifacts:/opt/gopath/artifacts
         - ./scripts:/opt/gopath/scripts
-        - ../../vendor:/opt/gopath/src/
+        - ../../chaincode/vendor:/opt/gopath/src/
     depends_on:
       - orderer.datapace.com
       - peer0.org1.datapace.com
