@@ -9,6 +9,8 @@ require (
 	github.com/cenkalti/backoff v2.1.1+incompatible // indirect
 	github.com/cloudflare/cfssl v0.0.0-20180323000720-5d63dbd981b5 // indirect
 	github.com/containerd/continuity v0.0.0-20181203112020-004b46473808 // indirect
+	github.com/datapace/groups v0.1.0 // indirect
+	github.com/datapace/sharing v0.1.3 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/docker/docker v17.12.0-ce-rc1.0.20190211150300-680095405094+incompatible // indirect
 	github.com/docker/libnetwork v0.8.0-dev.2.0.20190128195551-d8d4c8cf03d7 // indirect
