@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -660,5 +661,102 @@ func TestRemoveStream(t *testing.T) {
 		res, err := req.make()
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestExportStream(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+	total := uint64(2)
+	for i := uint64(0); i < total; i++ {
+		svc.AddStream(genStream())
+	}
+
+	cases := []struct {
+		desc   string
+		auth   string
+		status int
+		size   int
+		resp   [][]string
+	}{
+		{
+			desc:   "export streams",
+			auth:   validKey,
+			status: http.StatusOK,
+			size:   3,
+			resp: [][]string{
+				{
+					"visibility",
+					"name",
+					"type",
+					"description",
+					"snippet",
+					"price",
+					"latitude",
+					"longitude",
+					"url",
+					"terms",
+					"metadata",
+				},
+				{
+					"public",
+					"name",
+					"type",
+					"description",
+					"{\n\t\t\t\"sensor_id\": \"8746\",\n\t\t\t\"sensor_type\": \"DHT22\",\n\t\t\t\"location\": \"4409\",\n\t\t\t\"lat\": \"50.873\",\n\t\t\t\"lon\": \"4.698\",\n\t\t\t\"timestamp\": \"2018-03-09T00:02:09\",\n\t\t\t\"temperature\": \"5.20\"\n\t\t}",
+					"123",
+					"50",
+					"50",
+					"https://myStream82.com",
+					"https://myStream82.com",
+					"",
+				},
+				{
+					"public",
+					"name",
+					"type",
+					"description",
+					"{\n\t\t\t\"sensor_id\": \"8746\",\n\t\t\t\"sensor_type\": \"DHT22\",\n\t\t\t\"location\": \"4409\",\n\t\t\t\"lat\": \"50.873\",\n\t\t\t\"lon\": \"4.698\",\n\t\t\t\"timestamp\": \"2018-03-09T00:02:09\",\n\t\t\t\"temperature\": \"5.20\"\n\t\t}",
+					"123",
+					"50",
+					"50",
+					"https://myStream83.com",
+					"https://myStream83.com",
+					"",
+				},
+			},
+		},
+		{
+			desc:   "export streams with no auth key",
+			auth:   "",
+			status: http.StatusForbidden,
+			size:   0,
+			resp:   [][]string{},
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/export", ts.URL),
+			token:  tc.auth,
+		}
+		r, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		defer r.Body.Close()
+		// Unauthorized requests should not be processed.
+		if tc.auth != validKey {
+			assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
+			continue
+		}
+		var actualResp [][]string
+		actualResp, err = csv.NewReader(r.Body).ReadAll()
+
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.size, len(actualResp))
+		assert.Equal(t, tc.resp, actualResp)
+		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
 	}
 }

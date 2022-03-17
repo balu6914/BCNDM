@@ -140,3 +140,14 @@ func (req removeStreamReq) validate() error {
 
 	return nil
 }
+
+type exportStreamsReq struct {
+	owner string
+}
+
+func (req exportStreamsReq) validate() error {
+	if !bson.IsObjectIdHex(req.owner) {
+		return streams.ErrMalformedData
+	}
+	return nil
+}

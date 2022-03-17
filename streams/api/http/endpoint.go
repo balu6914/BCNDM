@@ -5,6 +5,7 @@ import (
 	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
+	"math"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -200,6 +201,34 @@ func searchStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 
 		res := searchStreamsRes{page}
+		return res, nil
+	}
+}
+
+func exportStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(exportStreamsReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		q := streams.Query{
+			Name:       "",
+			Owner:      req.owner,
+			StreamType: "",
+			Coords:     nil,
+			Page:       0,
+			Limit:      math.MaxUint64,
+			MinPrice:   nil,
+			MaxPrice:   nil,
+		}
+
+		page, err := svc.SearchStreams(req.owner, q)
+		if err != nil {
+			return nil, err
+		}
+
+		res := exportStreamsResp{page.Content}
 		return res, nil
 	}
 }

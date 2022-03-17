@@ -85,6 +85,11 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 		opts...,
 	))
 
+	r.Get(
+		"/export",
+		kithttp.NewServer(exportStreamsEndpoint(svc), decodeExportStreamsRequest, encodeExportStreamsResponse, opts...),
+	)
+
 	r.GetFunc("/version", datapace.Version())
 
 	return r
@@ -224,7 +229,7 @@ func parseStream(record []string, keys map[string]int) (*streams.Stream, error) 
 }
 
 func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	if !strings.Contains(r.Header.Get("Content-Type"), fileContentType) {
+	if !strings.Contains(r.Header.Get("Content-Type"), contentTypeFormData) {
 		return nil, streams.ErrWrongType
 	}
 
@@ -348,8 +353,22 @@ func decodeSearchStreamsRequest(_ context.Context, r *http.Request) (interface{}
 	return req, nil
 }
 
+func decodeExportStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
+	}
+	req := exportStreamsReq{owner: owner}
+	return req, nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", contentTypeJson)
 
 	if ar, ok := response.(apiRes); ok {
 		for k, v := range ar.headers() {
@@ -366,8 +385,71 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
+func encodeExportStreamsResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", contentTypeCsv)
+	resp := response.(exportStreamsResp)
+	for k, v := range resp.headers() {
+		w.Header().Set(k, v)
+	}
+	w.WriteHeader(resp.code())
+	if resp.empty() {
+		return nil
+	}
+	csvWriter := csv.NewWriter(w)
+	csvRecs := [][]string{
+		{
+			"visibility",
+			"name",
+			"type",
+			"description",
+			"snippet",
+			"price",
+			"latitude",
+			"longitude",
+			"url",
+			"terms",
+			"metadata",
+		},
+	}
+	for _, stream := range resp.streams {
+		csvRec, err := encodeExportStreamCsvRec(stream)
+		if err != nil {
+			return err
+		}
+		csvRecs = append(csvRecs, csvRec)
+	}
+	return csvWriter.WriteAll(csvRecs)
+}
+
+func encodeExportStreamCsvRec(stream streams.Stream) ([]string, error) {
+	lat := stream.Location.Coordinates[0]
+	long := stream.Location.Coordinates[1]
+	jsonMd := []byte{}
+	var err error
+	if stream.Metadata != nil {
+		jsonMd, err = json.Marshal(stream.Metadata)
+		if err != nil {
+			return []string{}, err
+		}
+	}
+	csvRec := []string{
+		string(stream.Visibility),
+		stream.Name,
+		stream.Type,
+		stream.Description,
+		stream.Snippet,
+		strconv.FormatUint(stream.Price, 10),
+		strconv.FormatFloat(lat, 'f', -1, 64),
+		strconv.FormatFloat(long, 'f', -1, 64),
+		stream.URL,
+		stream.Terms,
+		string(jsonMd),
+	}
+	return csvRec, nil
+}
+
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", contentTypeJson)
 	switch errVal := err.(type) {
 	case errors.Error:
 		switch {
