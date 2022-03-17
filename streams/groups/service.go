@@ -43,6 +43,9 @@ func (svc service) GetUserGroups(userId string) (groupIds []string, err error) {
 		logger.Warn(fmt.Sprintf("Failed to resolve user %s groups, groups service is unavailable (not supported).", userId))
 		return []string{}, nil
 	}
+	if st != nil && st.Code() == codes.NotFound {
+		return []string{}, nil // not a failure if a user is not in any group
+	}
 	if err != nil {
 		return []string{}, err
 	}
