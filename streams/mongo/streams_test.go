@@ -281,6 +281,65 @@ func TestSearch(t *testing.T) {
 	}
 }
 
+func TestSearchShared(t *testing.T) {
+
+	db.DB(testDB).DropDatabase()
+	repo := mongo.New(db)
+
+	all := []streams.Stream{}
+	s0 := stream()
+	s0.Visibility = streams.Protected
+	id, err := repo.Save(s0)
+	require.Nil(t, err, "Repo should save streams.")
+	s0.ID = id
+	all = append(all, s0)
+
+	s1 := stream()
+	s1.Visibility = streams.Protected
+	s1.Name = "different name"
+	s1.Type = "different type"
+	s1.ID, err = repo.Save(s1)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
+	all = append(all, s1)
+
+	cases := []struct {
+		desc    string
+		query   streams.Query
+		page    streams.Page
+		content []streams.Stream
+	}{
+		{
+			desc: "search streams by owner and shared stream id",
+			query: streams.Query{
+				Limit: limit,
+				Owner: s0.Owner,
+				Partners: []string{
+					s0.Owner,
+				},
+				Shared: map[string]bool{
+					s1.ID: true,
+				},
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 2,
+				Content: []streams.Stream{
+					s0,
+					s1,
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		res, err := repo.Search(tc.query)
+		assert.Nil(t, err, "There should be no error searching streams")
+		assert.Equal(t, tc.page.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.page.Limit, res.Limit))
+		assert.Equal(t, tc.page.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.page.Total, res.Total))
+		assert.ElementsMatch(t, tc.page.Content, res.Content, tc.desc)
+	}
+}
+
 func TestSave(t *testing.T) {
 	db.DB(testDB).DropDatabase()
 	db.ResetIndexCache()

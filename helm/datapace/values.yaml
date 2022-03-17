@@ -168,3 +168,17 @@ bc:
     - peer0.org1.datapace.com
     - orderer.datapace.com
     - ca.org1.datapace.com
+
+# Optional services
+
+groups:
+  suffix: groups
+  service:
+    port:
+      grpc: 8095
+
+sharing:
+  suffix: sharing
+  service:
+    port:
+      grpc: 8097

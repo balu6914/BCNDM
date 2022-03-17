@@ -118,6 +118,8 @@ services:
       - DATAPACE_EXECUTIONS_URL=datapace-executions:8089
       - DATAPACE_ACCESS_CONTROL_URL=datapace-access-control:8091
       - DATAPACE_TERMS_URL=datapace-terms:8093
+      - DATAPACE_GROUPS_URL=datapace-groups:8095
+      - DATAPACE_SHARING_URL=datapace-sharing:8097
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
       - DATAPACE_KUBEFLOW_URL=https://kubeflow.datapace.io/
     volumes:
