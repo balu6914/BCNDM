@@ -9,8 +9,7 @@ var (
 )
 
 type (
-	serviceMock struct {
-	}
+	serviceMock struct{}
 )
 
 func NewServiceMock() Service {

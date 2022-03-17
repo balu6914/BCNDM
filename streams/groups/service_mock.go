@@ -1,8 +1,7 @@
 package groups
 
 type (
-	serviceMock struct {
-	}
+	serviceMock struct{}
 )
 
 func NewServiceMock() Service {

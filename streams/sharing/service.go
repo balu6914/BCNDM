@@ -2,18 +2,9 @@ package sharing
 
 import (
 	"context"
-	"fmt"
-	log "github.com/datapace/datapace/logger"
 	"github.com/datapace/sharing"
 	sharingProto "github.com/datapace/sharing/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"os"
 	"time"
-)
-
-var (
-	logger = log.New(os.Stdout)
 )
 
 type (
@@ -51,11 +42,6 @@ func (svc sharingService) DeleteSharing(userId string, streamId string) error {
 		},
 	}
 	_, err := svc.client.UpdateReceivers(ctx, &req)
-	st, _ := status.FromError(err)
-	if st != nil && st.Code() == codes.Unavailable {
-		logger.Warn(fmt.Sprintf("Failed to unshare stream %s: sharing service is unavailable (not supported).", streamId))
-		return nil
-	}
 	return err
 }
 
@@ -67,17 +53,15 @@ func (svc sharingService) GetSharings(rcvUserId string, rcvGroupIds []string) ([
 		ReceiverUserId:   rcvUserId,
 	}
 	resp, err := svc.client.GetSharings(ctx, &req)
-	st, _ := status.FromError(err)
-	if st != nil && st.Code() == codes.Unavailable {
-		logger.Warn("Failed to resolve shared streams: sharing service is unavailable (not supported).")
-		return []sharing.Sharing{}, nil
+	if err != nil {
+		return []sharing.Sharing{}, err
 	}
 	var results []sharing.Sharing
 	for _, s := range resp.Sharings {
 		result := convertSharing(s)
 		results = append(results, result)
 	}
-	return results, nil
+	return results, err
 }
 
 func convertSharing(sp *sharingProto.Sharing) sharing.Sharing {

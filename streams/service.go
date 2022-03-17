@@ -3,12 +3,10 @@ package streams
 import (
 	"context"
 	"fmt"
-	log "github.com/datapace/datapace/logger"
 	"github.com/datapace/datapace/streams/groups"
 	"github.com/datapace/datapace/streams/sharing"
 	"math"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -45,8 +43,6 @@ var (
 	// ErrInvalidBQAccess indicates unauthorized user for accessing
 	// the Big Query API.
 	ErrInvalidBQAccess = errors.New("wrong user role")
-
-	logger = log.New(os.Stdout)
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -280,7 +276,8 @@ func (ss streamService) RemoveStream(owner string, id string) error {
 	if err := ss.streams.Remove(owner, id); err != nil {
 		return err
 	}
-	return ss.sharingSvc.DeleteSharing(owner, id)
+	_ = ss.sharingSvc.DeleteSharing(owner, id)
+	return nil
 }
 
 func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
@@ -310,14 +307,8 @@ func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
 }
 
 func (ss streamService) resolveSharedStreams(userId string) map[string]bool {
-	groupIds, err := ss.groupsSvc.GetUserGroups(userId)
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Failed to resolve user %s groups: %s", userId, err))
-	}
-	sharings, err := ss.sharingSvc.GetSharings(userId, groupIds)
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Failed to resolve shared stream ids for user %s: %s", userId, err))
-	}
+	groupIds, _ := ss.groupsSvc.GetUserGroups(userId)
+	sharings, _ := ss.sharingSvc.GetSharings(userId, groupIds)
 	streamIds := make(map[string]bool)
 	for _, s := range sharings {
 		streamIds[string(s.StreamId)] = true
@@ -339,7 +330,6 @@ func (ss streamService) arePartners(owner, userId string) bool {
 
 	partners, err := ss.accessControl.Partners(userId)
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to request partners for the user %s: %s", userId, err))
 		return false
 	}
 
