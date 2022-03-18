@@ -63,7 +63,7 @@ type Service interface {
 	// Adds new stream to the user identified by the provided id.
 	AddStream(Stream) (string, error)
 
-	// Adds new streams via parsed csv file.
+	// Adds new streams.
 	AddBulkStreams([]Stream) error
 
 	// Retrieves data about subset of streams given geolocation

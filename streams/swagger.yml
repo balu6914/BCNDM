@@ -155,9 +155,9 @@ paths:
       parameters:
         - $ref: "#/parameters/Authorization"
         - in: formData
-          name: csv
+          name: data
           type: file
-          description: The csv file that contains a list of streams to be uploaded.
+          description: The csv/json file that contains a list of streams to be uploaded.
       responses:
         201:
           description: Stream created.

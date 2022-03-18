@@ -151,8 +151,8 @@ type csvFile struct {
 	records [][]string
 }
 
-func readFile(r *http.Request) (*csvFile, error) {
-	file, _, err := r.FormFile("csv")
+func readCsvFile(r *http.Request) (*csvFile, error) {
+	file, _, err := r.FormFile("data")
 	if err != nil {
 		return nil, streams.ErrMalformedData
 	}
@@ -238,7 +238,7 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 		return nil, err
 	}
 
-	file, err := readFile(r)
+	file, err := readCsvFile(r)
 	if err != nil {
 		return nil, err
 	}
