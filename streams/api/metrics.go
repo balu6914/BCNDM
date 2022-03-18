@@ -88,3 +88,11 @@ func (ms *metricsMiddleware) RemoveStream(key, id string) error {
 
 	return ms.svc.RemoveStream(key, id)
 }
+
+func (ms *metricsMiddleware) ExportStreams(owner string) ([]streams.Stream, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "export_streams").Add(1)
+		ms.latency.With("method", "export_streams").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+	return ms.svc.ExportStreams(owner)
+}
