@@ -1,5 +1,5 @@
 # Stage 0, based on Node.js, to build and compile Angular
-FROM node:lts-alpine as node
+FROM node:lts-alpine3.10 as node
 WORKDIR /app
 COPY package.json /app/
 RUN npm install
