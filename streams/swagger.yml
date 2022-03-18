@@ -239,7 +239,7 @@ paths:
           description: Missing or invalid access token provided.
         500:
           $ref: "#/responses/ServiceError"
-  /streams/export:
+  /export:
     get:
       summary: Retrieves all owned streams in CSV format
       tags:

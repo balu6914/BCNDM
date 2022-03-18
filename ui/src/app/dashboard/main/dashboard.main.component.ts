@@ -99,22 +99,4 @@ fetchStreams(page: Page<Subscription>) {
   onUnhoverRow(row) {
     this.map.mouseUnhoverMarker(row);
   }
-
-  downloadAllCsv() {
-    this.streamService.getAllStreamsCsv().subscribe(
-      data => {
-        const element = document.createElement('a');
-        const file = new Blob([data], {
-          type: 'text/plain'
-        });
-        element.href = URL.createObjectURL(file);
-        element.download = 'streams.csv';
-        element.click();
-      },
-      err => {
-        console.log(err);
-      }
-    );
-  }
-
 }
