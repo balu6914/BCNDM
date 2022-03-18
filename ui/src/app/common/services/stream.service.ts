@@ -38,4 +38,8 @@ export class StreamService {
     });
   }
 
+  getAllStreamsCsv() {
+    return this.http.get(`streams/export`, {responseType: 'text'});
+  }
+
 }
