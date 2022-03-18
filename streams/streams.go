@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"encoding/json"
 	"net/url"
 	"strconv"
 
@@ -68,6 +69,20 @@ type Stream struct {
 	External    bool                   `json:"external,omitempty"`
 	BQ          BigQuery               `json:"bq,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+var CsvHeader = []string{
+	"visibility",
+	"name",
+	"type",
+	"description",
+	"snippet",
+	"price",
+	"longitude",
+	"latitude",
+	"url",
+	"terms",
+	"metadata",
 }
 
 // Attributes returns auth.Resource attributes.
@@ -156,6 +171,34 @@ func (s *Stream) Validate() error {
 	}
 
 	return nil
+}
+
+// Csv returns the CSV record representation of the Stream
+func (s Stream) Csv() ([]string, error) {
+	lat := s.Location.Coordinates[0]
+	long := s.Location.Coordinates[1]
+	jsonMd := []byte{}
+	var err error
+	if s.Metadata != nil {
+		jsonMd, err = json.Marshal(s.Metadata)
+		if err != nil {
+			return []string{}, err
+		}
+	}
+	csvRec := []string{
+		string(s.Visibility),
+		s.Name,
+		s.Type,
+		s.Description,
+		s.Snippet,
+		strconv.FormatUint(s.Price, 10),
+		strconv.FormatFloat(long, 'f', -1, 64),
+		strconv.FormatFloat(lat, 'f', -1, 64),
+		s.URL,
+		s.Terms,
+		string(jsonMd),
+	}
+	return csvRec, nil
 }
 
 // StreamRepository specifies a stream persistence API.

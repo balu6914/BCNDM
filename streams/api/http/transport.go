@@ -85,10 +85,12 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 		opts...,
 	))
 
-	r.Get(
-		"/export",
-		kithttp.NewServer(exportStreamsEndpoint(svc), decodeExportStreamsRequest, encodeExportStreamsResponse, opts...),
-	)
+	r.Get("/export", kithttp.NewServer(
+		exportStreamsEndpoint(svc),
+		decodeExportStreamsRequest,
+		encodeExportStreamsResponse,
+		opts...,
+	))
 
 	r.GetFunc("/version", datapace.Version())
 
@@ -397,22 +399,10 @@ func encodeExportStreamsResponse(_ context.Context, w http.ResponseWriter, respo
 	}
 	csvWriter := csv.NewWriter(w)
 	csvRecs := [][]string{
-		{
-			"visibility",
-			"name",
-			"type",
-			"description",
-			"snippet",
-			"price",
-			"longitude",
-			"latitude",
-			"url",
-			"terms",
-			"metadata",
-		},
+		streams.CsvHeader,
 	}
 	for _, stream := range resp.streams {
-		csvRec, err := encodeExportStreamCsvRec(stream)
+		csvRec, err := stream.Csv()
 		if err != nil {
 			return err
 		}
