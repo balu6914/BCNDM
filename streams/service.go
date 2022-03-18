@@ -3,6 +3,7 @@ package streams
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -86,6 +87,9 @@ type Service interface {
 	// Removes the Stream identified with the provided id, that
 	// belongs to the user identified by the provided id.
 	RemoveStream(string, string) error
+
+	// ExportStreams returns all streams available to the specified owner
+	ExportStreams(string) ([]Stream, error)
 }
 
 type streamService struct {
@@ -266,4 +270,28 @@ func (ss streamService) ViewStream(id, owner string) (Stream, error) {
 
 func (ss streamService) RemoveStream(owner string, id string) error {
 	return ss.streams.Remove(owner, id)
+}
+
+func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
+	partners, err := ss.accessControl.Partners(owner)
+	if err != nil {
+		return []Stream{}, err
+	}
+	partners = append(partners, owner)
+	q := Query{
+		Name:       "",
+		Owner:      owner,
+		Partners:   partners,
+		StreamType: "",
+		Coords:     nil,
+		Page:       0,
+		Limit:      math.MaxUint64,
+		MinPrice:   nil,
+		MaxPrice:   nil,
+	}
+	p, err := ss.streams.Search(q)
+	if err != nil {
+		return p.Content, err
+	}
+	return p.Content, nil
 }

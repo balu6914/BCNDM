@@ -27,7 +27,7 @@ type Visibility string
 // http://docs.mongoengine.org/guide/querying.html#geo-queries
 type Location struct {
 	Type string `json:"type,omitempty"`
-	// Coordinates represent latitude and longitude. It's represented this
+	// Coordinates represent longitude and latitude. It's represented this
 	// way to match the way MongoDB represents geo data.
 	Coordinates [2]float64 `json:"coordinates,omitempty"`
 }
