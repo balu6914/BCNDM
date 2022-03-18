@@ -39,7 +39,7 @@ export class StreamService {
   }
 
   getAllStreamsCsv() {
-    return this.http.get(`${environment.API_STREAMS}`, {responseType: 'text/csv'});
+    return this.http.get(`${environment.API_STREAMS}`, {responseType: 'text'});
   }
 
 }

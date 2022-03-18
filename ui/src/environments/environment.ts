@@ -10,7 +10,7 @@ export const environment = {
   API_AUTH_POLICIES: '/auth/policies',
   API_ACCESS_CONTROL: '/access-control/access-requests',
   API_SUBSCRIPTIONS: '/subscriptions/subscriptions',
-  API_STREAMS: '/streams/streams',
+  API_STREAMS: '/streams',
   API_STREAMS_STREAMS: '/streams/streams',
   API_TOKENS: '/transactions/tokens',
   API_CONTRACTS: '/transactions/contracts',
