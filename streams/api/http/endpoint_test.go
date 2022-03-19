@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -22,10 +23,13 @@ import (
 )
 
 const (
-	validFilePath    = "../../../assets/test/validBulk.csv"
-	invalidFilePath  = "../../../assets/test/invalidBulk.csv"
-	conflictFilePath = "../../../assets/test/conflictBulk.csv"
-	urlLen           = 20
+	validFilePath        = "../../../assets/test/validBulk.csv"
+	invalidFilePath      = "../../../assets/test/invalidBulk.csv"
+	conflictFilePath     = "../../../assets/test/conflictBulk.csv"
+	validJsonFilePath    = "../../../assets/test/validBulk.json"
+	invalidJsonFilePath  = "../../../assets/test/invalidBulk.json"
+	conflictJsonFilePath = "../../../assets/test/conflictBulk.json"
+	urlLen               = 20
 )
 
 var (
@@ -119,7 +123,7 @@ func toJSON(data interface{}) string {
 func sendFile(fileName, targetURL string) (io.Reader, string) {
 	bodyBuff := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuff)
-	fileWriter, _ := bodyWriter.CreateFormFile("csv", fileName)
+	fileWriter, _ := bodyWriter.CreateFormFile("data", fileName)
 	f, _ := os.Open(fileName)
 	defer f.Close()
 
@@ -214,6 +218,9 @@ func TestAddBulkStreams(t *testing.T) {
 	valid, ct := sendFile(validFilePath, ts.URL)
 	invalid, ct1 := sendFile(invalidFilePath, ts.URL)
 	conflict, ct2 := sendFile(conflictFilePath, ts.URL)
+	validJson, ct3 := sendFile(validJsonFilePath, ts.URL)
+	invalidJson, ct4 := sendFile(invalidJsonFilePath, ts.URL)
+	conflictJson, ct5 := sendFile(conflictJsonFilePath, ts.URL)
 
 	cases := []struct {
 		desc        string
@@ -254,6 +261,27 @@ func TestAddBulkStreams(t *testing.T) {
 			desc:        "add a bulk of streams with conflicts",
 			req:         conflict,
 			contentType: ct2,
+			auth:        validKey,
+			status:      http.StatusConflict,
+		},
+		{
+			desc:        "add a valid bulk of streams in JSON format",
+			req:         validJson,
+			contentType: ct3,
+			auth:        validKey,
+			status:      http.StatusCreated,
+		},
+		{
+			desc:        "add an invalid bulk of streams in JSON format",
+			req:         invalidJson,
+			contentType: ct4,
+			auth:        validKey,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "add a conflicting bulk of streams in JSON format",
+			req:         conflictJson,
+			contentType: ct5,
 			auth:        validKey,
 			status:      http.StatusConflict,
 		},
@@ -660,5 +688,102 @@ func TestRemoveStream(t *testing.T) {
 		res, err := req.make()
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestExportStream(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+	total := uint64(2)
+	for i := uint64(0); i < total; i++ {
+		svc.AddStream(genStream())
+	}
+
+	cases := []struct {
+		desc   string
+		auth   string
+		status int
+		size   int
+		resp   [][]string
+	}{
+		{
+			desc:   "export streams",
+			auth:   validKey,
+			status: http.StatusOK,
+			size:   3,
+			resp: [][]string{
+				{
+					"visibility",
+					"name",
+					"type",
+					"description",
+					"snippet",
+					"price",
+					"longitude",
+					"latitude",
+					"url",
+					"terms",
+					"metadata",
+				},
+				{
+					"public",
+					"name",
+					"type",
+					"description",
+					"{\n\t\t\t\"sensor_id\": \"8746\",\n\t\t\t\"sensor_type\": \"DHT22\",\n\t\t\t\"location\": \"4409\",\n\t\t\t\"lat\": \"50.873\",\n\t\t\t\"lon\": \"4.698\",\n\t\t\t\"timestamp\": \"2018-03-09T00:02:09\",\n\t\t\t\"temperature\": \"5.20\"\n\t\t}",
+					"123",
+					"50",
+					"50",
+					"https://myStream290.com",
+					"https://myStream290.com",
+					"",
+				},
+				{
+					"public",
+					"name",
+					"type",
+					"description",
+					"{\n\t\t\t\"sensor_id\": \"8746\",\n\t\t\t\"sensor_type\": \"DHT22\",\n\t\t\t\"location\": \"4409\",\n\t\t\t\"lat\": \"50.873\",\n\t\t\t\"lon\": \"4.698\",\n\t\t\t\"timestamp\": \"2018-03-09T00:02:09\",\n\t\t\t\"temperature\": \"5.20\"\n\t\t}",
+					"123",
+					"50",
+					"50",
+					"https://myStream291.com",
+					"https://myStream291.com",
+					"",
+				},
+			},
+		},
+		{
+			desc:   "export streams with no auth key",
+			auth:   "",
+			status: http.StatusForbidden,
+			size:   0,
+			resp:   [][]string{},
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/export", ts.URL),
+			token:  tc.auth,
+		}
+		r, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		defer r.Body.Close()
+		// Unauthorized requests should not be processed.
+		if tc.auth != validKey {
+			assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
+			continue
+		}
+		var actualResp [][]string
+		actualResp, err = csv.NewReader(r.Body).ReadAll()
+
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.size, len(actualResp))
+		assert.Equal(t, tc.resp, actualResp)
+		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
 	}
 }

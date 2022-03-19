@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"encoding/json"
 	"net/url"
 	"strconv"
 
@@ -27,7 +28,7 @@ type Visibility string
 // http://docs.mongoengine.org/guide/querying.html#geo-queries
 type Location struct {
 	Type string `json:"type,omitempty"`
-	// Coordinates represent latitude and longitude. It's represented this
+	// Coordinates represent longitude and latitude. It's represented this
 	// way to match the way MongoDB represents geo data.
 	Coordinates [2]float64 `json:"coordinates,omitempty"`
 }
@@ -68,6 +69,20 @@ type Stream struct {
 	External    bool                   `json:"external,omitempty"`
 	BQ          BigQuery               `json:"bq,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+var CsvHeader = []string{
+	"visibility",
+	"name",
+	"type",
+	"description",
+	"snippet",
+	"price",
+	"longitude",
+	"latitude",
+	"url",
+	"terms",
+	"metadata",
 }
 
 // Attributes returns auth.Resource attributes.
@@ -156,6 +171,76 @@ func (s *Stream) Validate() error {
 	}
 
 	return nil
+}
+
+// Csv returns the CSV record representation of the Stream
+func (s Stream) Csv() ([]string, error) {
+	lat := s.Location.Coordinates[0]
+	long := s.Location.Coordinates[1]
+	jsonMd := []byte{}
+	var err error
+	if s.Metadata != nil {
+		jsonMd, err = json.Marshal(s.Metadata)
+		if err != nil {
+			return []string{}, err
+		}
+	}
+	csvRec := []string{
+		string(s.Visibility),
+		s.Name,
+		s.Type,
+		s.Description,
+		s.Snippet,
+		strconv.FormatUint(s.Price, 10),
+		strconv.FormatFloat(long, 'f', -1, 64),
+		strconv.FormatFloat(lat, 'f', -1, 64),
+		s.URL,
+		s.Terms,
+		string(jsonMd),
+	}
+	return csvRec, nil
+}
+
+// NewFromCsv constructs a new Stream from the CSV record and the column position map
+func NewFromCsv(record []string, keys map[string]int) (*Stream, error) {
+	price, err := strconv.ParseUint(record[keys["price"]], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	longitude, err := strconv.ParseFloat(record[keys["longitude"]], 64)
+	if err != nil {
+		return nil, err
+	}
+
+	latitude, err := strconv.ParseFloat(record[keys["latitude"]], 64)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert Metadata from string to bson.M if present
+	data := []byte(record[keys["metadata"]])
+	metadata := bson.M{}
+	if len(data) != 0 {
+		json.Unmarshal(data, &metadata)
+	}
+
+	stream := &Stream{
+		Visibility:  Visibility(record[keys["visibility"]]),
+		Name:        record[keys["name"]],
+		Type:        record[keys["type"]],
+		Description: record[keys["description"]],
+		Snippet:     record[keys["snippet"]],
+		Price:       price,
+		Location: Location{
+			Type:        "Point",
+			Coordinates: [2]float64{longitude, latitude},
+		},
+		URL:      record[keys["url"]],
+		Terms:    record[keys["terms"]],
+		Metadata: metadata,
+	}
+	return stream, nil
 }
 
 // StreamRepository specifies a stream persistence API.

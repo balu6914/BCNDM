@@ -5,17 +5,15 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"io"
+	"mime/multipart"
 	"net/http"
-	"strconv"
 	"strings"
-
-	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/go-zoo/bone"
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/datapace/datapace"
 	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
+	kithttp "github.com/go-kit/kit/transport/http"
+	"github.com/go-zoo/bone"
 
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
@@ -85,6 +83,13 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 		opts...,
 	))
 
+	r.Get("/export", kithttp.NewServer(
+		exportStreamsEndpoint(svc),
+		decodeExportStreamsRequest,
+		encodeExportStreamsResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", datapace.Version())
 
 	return r
@@ -146,17 +151,85 @@ func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, er
 	return req, nil
 }
 
+func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	if !strings.Contains(r.Header.Get("Content-Type"), contentTypeFormData) {
+		return nil, streams.ErrWrongType
+	}
+
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.CreateBulk),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
+	}
+
+	file, fileHeader, err := r.FormFile("data")
+	if err != nil {
+		return nil, streams.ErrMalformedData
+	}
+	fileName := fileHeader.Filename
+
+	var s []streams.Stream
+	if strings.HasSuffix(fileName, ".csv") {
+		s, err = decodeCsvStreams(file, owner)
+	} else if strings.HasSuffix(fileName, ".json") {
+		s, err = decodeJsonStreams(file, owner)
+	} else {
+		err = streams.ErrMalformedData
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if len(s) < 1 {
+		return nil, streams.ErrMalformedData
+	}
+
+	req := addBulkStreamsReq{
+		owner:   owner,
+		Streams: s,
+	}
+
+	return req, nil
+}
+
+func decodeCsvStreams(file multipart.File, owner string) ([]streams.Stream, error) {
+	csvFile, err := readCsvFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	// Keys represent a map with csv field names as keys and field col
+	// numbers as values.
+	keys := make(map[string]int)
+	for idx, attr := range csvFile.columns {
+		keys[attr] = idx
+	}
+
+	s := []streams.Stream{}
+	for _, record := range csvFile.records {
+		stream, err := streams.NewFromCsv(record, keys)
+		if err != nil {
+			return nil, err
+		}
+		stream.Owner = owner
+		if stream.Location.Type == "" {
+			stream.Location.Type = defLocType
+		}
+		s = append(s, *stream)
+	}
+	return s, nil
+}
+
 type csvFile struct {
 	columns []string
 	records [][]string
 }
 
-func readCsvFile(r *http.Request) (*csvFile, error) {
-	file, _, err := r.FormFile("data")
-	if err != nil {
-		return nil, streams.ErrMalformedData
-	}
-
+func readCsvFile(file multipart.File) (*csvFile, error) {
 	reader := csv.NewReader(file)
 
 	content, err := reader.ReadAll()
@@ -182,99 +255,19 @@ func readCsvFile(r *http.Request) (*csvFile, error) {
 	return ret, nil
 }
 
-func parseStream(record []string, keys map[string]int) (*streams.Stream, error) {
-	price, err := strconv.ParseUint(record[keys["price"]], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	longitude, err := strconv.ParseFloat(record[keys["longitude"]], 64)
-	if err != nil {
-		return nil, err
-	}
-
-	latitude, err := strconv.ParseFloat(record[keys["latitude"]], 64)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert Metadata from string to bson.M if present
-	data := []byte(record[keys["metadata"]])
-	metadata := bson.M{}
-	if len(data) != 0 {
-		json.Unmarshal(data, &metadata)
-	}
-
-	ret := &streams.Stream{
-		Visibility:  streams.Visibility(record[keys["visibility"]]),
-		Name:        record[keys["name"]],
-		Type:        record[keys["type"]],
-		Description: record[keys["description"]],
-		Snippet:     record[keys["snippet"]],
-		Price:       price,
-		Location: streams.Location{
-			Type:        "Point",
-			Coordinates: [2]float64{longitude, latitude},
-		},
-		URL:      record[keys["url"]],
-		Terms:    record[keys["terms"]],
-		Metadata: metadata,
-	}
-	return ret, nil
-}
-
-func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	if !strings.Contains(r.Header.Get("Content-Type"), fileContentType) {
-		return nil, streams.ErrWrongType
-	}
-
-	ar := &authproto.AuthRequest{
-		Action: int64(auth.CreateBulk),
-		Token:  r.Header.Get("Authorization"),
-		Type:   streamType,
-	}
-	owner, err := authService.Authorize(ar)
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := readCsvFile(r)
-	if err != nil {
-		return nil, err
-	}
-
-	// Keys represent a map with csv field names as keys and field col
-	// numbers as values.
-	keys := make(map[string]int)
-	for idx, attr := range file.columns {
-		keys[attr] = idx
-	}
-
-	s := []streams.Stream{}
-	for _, record := range file.records {
-		stream, err := parseStream(record, keys)
-		if err != nil {
-			return nil, err
+func decodeJsonStreams(file multipart.File, owner string) ([]streams.Stream, error) {
+	ss := []streams.Stream{}
+	err := json.NewDecoder(file).Decode(&ss)
+	// take care on the stream.Owner and stream.Location.Type
+	results := []streams.Stream{}
+	for _, s := range ss {
+		s.Owner = owner
+		if s.Location.Type == "" {
+			s.Location.Type = defLocType
 		}
-
-		stream.Owner = owner
-
-		if stream.Location.Type == "" {
-			stream.Location.Type = defLocType
-		}
-		s = append(s, *stream)
+		results = append(results, s)
 	}
-
-	if len(s) < 1 {
-		return nil, streams.ErrMalformedData
-	}
-
-	req := addBulkStreamsReq{
-		owner:   owner,
-		Streams: s,
-	}
-
-	return req, nil
+	return results, err
 }
 
 func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -348,8 +341,22 @@ func decodeSearchStreamsRequest(_ context.Context, r *http.Request) (interface{}
 	return req, nil
 }
 
+func decodeExportStreamsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
+	}
+	req := exportStreamsReq{owner: owner}
+	return req, nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", contentTypeJson)
 
 	if ar, ok := response.(apiRes); ok {
 		for k, v := range ar.headers() {
@@ -366,8 +373,32 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
+func encodeExportStreamsResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", contentTypeCsv)
+	resp := response.(exportStreamsResp)
+	for k, v := range resp.headers() {
+		w.Header().Set(k, v)
+	}
+	w.WriteHeader(resp.code())
+	if resp.empty() {
+		return nil
+	}
+	csvWriter := csv.NewWriter(w)
+	csvRecs := [][]string{
+		streams.CsvHeader,
+	}
+	for _, stream := range resp.streams {
+		csvRec, err := stream.Csv()
+		if err != nil {
+			return err
+		}
+		csvRecs = append(csvRecs, csvRec)
+	}
+	return csvWriter.WriteAll(csvRecs)
+}
+
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", contentTypeJson)
 	switch errVal := err.(type) {
 	case errors.Error:
 		switch {

@@ -239,6 +239,26 @@ paths:
           description: Missing or invalid access token provided.
         500:
           $ref: "#/responses/ServiceError"
+  /export:
+    get:
+      summary: Retrieves all owned streams in CSV format
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/Streams'
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Stream does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
 
 parameters:
   Authorization:
@@ -344,6 +364,12 @@ definitions:
       - type
       - description
       - price
+
+  Streams:
+    description: Array of streams.
+    type: array
+    items:
+      $ref: '#/definitions/StreamRes'
 
   Page:
     type: object
