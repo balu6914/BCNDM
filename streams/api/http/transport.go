@@ -173,11 +173,12 @@ func decodeAddBulkStreamsRequest(_ context.Context, r *http.Request) (interface{
 	fileName := fileHeader.Filename
 
 	var s []streams.Stream
-	if strings.HasSuffix(fileName, ".csv") {
+	switch {
+	case strings.HasSuffix(fileName, ".csv"):
 		s, err = decodeCsvStreams(file, owner)
-	} else if strings.HasSuffix(fileName, ".json") {
+	case strings.HasSuffix(fileName, ".json"):
 		s, err = decodeJsonStreams(file, owner)
-	} else {
+	default:
 		err = streams.ErrMalformedData
 	}
 	if err != nil {
