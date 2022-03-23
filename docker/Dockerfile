@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine AS builder
+FROM golang:1.15-alpine AS builder
 ARG SVC_NAME
 WORKDIR /go/src/github.com/datapace/datapace
 COPY . .
