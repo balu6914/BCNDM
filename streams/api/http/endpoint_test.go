@@ -696,6 +696,7 @@ func TestExportStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 	total := uint64(2)
+	counter = 0
 	for i := uint64(0); i < total; i++ {
 		svc.AddStream(genStream())
 	}
@@ -735,8 +736,8 @@ func TestExportStream(t *testing.T) {
 					"123",
 					"50",
 					"50",
-					"https://myStream290.com",
-					"https://myStream290.com",
+					"https://myStream1.com",
+					"https://myStream1.com",
 					"",
 				},
 				{
@@ -748,8 +749,8 @@ func TestExportStream(t *testing.T) {
 					"123",
 					"50",
 					"50",
-					"https://myStream291.com",
-					"https://myStream291.com",
+					"https://myStream2.com",
+					"https://myStream2.com",
 					"",
 				},
 			},
