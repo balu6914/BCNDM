@@ -45,6 +45,10 @@ type Service interface {
 
 	// RevokeAccessRequest updates status of access request to revoked.
 	RevokeAccessRequest(string, string) error
+
+	// GrantAccess combines both request access and approve it in a single call.
+	// Returns the access request id to revoke later, if needed.
+	GrantAccess(string, string) (string, error)
 }
 
 var _ Service = (*accessControlService)(nil)
@@ -169,4 +173,15 @@ func (acs accessControlService) RevokeAccessRequest(key, id string) error {
 	}
 
 	return acs.repo.Revoke(uid, id)
+}
+
+func (acs accessControlService) GrantAccess(key, dstUserId string) (string, error) {
+	srcUserId, err := acs.auth.Identify(key)
+	if err != nil {
+		return "", ErrUnauthorizedAccess
+	}
+	if err := acs.ledger.GrantAccess(srcUserId, dstUserId); err != nil {
+		return "", err
+	}
+	return acs.repo.GrantAccess(srcUserId, dstUserId)
 }

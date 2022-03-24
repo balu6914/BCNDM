@@ -88,3 +88,12 @@ func (ms *metricsMiddleware) RevokeAccessRequest(key, id string) error {
 
 	return ms.svc.RevokeAccessRequest(key, id)
 }
+
+func (ms *metricsMiddleware) GrantAccess(key string, dstUserId string) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "grant_access").Add(1)
+		ms.latency.With("method", "grant_access").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.GrantAccess(key, dstUserId)
+}

@@ -59,6 +59,13 @@ func MakeHandler(svc access.Service) http.Handler {
 		opts...,
 	))
 
+	r.Put("/access/grant/:uid", kithttp.NewServer(
+		grantAccessEndpoint(svc),
+		decodeGrantRequest,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", datapace.Version())
 	r.Handle("/metrics", promhttp.Handler())
 
@@ -114,6 +121,14 @@ func decodeListAccessRequests(_ context.Context, r *http.Request) (interface{}, 
 		state: state,
 	}
 
+	return req, nil
+}
+
+func decodeGrantRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	req := grantAccessReq{
+		key:        r.Header.Get("Authorization"),
+		dstUserIid: bone.GetValue(r, "uid"),
+	}
 	return req, nil
 }
 

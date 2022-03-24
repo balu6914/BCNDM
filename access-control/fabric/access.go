@@ -146,3 +146,10 @@ func (arl accessRequestLedger) Revoke(revoker, sender string) error {
 
 	return nil
 }
+
+func (arl accessRequestLedger) GrantAccess(srcUserId string, dstUserId string) error {
+	if err := arl.RequestAccess(dstUserId, srcUserId); err != nil {
+		return err
+	}
+	return arl.Approve(srcUserId, dstUserId)
+}

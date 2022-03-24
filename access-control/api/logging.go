@@ -110,3 +110,16 @@ func (lm *loggingMiddleware) RevokeAccessRequest(key, id string) (err error) {
 
 	return lm.svc.RevokeAccessRequest(key, id)
 }
+
+func (lm *loggingMiddleware) GrantAccess(key string, dstUserId string) (accReqId string, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method GrantAccess for key %s and dstUserId %s and took %s to complete", key, dstUserId, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.GrantAccess(key, dstUserId)
+}

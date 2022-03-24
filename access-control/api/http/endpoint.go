@@ -115,3 +115,20 @@ func listReceivedRequestsEndpoint(svc access.Service) endpoint.Endpoint {
 		return res, nil
 	}
 }
+
+func grantAccessEndpoint(svc access.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(grantAccessReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		id, err := svc.GrantAccess(req.key, req.dstUserIid)
+		if err != nil {
+			return nil, err
+		}
+		res := grantAccessResp{
+			id: id,
+		}
+		return res, nil
+	}
+}
