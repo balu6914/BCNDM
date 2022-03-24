@@ -135,7 +135,7 @@ paths:
   /access/grant/{uid}:
     put:
       summary: Grants the access to the user specified in the payload.
-      description: Changes pending access request state to approved.
+      description: Creates a new pending access request and changes its state to approved in a single request.
       tags:
         - access-grant
       parameters:
