@@ -295,7 +295,7 @@ func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
 		StreamType: "",
 		Coords:     nil,
 		Page:       0,
-		Limit:      math.MaxUint64,
+		Limit:      math.MaxInt32,
 		MinPrice:   nil,
 		MaxPrice:   nil,
 	}
