@@ -706,31 +706,30 @@ func TestExportStream(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		auth   string
-		status int
-		size   int
-		resp   [][]string
+		desc           string
+		auth           string
+		status         int
+		respCsvHeader  []string
+		respCsvRecords [][]string
 	}{
 		{
 			desc:   "export streams",
 			auth:   validKey,
 			status: http.StatusOK,
-			size:   3,
-			resp: [][]string{
-				{
-					"visibility",
-					"name",
-					"type",
-					"description",
-					"snippet",
-					"price",
-					"longitude",
-					"latitude",
-					"url",
-					"terms",
-					"metadata",
-				},
+			respCsvHeader: []string{
+				"visibility",
+				"name",
+				"type",
+				"description",
+				"snippet",
+				"price",
+				"longitude",
+				"latitude",
+				"url",
+				"terms",
+				"metadata",
+			},
+			respCsvRecords: [][]string{
 				{
 					"public",
 					"name",
@@ -763,8 +762,6 @@ func TestExportStream(t *testing.T) {
 			desc:   "export streams with no auth key",
 			auth:   "",
 			status: http.StatusForbidden,
-			size:   0,
-			resp:   [][]string{},
 		},
 	}
 
@@ -785,10 +782,27 @@ func TestExportStream(t *testing.T) {
 		}
 		var actualResp [][]string
 		actualResp, err = csv.NewReader(r.Body).ReadAll()
-
 		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
-		assert.Equal(t, tc.size, len(actualResp))
-		assert.Equal(t, tc.resp, actualResp)
+
 		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
+
+		if r.StatusCode == http.StatusOK {
+			assert.Equal(t, tc.respCsvHeader, actualResp[0])
+			for _, expectedRec := range tc.respCsvRecords {
+				found := false
+				for _, actualRec := range actualResp[1:] {
+					if len(expectedRec) != len(actualRec) {
+						continue
+					}
+					for i := 0; i < len(expectedRec); i++ {
+						if expectedRec[i] != actualRec[i] {
+							break
+						}
+					}
+					found = true
+				}
+				assert.True(t, found, fmt.Sprintf("%s: expected CSV record %s was not found in the response", tc.desc, expectedRec))
+			}
+		}
 	}
 }
