@@ -340,6 +340,126 @@ func TestSearchShared(t *testing.T) {
 	}
 }
 
+func TestSearchByMetadata(t *testing.T) {
+
+	db.DB(testDB).DropDatabase()
+	repo := mongo.New(db)
+
+	all := []streams.Stream{}
+	s0 := stream()
+	s0.Visibility = streams.Public
+	id, err := repo.Save(s0)
+	require.Nil(t, err, "Repo should save streams.")
+	s0.ID = id
+	all = append(all, s0)
+
+	s1 := stream()
+	s1.Owner = s0.Owner
+	s1.Visibility = streams.Public
+	s1.Name = "different name"
+	s1.Metadata = map[string]interface{}{
+		"foo": 42,
+	}
+	s1.ID, err = repo.Save(s1)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
+	all = append(all, s1)
+
+	s2 := stream()
+	s2.Owner = s0.Owner
+	s2.Visibility = streams.Public
+	s2.Name = "different name 2"
+	s2.Metadata = bson.M{
+		"nested": bson.M{
+			"field1": "value1",
+			"field2": bson.M{
+				"field3": "value2",
+			},
+		},
+	}
+	s2.ID, err = repo.Save(s2)
+	require.Nil(t, err, fmt.Sprintf("received unexpected error: %s", err))
+	all = append(all, s2)
+
+	cases := []struct {
+		desc    string
+		query   streams.Query
+		page    streams.Page
+		content []streams.Stream
+	}{
+		{
+			desc: "search streams by present metadata",
+			query: streams.Query{
+				Limit: limit,
+				Owner: s0.Owner,
+				Partners: []string{
+					s0.Owner,
+				},
+				Metadata: map[string]interface{}{
+					"foo": 42,
+				},
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 1,
+				Content: []streams.Stream{
+					s1,
+				},
+			},
+		},
+		{
+			desc: "search streams by empty metadata",
+			query: streams.Query{
+				Limit: limit,
+				Owner: s0.Owner,
+				Partners: []string{
+					s0.Owner,
+				},
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 3,
+				Content: []streams.Stream{
+					s0,
+					s1,
+					s2,
+				},
+			},
+		},
+		{
+			desc: "search streams by nested metadata",
+			query: streams.Query{
+				Limit: limit,
+				Owner: s0.Owner,
+				Partners: []string{
+					s0.Owner,
+				},
+				Metadata: map[string]interface{}{
+					"nested": map[string]interface{}{
+						"field2": map[string]interface{}{
+							"field3": "value2",
+						},
+					},
+				},
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 1,
+				Content: []streams.Stream{
+					s2,
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		res, err := repo.Search(tc.query)
+		assert.Nil(t, err, "There should be no error searching streams")
+		assert.Equal(t, tc.page.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.page.Limit, res.Limit))
+		assert.Equal(t, tc.page.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.page.Total, res.Total))
+		assert.ElementsMatch(t, tc.page.Content, res.Content, tc.desc)
+	}
+}
+
 func TestSave(t *testing.T) {
 	db.DB(testDB).DropDatabase()
 	db.ResetIndexCache()

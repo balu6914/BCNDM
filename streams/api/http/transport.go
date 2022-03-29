@@ -90,6 +90,13 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 		opts...,
 	))
 
+	r.Post("/search", kithttp.NewServer(
+		searchStreamsEndpoint(svc),
+		decodeSearchStreamsJsonRequest,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", datapace.Version())
 
 	return r
@@ -353,6 +360,27 @@ func decodeExportStreamsRequest(_ context.Context, r *http.Request) (interface{}
 		return nil, err
 	}
 	req := exportStreamsReq{owner: owner}
+	return req, nil
+}
+
+func decodeSearchStreamsJsonRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.List),
+		Token:  r.Header.Get("Authorization"),
+		Type:   streamType,
+	}
+	owner, err := authService.Authorize(ar)
+	if err != nil {
+		return nil, err
+	}
+
+	req := newSearchStreamReq()
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+	req.user = owner
+
 	return req, nil
 }
 

@@ -259,6 +259,30 @@ paths:
           description: Stream does not exist.
         500:
           $ref: "#/responses/ServiceError"
+  /search:
+    post:
+      summary: Retrieves streams by certain criteria
+      tags:
+        - streams
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: searchRequest
+          description: Search Request JSON
+          in: body
+          schema:
+            $ref: '#/definitions/SearchReq'
+          required: true
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/Page'
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
 
 parameters:
   Authorization:
@@ -405,3 +429,39 @@ definitions:
         type: array
         items:
           type: string
+
+  SearchReq:
+    type: object
+    description: Search streams request
+    properties:
+      name:
+        type: string
+        description: Stream name
+      owner:
+        type: string
+        description: Stream owner
+      type:
+        type: string
+        description: Stream type
+      coords:
+        type: array
+        items:
+          type: array
+          items:
+            type: number
+        description: Array of 4 coordinates (long/lat number pairs)
+      page:
+        type: integer
+        description: Results page start offset
+      limit:
+        type: integer
+        description: Results page size limit
+      minPrice:
+        type: number
+        description: min price
+      maxPrice:
+        type: number
+        description: max price
+      metadata:
+        type: object
+        description: Metadata constraint

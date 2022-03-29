@@ -792,3 +792,114 @@ func TestExportStream(t *testing.T) {
 		assert.Equal(t, tc.status, r.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, r.StatusCode))
 	}
 }
+
+func TestSearchStreamsByMetadata(t *testing.T) {
+
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	s0 := genStream()
+	s0.ID, _ = svc.AddStream(s0)
+	s1 := genStream()
+	s1.Metadata = map[string]interface{}{
+		"field1": "value1",
+	}
+	s1.ID, _ = svc.AddStream(s1)
+	s2 := genStream()
+	s2.Metadata = map[string]interface{}{
+		"field1": map[string]interface{}{
+			"field2": "value2",
+			"field3": map[string]interface{}{
+				"field4": 42.,
+			},
+		},
+	}
+	s2.ID, _ = svc.AddStream(s2)
+
+	cases := []struct {
+		desc   string
+		auth   string
+		req    string
+		status int
+		resp   streams.Page
+	}{
+		{
+			desc:   "Search streams w/o metadata constraints",
+			auth:   validKey,
+			req:    toJSON(map[string]interface{}{}),
+			status: http.StatusOK,
+			resp: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 3,
+				Content: []streams.Stream{
+					s0,
+					s1,
+					s2,
+				},
+			},
+		},
+		{
+			desc: "Search streams w/ nested metadata constraint",
+			auth: validKey,
+			req: toJSON(map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"field1": map[string]interface{}{
+						"field3": map[string]interface{}{
+							"field4": 42,
+						},
+					},
+				},
+			}),
+			status: http.StatusOK,
+			resp: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+				Content: []streams.Stream{
+					s2,
+				},
+			},
+		},
+		{
+			desc: "Search streams w/ metadata constraint",
+			auth: validKey,
+			req: toJSON(map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"field1": "value1",
+				},
+			}),
+			status: http.StatusOK,
+			resp: streams.Page{
+				Page:  0,
+				Limit: 20,
+				Total: 1,
+				Content: []streams.Stream{
+					s1,
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodPost,
+			url:    fmt.Sprintf("%s/search", ts.URL),
+			token:  tc.auth,
+			body:   strings.NewReader(tc.req),
+		}
+		resp, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, resp.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, resp.StatusCode))
+
+		var result streams.Page
+		err = json.NewDecoder(resp.Body).Decode(&result)
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.resp.Limit, result.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.resp.Limit, result.Limit))
+		assert.Equal(t, tc.resp.Total, result.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.resp.Total, result.Total))
+
+		assert.ElementsMatch(t, tc.resp.Content, result.Content)
+	}
+}

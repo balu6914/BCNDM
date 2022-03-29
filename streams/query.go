@@ -31,11 +31,18 @@ const (
 // the first "-" will be ignored (i.e. name=--myName wil perform name=-myName search).
 // Range fields ar treated as a RANGE, not EQUALS so they are of kind "min" or "max".
 type Query struct {
-	Page       uint64
-	Limit      uint64
-	Coords     [][]float64
-	Partners   []string
-	Shared     map[string]bool
+	Page     uint64
+	Limit    uint64
+	Coords   [][]float64
+	Partners []string
+
+	// Shared Stream Id set to include into the query
+	Shared map[string]bool
+
+	// Metadata is raw metadata to match. Multiple values should be treated as having AND relation.
+	// Exact value match is supported only (no negation, no regex, etc).
+	Metadata map[string]interface{}
+
 	Owner      string  `kind:"id" db:"owner"`
 	Name       string  `kind:"plain" db:"name"`
 	StreamType string  `kind:"plain" db:"type"`
@@ -114,13 +121,8 @@ func GenQuery(q *Query) *bson.M {
 	v := reflect.ValueOf(q).Elem()
 	t := reflect.TypeOf(*q)
 	query := genQuery(t, v)
-	if q.Coords != nil {
-		query["location"] = bson.M{
-			"$within": bson.M{
-				"$polygon": q.Coords,
-			},
-		}
-	}
+	addLocationClause(&query, q.Coords)
+	addMetadataClause(&query, "metadata", q.Metadata)
 
 	var oids []bson.ObjectId
 	for streamId := range q.Shared {
@@ -179,4 +181,26 @@ func GenQuery(q *Query) *bson.M {
 	}
 
 	return &query
+}
+
+func addLocationClause(queryRef *bson.M, coords [][]float64) {
+	if coords != nil {
+		(*queryRef)["location"] = bson.M{
+			"$within": bson.M{
+				"$polygon": coords,
+			},
+		}
+	}
+}
+
+func addMetadataClause(queryRef *bson.M, parentPath string, md map[string]interface{}) {
+	for k, v := range md {
+		path := parentPath + "." + k
+		mv, vIsMap := v.(map[string]interface{})
+		if vIsMap {
+			addMetadataClause(queryRef, path, mv)
+			continue
+		}
+		(*queryRef)[path] = v
+	}
 }

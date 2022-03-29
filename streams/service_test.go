@@ -422,6 +422,136 @@ func TestSearchStreamsShared(t *testing.T) {
 	}
 }
 
+func TestSearchStreamsByMetadata(t *testing.T) {
+	svc := newService()
+	stream0 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream0",
+		Visibility: "protected",
+		URL:        "url0",
+		Metadata: map[string]interface{}{
+			"Ends": "2022-05-31T09:54:15Z",
+		},
+	}
+	_, _ = svc.AddStream(stream0)
+	stream1 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream1",
+		Visibility: "protected",
+		URL:        "url1",
+	}
+	_, _ = svc.AddStream(stream1)
+	stream2 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream2",
+		Visibility: "protected",
+		URL:        "url2",
+		Metadata: map[string]interface{}{
+			"Starts": "2022-05-30T09:54:15Z",
+			"Ends":   "2022-05-31T09:54:15Z",
+		},
+	}
+	_, _ = svc.AddStream(stream2)
+	cases := []struct {
+		desc        string
+		userId      string
+		query       streams.Query
+		resultsPage streams.Page
+	}{
+		{
+			desc:   "Search streams w/o metadata constraint",
+			userId: "user0",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "user0",
+			},
+			resultsPage: streams.Page{
+				Page:  0,
+				Limit: 1_000_000,
+				Total: 3,
+				Content: []streams.Stream{
+					stream0,
+					stream1,
+					stream2,
+				},
+			},
+		},
+		{
+			desc:   "Search streams w/ metadata constraint",
+			userId: "user0",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "user0",
+				Metadata: map[string]interface{}{
+					"Ends": "2022-05-31T09:54:15Z",
+				},
+			},
+			resultsPage: streams.Page{
+				Page:  0,
+				Limit: 1_000_000,
+				Total: 2,
+				Content: []streams.Stream{
+					stream0,
+					stream2,
+				},
+			},
+		},
+		{
+			desc:   "Search streams w/ non equal metadata constraint",
+			userId: "user0",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "user0",
+				Metadata: map[string]interface{}{
+					"foo": "bar",
+				},
+			},
+			resultsPage: streams.Page{
+				Page:    0,
+				Limit:   1_000_000,
+				Total:   0,
+				Content: []streams.Stream{},
+			},
+		},
+		{
+			desc:   "Search streams w/ multiple metadata constraints",
+			userId: "user0",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "user0",
+				Metadata: map[string]interface{}{
+					"Starts": "2022-05-30T09:54:15Z",
+					"Ends":   "2022-05-31T09:54:15Z",
+				},
+			},
+			resultsPage: streams.Page{
+				Page:  0,
+				Limit: 1_000_000,
+				Total: 1,
+				Content: []streams.Stream{
+					stream2,
+				},
+			},
+		},
+	}
+	for _, tc := range cases {
+		res, err := svc.SearchStreams(tc.userId, tc.query)
+		assert.Nil(t, err, "There should be no error searching streams")
+		assert.Equal(t, tc.resultsPage.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.resultsPage.Limit, res.Limit))
+		assert.Equal(t, tc.resultsPage.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.resultsPage.Total, res.Total))
+		for _, expectedStream := range tc.resultsPage.Content {
+			found := false
+			for _, s := range res.Content {
+				if expectedStream.ID != s.ID {
+					continue
+				}
+				found = true
+			}
+			assert.True(t, found)
+		}
+	}
+}
+
 func TestUpdateStream(t *testing.T) {
 	s := stream()
 	svc := newService()
