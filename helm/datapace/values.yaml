@@ -27,6 +27,7 @@ defaults:
 
 dproxy:
   suffix: dproxy
+  encKey: W0JD00gEAGUDV6UI0+16iVRx8p+PQx79ahGlBwhWz/g=
   image:
     name: dproxy
   service:
