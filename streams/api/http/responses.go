@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	contentType     = "application/json"
-	fileContentType = "multipart/form-data"
+	contentTypeJson     = "application/json"
+	contentTypeFormData = "multipart/form-data"
+	contentTypeCsv      = "text/csv"
 )
 
 type apiRes interface {
@@ -123,6 +124,22 @@ func (res removeStreamRes) headers() map[string]string {
 
 func (res removeStreamRes) empty() bool {
 	return true
+}
+
+type exportStreamsResp struct {
+	streams []streams.Stream
+}
+
+func (res exportStreamsResp) code() int {
+	return http.StatusOK
+}
+
+func (res exportStreamsResp) headers() map[string]string {
+	return map[string]string{"Content-Type": contentTypeCsv}
+}
+
+func (res exportStreamsResp) empty() bool {
+	return false
 }
 
 type errorRes struct {

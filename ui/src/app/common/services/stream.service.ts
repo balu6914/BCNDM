@@ -13,29 +13,33 @@ export class StreamService {
   ) { }
 
   getStream(id: string): Observable<Stream> {
-    return this.http.get<Stream>(`${environment.API_STREAMS}/${id}`);
+    return this.http.get<Stream>(`${environment.API_STREAMS_STREAMS}/${id}`);
   }
 
   addStream(data) {
-    return this.http.post(`${environment.API_STREAMS}`, data);
+    return this.http.post(`${environment.API_STREAMS_STREAMS}`, data);
   }
 
   addStreamBulk(csv) {
-    return this.http.post(`${environment.API_STREAMS}/bulk`, csv);
+    return this.http.post(`${environment.API_STREAMS_STREAMS}/bulk`, csv);
   }
 
   removeStream(id: string) {
-    return this.http.delete(`${environment.API_STREAMS}/${id}`);
+    return this.http.delete(`${environment.API_STREAMS_STREAMS}/${id}`);
   }
 
   updateStream(id: string, data) {
-    return this.http.put(`${environment.API_STREAMS}/${id}`, data);
+    return this.http.put(`${environment.API_STREAMS_STREAMS}/${id}`, data);
   }
 
   searchStreams(q: Query): Observable<Page<Stream>> {
-    return this.http.get<Page<Stream>>(`${environment.API_STREAMS}`, {
+    return this.http.get<Page<Stream>>(`${environment.API_STREAMS_STREAMS}`, {
       params: q.generateQuery()
     });
+  }
+
+  getAllStreamsCsv() {
+    return this.http.get(`${environment.API_STREAMS}`, {responseType: 'text'});
   }
 
 }

@@ -113,3 +113,15 @@ func (lm *loggingMiddleware) RemoveStream(key string, id string) (err error) {
 
 	return lm.svc.RemoveStream(key, id)
 }
+
+func (lm *loggingMiddleware) ExportStreams(owner string) (results []streams.Stream, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method export_streams for took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+	return lm.svc.ExportStreams(owner)
+}

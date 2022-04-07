@@ -99,5 +99,4 @@ fetchStreams(page: Page<Subscription>) {
   onUnhoverRow(row) {
     this.map.mouseUnhoverMarker(row);
   }
-
 }
