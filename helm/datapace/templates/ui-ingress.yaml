@@ -10,6 +10,10 @@ metadata:
   name: "{{ (printf "%s-%s" $fullName .Values.ui.suffix) }}"
   labels:
     {{- include "datapace.labels" . | nindent 4 }}
+  {{- with .Values.dproxy.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
 {{- if .Values.ui.ingress.tls }}
   tls:

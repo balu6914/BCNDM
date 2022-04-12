@@ -36,11 +36,14 @@ dproxy:
       http: 80
   ingress:
     enabled: true
-    annotations: {}
+    annotations: {kubernetes.io/ingress.class: nginx}
     hosts:
       - host: dproxy.datapace.local
         paths: ["/"]
-    tls: []
+    tls:
+      - hosts:
+        - dproxy.datapace.local
+        secretName: dproxy.datapace.local
 
 auth:
   operations:
@@ -132,7 +135,7 @@ ui:
     port: 3000
   ingress:
     enabled: true
-    annotations: {}
+    annotations: {kubernetes.io/ingress.class: nginx}
     host: ui.datapace.local
     tls:
       - hosts:
@@ -145,6 +148,10 @@ postgresql:
 
 mongodb:
   nameOverride: datapace-mongodb
+  architecture: replicaset
+  replicaCount: 3
+  persistence:
+    enabled: true
   usePassword: false
   metrics:
     enabled: true
@@ -152,7 +159,7 @@ mongodb:
     service:
       port: 9216
     serviceMonitor:
-      enabled: true
+      enabled: false
 
 bc:
   ip: 10.0.0.1
