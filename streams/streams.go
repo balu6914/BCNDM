@@ -201,6 +201,48 @@ func (s Stream) Csv() ([]string, error) {
 	return csvRec, nil
 }
 
+// NewFromCsv constructs a new Stream from the CSV record and the column position map
+func NewFromCsv(record []string, keys map[string]int) (*Stream, error) {
+	price, err := strconv.ParseUint(record[keys["price"]], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	longitude, err := strconv.ParseFloat(record[keys["longitude"]], 64)
+	if err != nil {
+		return nil, err
+	}
+
+	latitude, err := strconv.ParseFloat(record[keys["latitude"]], 64)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert Metadata from string to bson.M if present
+	data := []byte(record[keys["metadata"]])
+	metadata := bson.M{}
+	if len(data) != 0 {
+		json.Unmarshal(data, &metadata)
+	}
+
+	stream := &Stream{
+		Visibility:  Visibility(record[keys["visibility"]]),
+		Name:        record[keys["name"]],
+		Type:        record[keys["type"]],
+		Description: record[keys["description"]],
+		Snippet:     record[keys["snippet"]],
+		Price:       price,
+		Location: Location{
+			Type:        "Point",
+			Coordinates: [2]float64{longitude, latitude},
+		},
+		URL:      record[keys["url"]],
+		Terms:    record[keys["terms"]],
+		Metadata: metadata,
+	}
+	return stream, nil
+}
+
 // StreamRepository specifies a stream persistence API.
 type StreamRepository interface {
 	// Save persists the stream. A non-nil error is returned to indicate

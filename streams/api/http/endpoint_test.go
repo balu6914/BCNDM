@@ -23,10 +23,13 @@ import (
 )
 
 const (
-	validFilePath    = "../../../assets/test/validBulk.csv"
-	invalidFilePath  = "../../../assets/test/invalidBulk.csv"
-	conflictFilePath = "../../../assets/test/conflictBulk.csv"
-	urlLen           = 20
+	validFilePath        = "../../../assets/test/validBulk.csv"
+	invalidFilePath      = "../../../assets/test/invalidBulk.csv"
+	conflictFilePath     = "../../../assets/test/conflictBulk.csv"
+	validJsonFilePath    = "../../../assets/test/validBulk.json"
+	invalidJsonFilePath  = "../../../assets/test/invalidBulk.json"
+	conflictJsonFilePath = "../../../assets/test/conflictBulk.json"
+	urlLen               = 20
 )
 
 var (
@@ -120,7 +123,7 @@ func toJSON(data interface{}) string {
 func sendFile(fileName, targetURL string) (io.Reader, string) {
 	bodyBuff := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuff)
-	fileWriter, _ := bodyWriter.CreateFormFile("csv", fileName)
+	fileWriter, _ := bodyWriter.CreateFormFile("data", fileName)
 	f, _ := os.Open(fileName)
 	defer f.Close()
 
@@ -215,6 +218,9 @@ func TestAddBulkStreams(t *testing.T) {
 	valid, ct := sendFile(validFilePath, ts.URL)
 	invalid, ct1 := sendFile(invalidFilePath, ts.URL)
 	conflict, ct2 := sendFile(conflictFilePath, ts.URL)
+	validJson, ct3 := sendFile(validJsonFilePath, ts.URL)
+	invalidJson, ct4 := sendFile(invalidJsonFilePath, ts.URL)
+	conflictJson, ct5 := sendFile(conflictJsonFilePath, ts.URL)
 
 	cases := []struct {
 		desc        string
@@ -255,6 +261,27 @@ func TestAddBulkStreams(t *testing.T) {
 			desc:        "add a bulk of streams with conflicts",
 			req:         conflict,
 			contentType: ct2,
+			auth:        validKey,
+			status:      http.StatusConflict,
+		},
+		{
+			desc:        "add a valid bulk of streams in JSON format",
+			req:         validJson,
+			contentType: ct3,
+			auth:        validKey,
+			status:      http.StatusCreated,
+		},
+		{
+			desc:        "add an invalid bulk of streams in JSON format",
+			req:         invalidJson,
+			contentType: ct4,
+			auth:        validKey,
+			status:      http.StatusBadRequest,
+		},
+		{
+			desc:        "add a conflicting bulk of streams in JSON format",
+			req:         conflictJson,
+			contentType: ct5,
 			auth:        validKey,
 			status:      http.StatusConflict,
 		},
@@ -669,6 +696,7 @@ func TestExportStream(t *testing.T) {
 	ts := newServer(svc)
 	defer ts.Close()
 	total := uint64(2)
+	counter = 0
 	for i := uint64(0); i < total; i++ {
 		svc.AddStream(genStream())
 	}
@@ -708,8 +736,8 @@ func TestExportStream(t *testing.T) {
 					"123",
 					"50",
 					"50",
-					"https://myStream290.com",
-					"https://myStream290.com",
+					"https://myStream1.com",
+					"https://myStream1.com",
 					"",
 				},
 				{
@@ -721,8 +749,8 @@ func TestExportStream(t *testing.T) {
 					"123",
 					"50",
 					"50",
-					"https://myStream291.com",
-					"https://myStream291.com",
+					"https://myStream2.com",
+					"https://myStream2.com",
 					"",
 				},
 			},

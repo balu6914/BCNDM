@@ -84,16 +84,16 @@ export class DashboardSellComponent implements OnInit {
       const file = fileList[0];
 
       const formData = new FormData();
-      formData.append('csv', file, file.name);
+      formData.append('data', file, file.name);
 
       this.streamService.addStreamBulk(formData).subscribe(
         data => {
           this.fetchStreams();
-          this.alertService.success(`CSV successfully uploaded`);
+          this.alertService.success(`Streams successfully uploaded`);
         },
         err => {
           if (err.status === 400) {
-            this.alertService.error(`Error with CSV file format`);
+            this.alertService.error(`Error with streams file format`);
           } else {
             this.alertService.error(`Status: ${err} - ${err.statusText}`);
           }
