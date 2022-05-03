@@ -5,6 +5,8 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -105,8 +107,10 @@ func newService() streams.Service {
 	ac := mocks.NewAccessControl([]string{})
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
+	groupsSvc := groups.NewServiceMock()
+	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms)
+	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
 }
 
 func newServer(svc streams.Service) *httptest.Server {

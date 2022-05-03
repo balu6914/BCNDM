@@ -2,6 +2,8 @@ package grpc_test
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 	"net"
 	"os"
 	"testing"
@@ -47,6 +49,8 @@ func newService() streams.Service {
 	ac := mocks.NewAccessControl([]string{})
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
+	groupsSvc := groups.NewServiceMock()
+	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms)
+	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
 }

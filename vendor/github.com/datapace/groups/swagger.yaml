@@ -1,0 +1,256 @@
+swagger: "2.0"
+info:
+  title: Groups service
+  description: HTTP API for the user groups
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /:
+    post:
+      summary: Create a new group with the specified name
+      description: Create a new group with the specified name
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/definitions/GroupMetadata"
+      responses:
+        201:
+          description: The group has been created.
+          headers:
+            Location:
+              type: string
+              description: The created group id prefixed by "/".
+        400:
+          description: Failed due to malformed group payload.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Another group with the same name already exists.
+        500:
+          $ref: "#/responses/ServiceError"
+    get:
+      summary: Get all existing groups
+      description: Get all existing groups
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/GroupList"
+        400:
+          description: Failed due to malformed access token.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /{gid}:
+    get:
+      summary: Get a group details by the group id
+      description: Get a group details by the group id
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: gid
+          description: Group Id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The group was found.
+          schema:
+            $ref: "#/definitions/GroupMetadata"
+        400:
+          description: Failed due to malformed group id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Delete the specified group
+      description: Delete the specified group
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: gid
+          description: Group Id
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: The group was deleted.
+        400:
+          description: Failed due to malformed group id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+  /{gid}/users/{uid}:
+    put:
+      summary: Put the specified user to the group
+      description: Put the specified user to the group
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: gid
+          description: Group Id
+          in: path
+          type: string
+          required: true
+        - name: uid
+          description: User Id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The user was added to the group successfully.
+        400:
+          description: Failed due to malformed group/user id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Remove the specified user from the group
+      description: Remove the specified user from the group
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: gid
+          description: Group Id
+          in: path
+          type: string
+          required: true
+        - name: uid
+          description: User Id
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: The user was removed from the group successfully.
+        400:
+          description: Failed due to malformed group/user id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+  /{gid}/users:
+    get:
+      summary: List all users in the specified group
+      description: Paginated list all users in the specified group
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: offset
+          description: Results page start offset
+          in: query
+          type: integer
+          minimum: 0
+          default: 0
+          required: false
+        - name: limit
+          description: Results page size limit
+          in: query
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 10
+          required: false
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: "#/definitions/UserListPage"
+        400:
+          description: Failed due to malformed group id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+  /user/{uid}:
+    get:
+      summary: Get all groups those the specified user belongs to
+      description: Get all groups those the specified user belongs to
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: uid
+          description: User Id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: "#/definitions/GroupList"
+        400:
+          description: Failed due to malformed user id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified group was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
+
+definitions:
+  GroupMetadata:
+    description: Group details without the id
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        description: Group name
+  UserListPage:
+    description: User id list page
+    type: object
+    required:
+      - complete
+      - uids
+    properties:
+      complete:
+        type: boolean
+        description: End of results flag
+      offset:
+        type: integer
+        description: Next results page offset, use it as an input offset for the next results page request
+        default: 0
+        minimum: 0
+      uids:
+        type: array
+        items:
+          type: string
+  GroupList:
+    description: Group list (full, no pagination)
+    type: object
+    required:
+      - gids
+    properties:
+      gids:
+        type: array
+        items:
+          type: string
