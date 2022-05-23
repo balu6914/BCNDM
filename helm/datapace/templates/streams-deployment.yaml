@@ -40,6 +40,10 @@ spec:
               value: "{{ include "datapace.fullname" . }}-{{ .Values.accesscontrol.suffix }}:{{ .Values.accesscontrol.service.port.grpc }}"
             - name: DATAPACE_TERMS_URL
               value: "{{ include "datapace.fullname" . }}-{{ .Values.terms.suffix }}:{{ .Values.terms.service.port.grpc }}"
+            - name: DATAPACE_GROUPS_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.groups.suffix }}:{{ .Values.groups.service.port.grpc }}"
+            - name: DATAPACE_SHARING_URL
+              value: "{{ include "datapace.fullname" . }}-{{ .Values.sharing.suffix }}:{{ .Values.sharing.service.port.grpc }}"
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /tmp/config/big-query/DigiSense-1987a4981f2e.json
             - name: DATAPACE_KUBEFLOW_URL

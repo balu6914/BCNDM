@@ -3,6 +3,8 @@ package streams
 import (
 	"context"
 	"fmt"
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 	"math"
 	"net/http"
 	"strings"
@@ -97,15 +99,26 @@ type streamService struct {
 	accessControl AccessControl
 	ai            AIService
 	terms         TermsService
+	groupsSvc     groups.Service
+	sharingSvc    sharing.Service
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(streams StreamRepository, accessControl AccessControl, ai AIService, terms TermsService) Service {
+func NewService(
+	streams StreamRepository,
+	accessControl AccessControl,
+	ai AIService,
+	terms TermsService,
+	groupsSvc groups.Service,
+	sharingSvc sharing.Service,
+) Service {
 	return streamService{
 		streams:       streams,
 		accessControl: accessControl,
 		ai:            ai,
 		terms:         terms,
+		groupsSvc:     groupsSvc,
+		sharingSvc:    sharingSvc,
 	}
 }
 
@@ -206,13 +219,16 @@ func (ss streamService) AddBulkStreams(streams []Stream) error {
 }
 
 func (ss streamService) SearchStreams(owner string, query Query) (Page, error) {
+
 	partners, err := ss.accessControl.Partners(owner)
 	if err != nil {
 		return Page{}, err
 	}
 	partners = append(partners, owner)
-
 	query.Partners = partners
+
+	ids := ss.resolveSharedStreams(owner)
+	query.Shared = ids
 
 	p, err := ss.streams.Search(query)
 	if err != nil {
@@ -238,26 +254,14 @@ func (ss streamService) ViewFullStream(id string) (Stream, error) {
 }
 
 func (ss streamService) ViewStream(id, owner string) (Stream, error) {
+
 	s, err := ss.streams.One(id)
 	if err != nil {
 		return s, err
 	}
 
-	if s.Visibility == Protected {
-		partners, err := ss.accessControl.Partners(owner)
-		if err != nil {
-			return Stream{}, err
-		}
-		partners = append(partners, owner)
-
-		in := false
-		for _, partner := range partners {
-			if s.Owner == partner {
-				in = true
-				break
-			}
-		}
-		if !in {
+	if s.Visibility == Protected && s.Owner != owner {
+		if !ss.allowedToAccess(owner, s) {
 			return Stream{}, ErrNotFound
 		}
 	}
@@ -269,7 +273,11 @@ func (ss streamService) ViewStream(id, owner string) (Stream, error) {
 }
 
 func (ss streamService) RemoveStream(owner string, id string) error {
-	return ss.streams.Remove(owner, id)
+	if err := ss.streams.Remove(owner, id); err != nil {
+		return err
+	}
+	_ = ss.sharingSvc.DeleteSharing(owner, id)
+	return nil
 }
 
 func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
@@ -278,10 +286,12 @@ func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
 		return []Stream{}, err
 	}
 	partners = append(partners, owner)
+	sharedIds := ss.resolveSharedStreams(owner)
 	q := Query{
 		Name:       "",
 		Owner:      owner,
 		Partners:   partners,
+		Shared:     sharedIds,
 		StreamType: "",
 		Coords:     nil,
 		Page:       0,
@@ -294,4 +304,46 @@ func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
 		return p.Content, err
 	}
 	return p.Content, nil
+}
+
+func (ss streamService) resolveSharedStreams(userId string) map[string]bool {
+	groupIds, _ := ss.groupsSvc.GetUserGroups(userId)
+	sharings, _ := ss.sharingSvc.GetSharings(userId, groupIds)
+	streamIds := make(map[string]bool)
+	for _, s := range sharings {
+		streamIds[string(s.StreamId)] = true
+	}
+	return streamIds
+}
+
+func (ss streamService) allowedToAccess(userId string, stream Stream) bool {
+	if ss.arePartners(stream.Owner, userId) {
+		return true
+	}
+	if ss.isShared(stream.ID, userId) {
+		return true
+	}
+	return false
+}
+
+func (ss streamService) arePartners(owner, userId string) bool {
+
+	partners, err := ss.accessControl.Partners(userId)
+	if err != nil {
+		return false
+	}
+
+	in := false
+	for _, partner := range partners {
+		if owner == partner {
+			in = true
+			break
+		}
+	}
+	return in
+}
+
+func (ss streamService) isShared(id string, userId string) bool {
+	ids := ss.resolveSharedStreams(userId)
+	return ids[id]
 }

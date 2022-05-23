@@ -35,6 +35,7 @@ type Query struct {
 	Limit      uint64
 	Coords     [][]float64
 	Partners   []string
+	Shared     map[string]bool
 	Owner      string  `kind:"id" db:"owner"`
 	Name       string  `kind:"plain" db:"name"`
 	StreamType string  `kind:"plain" db:"type"`
@@ -121,32 +122,60 @@ func GenQuery(q *Query) *bson.M {
 		}
 	}
 
+	var oids []bson.ObjectId
+	for streamId := range q.Shared {
+		oids = append(oids, bson.ObjectIdHex(streamId))
+	}
+	idsClause := bson.M{
+		"_id": bson.M{
+			"$in": oids,
+		},
+	}
+
 	query["$or"] = []bson.M{
-		bson.M{
+		{
 			"visibility": Public,
 		},
-		bson.M{
+		{
 			"$and": []bson.M{
-				bson.M{
+				{
 					"visibility": Protected,
 				},
-				bson.M{
-					"owner": bson.M{
-						"$in": q.Partners,
+				{
+					"$or": []bson.M{
+						{
+							"owner": bson.M{
+								"$in": q.Partners,
+							},
+						},
+						idsClause,
 					},
 				},
 			},
 		},
-		bson.M{
+		{
 			"$and": []bson.M{
-				bson.M{
+				{
 					"visibility": Private,
 				},
-				bson.M{
-					"owner": q.Partners[len(q.Partners)-1],
+				{
+					"owner": q.Partners[len(q.Partners)-1], // last is the stream owner
 				},
 			},
 		},
+	}
+
+	if owner, present := query["owner"]; present && len(oids) > 0 {
+		delete(query, "owner")
+		ownerOrIdsClause := bson.M{
+			"$or": []bson.M{
+				{
+					"owner": owner,
+				},
+				idsClause,
+			},
+		}
+		query["$or"] = append(query["$or"].([]bson.M), ownerOrIdsClause)
 	}
 
 	return &query

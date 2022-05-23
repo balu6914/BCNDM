@@ -24,6 +24,8 @@ default values.
 | DATAPACE_STREAMS_DB_PASS    | Database password                        |                |
 | DATAPACE_AUTH_URL           | Auth service gRPC URL                    | localhost:8081 |
 | DATAPACE_ACCESS_CONTROL_URL | Access Control service gRPC URL          | localhost:8081 |
+| DATAPACE_GROUPS_URL         | Groups service gRPC URL (optional)       | localhost:8081 |
+| DATAPACE_SHARING_URL        | Sharing service gRPC URL (optional)      | localhost:8081 |
 
 ## Deployment
 
@@ -42,10 +44,13 @@ make streams
 make install
 
 # set the environment variables and run the service
-DATAPACE_STREAMS_HTTP_PORT=[Service HTTP port] DATAPACE_STREAMS_GRPC_PORT=[Service gRPC port] DATAPACE_STREAMS_DB_URL=[List of database cluster URLs] DATAPACE_STREAMS_DB_NAME=[Name of the database used by the service] DATAPACE_STREAMS_DB_USER=[Database user] DATAPACE_STREAMS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] DATAPACE_ACCESS_CONTROL_URL=[Access Control service gRPC URL] $GOBIN/datapace-streams
+DATAPACE_STREAMS_HTTP_PORT=[Service HTTP port] DATAPACE_STREAMS_GRPC_PORT=[Service gRPC port] DATAPACE_STREAMS_DB_URL=[List of database cluster URLs] DATAPACE_STREAMS_DB_NAME=[Name of the database used by the service] DATAPACE_STREAMS_DB_USER=[Database user] DATAPACE_STREAMS_DB_PASS=[Database password] DATAPACE_AUTH_URL=[Auth service gRPC URL] GOOGLE_APPLICATION_CREDENTIALS=[Path to Google app credentials file] DATAPACE_ACCESS_CONTROL_URL=[Access Control service gRPC URL] DATAPACE_GROUPS_URL=[Groups service gRPC URL] DATAPACE_SHARING_URL=[Sharing service gRPC URL] $GOBIN/datapace-streams
 ```
 
 Please note the presence of the GOOGLE_APPLICATION_CREDENTIALS env variable which is used by Google Big Query client.
+
+The dependencies on the `groups` and `sharing` services are optional. Running `streams` service without these will cause
+warning messages in the logs but no failure.
 
 ## Usage
 

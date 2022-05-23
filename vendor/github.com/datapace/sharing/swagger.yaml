@@ -1,0 +1,88 @@
+swagger: "2.0"
+info:
+  title: Datapace Sharing service
+  description: HTTP API for the streams sharing with users and user groups
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /stream/{streamId}:
+    post:
+      summary: (Un)share the stream to the specified user/group
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: streamId
+          description: Stream Id
+          required: true
+          in: path
+          type: string
+        - $ref: "#/definitions/Receivers"
+      responses:
+        200:
+          description: The stream sharing has been created/updated/deleted successfully.
+        400:
+          description: Failed due to malformed receivers payload.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Entity version mismatch, client should reread the entity before update.
+        500:
+          $ref: "#/responses/ServiceError"
+    get:
+      summary: Get all the stream sharing receivers, if any
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: streamId
+          description: Stream Id
+          required: true
+          in: path
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Receivers"
+        400:
+          description: Failed due to malformed stream id.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Sharing not found.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occurred.
+
+definitions:
+  Receivers:
+    description: Set of receiver users and groups
+    type: object
+    required:
+      - userIds
+      - groupIds
+    properties:
+      version:
+        description: Entity version for the conditional update purpose
+        type: integer
+      userIds:
+        description: User Ids
+        type: array
+        items:
+          type: string
+      groupIds:
+        description: Group Ids
+        type: array
+        items:
+          type: string

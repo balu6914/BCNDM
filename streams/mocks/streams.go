@@ -140,6 +140,9 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 			if stream.Owner == owner {
 				ret = append(ret, stream)
 			}
+			if query.Shared[stream.ID] {
+				ret = append(ret, stream)
+			}
 		}
 	}
 

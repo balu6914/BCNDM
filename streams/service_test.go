@@ -2,6 +2,8 @@ package streams_test
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 	"math/rand"
 	"testing"
 
@@ -70,8 +72,10 @@ func newService(partners ...string) streams.Service {
 	ac := mocks.NewAccessControl(partners)
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
+	groupsSvc := groups.NewServiceMock()
+	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms)
+	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
 }
 
 func pointer(val uint64) *uint64 {
@@ -332,6 +336,92 @@ func TestSearchStreams(t *testing.T) {
 	}
 }
 
+func TestSearchStreamsShared(t *testing.T) {
+	svc := newService()
+	stream0 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream0",
+		Visibility: "protected",
+		URL:        "url0",
+	}
+	_, _ = svc.AddStream(stream0)
+	stream1 := streams.Stream{
+		Owner:      "user1",
+		ID:         "stream1",
+		Visibility: "protected",
+		URL:        "url1",
+	}
+	_, _ = svc.AddStream(stream1)
+	cases := []struct {
+		desc        string
+		userId      string
+		query       streams.Query
+		resultsPage streams.Page
+	}{
+		{
+			desc:   "Search a stream shared to a user",
+			userId: "sharingReceiverUser",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "sharingReceiverUser",
+			},
+			resultsPage: streams.Page{
+				Page:    0,
+				Limit:   1_000_000,
+				Total:   1,
+				Content: []streams.Stream{stream0},
+			},
+		},
+		{
+			desc:   "Search a stream shared to a group including the requested user",
+			userId: "userInSomeGroups",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "userInSomeGroups",
+			},
+			resultsPage: streams.Page{
+				Page:    0,
+				Limit:   1_000_000,
+				Total:   1,
+				Content: []streams.Stream{stream1},
+			},
+		},
+		{
+			desc:   "Search for streams shared to both a requested user and a group including the requested user",
+			userId: "sharingReceiverUserInSomeGroups",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "sharingReceiverUserInSomeGroups",
+			},
+			resultsPage: streams.Page{
+				Page:  0,
+				Limit: 1_000_000,
+				Total: 2,
+				Content: []streams.Stream{
+					stream0,
+					stream1,
+				},
+			},
+		},
+	}
+	for _, tc := range cases {
+		res, err := svc.SearchStreams(tc.userId, tc.query)
+		assert.Nil(t, err, "There should be no error searching streams")
+		assert.Equal(t, tc.resultsPage.Limit, res.Limit, fmt.Sprintf("%s: expected limit %d got %d\n", tc.desc, tc.resultsPage.Limit, res.Limit))
+		assert.Equal(t, tc.resultsPage.Total, res.Total, fmt.Sprintf("%s: expected total %d got %d\n", tc.desc, tc.resultsPage.Total, res.Total))
+		for _, expectedStream := range tc.resultsPage.Content {
+			found := false
+			for _, s := range res.Content {
+				if expectedStream.ID != s.ID {
+					continue
+				}
+				found = true
+			}
+			assert.True(t, found)
+		}
+	}
+}
+
 func TestUpdateStream(t *testing.T) {
 	s := stream()
 	svc := newService()
@@ -424,6 +514,67 @@ func TestViewStream(t *testing.T) {
 	}
 }
 
+func TestViewStreamShared(t *testing.T) {
+	svc := newService()
+	stream0 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream0",
+		Visibility: "protected",
+		URL:        "url0",
+	}
+	_, _ = svc.AddStream(stream0)
+	stream1 := streams.Stream{
+		Owner:      "user1",
+		ID:         "stream1",
+		Visibility: "protected",
+		URL:        "url1",
+	}
+	_, _ = svc.AddStream(stream1)
+	cases := []struct {
+		desc           string
+		streamId       string
+		userId         string
+		expectedErr    error
+		expectedStream *streams.Stream
+	}{
+		{
+			desc:           "View a stream shared to a user",
+			streamId:       "stream0",
+			userId:         "sharingReceiverUser",
+			expectedErr:    nil,
+			expectedStream: &stream0,
+		},
+		{
+			desc:           "View a stream not shared to a user",
+			streamId:       "stream1",
+			userId:         "sharingReceiverUser",
+			expectedErr:    streams.ErrNotFound,
+			expectedStream: nil,
+		},
+		{
+			desc:           "View a stream not shared to any group including the requested user",
+			streamId:       "stream0",
+			userId:         "userInSomeGroups",
+			expectedErr:    streams.ErrNotFound,
+			expectedStream: nil,
+		},
+		{
+			desc:           "View a stream shared to a group including the requested user",
+			streamId:       "stream1",
+			userId:         "userInSomeGroups",
+			expectedErr:    nil,
+			expectedStream: &stream1,
+		},
+	}
+	for _, tc := range cases {
+		s, err := svc.ViewStream(tc.streamId, tc.userId)
+		assert.Equal(t, tc.expectedErr, err)
+		if tc.expectedStream != nil {
+			assert.Equal(t, tc.expectedStream.ID, s.ID)
+		}
+	}
+}
+
 func TestRemoveStream(t *testing.T) {
 	s := stream()
 	svc := newService()
@@ -452,5 +603,61 @@ func TestRemoveStream(t *testing.T) {
 	for _, tc := range cases {
 		err := svc.RemoveStream(tc.owner, tc.streamId)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+	}
+}
+
+func TestExportStreamsShared(t *testing.T) {
+	svc := newService()
+	stream0 := streams.Stream{
+		Owner:      "user0",
+		ID:         "stream0",
+		Visibility: "protected",
+		URL:        "url0",
+	}
+	_, _ = svc.AddStream(stream0)
+	stream1 := streams.Stream{
+		Owner:      "user1",
+		ID:         "stream1",
+		Visibility: "protected",
+		URL:        "url1",
+	}
+	_, _ = svc.AddStream(stream1)
+	cases := []struct {
+		desc            string
+		userId          string
+		expectedStreams []streams.Stream
+	}{
+		{
+			desc:            "Export a stream shared to a user",
+			userId:          "sharingReceiverUser",
+			expectedStreams: []streams.Stream{stream0},
+		},
+		{
+			desc:            "Export a stream shared to a group including the requested user",
+			userId:          "userInSomeGroups",
+			expectedStreams: []streams.Stream{stream1},
+		},
+		{
+			desc:   "Export multiple streams shared to both a requested user and a group including the requested user",
+			userId: "sharingReceiverUserInSomeGroups",
+			expectedStreams: []streams.Stream{
+				stream0,
+				stream1,
+			},
+		},
+	}
+	for _, tc := range cases {
+		ss, err := svc.ExportStreams(tc.userId)
+		assert.Nil(t, err, "There should be no error exporting streams")
+		for _, expectedStream := range tc.expectedStreams {
+			found := false
+			for _, s := range ss {
+				if expectedStream.ID != s.ID {
+					continue
+				}
+				found = true
+			}
+			assert.True(t, found)
+		}
 	}
 }

@@ -1,0 +1,11 @@
+*.test
+./datapace-groups
+cover.out
+cover.tmp
+.idea
+# Kreya
+*.krop
+*.krpref
+*.krproj
+*.krenv
+*-request.json
