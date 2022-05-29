@@ -1,5 +1,11 @@
 {{- if .Values.peer.ingress.enabled -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
 apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
   name: hlf-peer--ingress
@@ -17,9 +23,18 @@ spec:
     http:
       paths:
       - path: /
-        backend: 
+      {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+        pathType: Prefix
+        backend:
+          service:
+            name: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+            port: 
+              number: 7051
+      {{- else }}
+        backend:
           serviceName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
           servicePort: 7051
+      {{- end }}
 {{- end }} {{- /* Peers */ -}}
 {{- end }} {{- /* Orgs */ -}}{{""}}
 {{- end }} {{- /* if ingress.enabled */ -}}
