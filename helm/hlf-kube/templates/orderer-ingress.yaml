@@ -1,5 +1,11 @@
 {{- if .Values.orderer.ingress.enabled -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
 apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
   name: hlf-orderer--ingress
@@ -16,9 +22,18 @@ spec:
     http:
       paths:
       - path: /
-        backend: 
+      {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+        pathType: Prefix
+        backend:
+          service:
+            name: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+            port: 
+              number: 7050
+      {{- else }}
+        backend:
           serviceName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
           servicePort: 7050
+      {{- end }}
 {{- end }} {{- /* org.Specs */ -}}
 {{- end }} {{- /* OrdererOrgs */ -}}{{""}}
 {{- end }} {{- /* if ingress.enabled */ -}}

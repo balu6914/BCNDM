@@ -26,6 +26,7 @@ defaults:
     tag: "latest"
 
 dproxy:
+  standalone: false
   suffix: dproxy
   encKey: W0JD00gEAGUDV6UI0+16iVRx8p+PQx79ahGlBwhWz/g=
   image:
@@ -38,12 +39,12 @@ dproxy:
     enabled: true
     annotations: {kubernetes.io/ingress.class: nginx}
     hosts:
-      - host: dproxy.datapace.local
+      - host: ndm.datapace.local
         paths: ["/"]
     tls:
       - hosts:
-        - dproxy.datapace.local
-        secretName: dproxy.datapace.local
+        - ndm.datapace.local
+        secretName: ndm.datapace.local
 
 auth:
   operations:
@@ -136,11 +137,11 @@ ui:
   ingress:
     enabled: true
     annotations: {kubernetes.io/ingress.class: nginx}
-    host: ui.datapace.local
+    host: ndm.datapace.local
     tls:
       - hosts:
-        - ui.datapace.local
-        secretName: ui.datapace.local
+        - ndm.datapace.local
+        secretName: ndm.datapace.local
 
 postgresql:
   postgresqlPassword: dproxy
@@ -168,6 +169,13 @@ bc:
     - peer0.org1.datapace.com
     - orderer.datapace.com
     - ca.org1.datapace.com
+
+keystore:
+  suffix: keystore-daemon
+  image: 
+    name: busybox
+    tag: latest
+  path: /data/ndm/keystore
 
 # Optional services
 

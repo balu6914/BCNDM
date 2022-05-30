@@ -2,7 +2,9 @@
 {{- $fullName := include "datapace.fullname" . -}}
 {{- $fullName := (printf "%s-%s" $fullName .Values.dproxy.suffix) -}}
 {{- $svcPort := .Values.dproxy.service.port.http -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
@@ -14,12 +16,26 @@ metadata:
     {{- include "datapace.labels" . | nindent 4 }}
   {{- with .Values.dproxy.ingress.annotations }}
   annotations:
+    {{- if not $.Values.dproxy.standalone }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- end }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+{{- if .Values.dproxy.standalone }}
 {{- if .Values.dproxy.ingress.tls }}
   tls:
   {{- range .Values.dproxy.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+{{- else }}
+  tls:
+  {{- range .Values.ui.ingress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . | quote }}
@@ -32,8 +48,25 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+        {{ if $.Values.dproxy.standalone }}
         {{- range .paths }}
           - path: {{ . }}
+            backend:
+              service:
+                name: "{{ $fullName }}"
+                port: 
+                  number: {{ $svcPort }}
+        {{- end }}
+        {{ else if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+          - path: /dproxy(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: "{{ $fullName }}"
+                port: 
+                  number: {{ $svcPort }}
+        {{ else }}
+          - path: /dproxy(/|$)(.*)
             backend:
               serviceName: "{{ $fullName }}"
               servicePort: {{ $svcPort }}

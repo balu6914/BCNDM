@@ -28,6 +28,15 @@ spec:
       serviceAccountName: {{ include "datapace.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: keystore
+                operator: In
+                values:
+                - "true"
       containers:
         - env:
             - name: DATAPACE_TRANSACTIONS_HTTP_PORT
@@ -123,11 +132,10 @@ spec:
           name: hlf-config
       - name: kvs
         persistentVolumeClaim:
-          claimName: transactions-kvs
+          claimName: kvs
       - name: msp
         persistentVolumeClaim:
-          claimName: transactions-msp
-
+          claimName: msp
       {{- if $.Values.hostAliases }}
       hostAliases:
       {{- range $i, $alias := $.Values.hostAliases }}
