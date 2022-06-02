@@ -124,7 +124,7 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 	ret := []streams.Stream{}
 	for _, stream := range srm.streams {
 		if contains(stream.Name, query.Name) && contains(stream.Type, query.StreamType) &&
-			inRange(stream.Price, query.MinPrice, query.MaxPrice) {
+			inRange(stream.Price, query.MinPrice, query.MaxPrice) && metadataMatches(stream.Metadata, query.Metadata) {
 			if query.Owner == "" {
 				ret = append(ret, stream)
 				continue
@@ -167,6 +167,31 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 
 	// Geolocation search mock is not used.
 	return page, nil
+}
+
+func metadataMatches(md map[string]interface{}, constraint map[string]interface{}) bool {
+	for k, v := range constraint {
+		mdv, present := md[k]
+		if !present {
+			return false
+		}
+		mv, constraintValIsMap := v.(map[string]interface{})
+		mmdv, mdValIsMap := mdv.(map[string]interface{})
+		if constraintValIsMap {
+			if !mdValIsMap {
+				return false
+			}
+			if metadataMatches(mmdv, mv) {
+				return false
+			} else {
+				continue
+			}
+		}
+		if mdv != v {
+			return false
+		}
+	}
+	return true
 }
 
 func (srm *streamRepositoryMock) Remove(owner, id string) error {

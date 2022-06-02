@@ -191,6 +191,7 @@ func searchStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 			Limit:      req.Limit,
 			MinPrice:   req.MinPrice,
 			MaxPrice:   req.MaxPrice,
+			Metadata:   req.Metadata,
 		}
 
 		page, err := svc.SearchStreams(req.user, q)
