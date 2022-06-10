@@ -99,7 +99,7 @@ func main() {
 	if cfg.standalone {
 		url = fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort)
 	}
-	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
+	go startHTTPServer(svc, r, f, cfg.httpPort, uri, logger, errs)
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
