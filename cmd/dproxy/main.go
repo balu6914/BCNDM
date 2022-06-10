@@ -42,6 +42,7 @@ const (
 	defFSPathPrefix   = "/fs"
 	defHTTPPathPrefix = "/http"
 	defEncKey         = ""
+	defStandalone	  = "true"
 
 	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
 	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
@@ -61,6 +62,8 @@ const (
 	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
 	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
 	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
+	envStandalone	  = "DATAPACE_DPROXY_STADALONE"
+
 )
 
 type config struct {
@@ -171,6 +174,13 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 	return eventsRepo, nil
 }
 
+func loadConfig(logger log.Logger) config {
+
+	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
+	if err != nil {
+		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
+	}
+
 func loadConfig() config {
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
@@ -181,6 +191,7 @@ func loadConfig() config {
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 		encKey:         datapace.Env(envEncKey, defEncKey),
+		standalone:	standalone,
 	}
 }
 
