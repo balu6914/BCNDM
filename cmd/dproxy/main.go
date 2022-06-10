@@ -80,7 +80,7 @@ type config struct {
 }
 
 func main() {
-	cfg := loadConfig()
+	cfg := loadConfig(logger)
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
@@ -176,7 +176,7 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 
 func loadConfig(logger log.Logger) config {
 
-	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
+	standalone, err := Strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
 	if err != nil {
 		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
 	}
