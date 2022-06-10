@@ -180,9 +180,6 @@ func loadConfig(logger log.Logger) config {
 	if err != nil {
 		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
 	}
-}
-
-func loadConfig() config {
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
