@@ -42,7 +42,7 @@ const (
 	defFSPathPrefix   = "/fs"
 	defHTTPPathPrefix = "/http"
 	defEncKey         = ""
-	defStandalone	  = "true"
+	defStandalone     = "true"
 
 	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
 	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
@@ -62,8 +62,7 @@ const (
 	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
 	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
 	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
-	envStandalone	  = "DATAPACE_DPROXY_STADALONE"
-
+	envStandalone     = "DATAPACE_PROXY_STANDALONE"
 )
 
 type config struct {
@@ -77,8 +76,7 @@ type config struct {
 	httpPathPrefix string
 	dbType         string
 	encKey         string
-	standalone	bool
-
+	standalone     bool
 }
 
 func main() {
@@ -102,7 +100,9 @@ func main() {
 	if cfg.standalone {
 		url = fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort)
 	}
+
 	go startHTTPServer(svc, r, f, cfg.httpPort, url, logger, errs)
+
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
@@ -112,6 +112,13 @@ func main() {
 	logger.Error(fmt.Sprintf("Proxy service terminated: %s", err))
 }
 
+func newService(jwtSecret string, eventsRepository persistence.EventRepository, key []byte, logger log.Logger) dproxy.Service {
+	tokenService := jwt.NewService(jwtSecret)
+	svc := dproxy.NewService(tokenService, eventsRepository, key)
+	svc = api.LoggingMiddleware(svc, logger)
+	svc = api.MetricsMiddleware(
+		svc,
+		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "dproxy",
 			Subsystem: "api",
 			Name:      "request_count",
@@ -167,12 +174,7 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 	return eventsRepo, nil
 }
 
-func loadConfig(logger log.Logger) config {
-
-	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
-	if err != nil {
-		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
-	}
+func loadConfig() config {
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
@@ -189,6 +191,5 @@ func loadConfig(logger log.Logger) config {
 func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.FsProxy, port, dProxyRootUrl string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))	
-}
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))
 }
