@@ -191,4 +191,4 @@ func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.F
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))	
 }
-
+}
