@@ -82,7 +82,7 @@ type config struct {
 }
 
 func main() {
-	cfg EECLOUD-8162:= loadConfig()
+	cfg := loadConfig()
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
@@ -189,13 +189,6 @@ func loadConfig(logger log.Logger) config {
 func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.FsProxy, port, dProxyRootUrl string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))
-	
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))	
 }
-import (
-	"encoding/base64"
-	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
+
