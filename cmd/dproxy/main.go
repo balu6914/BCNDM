@@ -82,7 +82,7 @@ type config struct {
 }
 
 func main() {
-	cfg:=loadConfig()
+	cfg EECLOUD-8162:= loadConfig()
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
@@ -112,13 +112,6 @@ func main() {
 	logger.Error(fmt.Sprintf("Proxy service terminated: %s", err))
 }
 
-func newService(jwtSecret string, eventsRepository persistence.EventRepository, key []byte, logger log.Logger) dproxy.Service {
-	tokenService := jwt.NewService(jwtSecret)
-	svc := dproxy.NewService(tokenService, eventsRepository, key)
-	svc = api.LoggingMiddleware(svc, logger)
-	svc = api.MetricsMiddleware(
-		svc,
-		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "dproxy",
 			Subsystem: "api",
 			Name:      "request_count",
@@ -189,7 +182,7 @@ func loadConfig(logger log.Logger) config {
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 		encKey:         datapace.Env(envEncKey, defEncKey),
-		standalone:	standalone,
+		standalone:     standalone,
 	}
 }
 
@@ -197,4 +190,12 @@ func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.F
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))
+	
 }
+import (
+	"encoding/base64"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
