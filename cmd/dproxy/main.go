@@ -74,6 +74,8 @@ type config struct {
 	httpPathPrefix string
 	dbType         string
 	encKey         string
+	standalone	bool
+
 }
 
 func main() {
@@ -93,6 +95,10 @@ func main() {
 	svc := newService(cfg.jwtSecret, eventsRepository, key, logger)
 	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
 	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
+	url := fmt.Sprintf("%s://%s:%s/dproxy", cfg.httpProto, cfg.httpHost, cfg.httpPort)
+	if cfg.standalone {
+		url = fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort)
+	}
 	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
 	go func() {
 		c := make(chan os.Signal)

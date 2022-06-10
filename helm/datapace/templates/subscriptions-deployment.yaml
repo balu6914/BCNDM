@@ -46,6 +46,8 @@ spec:
               value: "http://{{ include "datapace.fullname" . }}-{{ .Values.dproxy.suffix }}:{{ .Values.dproxy.service.port.http }}"
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /tmp/config/big-query/DigiSense-1987a4981f2e.json
+            - name: DATAPACE_DPROXY_STANDALONE
+              value: "{{ .Values.dproxy.suffix }}"  
           name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
