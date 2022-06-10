@@ -174,7 +174,12 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 	return eventsRepo, nil
 }
 
-func loadConfig() config {
+func loadConfig(logger log.Logger) config {
+
+	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
+	if err != nil {
+		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
+	}
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
@@ -184,7 +189,8 @@ func loadConfig() config {
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 		encKey:         datapace.Env(envEncKey, defEncKey),
-		standalone:     standalone,
+		standalone:	standalone,
+
 	}
 }
 
