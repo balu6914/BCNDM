@@ -62,7 +62,7 @@ const (
 	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
 	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
 	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
-	envStandalone     = "DATAPACE_PROXY_STANDALONE"
+	envStandalone     = "DATAPACE_DPROXY_STANDALONE"
 )
 
 type config struct {
@@ -80,7 +80,7 @@ type config struct {
 }
 
 func main() {
-	cfg := loadConfig(logger)
+	cfg := loadConfig()
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
@@ -176,7 +176,7 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 
 func loadConfig(logger log.Logger) config {
 
-	standalone, err := Strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
+	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
 	if err != nil {
 		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
 	}
