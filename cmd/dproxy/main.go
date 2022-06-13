@@ -80,7 +80,7 @@ type config struct {
 }
 
 func main() {
-	cfg := loadConfig(logger.Logger)
+	cfg := loadConfig(log.Logger)
 	logger := logger.New(os.Stdout)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
