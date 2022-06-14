@@ -163,7 +163,6 @@ mongodb:
     enabled: false
   persistence:
     enabled: true
-  usePassword: false
   metrics:
     enabled: true
     containerPort: 9216
