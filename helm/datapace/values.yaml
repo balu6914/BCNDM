@@ -60,6 +60,15 @@ auth:
     port:
       http: 8080
       grpc: 8081
+  hpa:
+    minReplicas: 1
+    maxReplicas: 5
+    resources:
+    - name: cpu
+      target:
+        type: Utilization
+        name: averageUtilization
+        value: 60
 
 transactions:
   operations: 
@@ -149,11 +158,11 @@ postgresql:
 
 mongodb:
   nameOverride: datapace-mongodb
-  architecture: replicaset
-  replicaCount: 3
+  architecture: standalone
+  auth:
+    enabled: false
   persistence:
     enabled: true
-  usePassword: false
   metrics:
     enabled: true
     containerPort: 9216
