@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
+	
 
 	"github.com/datapace/datapace"
 	"github.com/datapace/datapace/dproxy"
@@ -42,6 +44,7 @@ const (
 	defFSPathPrefix   = "/fs"
 	defHTTPPathPrefix = "/http"
 	defEncKey         = ""
+	defStandalone     = "true"
 
 	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
 	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
@@ -61,6 +64,7 @@ const (
 	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
 	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
 	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
+	envStandalone     = "DATAPACE_DPROXY_STANDALONE"
 )
 
 type config struct {
@@ -74,11 +78,12 @@ type config struct {
 	httpPathPrefix string
 	dbType         string
 	encKey         string
+	standalone     bool
 }
 
 func main() {
-	cfg := loadConfig()
 	logger := logger.New(os.Stdout)
+	cfg := loadConfig(logger)
 	errs := make(chan error, 2)
 	eventsRepository, err := connectToEventsRepository()
 	if err != nil {
@@ -93,7 +98,13 @@ func main() {
 	svc := newService(cfg.jwtSecret, eventsRepository, key, logger)
 	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
 	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
-	go startHTTPServer(svc, r, f, cfg.httpPort, fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort), logger, errs)
+	url := fmt.Sprintf("%s://%s:%s/dproxy", cfg.httpProto, cfg.httpHost, cfg.httpPort)
+	if cfg.standalone {
+		url = fmt.Sprintf("%s://%s:%s", cfg.httpProto, cfg.httpHost, cfg.httpPort)
+	}
+
+	go startHTTPServer(svc, r, f, cfg.httpPort, url, logger, errs)
+
 	go func() {
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGINT)
@@ -165,7 +176,12 @@ func connectToEventsRepository() (persistence.EventRepository, error) {
 	return eventsRepo, nil
 }
 
-func loadConfig() config {
+func loadConfig(logger log.Logger) config {
+
+	standalone, err := strconv.ParseBool(datapace.Env(envStandalone, defStandalone))
+	if err != nil {
+		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
+	}
 	return config{
 		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
@@ -175,6 +191,8 @@ func loadConfig() config {
 		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
 		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
 		encKey:         datapace.Env(envEncKey, defEncKey),
+		standalone:	standalone,
+
 	}
 }
 
