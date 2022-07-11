@@ -27,7 +27,7 @@ type CustomClaims struct {
 
 // New instantiates a JWT identity provider.
 func New(secret string) auth.IdentityProvider {
-	return &jwtIdentityProvider{}
+	return &jwtIdentityProvider{secret: secret}
 }
 
 func (idp *jwtIdentityProvider) TemporaryKey(id string, role string) (string, error) {
