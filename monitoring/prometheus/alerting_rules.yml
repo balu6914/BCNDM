@@ -1,0 +1,455 @@
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: Kubernetes API server
+        rules:
+          - alert: KubernetesApiServerErrors
+            expr: sum(rate(apiserver_request_total{job="apiserver",code=~"^(?:5..)$"}[1m])) / sum(rate(apiserver_request_total{job="apiserver"}[1m])) * 100 > 3
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes API server errors (instance {{ $labels.instance }})"
+              description: "Kubernetes API server is experiencing high error rate\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesApiServerLatency
+            annotations:
+              description: |-
+                Kubernetes API server has a 99th percentile latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.
+                  VALUE = {{ $value }}
+                  LABELS = {{ $labels }}
+              summary: Kubernetes API server latency (instance {{ $labels.instance }})
+            expr: histogram_quantile(0.99, sum(rate(apiserver_request_latencies_bucket{subresource!="log",verb!~"^(?:CONNECT|WATCHLIST|WATCH|PROXY)$"} [10m])) WITHOUT (instance, resource)) / 1e+06 > 1
+            for: 2m
+            labels:
+              severity: warning
+          - alert: KubernetesApiClientErrors
+            expr: (sum(rate(rest_client_requests_total{code=~"(4|5).."}[1m])) by (instance, job) / sum(rate(rest_client_requests_total[1m])) by (instance, job)) * 100 > 1
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes API client errors (instance {{ $labels.instance }})"
+              description: "Kubernetes API client is experiencing high error rate\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesClientCertificateExpiresNextWeek
+            expr: apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 7*24*60*60
+            for: 0m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes client certificate expires next week (instance {{ $labels.instance }})"
+              description: "A client certificate used to authenticate to the apiserver is expiring next week.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesClientCertificateExpiresSoon
+            expr: apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 24*60*60
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes client certificate expires soon (instance {{ $labels.instance }})"
+              description: "A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Container OomKiller
+        rules:
+          - alert: KubernetesContainerOomKiller
+            expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+            for: 0m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes container oom killer (instance {{ $labels.instance }})"
+              description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"     
+      - name: Kubernetes Cronjon Suspended
+        rules:
+          - alert: KubernetesCronjobSuspended
+            expr: kube_cronjob_spec_suspend != 0
+            for: 0m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes CronJob suspended (instance {{ $labels.instance }})"
+              description: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is suspended\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Cronjob Too Long
+        rules:
+          - alert: KubernetesCronjobTooLong
+            expr: time() - kube_cronjob_next_schedule_time > 3600
+            for: 0m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes CronJob too long (instance {{ $labels.instance }})"
+              description: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1h to complete.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Job Failed
+        rules:
+          - alert: KubernetesJobFailed
+            expr: kube_job_status_failed > 0
+            for: 0m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes Job failed (instance {{ $labels.instance }})"
+              description: "Job {{$labels.namespace}}/{{$labels.exported_job}} failed to complete\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Out of Capacity
+        rules:
+          - alert: KubernetesOutOfCapacity
+            expr: 100 * kube_resourcequota{job="kubernetes-service-endpoints", type="used"}
+                    / ignoring(instance, job, type)
+                  (kube_resourcequota{job="kubernetes-service-endpoints", type="hard"} > 0)
+                    > 90
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes out of capacity (instance {{ $labels.instance }})"
+              description: "{{ $labels.node }} is out of capacity\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubertenetes Pods
+        rules:
+          - alert: KubernetesPodNotHealthy
+            expr: min_over_time(sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed"})[15m:1m]) > 0
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Pod not healthy (instance {{ $labels.instance }})"
+              description: "Pod has been in a non-ready state for longer than 15 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesPodCrashLooping
+            expr: increase(kube_pod_container_status_restarts_total[1m]) > 3
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes pod crash looping (instance {{ $labels.instance }})"
+              description: "Pod {{ $labels.pod }} is crash looping\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Replica sets
+        rules:
+          - alert: KubernetesReplicassetMismatch
+            expr: kube_replicaset_spec_replicas != kube_replicaset_status_ready_replicas
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes ReplicasSet mismatch (instance {{ $labels.instance }})"
+              description: "Deployment Replicas mismatch\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesDeploymentReplicasMismatch
+            expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes Deployment replicas mismatch (instance {{ $labels.instance }})"
+              description: "Deployment Replicas mismatch\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesDeploymentGenerationMismatch
+            expr: kube_deployment_status_observed_generation != kube_deployment_metadata_generation
+            for: 10m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Deployment generation mismatch (instance {{ $labels.instance }})"
+              description: "A Deployment has failed but has not been rolled back.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesJobSlowCompletion
+            expr: kube_job_spec_completions - kube_job_status_succeeded > 0
+            for: 12h
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes job slow completion (instance {{ $labels.instance }})"
+              description: "Kubernetes Job {{ $labels.namespace }}/{{ $labels.job_name }} did not complete in time.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kubernetes Statefulset
+        rules:
+          - alert: KubernetesStatefulsetDown
+            expr: (kube_statefulset_status_replicas_ready / kube_statefulset_status_replicas_current) != 1
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes StatefulSet down (instance {{ $labels.instance }})"
+              description: "A StatefulSet went down\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesStatefulsetGenerationMismatch
+            expr: kube_statefulset_status_observed_generation != kube_statefulset_metadata_generation
+            for: 10m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes StatefulSet generation mismatch (instance {{ $labels.instance }})"
+              description: "A StatefulSet has failed but has not been rolled back.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesStatefulsetUpdateNotRolledOut
+            expr: max without (revision) (kube_statefulset_status_current_revision unless kube_statefulset_status_update_revision) * (kube_statefulset_replicas != kube_statefulset_status_replicas_updated)
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes StatefulSet update not rolled out (instance {{ $labels.instance }})"
+              description: "StatefulSet update has not been rolled out.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesStatefulsetReplicasMismatch
+            expr: kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes StatefulSet replicas mismatch (instance {{ $labels.instance }})"
+              description: "A StatefulSet does not match the expected number of replicas.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesHpaScalingAbility
+            expr: kube_horizontalpodautoscaler_status_condition{status="false", condition="AbleToScale"} == 1
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes HPA scaling ability (instance {{ $labels.instance }})"
+              description: "Pod is unable to scale\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"    
+      - name: Kubernetes Volumes
+        rules:
+          - alert: KubernetesVolumeOutOfDiskSpace
+            expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 10
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes Volume out of disk space (instance {{ $labels.instance }})"
+              description: "Volume is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesVolumeFullInFourDays
+            expr: predict_linear(kubelet_volume_stats_available_bytes[6h], 4 * 24 * 3600) < 0
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Volume full in four days (instance {{ $labels.instance }})"
+              description: "{{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is expected to fill up within four days. Currently {{ $value | humanize }}% is available.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesPersistentvolumeError
+            expr: kube_persistentvolume_status_phase{phase=~"Failed|Pending", job="kube-state-metrics"} > 0
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes PersistentVolume error (instance {{ $labels.instance }})"
+              description: "Persistent volume is in bad state\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          - alert: KubernetesPersistentvolumeclaimPending
+            expr: kube_persistentvolumeclaim_status_phase{phase="Pending"} == 1
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Kubernetes PersistentVolumeClaim pending (instance {{ $labels.instance }})"
+              description: "PersistentVolumeClaim {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is pending\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Prometheus Alert Manager
+        rules:
+        - alert: PrometheusAlertmanagerConfigurationReloadFailure
+          expr: alertmanager_config_last_reload_successful != 1
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prometheus AlertManager configuration reload failure (instance {{ $labels.instance }})
+            description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusAlertmanagerConfigNotSynced
+          expr: count(count_values("config_hash", alertmanager_config_hash)) > 1
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prometheus AlertManager config not synced (instance {{ $labels.instance }})
+            description: "Configurations of AlertManager cluster instances are out of sync\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusNotConnectedToAlertmanager
+          expr: prometheus_notifications_alertmanagers_discovered < 1
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus not connected to alertmanager (instance {{ $labels.instance }})
+            description: "Prometheus cannot connect the alertmanager\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusAlertmanagerNotificationFailing
+          expr: rate(alertmanager_notifications_failed_total[1m]) > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus AlertManager notification failing (instance {{ $labels.instance }})
+            description: "Alertmanager is failing sending notifications\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusRuleEvaluationFailures
+          expr: increase(prometheus_rule_evaluation_failures_total[3m]) > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus rule evaluation failures (instance {{ $labels.instance }})
+            description: "Prometheus encountered {{ $value }} rule evaluation failures, leading to potentially ignored alerts.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Prometheus Job Missing
+        rules:
+        - alert: PrometheusJobMissing
+          expr: absent(up{job="prometheus"})
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prometheus job missing (instance {{ $labels.instance }})
+            description: "A Prometheus job has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Prometheus Targets
+        rules:
+        - alert: PrometheusTargetMissing
+          expr: up == 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus target missing (instance {{ $labels.instance }})
+            description: "A Prometheus target has disappeared. An exporter might be crashed.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusAllTargetsMissing
+          expr: count by (job) (up) == 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus all targets missing (instance {{ $labels.instance }})
+            description: "A Prometheus job does not have living target anymore.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusConfigurationReloadFailure
+          expr: prometheus_config_last_reload_successful != 1
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prometheus configuration reload failure (instance {{ $labels.instance }})
+            description: "Prometheus configuration reload error\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: PrometheusTooManyRestarts
+          expr: changes(process_start_time_seconds{job=~"prometheus|pushgateway|alertmanager"}[15m]) > 2
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prometheus too many restarts (instance {{ $labels.instance }})
+            description: "Prometheus has restarted more than twice in the last 15 minutes. It might be crashlooping.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - name: Kube Version Mismatch
+        rules:
+        - alert: KubeVersionMismatch
+          expr: count by(cluster_name) (count by(git_version, cluster_name) (label_replace(kubernetes_build_info{job!~"kube-dns|coredns"}, "git_version", "$1", "git_version", "(v[0-9]*.[0-9]*).*"))) > 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            description: There are {{ $value }} different versions of Kubernetes components running.
+        - alert: KubeNodeNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            description: "{{ $labels.node }} has been unready for more than 10 minutes."
+      - name: NESC Alert
+        rules:
+        - alert: Cluster_downtime
+          expr: job:cluster:health == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            description: Cluster or some of its key services is not healthy
+            summary: Cluster is not healthy
+        - alert: Prometheus_not_healthy
+          expr: probe_success{kubernetes_name="prometheus-server"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            description: Prometheus is not healthy or removed from cluster
+            summary: Prometheus is not healthy
+        - alert: Grafana_not_healthy
+          expr: probe_success{kubernetes_name="prometheus-grafana"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            description: Grafana is not healthy or removed from cluster
+            summary: Grafana is not healthy
+        - alert: Alertmanager_not_healthy
+          expr: probe_success{kubernetes_name="prometheus-alertmanager"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            description: Alertmanager is not healthy or removed from cluster
+            summary: Alertmanager is not healthy
+        - alert: Keycloak_not_healthy
+          expr: probe_success{kubernetes_name="keycloak-http"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            description: Keycloak is not healthy or removed from cluster
+            summary: Keycloak is not healthy
+        - alert: Auth_proxy_not_healthy
+          expr: probe_success{kubernetes_name="oauth2-proxy"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            description: Auth proxy is not healthy or removed from cluster
+            summary: Auth proxy is not healthy
+      - name: Node Exporter Alerts
+        rules:
+        - alert: NodeNotHealthy
+          expr: up{job="kubernetes-nodes"} == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+            summary: Instance {{ $labels.instance }} down
+        - alert: NodeFilesystemAlmostOutOfSpace
+          expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes * 100 < 5 and node_filesystem_readonly == 0)
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left.
+        - alert: DeadMansSwitch
+          expr: vector(1)
+          labels:
+            severity: none
+          annotations:
+            description: This is a DeadMansSwitch meant to ensure that the entire alerting pipeline is functional.
+            summary: This is a DeadMansSwitch meant to ensure that the entire alerting pipeline is functional.
+      - name: Prometheus Alerts
+        rules:
+        - alert: PrometheusNotificationQueueRunningFull
+          expr: predict_linear(prometheus_notifications_queue_length{job="prometheus"}[5m], 60 * 30) > prometheus_notifications_queue_capacity{job="prometheus"}
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            description: Prometheus' alert notification queue is running full for {{$labels.namespace}}/{{$labels.pod}}
+            summary: Prometheus' alert notification queue is running full
+        - alert: PrometheusErrorSendingAlertsWarning
+          expr: rate(prometheus_notifications_errors_total{job="prometheus"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus"}[5m]) > 0.01
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{$labels.pod}} to Alertmanager {{$labels.Alertmanager}}
+            summary: Errors while sending alerts from Prometheus
+        - alert: PrometheusErrorSendingAlertsCritical
+          expr: rate(prometheus_notifications_errors_total{job="prometheus"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus"}[5m]) > 0.03
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{$labels.pod}} to Alertmanager {{$labels.Alertmanager}}
+            summary: Errors while sending alerts from Prometheus
+        - alert: PromScrapeFailed
+          expr: up{kubernetes_namespace=~"aad-pod-identity|argo|blockchain|btel|ckey|datapace|default|external-dns|ingress-azure|ingress-nginx|kube-node-lease|kube-public|kube-system|loki|monitoring|opensearch|velero"} != 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            description: Prometheus failed to scrape a target {{ $labels.job }} / {{ $labels.instance }}.
+            summary: Prometheus failed to scrape a target {{ $labels.job }} / {{ $labels.instance }}.
+      - name: Velero Alerts
+        rules:
+        - alert: VeleroBackupFailures
+          annotations:
+            summary: Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} failed backups.
+          expr: sum(velero_backup_failure_total{schedule!=""} offset 24h)/sum(velero_backup_attempt_total{schedule!=""} offset 24h) > 0 
+          for: 15m
+          labels:
+            severity: critical
+        - alert: VeleroBackupPartialFailures
+          annotations:
+            summary: Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} partialy failed backups.
+          expr: sum(velero_backup_partial_failure_total{schedule!=""} offset 24h)/sum(velero_backup_attempt_total{schedule!=""} offset 24h) > 0
+          for: 15m
+          labels:
+            severity: warning

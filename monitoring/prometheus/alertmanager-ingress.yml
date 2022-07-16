@@ -1,0 +1,22 @@
+alertmanager:
+  # prefixURL: /   # <-- commented out
+  # baseURL: https://my-cluster-external-hostname/prometheus  # <-- commented out
+  extraFlags:  # <-- added this section to specify my args manually
+    - web.enable-lifecycle
+    - web.route-prefix=/
+    - web.external-url=https://ndm.datapace.local/alerts
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    path: "/alerts(/|$)(.*)"
+    hosts:
+      - ndm.datapace.local
+    tls:
+      - secretName: ndm.datapace.local
+        hosts:
+          - ndm.datapace.local
+  service:
+    servicePort: 9090
+
