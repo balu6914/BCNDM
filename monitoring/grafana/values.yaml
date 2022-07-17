@@ -3,11 +3,11 @@ grafana:
     dashboards:
       enabled: true
       label: grafana_datasource
-	  searchNamespace: monitoring
+	searchNamespace: monitoring
     datasources:
       enabled: true
       label: grafana_dashboard
-	  searchNamespace: monitoring
+	searchNamespace: monitoring
   ingress:
     enabled: true
     annotations:
