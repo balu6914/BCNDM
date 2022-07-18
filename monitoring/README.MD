@@ -3,7 +3,7 @@
 ```javascript
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
-helm install loki -n monitoring grafana/loki-stack
+helm install loki -n monitoring grafana/loki-stack -f loki/values.yaml
 ```
 ## Install Prometheus ##
 ```javascript
