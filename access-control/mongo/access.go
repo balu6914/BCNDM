@@ -166,14 +166,6 @@ func (repo accessRequestRepository) Revoke(receiver, id string) error {
 	return nil
 }
 
-func (repo accessRequestRepository) GrantAccess(srcUserId string, dstUserId string) (string, error) {
-	reqId, err := repo.RequestAccess(dstUserId, srcUserId)
-	if err != nil {
-		return "", err
-	}
-	return reqId, repo.Approve(dstUserId, reqId)
-}
-
 type accessRequest struct {
 	ID       bson.ObjectId `bson:"_id"`
 	Sender   string        `bson:"sender"`

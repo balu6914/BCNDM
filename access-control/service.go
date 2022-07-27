@@ -1,6 +1,9 @@
 package access
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	// ErrConflict indicates that sent access request already exists and is not
@@ -78,11 +81,7 @@ func (acs accessControlService) RequestAccess(key, partner string) (string, erro
 		return "", ErrUnauthorizedAccess
 	}
 
-	if err := acs.ledger.RequestAccess(id, partner); err != nil {
-		return "", err
-	}
-
-	return acs.repo.RequestAccess(id, partner)
+	return acs.requestAccess(id, partner)
 }
 
 func (acs accessControlService) ListSentAccessRequests(key string, state State) ([]Request, error) {
@@ -144,17 +143,7 @@ func (acs accessControlService) ApproveAccessRequest(key, id string) error {
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
-	req, err := acs.repo.One(id)
-	if err != nil {
-		return err
-	}
-
-	if err := acs.ledger.Approve(uid, req.Sender); err != nil {
-		return err
-	}
-
-	return acs.repo.Approve(uid, id)
+	return acs.approveAccess(uid, id)
 }
 
 func (acs accessControlService) RevokeAccessRequest(key, id string) error {
@@ -176,12 +165,37 @@ func (acs accessControlService) RevokeAccessRequest(key, id string) error {
 }
 
 func (acs accessControlService) GrantAccess(key, dstUserId string) (string, error) {
+	if err := acs.auth.Exists(dstUserId); err != nil {
+		return "", fmt.Errorf("failed to grant access, destination user doesn't exist: %w", ErrNotFound)
+	}
 	srcUserId, err := acs.auth.Identify(key)
 	if err != nil {
 		return "", ErrUnauthorizedAccess
 	}
-	if err := acs.ledger.GrantAccess(srcUserId, dstUserId); err != nil {
-		return "", err
+	accReqId, err := acs.requestAccess(srcUserId, dstUserId)
+	if err != nil {
+		return "", fmt.Errorf("failed to grant access on request: %w", err)
 	}
-	return acs.repo.GrantAccess(srcUserId, dstUserId)
+	if err := acs.ApproveAccessRequest(key, accReqId); err != nil {
+		return "", fmt.Errorf("failed to grant access on approve: %w", err)
+	}
+	return accReqId, nil
+}
+
+func (acs accessControlService) requestAccess(srcUserId, dstUserId string) (string, error) {
+	if err := acs.ledger.RequestAccess(srcUserId, dstUserId); err != nil {
+		return "", fmt.Errorf("failed to request access in the ledger: %w", err)
+	}
+	return acs.repo.RequestAccess(srcUserId, dstUserId)
+}
+
+func (acs accessControlService) approveAccess(srcUserId, accReqId string) error {
+	req, err := acs.repo.One(accReqId)
+	if err != nil {
+		return fmt.Errorf("failed to approve access: request not found in DB: %w", err)
+	}
+	if err := acs.ledger.Approve(srcUserId, req.Sender); err != nil {
+		return fmt.Errorf("failed to approve access in the ledger: %w ", err)
+	}
+	return acs.repo.Approve(srcUserId, accReqId)
 }
