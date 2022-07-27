@@ -47,6 +47,8 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return cr.revokeAccess(stub, args)
 	case "listAccess":
 		return cr.listAccess(stub, args)
+	case "grantAccess":
+		return cr.grantAccess(stub, args)
 	}
 
 	return shim.Error(errIncorrectFunc.Error())
