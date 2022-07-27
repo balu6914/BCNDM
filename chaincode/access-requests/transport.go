@@ -125,3 +125,20 @@ func (cr chaincodeRouter) listAccess(stub shim.ChaincodeStubInterface, args []st
 
 	return shim.Success(payload)
 }
+
+func (cr chaincodeRouter) grantAccess(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error(errInvalidNumOfArgs.Error())
+	}
+
+	var req grantReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if err := cr.svc.GrantAccess(stub, req.Destination); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}

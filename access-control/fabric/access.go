@@ -15,6 +15,7 @@ const (
 	requestFcn = "requestAccess"
 	approveFcn = "approveAccess"
 	revokeFcn  = "revokeAccess"
+	grantFcn   = "grantAccess"
 	chanID     = "datapacechannel"
 )
 
@@ -137,6 +138,42 @@ func (arl accessRequestLedger) Revoke(revoker, sender string) error {
 	_, err = client.Execute(channel.Request{
 		ChaincodeID: arl.chaincode,
 		Fcn:         revokeFcn,
+		Args:        [][]byte{data},
+	})
+	if err != nil {
+		arl.logger.Warn(fmt.Sprintf("failed to execute access control chaincode: %s", err))
+		return err
+	}
+
+	return nil
+}
+
+func (arl accessRequestLedger) Grant(src, dst string) error {
+	ctx := arl.sdk.ChannelContext(
+		chanID,
+		fabsdk.WithUser(src),
+		fabsdk.WithOrg(arl.org),
+	)
+
+	client, err := channel.New(ctx)
+	if err != nil {
+		arl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
+		return err
+	}
+
+	req := grantReq{
+		Destination: dst,
+	}
+
+	data, err := json.Marshal(req)
+	if err != nil {
+		arl.logger.Warn(fmt.Sprintf("failed to serialize grant request: %s", err))
+		return err
+	}
+
+	_, err = client.Execute(channel.Request{
+		ChaincodeID: arl.chaincode,
+		Fcn:         grantFcn,
 		Args:        [][]byte{data},
 	})
 	if err != nil {

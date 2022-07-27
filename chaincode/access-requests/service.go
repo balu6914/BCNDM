@@ -55,6 +55,9 @@ type Service interface {
 
 	// ListAccess returns page of access requests.
 	ListAccess(shim.ChaincodeStubInterface) ([]Access, error)
+
+	// GrantAccess sets the access request entity with approved state
+	GrantAccess(stub shim.ChaincodeStubInterface, dst string) error
 }
 
 // Access represents access request and its status.

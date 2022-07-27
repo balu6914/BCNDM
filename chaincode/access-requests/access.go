@@ -144,3 +144,21 @@ func (ac accessChaincode) ListAccess(stub shim.ChaincodeStubInterface) ([]Access
 
 	return res, nil
 }
+
+func (ac accessChaincode) GrantAccess(stub shim.ChaincodeStubInterface, dst string) error {
+	src, err := callerCN(stub)
+	if err != nil {
+		return err
+	}
+
+	key, err := stub.CreateCompositeKey(indexAccess, []string{dst, src})
+	if err != nil {
+		return ErrFailedKeyCreation
+	}
+
+	if err := stub.PutState(key, []byte(Approved)); err != nil {
+		return ErrSettingState
+	}
+
+	return nil
+}
