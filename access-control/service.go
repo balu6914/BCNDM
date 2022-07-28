@@ -165,16 +165,13 @@ func (acs accessControlService) RevokeAccessRequest(key, id string) error {
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
 	req, err := acs.repo.One(id)
 	if err != nil {
-		return err
+		return fmt.Errorf("revoke failed on getting access request %s from DB: %w", id, err)
 	}
-
 	if err := acs.ledger.Revoke(uid, req.Sender); err != nil {
-		return err
+		return fmt.Errorf("revoke failed in ledger: %w", err)
 	}
-
 	return acs.repo.Revoke(uid, id)
 }
 
