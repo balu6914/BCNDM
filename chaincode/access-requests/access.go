@@ -1,6 +1,9 @@
 package main
 
-import "github.com/hyperledger/fabric/core/chaincode/shim"
+import (
+	"fmt"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
+)
 
 const indexAccess = "cn~access"
 
@@ -91,8 +94,9 @@ func (ac accessChaincode) RevokeAccess(stub shim.ChaincodeStubInterface, request
 		return ErrNotFound
 	}
 
-	if State(val) != Approved && State(val) != Pending {
-		return ErrInvalidStateTransition
+	state := State(val)
+	if state != Approved && state != Pending {
+		return fmt.Errorf("%w: %s", ErrInvalidStateTransition, state)
 	}
 
 	if err := stub.PutState(key, []byte(Revoked)); err != nil {
