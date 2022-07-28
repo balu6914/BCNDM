@@ -79,3 +79,20 @@ func (req listAccessRequestsReq) validate() error {
 
 	return nil
 }
+
+type grantAccessReq struct {
+	key        string
+	dstUserIid string
+}
+
+func (req grantAccessReq) validate() error {
+	if req.key == "" {
+		return auth.ErrUnauthorizedAccess
+	}
+
+	if req.dstUserIid == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}

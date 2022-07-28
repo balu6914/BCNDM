@@ -1,6 +1,9 @@
 package access
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	// ErrConflict indicates that sent access request already exists and is not
@@ -45,6 +48,10 @@ type Service interface {
 
 	// RevokeAccessRequest updates status of access request to revoked.
 	RevokeAccessRequest(string, string) error
+
+	// GrantAccess combines both request access and approve it in a single call.
+	// Returns the access request id to revoke later, if needed.
+	GrantAccess(string, string) (string, error)
 }
 
 var _ Service = (*accessControlService)(nil)
@@ -158,15 +165,26 @@ func (acs accessControlService) RevokeAccessRequest(key, id string) error {
 	if err != nil {
 		return ErrUnauthorizedAccess
 	}
-
 	req, err := acs.repo.One(id)
 	if err != nil {
-		return err
+		return fmt.Errorf("revoke failed on getting access request %s from DB: %w", id, err)
 	}
-
 	if err := acs.ledger.Revoke(uid, req.Sender); err != nil {
-		return err
+		return fmt.Errorf("revoke failed in ledger: %w", err)
 	}
-
 	return acs.repo.Revoke(uid, id)
+}
+
+func (acs accessControlService) GrantAccess(key, dstUserId string) (string, error) {
+	if err := acs.auth.Exists(dstUserId); err != nil {
+		return "", fmt.Errorf("failed to grant access, destination user doesn't exist: %w", ErrNotFound)
+	}
+	srcUserId, err := acs.auth.Identify(key)
+	if err != nil {
+		return "", ErrUnauthorizedAccess
+	}
+	if err := acs.ledger.Grant(srcUserId, dstUserId); err != nil {
+		return "", err
+	}
+	return acs.repo.GrantAccess(srcUserId, dstUserId)
 }

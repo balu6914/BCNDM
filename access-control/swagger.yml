@@ -132,6 +132,30 @@ paths:
           description: Access request with specified ID doesn't exist.
         500:
           $ref: "#/responses/ServiceError"
+  /access/grant/{uid}:
+    put:
+      summary: Grants the access to the user specified in the payload.
+      description: Creates a new pending access request and changes its state to approved in a single request.
+      tags:
+        - access-grant
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: uid
+          description: Target user ID whom the access is being granted.
+          in: path
+          type: string
+          required: true
+      responses:
+        201:
+          description: Successfully granted the access.
+          headers:
+            Location:
+              type: string
+              description: The created corresponding access-request id to revoke later when needed
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
 
 parameters:
   Authorization:

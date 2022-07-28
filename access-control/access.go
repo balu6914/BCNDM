@@ -42,6 +42,10 @@ type RequestRepository interface {
 
 	// One finds and returns access request by it's id.
 	One(string) (Request, error)
+
+	// GrantAccess combines the RequestAccess and Approve in a single call.
+	// Returns the access request id to revoke later when needed.
+	GrantAccess(srcUserId, dstUserId string) (string, error)
 }
 
 // RequestLedger specifies access request writer API.
@@ -55,4 +59,7 @@ type RequestLedger interface {
 
 	// Revoke updates status of access request to revoked.
 	Revoke(string, string) error
+
+	// Grant the access to the desitnation.
+	Grant(src, dst string) error
 }

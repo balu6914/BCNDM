@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	access "github.com/datapace/datapace/access-control"
 
 	"gopkg.in/mgo.v2"
@@ -154,16 +155,24 @@ func (repo accessRequestRepository) Revoke(receiver, id string) error {
 		return access.ErrMalformedEntity
 	}
 
-	q := bson.M{"_id": bson.ObjectIdHex(id), "receiver": receiver, "state": access.Pending}
+	q := bson.M{"_id": bson.ObjectIdHex(id), "receiver": receiver}
 	u := bson.M{"$set": bson.M{"state": access.Revoked}}
 	if err := collection.Update(q, u); err != nil {
 		if err == mgo.ErrNotFound {
-			return access.ErrNotFound
+			return fmt.Errorf("revoke failed, access request query: %s, cause: %w", q, access.ErrNotFound)
 		}
-		return err
+		return fmt.Errorf("revoke failed, access request query: %s, cause: %w", q, err)
 	}
 
 	return nil
+}
+
+func (repo accessRequestRepository) GrantAccess(srcUserId string, dstUserId string) (string, error) {
+	reqId, err := repo.RequestAccess(dstUserId, srcUserId)
+	if err != nil {
+		return "", err
+	}
+	return reqId, repo.Approve(srcUserId, reqId)
 }
 
 type accessRequest struct {

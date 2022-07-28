@@ -83,3 +83,21 @@ func (res listAccessRequestsRes) headers() map[string]string {
 func (res listAccessRequestsRes) empty() bool {
 	return false
 }
+
+type grantAccessResp struct {
+	id string
+}
+
+func (res grantAccessResp) code() int {
+	return http.StatusCreated
+}
+
+func (res grantAccessResp) headers() map[string]string {
+	return map[string]string{
+		"Location": fmt.Sprintf("/access-requests/%s", res.id),
+	}
+}
+
+func (res grantAccessResp) empty() bool {
+	return true
+}
