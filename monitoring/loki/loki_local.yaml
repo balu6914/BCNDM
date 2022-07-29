@@ -1,0 +1,19 @@
+loki:
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 100Gi
+  config:
+    compactor:
+      working_directory: /data/loki/boltdb-shipper-compactor
+      shared_store: filesystem
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 1h
+      retention_delete_worker_count: 150
+    limits_config:
+      max_global_streams_per_user: 5000
+      max_query_length: 2160h
+      max_query_parallelism: 32
+      retention_period: 2160h # 90 days
