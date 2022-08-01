@@ -1,0 +1,21 @@
+loki:
+  config:
+    limits_config:
+      max_query_length: 2160h #90 days
+    schema_config:
+      configs:
+        - from: 2021-05-12
+          store: boltdb-shipper
+          object_store: azure
+          schema: v11
+          index:
+            prefix: loki_index_
+            period: 24h
+    storage_config:
+      azure:
+        # Need to be supplied at the time of deployment
+        container_name: 
+        account_name: 
+        account_key: 
+  serviceMonitor:
+    enabled: true
