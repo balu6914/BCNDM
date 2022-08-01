@@ -17,6 +17,7 @@ var _ authproto.AuthServiceClient = (*grpcClient)(nil)
 type grpcClient struct {
 	identify  endpoint.Endpoint
 	email     endpoint.Endpoint
+	emailById endpoint.Endpoint
 	exists    endpoint.Endpoint
 	authorize endpoint.Endpoint
 }
@@ -37,6 +38,15 @@ func NewClient(conn *grpc.ClientConn) authproto.AuthServiceClient {
 		"datapace.AuthService",
 		"Email",
 		encodeIdentifyRequest,
+		decodeEmailResponse,
+		authproto.UserEmail{},
+	).Endpoint()
+
+	emailById := kitgrpc.NewClient(
+		conn,
+		"datapace.AuthService",
+		"EmailById",
+		encodeByIdRequest,
 		decodeEmailResponse,
 		authproto.UserEmail{},
 	).Endpoint()
@@ -62,6 +72,7 @@ func NewClient(conn *grpc.ClientConn) authproto.AuthServiceClient {
 	return &grpcClient{
 		identify:  identify,
 		email:     email,
+		emailById: emailById,
 		exists:    exists,
 		authorize: authorize,
 	}
@@ -79,6 +90,16 @@ func (client grpcClient) Identify(ctx context.Context, token *authproto.Token, _
 
 func (client grpcClient) Email(ctx context.Context, token *authproto.Token, _ ...grpc.CallOption) (*authproto.UserEmail, error) {
 	res, err := client.email(ctx, identityReq{token.GetValue()})
+	if err != nil {
+		return nil, err
+	}
+
+	emailRes := res.(emailRes)
+	return &authproto.UserEmail{Email: emailRes.email, ContactEmail: emailRes.contactEmail}, emailRes.err
+}
+
+func (client grpcClient) EmailById(ctx context.Context, id *commonproto.ID, _ ...grpc.CallOption) (*authproto.UserEmail, error) {
+	res, err := client.email(ctx, identityReq{id.GetValue()})
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +142,11 @@ func encodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{},
 func decodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*commonproto.ID)
 	return identityRes{res.GetValue(), nil}, nil
+}
+
+func encodeByIdRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(byIdReq)
+	return &commonproto.ID{Value: req.id}, nil
 }
 
 func decodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {

@@ -267,6 +267,10 @@ func (as *authService) ViewEmail(key string) (User, error) {
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
+	return as.ViewEmailById(id)
+}
+
+func (as *authService) ViewEmailById(id string) (User, error) {
 	user, err := as.users.OneByID(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess

@@ -26,6 +26,18 @@ func (req existsReq) validate() error {
 	return nil
 }
 
+type byIdReq struct {
+	id string
+}
+
+func (req byIdReq) validate() error {
+	if req.id == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
 type authReq struct {
 	token        string
 	action       int64

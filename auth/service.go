@@ -60,6 +60,9 @@ type Service interface {
 	// ID, that belongs to the user identified by the provided key.
 	ViewEmail(string) (User, error)
 
+	// ViewEmailById retrieves data about the user by its id.
+	ViewEmailById(id string) (User, error)
+
 	// Identity retrieves Client ID for provided client token.
 	Identify(string) (string, error)
 

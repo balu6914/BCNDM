@@ -19,6 +19,7 @@ type grpcServer struct {
 	authproto.UnimplementedAuthServiceServer
 	identify  kitgrpc.Handler
 	email     kitgrpc.Handler
+	emailById kitgrpc.Handler
 	exists    kitgrpc.Handler
 	authorize kitgrpc.Handler
 }
@@ -37,6 +38,12 @@ func NewServer(svc auth.Service) authproto.AuthServiceServer {
 		encodeEmailResponse,
 	)
 
+	emailById := kitgrpc.NewServer(
+		emailByEndpoint(svc),
+		decodeByIdRequest,
+		encodeEmailResponse,
+	)
+
 	exists := kitgrpc.NewServer(
 		existsEndpoint(svc),
 		decodeExistsRequest,
@@ -52,6 +59,7 @@ func NewServer(svc auth.Service) authproto.AuthServiceServer {
 	return &grpcServer{
 		identify:  identify,
 		email:     email,
+		emailById: emailById,
 		exists:    exists,
 		authorize: authorize,
 	}
@@ -97,6 +105,11 @@ func decodeIdentifyRequest(_ context.Context, grpcReq interface{}) (interface{},
 func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(identityRes)
 	return &commonproto.ID{Value: res.id}, encodeError(res.err)
+}
+
+func decodeByIdRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*commonproto.ID)
+	return byIdReq{req.GetValue()}, nil
 }
 
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
