@@ -100,6 +100,19 @@ func (lm *loggingMiddleware) ViewEmail(key string) (user auth.User, err error) {
 	return lm.svc.ViewEmail(key)
 }
 
+func (lm *loggingMiddleware) ViewUserById(id string) (u auth.User, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method view_user_by_id for ID %s and took %s to complete", id, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.ViewUserById(id)
+}
+
 func (lm *loggingMiddleware) ListUsers(key string) (list []auth.User, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method list_users for key %s and took %s to complete", key, time.Since(begin))
