@@ -41,6 +41,10 @@ func (mac *mockAuthClient) Email(_ context.Context, token *authproto.Token, _ ..
 	return &authproto.UserEmail{Email: "", ContactEmail: ""}, nil
 }
 
+func (svc *mockAuthClient) UserById(ctx context.Context, in *commonproto.ID, opts ...grpc.CallOption) (*authproto.User, error) {
+	return nil, nil
+}
+
 func (mac *mockAuthClient) Exists(_ context.Context, id *commonproto.ID, _ ...grpc.CallOption) (*empty.Empty, error) {
 	return &empty.Empty{}, nil
 }

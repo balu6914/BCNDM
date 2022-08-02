@@ -40,6 +40,10 @@ func (svc authClientMock) Email(_ context.Context, in *authproto.Token, opts ...
 	return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 }
 
+func (svc authClientMock) UserById(ctx context.Context, in *commonproto.ID, opts ...grpc.CallOption) (*authproto.User, error) {
+	return nil, nil
+}
+
 func (svc authClientMock) Exists(_ context.Context, id *commonproto.ID, opts ...grpc.CallOption) (*empty.Empty, error) {
 	return &empty.Empty{}, nil
 }
