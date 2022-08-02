@@ -55,13 +55,13 @@ type Service interface {
 	// Key provided must have same ID (user viewing his own data) or admin role.
 	ViewUser(string, string) (User, error)
 
+	// ViewUserById retrieves data about the user by its id.
+	ViewUserById(id string) (User, error)
+
 	// ViewEmail provides backwards compatibility for grpc which doesn't support authorization at the moment
 	// It retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
 	ViewEmail(string) (User, error)
-
-	// ViewEmailById retrieves data about the user by its id.
-	ViewEmailById(id string) (User, error)
 
 	// Identity retrieves Client ID for provided client token.
 	Identify(string) (string, error)

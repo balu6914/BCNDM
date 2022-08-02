@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion6
 type AuthServiceClient interface {
 	Identify(ctx context.Context, in *Token, opts ...grpc.CallOption) (*common.ID, error)
 	Email(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserEmail, error)
-	EmailById(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*UserEmail, error)
+	UserById(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*User, error)
 	Exists(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Authorize(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*common.ID, error)
 }
@@ -52,9 +52,9 @@ func (c *authServiceClient) Email(ctx context.Context, in *Token, opts ...grpc.C
 	return out, nil
 }
 
-func (c *authServiceClient) EmailById(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*UserEmail, error) {
-	out := new(UserEmail)
-	err := c.cc.Invoke(ctx, "/datapace.AuthService/EmailById", in, out, opts...)
+func (c *authServiceClient) UserById(ctx context.Context, in *common.ID, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/datapace.AuthService/UserById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *authServiceClient) Authorize(ctx context.Context, in *AuthRequest, opts
 type AuthServiceServer interface {
 	Identify(context.Context, *Token) (*common.ID, error)
 	Email(context.Context, *Token) (*UserEmail, error)
-	EmailById(context.Context, *common.ID) (*UserEmail, error)
+	UserById(context.Context, *common.ID) (*User, error)
 	Exists(context.Context, *common.ID) (*emptypb.Empty, error)
 	Authorize(context.Context, *AuthRequest) (*common.ID, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -101,8 +101,8 @@ func (*UnimplementedAuthServiceServer) Identify(context.Context, *Token) (*commo
 func (*UnimplementedAuthServiceServer) Email(context.Context, *Token) (*UserEmail, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Email not implemented")
 }
-func (*UnimplementedAuthServiceServer) EmailById(context.Context, *common.ID) (*UserEmail, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EmailById not implemented")
+func (*UnimplementedAuthServiceServer) UserById(context.Context, *common.ID) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserById not implemented")
 }
 func (*UnimplementedAuthServiceServer) Exists(context.Context, *common.ID) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Exists not implemented")
@@ -152,20 +152,20 @@ func _AuthService_Email_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_EmailById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AuthService_UserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(common.ID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).EmailById(ctx, in)
+		return srv.(AuthServiceServer).UserById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/datapace.AuthService/EmailById",
+		FullMethod: "/datapace.AuthService/UserById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).EmailById(ctx, req.(*common.ID))
+		return srv.(AuthServiceServer).UserById(ctx, req.(*common.ID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -219,8 +219,8 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_Email_Handler,
 		},
 		{
-			MethodName: "EmailById",
-			Handler:    _AuthService_EmailById_Handler,
+			MethodName: "UserById",
+			Handler:    _AuthService_UserById_Handler,
 		},
 		{
 			MethodName: "Exists",

@@ -9,7 +9,7 @@ import "proto/common.proto";
 service AuthService {
     rpc Identify(Token) returns (ID) {}
     rpc Email(Token) returns (UserEmail) {}
-    rpc EmailById(ID) returns (UserEmail) {}
+    rpc UserById(ID) returns (User) {}
     rpc Exists(ID) returns (google.protobuf.Empty) {}
     rpc Authorize(AuthRequest) returns (ID) {}
 }
@@ -28,4 +28,15 @@ message Token {
 message UserEmail {
     string email = 1;
     string contactEmail = 2;
+}
+
+message User {
+    string id = 1;
+    UserEmail email = 2;
+    string firstName = 3;
+    string lastName = 4;
+    string company = 5;
+    string address = 6;
+    string phone = 7;
+    string role = 8;
 }
