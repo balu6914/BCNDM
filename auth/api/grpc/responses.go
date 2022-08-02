@@ -14,3 +14,16 @@ type emailRes struct {
 type existsRes struct {
 	err error
 }
+
+type userResp struct {
+	id           string
+	email        string
+	contactEmail string
+	firstName    string
+	lastName     string
+	company      string
+	address      string
+	phone        string
+	role         string
+	err          error
+}

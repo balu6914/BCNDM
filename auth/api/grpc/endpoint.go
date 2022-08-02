@@ -37,6 +37,31 @@ func emailEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
+func userByEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(byIdReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		u, err := svc.ViewUserById(req.id)
+		if err != nil {
+			return userResp{err: err}, err
+		}
+		return userResp{
+			id:           u.ID,
+			email:        u.Email,
+			contactEmail: u.ContactEmail,
+			firstName:    u.FirstName,
+			lastName:     u.LastName,
+			company:      u.Company,
+			address:      u.Address,
+			phone:        u.Phone,
+			role:         u.Role,
+			err:          nil,
+		}, nil
+	}
+}
+
 func existsEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(existsReq)

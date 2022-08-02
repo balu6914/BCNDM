@@ -3,6 +3,7 @@ package grpc_test
 import (
 	"context"
 	"fmt"
+	commonproto "github.com/datapace/datapace/proto/common"
 	"sync"
 	"testing"
 	"time"
@@ -205,6 +206,49 @@ func TestEmail(t *testing.T) {
 	for desc, tc := range cases {
 		email, err := client.Email(ctx, &authproto.Token{Value: tc.token})
 		assert.Equal(t, tc.email, email.GetEmail(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, email.GetEmail()))
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
+	}
+}
+
+func TestUserById(t *testing.T) {
+	_, err := svc.Register(k, user)
+	authAddr := fmt.Sprintf("localhost:%d", port)
+	conn, err := grpc.Dial(authAddr, grpc.WithInsecure())
+	require.Nil(t, err, "unexpected error dialing GRPC: %s", err)
+	client := grpcapi.NewClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	cases := map[string]struct {
+		id        string
+		email     string
+		firstName string
+		lastName  string
+		role      string
+		err       error
+	}{
+		"get user": {
+			id:        user.ID,
+			email:     user.Email,
+			firstName: user.FirstName,
+			lastName:  user.LastName,
+			role:      user.Role,
+			err:       nil,
+		},
+		"get user with an empty id": {
+			id:  "",
+			err: status.Error(codes.InvalidArgument, "received invalid request"),
+		},
+		"get user with an invalid id": {
+			id:  invalid,
+			err: status.Error(codes.Unauthenticated, "failed to identify user from key"),
+		},
+	}
+	for desc, tc := range cases {
+		u, err := client.UserById(ctx, &commonproto.ID{Value: tc.id})
+		assert.Equal(t, tc.email, u.GetEmail().GetEmail(), fmt.Sprintf("%s: expected %s got %s", desc, tc.email, u.GetEmail().GetEmail()))
+		assert.Equal(t, tc.firstName, u.GetFirstName(), fmt.Sprintf("%s: expected %s got %s", desc, tc.firstName, u.GetFirstName()))
+		assert.Equal(t, tc.lastName, u.GetLastName(), fmt.Sprintf("%s: expected %s got %s", desc, tc.lastName, u.GetLastName()))
+		assert.Equal(t, tc.role, u.GetRole(), fmt.Sprintf("%s: expected %s got %s", desc, tc.role, u.GetRole()))
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s", desc, tc.err, err))
 	}
 }

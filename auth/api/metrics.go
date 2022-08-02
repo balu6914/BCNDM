@@ -80,6 +80,15 @@ func (ms *metricsMiddleware) ViewEmail(key string) (auth.User, error) {
 	return ms.svc.ViewEmail(key)
 }
 
+func (ms *metricsMiddleware) ViewUserById(id string) (auth.User, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_user_by_id").Add(1)
+		ms.latency.With("method", "view_user_by_id").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ViewUserById(id)
+}
+
 func (ms *metricsMiddleware) ListUsers(key string) ([]auth.User, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "list_users").Add(1)

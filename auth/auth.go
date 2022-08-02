@@ -262,16 +262,20 @@ func (as *authService) ViewUser(key, userID string) (User, error) {
 	return user, nil
 }
 
-func (as *authService) ViewEmail(key string) (User, error) {
-	id, err := as.idp.Identity(key)
-	if err != nil {
-		return User{}, ErrUnauthorizedAccess
-	}
+func (as *authService) ViewUserById(id string) (User, error) {
 	user, err := as.users.OneByID(id)
 	if err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
 	return user, nil
+}
+
+func (as *authService) ViewEmail(key string) (User, error) {
+	id, err := as.idp.Identity(key)
+	if err != nil {
+		return User{}, ErrUnauthorizedAccess
+	}
+	return as.ViewUserById(id)
 }
 
 func (as *authService) ListUsers(key string) ([]User, error) {

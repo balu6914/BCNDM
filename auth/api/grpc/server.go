@@ -19,6 +19,7 @@ type grpcServer struct {
 	authproto.UnimplementedAuthServiceServer
 	identify  kitgrpc.Handler
 	email     kitgrpc.Handler
+	userById  kitgrpc.Handler
 	exists    kitgrpc.Handler
 	authorize kitgrpc.Handler
 }
@@ -37,6 +38,12 @@ func NewServer(svc auth.Service) authproto.AuthServiceServer {
 		encodeEmailResponse,
 	)
 
+	userById := kitgrpc.NewServer(
+		userByEndpoint(svc),
+		decodeByIdRequest,
+		encodeUserResponse,
+	)
+
 	exists := kitgrpc.NewServer(
 		existsEndpoint(svc),
 		decodeExistsRequest,
@@ -52,6 +59,7 @@ func NewServer(svc auth.Service) authproto.AuthServiceServer {
 	return &grpcServer{
 		identify:  identify,
 		email:     email,
+		userById:  userById,
 		exists:    exists,
 		authorize: authorize,
 	}
@@ -71,6 +79,14 @@ func (s *grpcServer) Email(ctx context.Context, id *authproto.Token) (*authproto
 		return nil, encodeError(err)
 	}
 	return res.(*authproto.UserEmail), nil
+}
+
+func (s *grpcServer) UserById(ctx context.Context, id *commonproto.ID) (*authproto.User, error) {
+	_, resp, err := s.userById.ServeGRPC(ctx, id)
+	if err != nil {
+		return nil, encodeError(err)
+	}
+	return resp.(*authproto.User), nil
 }
 
 func (s *grpcServer) Exists(ctx context.Context, id *commonproto.ID) (*empty.Empty, error) {
@@ -102,6 +118,30 @@ func encodeIdentifyResponse(_ context.Context, grpcRes interface{}) (interface{}
 func encodeEmailResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(emailRes)
 	return &authproto.UserEmail{Email: res.email, ContactEmail: res.contactEmail}, encodeError(res.err)
+}
+
+func decodeByIdRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*commonproto.ID)
+	return byIdReq{req.GetValue()}, nil
+}
+
+func encodeUserResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
+	resp := grpcRes.(userResp)
+	e := authproto.UserEmail{
+		Email:        resp.email,
+		ContactEmail: resp.contactEmail,
+	}
+	u := authproto.User{
+		Id:        resp.id,
+		Email:     &e,
+		FirstName: resp.firstName,
+		LastName:  resp.lastName,
+		Company:   resp.company,
+		Address:   resp.address,
+		Phone:     resp.phone,
+		Role:      resp.role,
+	}
+	return &u, encodeError(resp.err)
 }
 
 func decodeExistsRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
