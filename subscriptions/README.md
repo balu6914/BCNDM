@@ -23,6 +23,7 @@ default values.
 | DATAPACE_AUTH_URL              | Auth service gRPC URL                    | localhost:8081        |
 | DATAPACE_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081        |
 | DATAPACE_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081        |
+| DATAPACE_SHARING_URL           | Sharing service gRPC URL (optional)      | localhost:8081        |
 | DATAPACE_PROXY_URL             | Proxy service URL                        | http://localhost:8080 |
 
 ## Deployment

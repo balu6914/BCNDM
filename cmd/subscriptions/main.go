@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/sharing"
+	sharingApi "github.com/datapace/sharing/api/grpc"
+	sharingProto "github.com/datapace/sharing/proto"
 	"net/http"
 	"os"
 	"os/signal"
@@ -35,6 +38,7 @@ const (
 	envAuthURL         = "DATAPACE_AUTH_URL"
 	envTransactionsURL = "DATAPACE_TRANSACTIONS_URL"
 	envStreamsURL      = "DATAPACE_STREAMS_URL"
+	envSharingUrl      = "DATAPACE_SHARING_URL"
 
 	// HTTP prefixed, because all others are gRPC.
 	envProxyURL      = "DATAPACE_PROXY_URL"
@@ -47,6 +51,7 @@ const (
 	defAuthURL         = "localhost:8081"
 	defTransactionsURL = "localhost:8081"
 	defStreamsURL      = "localhost:8081"
+	defSharingUrl      = "localhost:8081"
 	defProxyURL        = "http://localhost:8080"
 	defSubsURL         = "0.0.0.0"
 	defMongoURL        = "0.0.0.0"
@@ -63,6 +68,7 @@ type config struct {
 	AuthURL             string
 	TransactionsURL     string
 	StreamsURL          string
+	SharingUrl          string
 	ProxyURL            string
 	MongoURL            string
 	MongoUser           string
@@ -92,7 +98,11 @@ func main() {
 	defer streamsConn.Close()
 	sc := streamsapi.NewClient(streamsConn)
 
-	svc := newService(ac, ms, sc, tc, cfg.ProxyURL, logger)
+	sharingConn := newGRPCConn(cfg.SharingUrl, logger)
+	defer sharingConn.Close()
+	sharingClient := sharingApi.NewClient(sharingConn)
+
+	svc := newService(ac, ms, sc, tc, sharingClient, cfg.ProxyURL, logger)
 
 	errs := make(chan error, 2)
 
@@ -113,6 +123,7 @@ func loadConfig() config {
 		SubsPort:            datapace.Env(envSubsPort, defSubsPort),
 		StreamsURL:          datapace.Env(envStreamsURL, defStreamsURL),
 		TransactionsURL:     datapace.Env(envTransactionsURL, defTransactionsURL),
+		SharingUrl:          datapace.Env(envSharingUrl, defSharingUrl),
 		ProxyURL:            datapace.Env(envProxyURL, defProxyURL),
 		MongoURL:            datapace.Env(envMongoURL, defMongoURL),
 		MongoUser:           datapace.Env(envMongoUser, defMongoUser),
@@ -151,14 +162,19 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
-func newService(ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
-	tc transactionsproto.TransactionsServiceClient, proxyURL string, logger log.Logger) subscriptions.Service {
+func newService(
+	ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
+	tc transactionsproto.TransactionsServiceClient, sharingClient sharingProto.SharingServiceClient,
+	proxyURL string, logger log.Logger,
+) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
+	sharingSvc := sharing.NewService(sharingClient)
+	sharingSvc = sharing.NewLoggingMiddleware(sharingSvc, logger)
 	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewSubscriptionRepository(ms)
-	svc := subscriptions.New(ac, repo, ss, ps, ts)
+	svc := subscriptions.New(ac, repo, ss, ps, ts, sharingSvc)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/sharing"
 	"net/http"
 	"strings"
 	"time"
@@ -73,16 +74,18 @@ type subscriptionsService struct {
 	streams       StreamsService
 	proxy         Proxy
 	transactions  TransactionsService
+	sharingSvc    sharing.Service
 }
 
 // New instantiates the domain service implementation.
-func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService) Service {
+func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService, sharingSvc sharing.Service) Service {
 	return &subscriptionsService{
 		auth:          auth,
 		subscriptions: subs,
 		streams:       streams,
 		proxy:         proxy,
 		transactions:  transactions,
+		sharingSvc:    sharingSvc,
 	}
 }
 
@@ -315,16 +318,17 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return "", ErrFailedCreateSub
 	}
 
-	if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
-		if ds != nil {
-			ds.Delete(context.Background())
+	// do not invoke transactions if stream price is 0 and stream is shared to the current user
+	if stream.Price > 0 || !ss.isStreamSharedTo(stream.ID, userID) {
+		if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+			if ds != nil {
+				ds.Delete(context.Background())
+			}
+			if err == ErrNotEnoughTokens {
+				return "", err
+			}
+			return "", ErrFailedTransfer
 		}
-
-		if err == ErrNotEnoughTokens {
-			return "", err
-		}
-
-		return "", ErrFailedTransfer
 	}
 
 	ss.subscriptions.Activate(id)
@@ -351,4 +355,17 @@ func (ss subscriptionsService) ViewSubscription(userID, subID string) (Subscript
 
 func (ss subscriptionsService) ViewSubByUserAndStream(userID, streamID string) (Subscription, error) {
 	return ss.subscriptions.OneByUserAndStream(userID, streamID)
+}
+
+func (ss subscriptionsService) isStreamSharedTo(streamId, rcvUserId string) bool {
+	sharings, err := ss.sharingSvc.GetSharings(rcvUserId, []string{})
+	if err != nil {
+		return false
+	}
+	for _, s := range sharings {
+		if string(s.StreamId) == streamId {
+			return true
+		}
+	}
+	return false
 }
