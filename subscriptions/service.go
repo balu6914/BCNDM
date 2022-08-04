@@ -318,8 +318,8 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return "", ErrFailedCreateSub
 	}
 
-	// do not invoke transactions if stream price is 0 and stream is shared to the current user
-	if stream.Price > 0 || !ss.isStreamSharedTo(stream.ID, userID) {
+	// do not invoke transactions if the stream is shared to the current user
+	if ss.isStreamSharedTo(stream.ID, userID) {
 		if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
 			if ds != nil {
 				ds.Delete(context.Background())
