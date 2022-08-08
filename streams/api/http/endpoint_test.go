@@ -591,6 +591,44 @@ func TestUpdateStream(t *testing.T) {
 			status: http.StatusBadRequest,
 			id:     stream.ID,
 		},
+	}
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodPut,
+			url:    fmt.Sprintf("%s/streams/%s", ts.URL, tc.id),
+			token:  tc.auth,
+			body:   strings.NewReader(tc.req),
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestUpdatePartnersStream(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	stream := genStream()
+	svc.AddStream(stream)
+	valid := toJSON(stream)
+	// Create an invalid stream.
+	s := genStream()
+	s.Name = ""
+	// Create stream that does not exist in database.
+	s = stream
+	nonExistingId := bson.NewObjectId().Hex()
+	s.ID = nonExistingId
+
+	cases := []struct {
+		desc   string
+		req    string
+		auth   string
+		status int
+		id     string
+	}{
 		{
 			desc:   "update non partner's stream - fail",
 			req:    valid,
