@@ -201,7 +201,7 @@ func (sr streamRepository) Update(stream streams.Stream) error {
 		return err
 	}
 
-	query := bson.M{"_id": dbs.ID, "owner": dbs.Owner}
+	query := bson.M{"_id": dbs.ID}
 	update := bson.M{"$set": dbs}
 	if err := c.Update(query, update); err != nil {
 		if err == mgo.ErrNotFound {
