@@ -17,7 +17,7 @@ paths:
         - subscriptions
       parameters:
         - $ref: "#/parameters/Authorization"
-        - $ref: "#/parameters/Subscription"
+        - $ref: "#/parameters/Subscriptions"
       responses:
         200:
           description: Subscription created.
@@ -97,12 +97,12 @@ parameters:
     in: header
     type: string
     required: true
-  Subscription:
-    name: subscription
-    description: JSON-formatted document describing the new subscription.
+  Subscriptions:
+    name: subscriptions
+    description: JSON-formatted array describing the new subscriptions.
     in: body
     schema:
-      $ref: "#/definitions/SubscriptionReq"
+      $ref: "#/definitions/SubscriptionsReq"
     required: true
   SubscriptionId:
     name: id
@@ -113,6 +113,10 @@ parameters:
     required: true
 
 definitions:
+  SubscriptionsReq:
+    type: array
+    items:
+      $ref: '#/definitions/SubscriptionReq'
   SubscriptionReq:
     type: object
     properties:

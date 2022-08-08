@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/sharing"
 	"io"
 	"strings"
 
@@ -52,7 +53,8 @@ func newService() subscriptions.Service {
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
 	auth := mocks.NewAuthClient(nil, nil)
-	return subscriptions.New(auth, subs, streams, proxy, transactions)
+	sharingSvc := sharing.NewServiceMock()
+	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc)
 }
 
 func newServer(svc subscriptions.Service, ac authproto.AuthServiceClient) *httptest.Server {

@@ -2,6 +2,7 @@ package subscriptions_test
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/sharing"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -43,7 +44,8 @@ func newService(tokens map[string]string) subscriptions.Service {
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
 	auth := mocks.NewAuthClient(tokens, nil)
-	return subscriptions.New(auth, subs, streams, proxy, transactions)
+	sharingSvc := sharing.NewServiceMock()
+	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc)
 }
 
 func TestAddSubscription(t *testing.T) {
