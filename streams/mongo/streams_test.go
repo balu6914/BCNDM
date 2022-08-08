@@ -570,11 +570,6 @@ func TestUpdate(t *testing.T) {
 			err:    nil,
 		},
 		{
-			desc:   "update an existing stream with wrong user ID",
-			stream: wrong,
-			err:    streams.ErrNotFound,
-		},
-		{
 			desc:   "update a non-existing stream",
 			stream: nonExisting,
 			err:    streams.ErrNotFound,
