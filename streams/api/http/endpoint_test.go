@@ -35,9 +35,10 @@ const (
 )
 
 var (
-	validKey    = bson.NewObjectId().Hex()
-	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	counter     = rand.Intn(100)
+	validKey     = bson.NewObjectId().Hex()
+	validPartner = bson.NewObjectId().Hex()
+	letterRunes  = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	counter      = rand.Intn(100)
 )
 
 func randomString(n int) string {
@@ -114,8 +115,9 @@ func newService() streams.Service {
 }
 
 func newServer(svc streams.Service) *httptest.Server {
-	auth := mocks.NewAuth([]string{validKey})
-	mux := httpapi.MakeHandler(svc, auth)
+	auth := mocks.NewAuth([]string{validKey, validPartner})
+	accessSvc := mocks.NewAccessControl([]string{validPartner})
+	mux := httpapi.MakeHandler(svc, auth, accessSvc)
 	return httptest.NewServer(mux)
 }
 
@@ -586,6 +588,45 @@ func TestUpdateStream(t *testing.T) {
 			req:    "",
 			auth:   validKey,
 			status: http.StatusBadRequest,
+			id:     stream.ID,
+		},
+	}
+	for _, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodPut,
+			url:    fmt.Sprintf("%s/streams/%s", ts.URL, tc.id),
+			token:  tc.auth,
+			body:   strings.NewReader(tc.req),
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", tc.desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestUpdatePartnersStream(t *testing.T) {
+	svc := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	stream := genStream()
+	stream.Owner = validPartner
+	svc.AddStream(stream)
+	valid := toJSON(stream)
+
+	cases := []struct {
+		desc   string
+		req    string
+		auth   string
+		status int
+		id     string
+	}{
+		{
+			desc:   "update partner's stream",
+			req:    valid,
+			auth:   validKey,
+			status: http.StatusOK,
 			id:     stream.ID,
 		},
 	}

@@ -158,7 +158,7 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
-	if s.ID != "" && !bson.IsObjectIdHex(s.Owner) {
+	if s.ID != "" && !bson.IsObjectIdHex(s.ID) {
 		return ErrMalformedData
 	}
 

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+	"github.com/datapace/datapace/errors"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/datapace/datapace/streams"
@@ -100,15 +102,15 @@ type updateStreamReq struct {
 
 func (req updateStreamReq) validate() error {
 	if req.id == "" {
-		return streams.ErrMalformedData
+		return errors.Wrap(errors.New("stream id is missing in the request"), streams.ErrMalformedData)
 	}
 
 	if req.stream.ID != "" && req.id != req.stream.ID {
-		return streams.ErrMalformedData
+		return errors.Wrap(fmt.Errorf("stream id %s change to %s is not allowed", req.stream.ID, req.id), streams.ErrMalformedData)
 	}
 
 	if req.stream.Owner != "" && req.owner != req.stream.Owner {
-		return streams.ErrMalformedData
+		return errors.Wrap(fmt.Errorf("stream owner %s change to %s is not allowed", req.stream.Owner, req.owner), streams.ErrMalformedData)
 	}
 
 	return req.stream.Validate()

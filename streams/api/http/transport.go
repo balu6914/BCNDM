@@ -33,7 +33,7 @@ var (
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
-func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
+func MakeHandler(svc streams.Service, auth streams.Authorization, accessSvc streams.AccessControl) http.Handler {
 	authService = auth
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorEncoder(encodeError),
@@ -63,7 +63,7 @@ func MakeHandler(svc streams.Service, auth streams.Authorization) http.Handler {
 	))
 
 	r.Put("/streams/:id", kithttp.NewServer(
-		updateStreamEndpoint(svc),
+		updateStreamEndpoint(svc, accessSvc),
 		decodeUpdateStreamRequest,
 		encodeResponse,
 		opts...,
