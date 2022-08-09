@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	accessproto "github.com/datapace/datapace/proto/access"
 	"github.com/datapace/datapace/streams/groups"
 	"github.com/datapace/datapace/streams/sharing"
 	"github.com/datapace/datapace/streams/terms"
@@ -98,10 +99,10 @@ func main() {
 	groupsConn := connectToGRPCService(cfg.GroupsURL, logger)
 	sharingConn := connectToGRPCService(cfg.SharingURL, logger)
 
-	svc, auth := newServices(ms, authConn, accessConn, execConn, termsConn, groupsConn, sharingConn, logger)
+	svc, auth, accessSvc := newServices(ms, authConn, accessConn, execConn, termsConn, groupsConn, sharingConn, logger)
 
 	errs := make(chan error, 2)
-	go startHTTPServer(svc, auth, cfg.HTTPPort, logger, errs)
+	go startHTTPServer(svc, auth, accessSvc, cfg.HTTPPort, logger, errs)
 
 	go startGRPCServer(svc, cfg.GRPCPort, logger, errs)
 
@@ -173,7 +174,7 @@ func newServices(
 	groupsConn *grpc.ClientConn,
 	sharingConn *grpc.ClientConn,
 	logger log.Logger,
-) (streams.Service, streams.Authorization) {
+) (streams.Service, streams.Authorization, streams.AccessControl) {
 	repo := mongo.New(ms)
 	acc := accessapi.NewClient(accessConn)
 	accessControl := access.New(acc)
@@ -210,13 +211,23 @@ func newServices(
 	auc := authapi.NewClient(authConn)
 	auth := streams.NewAuthorization(auc, logger)
 
-	return svc, auth
+	accessClient := accessproto.NewAccessServiceClient(accessConn)
+	accessSvc := access.New(accessClient)
+
+	return svc, auth, accessSvc
 }
 
-func startHTTPServer(svc streams.Service, auth streams.Authorization, port string, logger log.Logger, errs chan error) {
+func startHTTPServer(
+	svc streams.Service,
+	auth streams.Authorization,
+	accessSvc streams.AccessControl,
+	port string,
+	logger log.Logger,
+	errs chan error,
+) {
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Streams service started, exposed port %s", port))
-	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, auth))
+	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, auth, accessSvc))
 }
 
 func startGRPCServer(svc streams.Service, port string, logger log.Logger, errs chan error) {

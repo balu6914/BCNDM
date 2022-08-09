@@ -75,7 +75,7 @@ func (srm *streamRepositoryMock) Update(stream streams.Stream) error {
 
 	dbKey := stream.ID
 
-	if v, ok := srm.streams[dbKey]; !ok || v.Owner != stream.Owner {
+	if _, ok := srm.streams[dbKey]; !ok {
 		return streams.ErrNotFound
 	}
 

@@ -575,11 +575,6 @@ func TestUpdateStream(t *testing.T) {
 			stream: stream(),
 			err:    streams.ErrNotFound,
 		},
-		{
-			desc:   "update a stream with wrong owner",
-			stream: wrongOwner,
-			err:    streams.ErrNotFound,
-		},
 	}
 
 	for _, tc := range cases {
