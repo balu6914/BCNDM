@@ -64,6 +64,7 @@ func stream() streams.Stream {
 				rand.Float64() * (float64)(rand.Intn(maxLong*2)-maxLong),
 			},
 		},
+		Visibility: streams.Public,
 	}
 }
 
@@ -143,9 +144,11 @@ func TestAddBulkStreams(t *testing.T) {
 func TestSearchStreams(t *testing.T) {
 	svc := newService()
 	size := 0
+	streamsOwner := bson.NewObjectId().Hex()
 	for i := 0; i < 50; i++ {
 		size++
 		s := stream()
+		s.Owner = streamsOwner
 		id, err := svc.AddStream(s)
 		s.ID = id
 		require.Nil(t, err, "Repo should save streams.")
@@ -159,6 +162,7 @@ func TestSearchStreams(t *testing.T) {
 	s1.Price = s1Price
 	s1.Name = "different name"
 	s1.Type = "different type"
+	s1.Owner = streamsOwner
 	id, _ := svc.AddStream(s1)
 	s1.ID = id
 	size++
@@ -181,8 +185,9 @@ func TestSearchStreams(t *testing.T) {
 		page  streams.Page
 	}{
 		{
-			desc: "search with query with only the limit specified",
-			size: lmt,
+			desc:  "search with query with only the limit specified",
+			owner: streamsOwner,
+			size:  lmt,
 			query: streams.Query{
 				Limit: limit,
 			},
@@ -192,8 +197,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search reset too big offest to default value silently",
-			size: 0,
+			desc:  "search reset too big offest to default value silently",
+			owner: streamsOwner,
+			size:  0,
 			query: streams.Query{
 				Limit: limit,
 				Page:  uint64(total + maxPage),
@@ -205,8 +211,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search with min price specified",
-			size: lmt,
+			desc:  "search with min price specified",
+			owner: streamsOwner,
+			size:  lmt,
 			// Get all except the one with the price1.
 			// Content is caluclated this way because MongoDB
 			// pages results from the last inserted entry.
@@ -233,8 +240,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search with price range specified",
-			size: 2,
+			desc:  "search with price range specified",
+			owner: streamsOwner,
+			size:  2,
 			// GTE price1 and LT price2 + 1 (to include price2)
 			query: streams.Query{
 				Limit:    limit,
@@ -247,8 +255,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search by owner",
-			size: 1,
+			desc:  "search by owner",
+			owner: s2.Owner,
+			size:  1,
 			query: streams.Query{
 				Limit: limit,
 				Owner: s2.Owner,
@@ -259,8 +268,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search by name",
-			size: 1,
+			desc:  "search by name",
+			owner: streamsOwner,
+			size:  1,
 			query: streams.Query{
 				Limit: limit,
 				Name:  s1.Name,
@@ -271,8 +281,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search by type",
-			size: 1,
+			desc:  "search by type",
+			owner: streamsOwner,
+			size:  1,
 			query: streams.Query{
 				Limit:      limit,
 				StreamType: s1.Type,
@@ -295,8 +306,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search by name other than provided",
-			size: lmt,
+			desc:  "search by name other than provided",
+			owner: streamsOwner,
+			size:  lmt,
 			query: streams.Query{
 				Limit: limit,
 				Name:  fmt.Sprintf("-%s", s1.Name),
@@ -307,8 +319,9 @@ func TestSearchStreams(t *testing.T) {
 			},
 		},
 		{
-			desc: "search by type other than provided",
-			size: lmt,
+			desc:  "search by type other than provided",
+			owner: streamsOwner,
+			size:  lmt,
 			query: streams.Query{
 				Limit:      limit,
 				StreamType: fmt.Sprintf("-%s", s1.Type),
@@ -363,7 +376,6 @@ func TestSearchStreamsShared(t *testing.T) {
 			userId: "sharingReceiverUser",
 			query: streams.Query{
 				Limit: 1_000_000,
-				Owner: "sharingReceiverUser",
 			},
 			resultsPage: streams.Page{
 				Page:    0,
@@ -377,7 +389,6 @@ func TestSearchStreamsShared(t *testing.T) {
 			userId: "userInSomeGroups",
 			query: streams.Query{
 				Limit: 1_000_000,
-				Owner: "userInSomeGroups",
 			},
 			resultsPage: streams.Page{
 				Page:    0,
@@ -391,7 +402,6 @@ func TestSearchStreamsShared(t *testing.T) {
 			userId: "sharingReceiverUserInSomeGroups",
 			query: streams.Query{
 				Limit: 1_000_000,
-				Owner: "sharingReceiverUserInSomeGroups",
 			},
 			resultsPage: streams.Page{
 				Page:  0,
@@ -401,6 +411,20 @@ func TestSearchStreamsShared(t *testing.T) {
 					stream0,
 					stream1,
 				},
+			},
+		},
+		{
+			desc:   "Search a stream shared to a user but filtered by owner filter",
+			userId: "sharingReceiverUser",
+			query: streams.Query{
+				Limit: 1_000_000,
+				Owner: "user1",
+			},
+			resultsPage: streams.Page{
+				Page:    0,
+				Limit:   1_000_000,
+				Total:   0,
+				Content: []streams.Stream{},
 			},
 		},
 	}

@@ -309,10 +309,9 @@ func TestSearchShared(t *testing.T) {
 		content []streams.Stream
 	}{
 		{
-			desc: "search streams by owner and shared stream id",
+			desc: "search streams by shared stream id",
 			query: streams.Query{
 				Limit: limit,
-				Owner: s0.Owner,
 				Partners: []string{
 					s0.Owner,
 				},
@@ -326,6 +325,26 @@ func TestSearchShared(t *testing.T) {
 				Content: []streams.Stream{
 					s0,
 					s1,
+				},
+			},
+		},
+		{
+			desc: "search streams by shared stream id and owner filter",
+			query: streams.Query{
+				Limit: limit,
+				Owner: s0.Owner,
+				Partners: []string{
+					s0.Owner,
+				},
+				Shared: map[string]bool{
+					s1.ID: true,
+				},
+			},
+			page: streams.Page{
+				Limit: limit,
+				Total: 1,
+				Content: []streams.Stream{
+					s0,
 				},
 			},
 		},

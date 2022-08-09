@@ -289,7 +289,6 @@ func (ss streamService) ExportStreams(owner string) ([]Stream, error) {
 	sharedIds := ss.resolveSharedStreams(owner)
 	q := Query{
 		Name:       "",
-		Owner:      owner,
 		Partners:   partners,
 		Shared:     sharedIds,
 		StreamType: "",

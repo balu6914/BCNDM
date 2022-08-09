@@ -124,7 +124,8 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 	ret := []streams.Stream{}
 	for _, stream := range srm.streams {
 		if contains(stream.Name, query.Name) && contains(stream.Type, query.StreamType) &&
-			inRange(stream.Price, query.MinPrice, query.MaxPrice) && metadataMatches(stream.Metadata, query.Metadata) {
+			inRange(stream.Price, query.MinPrice, query.MaxPrice) && metadataMatches(stream.Metadata, query.Metadata) &&
+			isVisible(stream, query) {
 			if query.Owner == "" {
 				ret = append(ret, stream)
 				continue
@@ -138,9 +139,6 @@ func (srm *streamRepositoryMock) Search(query streams.Query) (streams.Page, erro
 				}
 			}
 			if stream.Owner == owner {
-				ret = append(ret, stream)
-			}
-			if query.Shared[stream.ID] {
 				ret = append(ret, stream)
 			}
 		}
@@ -192,6 +190,24 @@ func metadataMatches(md map[string]interface{}, constraint map[string]interface{
 		}
 	}
 	return true
+}
+
+func isVisible(stream streams.Stream, query streams.Query) bool {
+	switch stream.Visibility {
+	case streams.Public:
+		return true
+	case streams.Protected:
+		for _, p := range query.Partners {
+			if stream.Owner == p {
+				return true
+			}
+		}
+		return query.Shared[stream.ID]
+	case streams.Private:
+		requester := query.Partners[len(query.Partners)-1]
+		return stream.Owner == requester
+	}
+	return false
 }
 
 func (srm *streamRepositoryMock) Remove(owner, id string) error {
