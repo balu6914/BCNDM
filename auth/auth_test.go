@@ -396,3 +396,12 @@ func TestIdentify(t *testing.T) {
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", desc, tc.err, err))
 	}
 }
+
+func TestListUsers(t *testing.T) {
+	svc, adminKey := newService()
+	_, err := svc.Register(adminKey, noAdmin)
+	userKey, _ := svc.Login(noAdmin)
+	users, err := svc.ListUsers(userKey)
+	assert.Nil(t, err)
+	assert.Empty(t, users)
+}
