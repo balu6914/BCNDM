@@ -97,12 +97,12 @@ func updateStreamEndpoint(svc streams.Service, accessSvc streams.AccessControl) 
 
 		// If requester is not a stream owner, then check if they're partners of stream owner.
 		if req.owner != referenceStream.Owner {
-			partners, err := accessSvc.Partners(referenceStream.Owner)
+			partners, err := accessSvc.Partners(req.owner)
 			if err != nil {
 				return nil, err
 			}
 			for _, p := range partners {
-				if req.owner == p {
+				if p == referenceStream.Owner {
 					req.stream.Owner = "" // don't update the stream owner because it's different
 					break
 				}

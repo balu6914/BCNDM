@@ -35,11 +35,10 @@ const (
 )
 
 var (
-	validKey        = bson.NewObjectId().Hex()
-	validPartner    = bson.NewObjectId().Hex()
-	validNonPartner = bson.NewObjectId().Hex()
-	letterRunes     = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	counter         = rand.Intn(100)
+	validKey     = bson.NewObjectId().Hex()
+	validPartner = bson.NewObjectId().Hex()
+	letterRunes  = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	counter      = rand.Intn(100)
 )
 
 func randomString(n int) string {
@@ -116,7 +115,7 @@ func newService() streams.Service {
 }
 
 func newServer(svc streams.Service) *httptest.Server {
-	auth := mocks.NewAuth([]string{validKey, validPartner, validNonPartner})
+	auth := mocks.NewAuth([]string{validKey, validPartner})
 	accessSvc := mocks.NewAccessControl([]string{validPartner})
 	mux := httpapi.MakeHandler(svc, auth, accessSvc)
 	return httptest.NewServer(mux)
@@ -612,15 +611,9 @@ func TestUpdatePartnersStream(t *testing.T) {
 	defer ts.Close()
 
 	stream := genStream()
+	stream.Owner = validPartner
 	svc.AddStream(stream)
 	valid := toJSON(stream)
-	// Create an invalid stream.
-	s := genStream()
-	s.Name = ""
-	// Create stream that does not exist in database.
-	s = stream
-	nonExistingId := bson.NewObjectId().Hex()
-	s.ID = nonExistingId
 
 	cases := []struct {
 		desc   string
@@ -630,16 +623,9 @@ func TestUpdatePartnersStream(t *testing.T) {
 		id     string
 	}{
 		{
-			desc:   "update non partner's stream - fail",
-			req:    valid,
-			auth:   validNonPartner,
-			status: http.StatusBadRequest,
-			id:     stream.ID,
-		},
-		{
 			desc:   "update partner's stream",
 			req:    valid,
-			auth:   validPartner,
+			auth:   validKey,
 			status: http.StatusOK,
 			id:     stream.ID,
 		},
