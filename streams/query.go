@@ -167,19 +167,6 @@ func GenQuery(q *Query) *bson.M {
 		},
 	}
 
-	if owner, present := query["owner"]; present && len(oids) > 0 {
-		delete(query, "owner")
-		ownerOrIdsClause := bson.M{
-			"$or": []bson.M{
-				{
-					"owner": owner,
-				},
-				idsClause,
-			},
-		}
-		query["$or"] = append(query["$or"].([]bson.M), ownerOrIdsClause)
-	}
-
 	return &query
 }
 
