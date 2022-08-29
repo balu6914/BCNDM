@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/datapace/datapace"
@@ -36,6 +37,7 @@ const (
 	envDBUser         = "DATAPACE_ACCESS_CONTROL_DB_USER"
 	envDBPass         = "DATAPACE_ACCESS_CONTROL_DB_PASS"
 	envDBName         = "DATAPACE_ACCESS_CONTROL_DB_NAME"
+	envDbMigration    = "DATAPACE_ACCESS_CONTROL_DB_MIGRATION"
 	envAuthURL        = "DATAPACE_AUTH_URL"
 	envFabricOrgAdmin = "DATAPACE_ACCESS_CONTROL_FABRIC_ADMIN"
 	envFabricOrgName  = "DATAPACE_ACCESS_CONTROL_FABRIC_NAME"
@@ -48,6 +50,7 @@ const (
 	defDBUser         = ""
 	defDBPass         = ""
 	defDBName         = "access"
+	defDbMigration    = "false"
 	defAuthURL        = "localhost:8081"
 	defFabricOrgAdmin = "admin"
 	defFabricOrgName  = "org1"
@@ -68,6 +71,7 @@ type config struct {
 	dbName           string
 	dbConnectTimeout int
 	dbSocketTimeout  int
+	dbMigration      bool
 	authURL          string
 	fabricOrgAdmin   string
 	fabricOrgName    string
@@ -112,6 +116,12 @@ func loadConfig() config {
 	configDir := datapace.Env(envDatapaceConfig, defDatapaceConfig)
 	configFile := fmt.Sprintf("%s/%s", configDir, fabricConfigFile)
 
+	dbMigrationRaw := datapace.Env(envDbMigration, defDbMigration)
+	dbMigration, err := strconv.ParseBool(dbMigrationRaw)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to parse the %s value: %s, should be \"true\"/\"false\"", envDbMigration, dbMigrationRaw))
+	}
+
 	return config{
 		httpPort:         datapace.Env(envHTTPPort, defHTTPPort),
 		grpcPort:         datapace.Env(envGRPCPort, defGRPCPort),
@@ -121,6 +131,7 @@ func loadConfig() config {
 		dbName:           datapace.Env(envDBName, defDBName),
 		dbConnectTimeout: dbConnectTimeout,
 		dbSocketTimeout:  dbSocketTimeout,
+		dbMigration:      dbMigration,
 		authURL:          datapace.Env(envAuthURL, defAuthURL),
 		fabricOrgName:    datapace.Env(envFabricOrgName, defFabricOrgName),
 		fabricOrgAdmin:   datapace.Env(envFabricOrgAdmin, defFabricOrgAdmin),
@@ -168,6 +179,15 @@ func newFabricSDK(configFile string, logger log.Logger) *fabsdk.FabricSDK {
 
 func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, conn *grpc.ClientConn, logger log.Logger) access.Service {
 	repo := mongo.NewAccessRequestRepository(ms)
+	if cfg.dbMigration {
+		logger.Info("Starting the data migration...")
+		err := repo.MigrateSameSenderAndReceiver()
+		if err == nil {
+			logger.Info("Data migration finished successfully")
+		} else {
+			panic(fmt.Sprintf("Data migration failed: %s", err))
+		}
+	}
 	al := fabric.NewRequestLedger(
 		sdk,
 		cfg.fabricOrgAdmin,

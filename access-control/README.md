@@ -11,13 +11,14 @@ following table. Note that any unset variables will be replaced with their
 default values.
 
 | Variable                             | Description                              | Default                                    |
-| ------------------------------------ | ---------------------------------------- | ------------------------------------------ |
+|--------------------------------------|------------------------------------------|--------------------------------------------|
 | DATAPACE_ACCESS_CONTROL_HTTP_PORT    | Access control service HTTP port         | 8080                                       |
 | DATAPACE_ACCESS_CONTROL_GRPC_PORT    | Access control service gRPC port         | 8081                                       |
 | DATAPACE_ACCESS_CONTROL_DB_URL       | Database URL                             | 0.0.0.0                                    |
 | DATAPACE_ACCESS_CONTROL_DB_USER      | Database user                            |                                            |
 | DATAPACE_ACCESS_CONTROL_DB_PASS      | Database password                        |                                            |
 | DATAPACE_ACCESS_CONTROL_DB_NAME      | Name of the database used by the service | access                                     |
+| DATAPACE_ACCESS_CONTROL_DB_MIGRATION | Flag to enable the data migration        | false                                      |
 | DATAPACE_AUTH_URL                    | Auth service gRPC URL                    | localhost:8081                             |
 | DATAPACE_ACCESS_CONTROL_FABRIC_ADMIN | Organization admin for Fabric            | admin                                      |
 | DATAPACE_ACCESS_CONTROL_FABRIC_NAME  | Organization name for Fabric             | org1                                       |
