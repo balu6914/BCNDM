@@ -19,11 +19,7 @@ func NewPubMiddleware(svc Service, pubSvc pub.Service) Service {
 func (pm pubMiddleware) AddSubscription(userId string, authToken string, inSub Subscription) (outSub Subscription, err error) {
 	defer func() {
 		if err == nil {
-			evt := pub.SubscriptionCreateEvent{
-				SubscriptionId: outSub.ID.Hex(),
-			}
-			to := outSub.StreamOwner
-			_, _ = pm.pubSvc.Publish(evt, to)
+			_, _ = pm.pubSvc.PublishSubscriptionCreated(outSub, outSub.StreamOwner)
 		}
 	}()
 	return pm.svc.AddSubscription(userId, authToken, inSub)

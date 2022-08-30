@@ -9,6 +9,6 @@ func NewServiceMock() Service {
 	return serviceMock{}
 }
 
-func (svc serviceMock) Publish(evt SubscriptionCreateEvent, toUserId string) (uint64, error) {
+func (svc serviceMock) PublishSubscriptionCreated(evt interface{}, toUserId string) (uint64, error) {
 	return 0, nil
 }

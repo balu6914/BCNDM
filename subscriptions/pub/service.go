@@ -8,13 +8,6 @@ import (
 
 type (
 
-	// SubscriptionCreateEvent is the event to be issued on a new subscription
-	SubscriptionCreateEvent struct {
-
-		// SubscriptionId is the new subscription id
-		SubscriptionId string `json:"subscriptionId"`
-	}
-
 	// SubjectFormat contains the subscriptions releated subjects configuration.
 	SubjectFormat struct {
 
@@ -25,9 +18,9 @@ type (
 	// Service is the subscription events publish service.
 	Service interface {
 
-		// Publish a SubscriptionCreateEvent to the specified user.
+		// PublishSubscriptionCreated event to the specified user.
 		// Returns sent message id, error otherwise.
-		Publish(evt SubscriptionCreateEvent, toUserId string) (uint64, error)
+		PublishSubscriptionCreated(evt interface{}, toUserId string) (uint64, error)
 	}
 
 	service struct {
@@ -43,15 +36,15 @@ func NewService(pubSubSvc pubsub.Service, subjFmt SubjectFormat) Service {
 	}
 }
 
-func (svc service) Publish(evt SubscriptionCreateEvent, toUserId string) (uint64, error) {
+func (svc service) PublishSubscriptionCreated(evt interface{}, toUserId string) (uint64, error) {
 	if svc.pubSubSvc == nil {
 		return 0, nil
 	}
 	subject := fmt.Sprintf(svc.subjFmt.SubscriptionCreate, toUserId)
-	return svc.publishJson(subject, evt)
+	return svc.publishJson(evt, subject)
 }
 
-func (svc service) publishJson(subject string, evt interface{}) (uint64, error) {
+func (svc service) publishJson(evt interface{}, subject string) (uint64, error) {
 	data, err := json.Marshal(evt)
 	if err != nil {
 		return 0, err
