@@ -188,6 +188,9 @@ func newService(cfg config, sdk *fabsdk.FabricSDK, ms *mgo.Session, conn *grpc.C
 			panic(fmt.Sprintf("Data migration failed: %s", err))
 		}
 	}
+	if err := mongo.EnsureIndices(ms); err != nil {
+		panic(err)
+	}
 	al := fabric.NewRequestLedger(
 		sdk,
 		cfg.fabricOrgAdmin,

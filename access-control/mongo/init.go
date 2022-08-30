@@ -45,13 +45,16 @@ func Connect(addr string, tout int, socketTout int, db string, user string, pass
 	ms.SetSocketTimeout(time.Duration(socketTout) * time.Millisecond)
 	ms.SetMode(mgo.Monotonic, true)
 
+	return ms, nil
+}
+
+func EnsureIndices(ms *mgo.Session) error {
 	mdb := ms.DB(dbName)
 	coll := mdb.C(collection)
 	for _, index := range indices {
 		if err := coll.EnsureIndex(index); err != nil {
-			return nil, err
+			return err
 		}
 	}
-
-	return ms, nil
+	return nil
 }
