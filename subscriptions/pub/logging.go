@@ -27,5 +27,5 @@ func (lm loggingMiddleware) PublishSubscriptionCreated(evt interface{}, toUserId
 		}
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
-	return lm.PublishSubscriptionCreated(evt, toUserId)
+	return lm.svc.PublishSubscriptionCreated(evt, toUserId)
 }
