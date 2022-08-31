@@ -279,7 +279,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	}
 
 	if userID != stream.Owner && stream.Visibility == string(streams.Private) {
-		return "", fmt.Errorf("%w: non-own private stream subscription is forbidden", ErrFailedCreateSub)
+		return Subscription{}, fmt.Errorf("%w: non-own private stream subscription is forbidden", ErrFailedCreateSub)
 	}
 
 	sub.StreamOwner = stream.Owner
