@@ -28,6 +28,7 @@ const (
 )
 
 var subscription = subscriptions.Subscription{
+	ID:          bson.NewObjectId(),
 	UserID:      user1ID,
 	StreamOwner: user2ID,
 	StreamID:    stream1ID,
