@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/datapace/datapace/subscriptions/sharing"
+	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"strings"
 	"time"
@@ -332,6 +333,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	}
 
 	ss.subscriptions.Activate(id)
+	sub.ID = bson.ObjectIdHex(id)
 
 	return sub, nil
 }
