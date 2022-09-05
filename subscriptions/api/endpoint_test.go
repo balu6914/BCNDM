@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	authproto "github.com/datapace/datapace/proto/auth"
@@ -161,7 +162,7 @@ func TestCreateSubscription(t *testing.T) {
 		contentType := res.Header.Get("Content-Type")
 		assert.Equal(t, tc.contentType, contentType, fmt.Sprintf("%s: expected content type %s got %s", tc.desc, tc.contentType, contentType))
 		if tc.respBodyContains != "" {
-			respBody, err := io.ReadAll(res.Body)
+			respBody, err := ioutil.ReadAll(res.Body)
 			assert.Nil(t, err)
 			assert.Contains(t, string(respBody), tc.respBodyContains)
 		}
