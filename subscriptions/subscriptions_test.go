@@ -3,9 +3,8 @@ package subscriptions_test
 import (
 	"fmt"
 	"github.com/datapace/datapace/subscriptions/sharing"
-	"testing"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2/bson"
@@ -20,6 +19,7 @@ const (
 	noUser    = "noUser"
 	stream1ID = "myStream1ID"
 	stream2ID = "myStream2ID"
+	stream3Id = "privateStream3"
 	wrong     = "wrong"
 	streamURL = "myUrl"
 	token     = "token"
@@ -40,6 +40,7 @@ func newService(tokens map[string]string) subscriptions.Service {
 	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
 		stream1ID: {Price: 10, Owner: user2ID},
 		stream2ID: {Price: 100, Owner: user1ID},
+		stream3Id: {Price: 1, Owner: user2ID, Visibility: "private"},
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
@@ -87,11 +88,22 @@ func TestAddSubscription(t *testing.T) {
 			},
 			err: subscriptions.ErrFailedTransfer,
 		},
+		{
+			desc: "create a new non-own private stream subscription fails",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      user1ID,
+				StreamID:    stream3Id,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: subscriptions.ErrFailedCreateSub,
+		},
 	}
 
 	for _, tc := range cases {
 		_, err := svc.AddSubscription(tc.sub.UserID, "", tc.sub)
-		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+		assert.ErrorIs(t, err, tc.err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
 }
 

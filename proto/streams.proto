@@ -20,4 +20,5 @@ message Stream {
     string dataset = 8;
     string table = 9;
     string fields = 10;
+    string visibility = 11;
 }
