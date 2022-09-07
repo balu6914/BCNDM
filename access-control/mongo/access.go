@@ -24,7 +24,26 @@ func (repo accessRequestRepository) RequestAccess(sender, receiver string) (stri
 	session := repo.db.Copy()
 	defer session.Close()
 	collection := session.DB(dbName).C(collection)
+	q := bson.M{"sender": sender, "receiver": receiver}
+	var ar accessRequest
+	if err := collection.Find(q).One(&ar); err != nil {
+		if err == mgo.ErrNotFound {
+			return repo.insertNew(collection, sender, receiver)
+		}
+		return "", err
+	}
+	// otherwise - found, update the state
+	u := bson.M{"$set": bson.M{"state": access.Pending}}
+	if err := collection.Update(q, u); err != nil {
+		if err == mgo.ErrNotFound {
+			return "", access.ErrNotFound
+		}
+		return "", err
+	}
+	return ar.ID.Hex(), nil
+}
 
+func (repo accessRequestRepository) insertNew(collection *mgo.Collection, sender, receiver string) (string, error) {
 	ar := accessRequest{
 		ID:       bson.NewObjectId(),
 		Sender:   sender,
@@ -38,7 +57,6 @@ func (repo accessRequestRepository) RequestAccess(sender, receiver string) (stri
 
 		return "", err
 	}
-
 	return ar.ID.Hex(), nil
 }
 
