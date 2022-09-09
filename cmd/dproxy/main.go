@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	
 
 	"github.com/datapace/datapace"
 	"github.com/datapace/datapace/dproxy"
@@ -26,59 +25,62 @@ import (
 )
 
 const (
-	defHTTPProto      = "http"
-	defHTTPHost       = "localhost"
-	defHTTPPort       = "8087"
-	defJWTSecret      = "examplesecret"
-	defLocalFsRoot    = "/tmp/test"
-	defDBType         = "mongo"
-	defDBHost         = "0.0.0.0"
-	defDBPort         = "27017"
-	defDBUser         = ""
-	defDBPass         = ""
-	defDBName         = "dproxy"
-	defDBSSLMode      = "disable"
-	defDBSSLCert      = ""
-	defDBSSLKey       = ""
-	defDBSSLRootCert  = ""
-	defFSPathPrefix   = "/fs"
-	defHTTPPathPrefix = "/http"
-	defEncKey         = ""
-	defStandalone     = "true"
+	defHTTPProto         = "http"
+	defHTTPHost          = "localhost"
+	defHTTPPort          = "8087"
+	defJWTSecret         = "examplesecret"
+	defLocalFsRoot       = "/tmp/test"
+	defDBType            = "mongo"
+	defDBHost            = "0.0.0.0"
+	defDBPort            = "27017"
+	defDBUser            = ""
+	defDBPass            = ""
+	defDBName            = "dproxy"
+	defDBSSLMode         = "disable"
+	defDBSSLCert         = ""
+	defDBSSLKey          = ""
+	defDBSSLRootCert     = ""
+	defFSPathPrefix      = "/fs"
+	defHTTPPathPrefix    = "/http"
+	defHttpTlsSkipVerify = "true"
+	defEncKey            = ""
+	defStandalone        = "true"
 
-	envHTTPProto      = "DATAPACE_PROXY_HTTP_PROTO"
-	envHTTPHost       = "DATAPACE_PROXY_HTTP_HOST"
-	envHTTPPort       = "DATAPACE_PROXY_HTTP_PORT"
-	envJWTSecret      = "DATAPACE_JWT_SECRET"
-	envLocalFsRoot    = "DATAPACE_LOCAL_FS_ROOT"
-	envDBType         = "DATAPACE_DPROXY_DB_TYPE"
-	envDBHost         = "DATAPACE_DPROXY_DB_HOST"
-	envDBPort         = "DATAPACE_DPROXY_DB_PORT"
-	envDBUser         = "DATAPACE_DPROXY_DB_USER"
-	envDBPass         = "DATAPACE_DPROXY_DB_PASS"
-	envDBName         = "DATAPACE_DPROXY_DB"
-	envDBSSLMode      = "DATAPACE_DPROXY_DB_SSL_MODE"
-	envDBSSLCert      = "DATAPACE_DPROXY_DB_SSL_CERT"
-	envDBSSLKey       = "DATAPACE_DPROXY_DB_SSL_KEY"
-	envDBSSLRootCert  = "DATAPACE_DPROXY_DB_SSL_ROOT_CERT"
-	envFSPathPrefix   = "DATAPACE_DPROXY_FS_PATH_PREFIX"
-	envHTTPPathPrefix = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
-	envEncKey         = "DATAPACE_DPROXY_ENCRYPTION_KEY"
-	envStandalone     = "DATAPACE_DPROXY_STANDALONE"
+	envHTTPProto         = "DATAPACE_PROXY_HTTP_PROTO"
+	envHTTPHost          = "DATAPACE_PROXY_HTTP_HOST"
+	envHTTPPort          = "DATAPACE_PROXY_HTTP_PORT"
+	envJWTSecret         = "DATAPACE_JWT_SECRET"
+	envLocalFsRoot       = "DATAPACE_LOCAL_FS_ROOT"
+	envDBType            = "DATAPACE_DPROXY_DB_TYPE"
+	envDBHost            = "DATAPACE_DPROXY_DB_HOST"
+	envDBPort            = "DATAPACE_DPROXY_DB_PORT"
+	envDBUser            = "DATAPACE_DPROXY_DB_USER"
+	envDBPass            = "DATAPACE_DPROXY_DB_PASS"
+	envDBName            = "DATAPACE_DPROXY_DB"
+	envDBSSLMode         = "DATAPACE_DPROXY_DB_SSL_MODE"
+	envDBSSLCert         = "DATAPACE_DPROXY_DB_SSL_CERT"
+	envDBSSLKey          = "DATAPACE_DPROXY_DB_SSL_KEY"
+	envDBSSLRootCert     = "DATAPACE_DPROXY_DB_SSL_ROOT_CERT"
+	envFSPathPrefix      = "DATAPACE_DPROXY_FS_PATH_PREFIX"
+	envHTTPPathPrefix    = "DATAPACE_DPROXY_HTTP_PATH_PREFIX"
+	envHttpTlsSkipVerify = "DATAPACE_DPROXY_HTTP_TLS_SKIP_VERIFY"
+	envEncKey            = "DATAPACE_DPROXY_ENCRYPTION_KEY"
+	envStandalone        = "DATAPACE_DPROXY_STANDALONE"
 )
 
 type config struct {
-	httpProto      string
-	httpHost       string
-	httpPort       string
-	jwtSecret      string
-	localFsRoot    string
-	dbConfig       postgres.Config
-	fsPathPrefix   string
-	httpPathPrefix string
-	dbType         string
-	encKey         string
-	standalone     bool
+	httpProto         string
+	httpHost          string
+	httpPort          string
+	jwtSecret         string
+	localFsRoot       string
+	dbConfig          postgres.Config
+	fsPathPrefix      string
+	httpPathPrefix    string
+	httpTlsSkipVerify bool
+	dbType            string
+	encKey            string
+	standalone        bool
 }
 
 func main() {
@@ -96,7 +98,7 @@ func main() {
 		os.Exit(1)
 	}
 	svc := newService(cfg.jwtSecret, eventsRepository, key, logger)
-	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, logger)
+	r := httpapi.NewReverseProxy(svc, cfg.httpPathPrefix, cfg.httpTlsSkipVerify, logger)
 	f := httpapi.NewFsProxy(svc, cfg.localFsRoot, cfg.fsPathPrefix, logger)
 	url := fmt.Sprintf("%s://%s:%s/dproxy", cfg.httpProto, cfg.httpHost, cfg.httpPort)
 	if cfg.standalone {
@@ -182,17 +184,21 @@ func loadConfig(logger log.Logger) config {
 	if err != nil {
 		logger.Error(fmt.Sprintf("Invalid %s value: %s", envStandalone, err.Error()))
 	}
+	httpTlsSkipVerify, err := strconv.ParseBool(datapace.Env(envHttpTlsSkipVerify, defHttpTlsSkipVerify))
+	if err != nil {
+		logger.Error(fmt.Sprintf("Invalid %s value: %s", envHttpTlsSkipVerify, err.Error()))
+	}
 	return config{
-		httpProto:      datapace.Env(envHTTPProto, defHTTPProto),
-		httpHost:       datapace.Env(envHTTPHost, defHTTPHost),
-		httpPort:       datapace.Env(envHTTPPort, defHTTPPort),
-		jwtSecret:      datapace.Env(envJWTSecret, defJWTSecret),
-		localFsRoot:    datapace.Env(envLocalFsRoot, defLocalFsRoot),
-		fsPathPrefix:   datapace.Env(envFSPathPrefix, defFSPathPrefix),
-		httpPathPrefix: datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
-		encKey:         datapace.Env(envEncKey, defEncKey),
-		standalone:	standalone,
-
+		httpProto:         datapace.Env(envHTTPProto, defHTTPProto),
+		httpHost:          datapace.Env(envHTTPHost, defHTTPHost),
+		httpPort:          datapace.Env(envHTTPPort, defHTTPPort),
+		jwtSecret:         datapace.Env(envJWTSecret, defJWTSecret),
+		localFsRoot:       datapace.Env(envLocalFsRoot, defLocalFsRoot),
+		fsPathPrefix:      datapace.Env(envFSPathPrefix, defFSPathPrefix),
+		httpPathPrefix:    datapace.Env(envHTTPPathPrefix, defHTTPPathPrefix),
+		httpTlsSkipVerify: httpTlsSkipVerify,
+		encKey:            datapace.Env(envEncKey, defEncKey),
+		standalone:        standalone,
 	}
 }
 

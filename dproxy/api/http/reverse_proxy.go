@@ -1,6 +1,7 @@
 package http
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -21,10 +22,16 @@ type ReverseProxy struct {
 	PathPrefix string
 }
 
-func NewReverseProxy(svc dproxy.Service, pathPrefix string, logger log.Logger) *ReverseProxy {
+func NewReverseProxy(svc dproxy.Service, pathPrefix string, tlsSkipVerify bool, logger log.Logger) *ReverseProxy {
 	return &ReverseProxy{
-		svc:        svc,
-		p:          &httputil.ReverseProxy{},
+		svc: svc,
+		p: &httputil.ReverseProxy{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: tlsSkipVerify,
+				},
+			},
+		},
 		PathPrefix: pathPrefix,
 		logger:     logger,
 		logPrefix:  "rp",
