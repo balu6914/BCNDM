@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/datapace/datapace/streams"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"net/http"
 	"strings"
@@ -274,6 +275,10 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	stream, err := ss.streams.One(sub.StreamID)
 	if err != nil {
 		return "", ErrNotFound
+	}
+
+	if userID != stream.Owner && stream.Visibility == string(streams.Private) {
+		return "", fmt.Errorf("%w: non-own private stream subscription is forbidden", ErrFailedCreateSub)
 	}
 
 	sub.StreamOwner = stream.Owner

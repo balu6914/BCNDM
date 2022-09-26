@@ -1,11 +1,11 @@
 package api_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	authproto "github.com/datapace/datapace/proto/auth"
@@ -31,9 +31,10 @@ const (
 )
 
 var (
-	token    = bson.NewObjectId().Hex()
-	userID   = bson.NewObjectId().Hex()
-	streamID = bson.NewObjectId().Hex()
+	token          = bson.NewObjectId().Hex()
+	userID         = bson.NewObjectId().Hex()
+	streamID       = bson.NewObjectId().Hex()
+	nonOwnStreamId = bson.NewObjectId().Hex()
 
 	sub = subscriptions.Subscription{
 		ID:        bson.NewObjectId(),
@@ -42,13 +43,27 @@ var (
 		StreamURL: streamURL,
 		Hours:     hours,
 	}
-	subs = []subscriptions.Subscription{sub}
+	subs        = []subscriptions.Subscription{sub}
+	nonOwnerSub = subscriptions.Subscription{
+		ID:        bson.NewObjectId(),
+		StreamID:  nonOwnStreamId,
+		StreamURL: streamURL,
+		Hours:     hours,
+	}
+	nonOwnerSubs = []subscriptions.Subscription{nonOwnerSub}
 )
 
 func newService() subscriptions.Service {
 	subs := mocks.NewSubscriptionsRepository()
 	streams := mocks.NewStreamsService(map[string]subscriptions.Stream{
-		streamID: subscriptions.Stream{},
+		streamID: {
+			Owner:      userID,
+			Visibility: "private",
+		},
+		nonOwnStreamId: {
+			Owner:      bson.NewObjectId().Hex(),
+			Visibility: "private",
+		},
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
@@ -72,10 +87,7 @@ type testRequest struct {
 }
 
 func (tr testRequest) make() (*http.Response, error) {
-	jm, _ := json.Marshal(subs)
-	msg := bytes.NewBuffer([]byte(jm))
-
-	req, err := http.NewRequest(tr.method, tr.url, msg)
+	req, err := http.NewRequest(tr.method, tr.url, tr.body)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +113,15 @@ func TestCreateSubscription(t *testing.T) {
 	defer ss.Close()
 
 	body := toJSON(subs)
+	nonOwnerBody := toJSON(nonOwnerSubs)
 
 	cases := []struct {
-		desc        string
-		auth        string
-		contentType string
-		body        string
-		status      int
+		desc             string
+		auth             string
+		contentType      string
+		body             string
+		status           int
+		respBodyContains string
 	}{
 		{
 			desc:        "create subscriptions with valid credentials",
@@ -122,6 +136,14 @@ func TestCreateSubscription(t *testing.T) {
 			contentType: contentType,
 			body:        body,
 			status:      http.StatusForbidden,
+		},
+		{
+			desc:             "create non-own private stream subscription fails",
+			auth:             token,
+			contentType:      contentType,
+			body:             nonOwnerBody,
+			status:           http.StatusCreated,
+			respBodyContains: subscriptions.ErrFailedCreateSub.Error(),
 		},
 	}
 
@@ -139,6 +161,11 @@ func TestCreateSubscription(t *testing.T) {
 		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", tc.desc, tc.status, res.StatusCode))
 		contentType := res.Header.Get("Content-Type")
 		assert.Equal(t, tc.contentType, contentType, fmt.Sprintf("%s: expected content type %s got %s", tc.desc, tc.contentType, contentType))
+		if tc.respBodyContains != "" {
+			respBody, err := ioutil.ReadAll(res.Body)
+			assert.Nil(t, err)
+			assert.Contains(t, string(respBody), tc.respBodyContains)
+		}
 	}
 }
 

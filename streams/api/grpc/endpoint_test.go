@@ -20,10 +20,11 @@ import (
 )
 
 var stream = streams.Stream{
-	Owner: owner,
-	ID:    bson.NewObjectId().Hex(),
-	URL:   "http://test.com",
-	Price: 100,
+	Owner:      owner,
+	ID:         bson.NewObjectId().Hex(),
+	URL:        "http://test.com",
+	Price:      100,
+	Visibility: streams.Private,
 }
 
 func TestOne(t *testing.T) {
@@ -44,10 +45,11 @@ func TestOne(t *testing.T) {
 		"get existing stream": {
 			id: id,
 			stream: &streamsproto.Stream{
-				Owner: stream.Owner,
-				Id:    id,
-				Url:   stream.URL,
-				Price: stream.Price,
+				Owner:      stream.Owner,
+				Id:         id,
+				Url:        stream.URL,
+				Price:      stream.Price,
+				Visibility: string(stream.Visibility),
 			},
 			err: nil,
 		},
