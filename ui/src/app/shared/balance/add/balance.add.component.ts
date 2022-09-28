@@ -36,7 +36,7 @@ export class BalanceAddComponent implements OnInit {
         [
           Validators.required,
           Validators.min(0),
-          Validators.max(100)
+          Validators.max(1000000)
         ],
       ]
     });
