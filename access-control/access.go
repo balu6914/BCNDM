@@ -46,6 +46,10 @@ type RequestRepository interface {
 	// GrantAccess combines the RequestAccess and Approve in a single call.
 	// Returns the access request id to revoke later when needed.
 	GrantAccess(srcUserId, dstUserId string) (string, error)
+
+	// MigrateSameSenderAndReceiver scans the whole table and finds all records having same sender and receiver. These
+	// records are then considered as a single access request record and discarded except the latest record id.
+	MigrateSameSenderAndReceiver() error
 }
 
 // RequestLedger specifies access request writer API.
