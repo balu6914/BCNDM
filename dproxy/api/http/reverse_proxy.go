@@ -79,5 +79,13 @@ func (rp *ReverseProxy) makeDirector(originalReq *http.Request) (func(r *http.Re
 		r.URL.RawPath = u.RawPath
 		r.URL.Path = u.Path
 		r.Host = u.Host
+		anonymizeRequest(r)
 	}, nil
+}
+
+func anonymizeRequest(req *http.Request) {
+	req.Header["X-Forwarded-For"] = nil
+	req.Header["X-Original-Forwarded-For"] = nil
+	req.Header["X-Real-Ip"] = nil
+	req.Header["User-Agent"] = nil
 }
