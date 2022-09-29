@@ -13,18 +13,20 @@ The service is configured using the environment variables presented in the
 following table. Note that any unset variables will be replaced with their
 default values.
 
-| Variable                       | Description                              | Default               |
-|--------------------------------|------------------------------------------|-----------------------|
-| DATAPACE_SUBSCRIPTIONS_PORT    | Stream service port                      | localhost             |
-| DATAPACE_SUBSCRIPTIONS_DB_URL  | List of database cluster URLs            | 0.0.0.0               |
-| DATAPACE_SUBSCRIPTIONS_DB_NAME | Name of the database used by the service | subscriptions         |
-| DATAPACE_SUBSCRIPTIONS_DB_USER | Database user                            |                       |
-| DATAPACE_SUBSCRIPTIONS_DB_PASS | Database password                        |                       |
-| DATAPACE_AUTH_URL              | Auth service gRPC URL                    | localhost:8081        |
-| DATAPACE_TRANSACTIONS_URL      | Transactions service gRPC URL            | localhost:8081        |
-| DATAPACE_STREAMS_URL           | Streams service gRPC URL                 | localhost:8081        |
-| DATAPACE_SHARING_URL           | Sharing service gRPC URL (optional)      | localhost:8081        |
-| DATAPACE_PROXY_URL             | Proxy service URL                        | http://localhost:8080 |
+| Variable                               | Description                                  | Default                       |
+|----------------------------------------|----------------------------------------------|-------------------------------|
+| DATAPACE_SUBSCRIPTIONS_PORT            | Stream service port                          | localhost                     |
+| DATAPACE_SUBSCRIPTIONS_DB_URL          | List of database cluster URLs                | 0.0.0.0                       |
+| DATAPACE_SUBSCRIPTIONS_DB_NAME         | Name of the database used by the service     | subscriptions                 |
+| DATAPACE_SUBSCRIPTIONS_DB_USER         | Database user                                |                               |
+| DATAPACE_SUBSCRIPTIONS_DB_PASS         | Database password                            |                               |
+| DATAPACE_AUTH_URL                      | Auth service gRPC URL                        | localhost:8081                |
+| DATAPACE_TRANSACTIONS_URL              | Transactions service gRPC URL                | localhost:8081                |
+| DATAPACE_STREAMS_URL                   | Streams service gRPC URL                     | localhost:8081                |
+| DATAPACE_SHARING_URL                   | Sharing service gRPC URL (optional)          | localhost:8081                |
+| DATAPACE_PROXY_URL                     | Proxy service URL                            | http://localhost:8080         |
+| DATAPACE_MSG_BUS_URL                   | Message bus service URL                      | nats://localhost:4222         |
+| DATAPACE_SUBSCRIPTIONS_SUBJ_FMT_CREATE | Subject template for new subscription events | subscriptions.stream.owner.%s |
 
 ## Deployment
 

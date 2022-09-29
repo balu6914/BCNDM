@@ -25,7 +25,7 @@ func addSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 				continue
 			}
 
-			id, err := svc.AddSubscription(req.UserID, req.UserToken, sub)
+			s, err := svc.AddSubscription(req.UserID, req.UserToken, sub)
 			if err != nil {
 				resps.Responses = append(resps.Responses, addSubResp{
 					StreamID:     sub.StreamID,
@@ -36,7 +36,7 @@ func addSubEndpoint(svc subscriptions.Service) endpoint.Endpoint {
 
 			resps.Responses = append(resps.Responses, addSubResp{
 				StreamID:       sub.StreamID,
-				SubscriptionID: id,
+				SubscriptionID: s.ID.Hex(),
 			})
 		}
 

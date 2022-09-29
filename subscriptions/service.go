@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/datapace/datapace/streams"
 	"github.com/datapace/datapace/subscriptions/sharing"
+	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"strings"
 	"time"
@@ -51,7 +52,7 @@ var (
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	// AddSubscription subscribes to a stream making a new Subscription.
-	AddSubscription(string, string, Subscription) (string, error)
+	AddSubscription(string, string, Subscription) (Subscription, error)
 
 	// SearchSubscriptions searches subscriptions by the query.
 	SearchSubscriptions(Query) (Page, error)
@@ -267,14 +268,14 @@ func (ss subscriptionsService) createBQ(url *string, token string, stream Stream
 	return client.Dataset(datasetID), nil
 }
 
-func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (string, error) {
+func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscription) (Subscription, error) {
 	sub.UserID = userID
 	sub.StartDate = time.Now()
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
 
 	stream, err := ss.streams.One(sub.StreamID)
 	if err != nil {
-		return "", ErrNotFound
+		return Subscription{}, ErrNotFound
 	}
 
 	if userID != stream.Owner && stream.Visibility == string(streams.Private) {
@@ -290,12 +291,12 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	if stream.External {
 		client, err := bigquery.NewClient(context.Background(), stream.Project)
 		if err != nil {
-			return "", err
+			return Subscription{}, err
 		}
 		defer client.Close()
 		ds, err = ss.createBQ(&url, token, stream, client, sub.EndDate)
 		if err != nil {
-			return "", err
+			return Subscription{}, err
 		}
 	}
 
@@ -305,7 +306,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			// Ignore if deletion fails, table will be removed after expiration anyway.
 			ds.Delete(context.Background())
 		}
-		return "", err
+		return Subscription{}, err
 	}
 
 	sub.StreamURL = hash
@@ -317,10 +318,10 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		}
 
 		if err == ErrConflict {
-			return "", ErrConflict
+			return Subscription{}, ErrConflict
 		}
 
-		return "", ErrFailedCreateSub
+		return Subscription{}, ErrFailedCreateSub
 	}
 
 	// do not invoke transactions if the stream is shared to the current user
@@ -330,15 +331,16 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 				ds.Delete(context.Background())
 			}
 			if err == ErrNotEnoughTokens {
-				return "", err
+				return Subscription{}, err
 			}
-			return "", ErrFailedTransfer
+			return Subscription{}, ErrFailedTransfer
 		}
 	}
 
 	ss.subscriptions.Activate(id)
+	sub.ID = bson.ObjectIdHex(id)
 
-	return id, nil
+	return sub, nil
 }
 
 func (ss subscriptionsService) SearchSubscriptions(q Query) (Page, error) {

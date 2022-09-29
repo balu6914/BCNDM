@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/pub"
 	"github.com/datapace/datapace/subscriptions/sharing"
+	"github.com/datapace/events/pubsub"
 	sharingApi "github.com/datapace/sharing/api/grpc"
 	sharingProto "github.com/datapace/sharing/proto"
 	"net/http"
@@ -39,6 +41,8 @@ const (
 	envTransactionsURL = "DATAPACE_TRANSACTIONS_URL"
 	envStreamsURL      = "DATAPACE_STREAMS_URL"
 	envSharingUrl      = "DATAPACE_SHARING_URL"
+	envMsgBusUrl       = "DATAPACE_MSG_BUS_URL"
+	envSubjFmtCreate   = "DATAPACE_SUBSCRIPTIONS_SUBJ_FMT_CREATE"
 
 	// HTTP prefixed, because all others are gRPC.
 	envProxyURL      = "DATAPACE_PROXY_URL"
@@ -52,6 +56,8 @@ const (
 	defTransactionsURL = "localhost:8081"
 	defStreamsURL      = "localhost:8081"
 	defSharingUrl      = "localhost:8081"
+	defMsgBusUrl       = "nats://localhost:4222"
+	defSubjFmtCreate   = "subscriptions.stream.owner.%s"
 	defProxyURL        = "http://localhost:8080"
 	defSubsURL         = "0.0.0.0"
 	defMongoURL        = "0.0.0.0"
@@ -76,6 +82,8 @@ type config struct {
 	MongoDatabase       string
 	MongoConnectTimeout int
 	MongoSocketTimeout  int
+	MsgBusUrl           string
+	SubjFmt             pub.SubjectFormat
 }
 
 func main() {
@@ -103,6 +111,14 @@ func main() {
 	sharingClient := sharingApi.NewClient(sharingConn)
 
 	svc := newService(ac, ms, sc, tc, sharingClient, cfg.ProxyURL, logger)
+
+	pubSubSvc, msgBusConnErr := pubsub.NewService(cfg.MsgBusUrl)
+	if msgBusConnErr != nil {
+		logger.Warn(fmt.Sprintf("Failed to connect message bus @ %s, events publishing won't be available", cfg.MsgBusUrl))
+	}
+	pubSvc := pub.NewService(pubSubSvc, cfg.SubjFmt)
+	pubSvc = pub.NewLoggingMiddleware(pubSvc, logger)
+	svc = subscriptions.NewPubMiddleware(svc, pubSvc)
 
 	errs := make(chan error, 2)
 
@@ -132,6 +148,10 @@ func loadConfig() config {
 		MongoConnectTimeout: defMongoConnectTimeout,
 		MongoSocketTimeout:  defMongoSocketTimeout,
 		AuthURL:             datapace.Env(envAuthURL, defAuthURL),
+		MsgBusUrl:           datapace.Env(envMsgBusUrl, defMsgBusUrl),
+		SubjFmt: pub.SubjectFormat{
+			SubscriptionCreate: datapace.Env(envSubjFmtCreate, defSubjFmtCreate),
+		},
 	}
 }
 

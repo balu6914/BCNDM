@@ -30,7 +30,7 @@ paths:
         400:
           description: Failed due to malformed JSON.
         402:
-          description: Subscription allready taken.
+          description: Subscription already taken.
         500:
           $ref: "#/responses/ServiceError"
   /subscriptions/{id}:

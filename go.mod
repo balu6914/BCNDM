@@ -5,6 +5,7 @@ go 1.14
 require (
 	cloud.google.com/go v0.34.0
 	github.com/asaskevich/govalidator v0.0.0-20180315120708-ccb8e960c48f
+	github.com/datapace/events v0.1.9
 	github.com/datapace/groups v0.1.0
 	github.com/datapace/sharing v0.1.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -23,7 +24,7 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20200212082348-64f95ea68aa3
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.7.1
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	google.golang.org/api v0.1.0
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.28.0 // indirect
