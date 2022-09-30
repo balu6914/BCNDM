@@ -320,10 +320,6 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 				},
 				{
 					Action: auth.List,
-					Type:   "user",
-				},
-				{
-					Action: auth.List,
 					Type:   "contract",
 				},
 				{
