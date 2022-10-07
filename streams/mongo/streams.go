@@ -10,8 +10,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// dbName - If name is empty, the database name provided in DialInfo is used instead
 const (
-	dbName     = "datapace-streams"
+	dbName     = ""
 	collection = "streams"
 	unknown    = "unknown conflict"
 	errMsg     = "Some of the URLs already exist in the database."

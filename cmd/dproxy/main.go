@@ -56,7 +56,7 @@ const (
 	envDBPort            = "DATAPACE_DPROXY_DB_PORT"
 	envDBUser            = "DATAPACE_DPROXY_DB_USER"
 	envDBPass            = "DATAPACE_DPROXY_DB_PASS"
-	envDBName            = "DATAPACE_DPROXY_DB"
+	envDBName            = "DATAPACE_DPROXY_DB_NAME"
 	envDBSSLMode         = "DATAPACE_DPROXY_DB_SSL_MODE"
 	envDBSSLCert         = "DATAPACE_DPROXY_DB_SSL_CERT"
 	envDBSSLKey          = "DATAPACE_DPROXY_DB_SSL_KEY"

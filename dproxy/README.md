@@ -46,7 +46,7 @@ As a persistence backend, dProxy can use either mongo or postgres databases.
 | DATAPACE_DPROXY_DB_PORT             | dProxy database port                                                                         | 27017         |
 | DATAPACE_DPROXY_DB_USER             | dProxy database username                                                                     |               |
 | DATAPACE_DPROXY_DB_PASS             | dProxy database password                                                                     |               |
-| DATAPACE_DPROXY_DB                  | dProxy database name                                                                         | dproxy        |
+| DATAPACE_DPROXY_DB_NAME             | dProxy database name                                                                         | dproxy        |
 | DATAPACE_DPROXY_DB_SSL_MODE         | dProxy database ssl switch                                                                   | disable       |
 | DATAPACE_DPROXY_DB_SSL_CERT         | dProxy database certificate                                                                  |               |
 | DATAPACE_DPROXY_DB_SSL_KEY          | dProxy database private key                                                                  |               |

@@ -6,8 +6,9 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
+// dbName - If name is empty, the database name provided in DialInfo is used instead
 const (
-	dbName         = "datapace-executions"
+	dbName         = ""
 	execCollection = "executions"
 	algoCollection = "algorithms"
 	dataCollection = "datasets"

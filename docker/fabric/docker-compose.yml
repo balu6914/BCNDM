@@ -103,7 +103,7 @@ services:
     #working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     working_dir: /opt/gopath/
     # On start we are provisioning the network
-    command: /bin/bash -c 'scripts/init.sh'
+    # command: /bin/bash -c 'scripts/init.sh'
     volumes:
         - /var/run/:/host/var/run/
         - ../../chaincode/:/opt/gopath/src/chaincode
