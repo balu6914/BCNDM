@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	testDB          = "auth"
+	testDB          = "datapace"
 	userDB          = ""
 	passDB          = ""
 	timeoutDB       = 5000
