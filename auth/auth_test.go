@@ -274,7 +274,9 @@ func TestUpdate(t *testing.T) {
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
-	user.ContactEmail = "new@email.com"
+	user2 := user
+	user2.ContactEmail = "new@email.com"
+	user2.Password = ""
 
 	cases := []struct {
 		desc string
@@ -285,13 +287,13 @@ func TestUpdate(t *testing.T) {
 		{
 			desc: "update user contact email",
 			key:  key,
-			user: user,
+			user: user2,
 			err:  nil,
 		},
 		{
 			desc: "update user with invalid credentials",
 			key:  "",
-			user: user,
+			user: user2,
 			err:  auth.ErrUnauthorizedAccess,
 		},
 	}
@@ -305,11 +307,11 @@ func TestUpdate(t *testing.T) {
 func TestUpdatePassword(t *testing.T) {
 	svc, k := newService()
 
-	user.Password = "Pass2222!"
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, err := svc.Login(user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, user.ID))
+	user.Password = "Pass2222!"
 
 	cases := []struct {
 		desc string
