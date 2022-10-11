@@ -234,7 +234,7 @@ func (as *authService) UpdateUser(key string, user User) error {
 		}
 		// Check if password is already used in the Last 5 passwords
 		for _, hpassword := range u.PasswordHistory {
-			if err := as.hasher.Compare(user.Password, hpassword); err != nil {
+			if err := as.hasher.Compare(user.Password, hpassword); err == nil {
 				return ErrUserPasswordHistory
 			}
 		}

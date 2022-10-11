@@ -377,8 +377,10 @@ func TestLogin(t *testing.T) {
 	require.Nil(t, err, "unexpected error registering user: %s", err)
 	_, err = svc.Register(key, userForDisable)
 	require.Nil(t, err, "unexpected error registering user: %s", err)
-	userForDisable.Disabled = true
-	err = svc.UpdateUser(key, userForDisable)
+	userForDisable2 := userForDisable
+	userForDisable2.Disabled = true
+	userForDisable2.Password = ""
+	err = svc.UpdateUser(key, userForDisable2)
 	require.Nil(t, err, "unexpected error disabling user: %s", err)
 
 	credentials := user
