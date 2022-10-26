@@ -71,7 +71,7 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
           this.form.reset();
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Status: ${err.status} - ${err.error.error}`);
           this.submitted = false;
         });
     }
