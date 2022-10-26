@@ -23,7 +23,6 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      old_password: ['', [Validators.required, Validators.minLength(8)]],
       new_password: ['', [Validators.required, Validators.minLength(8),
         // 2. check whether the entered password has a number
         CustomValidators.patternValidator(/\d/, { hasNumber: true }),
@@ -60,7 +59,6 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
     if (this.form.valid) {
       const updateUserReq = {
         id: this.user.id,
-        old_password: this.form.value.old_password,
         // change new_password to password feild so API call take intor account the new password to update
         password: this.form.value.new_password,
         re_password: this.form.value.re_password,
@@ -71,7 +69,7 @@ export class DashboardProfilePasswordUpdateComponent implements OnInit {
           this.form.reset();
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.error.error}`);
+          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
           this.submitted = false;
         });
     }

@@ -28,14 +28,15 @@ export class DashboardAdminEditComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      role:       [this.user.role, [Validators.required]],
-      email:      [this.user.email, [Validators.required, Validators.email, Validators.maxLength(256)]],
-      first_name: [this.user.first_name, [Validators.maxLength(32)]],
-      last_name:  [this.user.last_name, [Validators.maxLength(32)]],
-      company:    [this.user.company, [Validators.maxLength(32)]],
-      address:    [this.user.address, [Validators.maxLength(128)]],
-      phone:      [this.user.phone, [Validators.maxLength(32)]],
-      password:   ['', [Validators.minLength(8), Validators.maxLength(32),
+      role:          [this.user.role, [Validators.required]],
+      email:         [this.user.email, [Validators.required, Validators.email, Validators.maxLength(256)]],
+      contact_email: [this.user.contact_email, [Validators.required, Validators.email, Validators.maxLength(256)]],
+      first_name:    [this.user.first_name, [Validators.maxLength(32)]],
+      last_name:     [this.user.last_name, [Validators.maxLength(32)]],
+      company:       [this.user.company, [Validators.maxLength(32)]],
+      address:       [this.user.address, [Validators.maxLength(128)]],
+      phone:         [this.user.phone, [Validators.maxLength(32)]],
+      password:      ['', [Validators.minLength(8), Validators.maxLength(32),
         // 2. check whether the entered password has a number
         CustomValidators.patternValidator(/\d/, { hasNumber: true }),
         // 3. check whether the entered password has upper case letter
@@ -56,6 +57,7 @@ export class DashboardAdminEditComponent implements OnInit {
           id: this.user.id,
           role: this.form.value.role,
           email: this.form.value.email,
+          contact_email: this.form.value.contact_email,
           first_name: this.form.value.first_name,
           last_name: this.form.value.last_name,
           company: this.form.value.company,

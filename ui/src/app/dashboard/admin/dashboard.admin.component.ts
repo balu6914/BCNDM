@@ -57,7 +57,7 @@ export class DashboardAdminComponent implements OnInit {
     // Config table
     this.table.title = 'Users';
     this.table.tableType = TableType.Users;
-    this.table.headers = ['Role', 'Email', 'Name', 'Company', 'Phone', 'Address', 'Account Login', 'Status', 'Balance', ''];
+    this.table.headers = ['Role', 'Email', 'Contact Email', 'Name', 'Company', 'Phone', 'Address', 'Account Login', 'Status', 'Balance', ''];
     this.table.hasDetails = true;
   }
 
@@ -81,6 +81,7 @@ export class DashboardAdminComponent implements OnInit {
       user: {
         id: row.id,
         email: row.email,
+        contact_email: row.contact_email,
         first_name: row.first_name,
         last_name: row.last_name,
         phone: row.phone,
@@ -106,6 +107,7 @@ export class DashboardAdminComponent implements OnInit {
       user: {
         id: row.id,
         email: row.email,
+        contact_email: row.contact_email,
         first_name: row.first_name,
         last_name: row.last_name,
         phone: row.phone,
@@ -134,6 +136,7 @@ export class DashboardAdminComponent implements OnInit {
       user: {
         id: row.id,
         email: row.email,
+        contact_email: row.contact_email,
         first_name: row.first_name,
         last_name: row.last_name,
         phone: row.phone,
