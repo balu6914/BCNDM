@@ -9,8 +9,9 @@ $topbar-height-mobile: 60px;
   $d: &;
 
   // margin-bottom: 25px;
-  background-color: #fff;
+  // background-color: #326295; 
   box-shadow: 0 1px 0 0 #DFE9F7;
+  height: 85px;
 
   &__wrapper {
     display: flex;
@@ -19,14 +20,14 @@ $topbar-height-mobile: 60px;
   }
   &__brand {
     display: inline-block;
-    background: url(#{$asset-path}/img/logo.svg) 0 0 no-repeat;
+    background: url(#{$asset-path}/img/logo.png) 0 0 no-repeat;
     width: 103px;
     height: 20px;
     background-size: 103px 20px;
     @include media-breakpoint-up(sm) {
-      width: 129px;
-      height: 25px;
-      background-size: 129px 25px;
+      width: 170px;
+      height: 50px;
+      background-size: 170px 50px;
     }
   }
   &__toggler {
