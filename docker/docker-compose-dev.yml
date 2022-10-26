@@ -6,7 +6,7 @@ services:
   # Auth DB
   ###
   datapace-auth-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-auth-db
     command: --nojournal
     volumes:
@@ -43,7 +43,7 @@ services:
   # Transactions DB
   ###
   datapace-transactions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-transactions-db
     command: --nojournal
     volumes:
@@ -86,7 +86,7 @@ services:
   # Streams DB
   ###
   datapace-streams-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-streams-db
     command: --nojournal
     volumes:
@@ -131,7 +131,7 @@ services:
   # Subscriptions DB
   ###
   datapace-subscriptions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-subscriptions-db
     command: --nojournal
     ports:
@@ -170,7 +170,7 @@ services:
   # Terms DB
   ###
   datapace-terms-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-terms-db
     command: --nojournal
     ports:
@@ -210,7 +210,7 @@ services:
   # Executions DB
   ###
   datapace-executions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-executions-db
     command: --nojournal
     volumes:
@@ -255,7 +255,7 @@ services:
   # Access Control DB
   ###
   datapace-access-control-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-access-control-db
     command: --nojournal
     volumes:
@@ -313,7 +313,7 @@ services:
       - datapace-net
 
   datapace-dproxy-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-dproxy-db
     command: --nojournal
     ports:

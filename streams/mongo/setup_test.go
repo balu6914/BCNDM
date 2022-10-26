@@ -1,4 +1,4 @@
-package mongo_test
+package mongo
 
 import (
 	"fmt"

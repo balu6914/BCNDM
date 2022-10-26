@@ -6,10 +6,10 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-// DBName - DB name
+// dbName - If name is empty, the database name provided in DialInfo is used instead
 // CollectionName - Collection name
 const (
-	dbName         = "datapace-terms"
+	dbName         = ""
 	collectionName = "terms"
 )
 

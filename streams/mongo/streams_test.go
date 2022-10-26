@@ -1,4 +1,4 @@
-package mongo_test
+package mongo
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 
 	log "github.com/datapace/datapace/logger"
 	"github.com/datapace/datapace/streams"
-	"github.com/datapace/datapace/streams/mongo"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,7 +18,6 @@ import (
 const (
 	url        = "localhost"
 	testDB     = "datapace-streams"
-	collection = "streams"
 	limit      = uint64(3)
 	maxPage    = uint64(100)
 	long       = float64(50)
@@ -64,8 +62,8 @@ func pointer(val uint64) *uint64 {
 }
 
 func TestSearch(t *testing.T) {
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	partners := []string{}
 	all := []streams.Stream{}
@@ -100,7 +98,7 @@ func TestSearch(t *testing.T) {
 	all = append(all, s1, s2)
 	partners = append(partners, s1.Owner, s2.Owner)
 
-	val, _ := db.DB(testDB).C(collection).Count()
+	val, _ := db.DB(dbName).C(collection).Count()
 	total := uint64(val)
 
 	cases := []struct {
@@ -283,8 +281,8 @@ func TestSearch(t *testing.T) {
 
 func TestSearchShared(t *testing.T) {
 
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	all := []streams.Stream{}
 	s0 := stream()
@@ -361,8 +359,8 @@ func TestSearchShared(t *testing.T) {
 
 func TestSearchByMetadata(t *testing.T) {
 
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	all := []streams.Stream{}
 	s0 := stream()
@@ -480,11 +478,11 @@ func TestSearchByMetadata(t *testing.T) {
 }
 
 func TestSave(t *testing.T) {
-	db.DB(testDB).DropDatabase()
+	db.DB(dbName).DropDatabase()
 	db.ResetIndexCache()
 	db.Refresh()
 
-	repo := mongo.New(db)
+	repo := New(db)
 
 	s := stream()
 	s1 := stream()
@@ -516,11 +514,11 @@ func TestSave(t *testing.T) {
 }
 
 func TestSaveAll(t *testing.T) {
-	db.DB(testDB).DropDatabase()
+	db.DB(dbName).DropDatabase()
 	db.ResetIndexCache()
 	db.Refresh()
 
-	repo := mongo.New(db)
+	repo := New(db)
 
 	validBulk := []streams.Stream{}
 	conflictBulk := []streams.Stream{}
@@ -564,8 +562,8 @@ func TestSaveAll(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	s := stream()
 	id, err := repo.Save(s)
@@ -602,8 +600,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestOne(t *testing.T) {
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	s := stream()
 	id, err := repo.Save(stream())
@@ -637,8 +635,8 @@ func TestOne(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	db.DB(testDB).DropDatabase()
-	repo := mongo.New(db)
+	db.DB(dbName).DropDatabase()
+	repo := New(db)
 
 	s := stream()
 	id, err := repo.Save(s)
