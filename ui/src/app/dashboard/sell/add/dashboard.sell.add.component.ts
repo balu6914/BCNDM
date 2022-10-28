@@ -121,7 +121,7 @@ export class DashboardSellAddComponent implements OnInit {
           this.modalAddStream.hide();
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          this.alertService.error(`Status: ${err.status} - ${err.error.error}`);
         }
       );
     }

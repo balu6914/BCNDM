@@ -100,7 +100,7 @@ export class DashboardBuyComponent implements OnInit {
         this.table = temp;
       },
       err => {
-        this.alertService.error(`Error: ${err.status} - ${err.statusText}`);
+        this.alertService.error(`Error: ${err.status} - ${err.error.error}`);
       });
   }
 
