@@ -272,18 +272,6 @@ func (as *authService) UpdateUser(key string, user User) error {
 		if err != nil {
 			return err
 		}
-		// Check if password is already used in the Last 5 passwords
-		for _, hpassword := range u.PasswordHistory {
-			if err := as.hasher.Compare(user.Password, hpassword); err == nil {
-				return ErrUserPasswordHistory
-			}
-		}
-		user.Password = hash
-		user.PasswordHistory = u.PasswordHistory
-		if len(user.PasswordHistory) > 5 {
-			user.PasswordHistory = user.PasswordHistory[1:]
-		}
-		user.PasswordHistory = append(user.PasswordHistory, user.Password)
 	}
 	if user.ContactEmail != "" && !govalidator.IsEmail(user.ContactEmail) {
 		return ErrMalformedEntity
