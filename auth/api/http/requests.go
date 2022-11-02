@@ -2,10 +2,9 @@ package http
 
 import (
 	"errors"
-
-	"github.com/datapace/datapace/auth"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/datapace/datapace/auth"
+	"regexp"
 )
 
 // User validation errors
@@ -105,6 +104,61 @@ func (req credentialsReq) validate() error {
 		return auth.ErrMalformedEntity
 	}
 
+	return nil
+}
+
+type recoverReq struct {
+	Email string `json:"email"`
+}
+
+func (req recoverReq) validate() error {
+	if !govalidator.IsEmail(req.Email) {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type recoveryTokenReq struct {
+	token string
+	id    string
+}
+
+func (req recoveryTokenReq) validate() error {
+	if req.token == "" || req.id == "" {
+		return auth.ErrMalformedEntity
+	}
+
+	tokenIsJWT, err := regexp.Match("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$", []byte(req.token))
+	if err != nil {
+		return err
+	}
+
+	if !govalidator.IsHexadecimal(req.id) || !tokenIsJWT {
+		return auth.ErrMalformedEntity
+	}
+
+	return nil
+}
+
+type recoveryPasswordReq struct {
+	token    string
+	Password string `json:"password"`
+	id       string
+}
+
+func (req recoveryPasswordReq) validate() error {
+	tokenIsJWT, err := regexp.Match("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$", []byte(req.token))
+	if err != nil {
+		return err
+	}
+	if req.token == "" || !tokenIsJWT {
+		return auth.ErrMalformedEntity
+	}
+	if req.Password == "" || len(req.Password) < minPasswordLength ||
+		len(req.Password) > maxPasswordLength {
+		return errInvalidPassword
+	}
 	return nil
 }
 

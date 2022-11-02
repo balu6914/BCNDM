@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	ulid "github.com/oklog/ulid/v2"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -34,6 +34,10 @@ var (
 	ErrPassContainUpCase = fmt.Errorf("password must contain a character between A and Z")
 	// ErrPassContainSymbol indicates that password don't contain a symbol
 	ErrPassContainSymbol = fmt.Errorf("password must contain a symbol")
+	// ErrPasswordRecoveryExpired indicates that password recovery time of 30 minutes has expired
+	ErrPasswordRecoveryExpired = fmt.Errorf("password recovery time expired")
+	// ErrMailNotSent that there was a problem with mail server while sending the password recovery email
+	ErrMailNotSent = fmt.Errorf("email transport error")
 )
 
 var _ Service = (*authService)(nil)
@@ -53,6 +57,8 @@ func (e *entropy) Read(p []byte) (n int, err error) {
 
 type authService struct {
 	users    UserRepository
+	recovery RecoveryTokenProvider
+	mailsvc  MailService
 	hasher   Hasher
 	idp      IdentityProvider
 	ts       TransactionsService
@@ -61,13 +67,26 @@ type authService struct {
 	entropy  *entropy
 }
 
+var symbols = []rune("01233456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = symbols[rand.Intn(len(symbols))]
+	}
+	return string(b)
+}
+
 // New instantiates the domain service implementation.
-func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl) Service {
+func New(users UserRepository, policies PolicyRepository, hasher Hasher, idp IdentityProvider, ts TransactionsService, access AccessControl, recovery RecoveryTokenProvider, mailsvc MailService) Service {
 	t := time.Now()
 	mt := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
 	e := &entropy{r: mt, t: t}
 	return &authService{
 		users:    users,
+		recovery: recovery,
+		mailsvc:  mailsvc,
 		hasher:   hasher,
 		idp:      idp,
 		ts:       ts,
@@ -207,6 +226,27 @@ func (as *authService) Login(user User) (string, error) {
 	return as.idp.TemporaryKey(dbu.ID, dbu.Role)
 }
 
+func (as *authService) checkAndHashPassword(storedUser User, newUser *User) error {
+	hash, err := as.hasher.Hash(newUser.Password)
+	if err != nil {
+		return ErrMalformedEntity
+	}
+	// Check if password is already used in the Last 5 passwords
+	for _, hpassword := range storedUser.PasswordHistory {
+		if err := as.hasher.Compare(newUser.Password, hpassword); err == nil {
+			return ErrUserPasswordHistory
+		}
+	}
+	newUser.Password = hash
+	newUser.PasswordHistory = storedUser.PasswordHistory
+	if len(newUser.PasswordHistory) > 5 {
+		newUser.PasswordHistory = newUser.PasswordHistory[1:]
+	}
+	newUser.PasswordHistory = append(newUser.PasswordHistory, newUser.Password)
+
+	return nil
+}
+
 // Update updates existing user. Key(token) supplied needs to either have admin role or
 // it needs to contain user.ID same with the user that is being updated (self update)
 // if non empty password is supplied, then password is hashed and saved instead of clear text
@@ -226,29 +266,78 @@ func (as *authService) UpdateUser(key string, user User) error {
 		user.Policies = []Policy{p}
 	}
 
-	// If password supplied, hash it
+	// If password supplied, hash it and check against latest 5 passwords
 	if user.Password != "" {
-		hash, err := as.hasher.Hash(user.Password)
+		err := as.checkAndHashPassword(u, &user)
 		if err != nil {
-			return ErrMalformedEntity
+			return err
 		}
-		// Check if password is already used in the Last 5 passwords
-		for _, hpassword := range u.PasswordHistory {
-			if err := as.hasher.Compare(user.Password, hpassword); err == nil {
-				return ErrUserPasswordHistory
-			}
-		}
-		user.Password = hash
-		user.PasswordHistory = u.PasswordHistory
-		if len(user.PasswordHistory) > 5 {
-			user.PasswordHistory = user.PasswordHistory[1:]
-		}
-		user.PasswordHistory = append(user.PasswordHistory, user.Password)
 	}
 	if user.ContactEmail != "" && !govalidator.IsEmail(user.ContactEmail) {
 		return ErrMalformedEntity
 	}
 	return as.users.Update(user)
+}
+
+func (as *authService) RecoverPassword(email string) error {
+	user, err := as.users.OneByEmail(email)
+	if err != nil {
+		return err
+	}
+
+	secret := randomString(32)
+	user.PasswordResetSecret = secret
+	tokenString, err := as.recovery.CreateTokenString(user.ID, secret)
+	if err != nil {
+		return err
+	}
+
+	if updateErr := as.users.Update(user); updateErr != nil {
+		return updateErr
+	}
+
+	templateData := map[string]interface{}{
+		"Token": tokenString,
+		"ID":    user.ID,
+	}
+	emailSubject := "Datapace password recovery."
+
+	if mailErr := as.mailsvc.SendRecoveryEmail(email, emailSubject, templateData); mailErr != nil {
+		return mailErr
+	}
+
+	return nil
+}
+
+func (as *authService) ValidateRecoveryToken(token string, id string) error {
+	user, err := as.users.OneByID(id)
+	if err != nil {
+		return ErrNotFound
+	}
+	_, parseErr := as.recovery.ParseToken(token, user.PasswordResetSecret)
+	if parseErr != nil {
+		return parseErr
+	}
+
+	return nil
+}
+
+func (as *authService) UpdatePassword(token string, id string, password string) error {
+	storedUser, err := as.users.OneByID(id)
+	if err != nil {
+		return ErrNotFound
+	}
+	_, parseErr := as.recovery.ParseToken(token, storedUser.PasswordResetSecret)
+	if parseErr != nil {
+		return parseErr
+	}
+	newUser := storedUser
+	newUser.Password = password
+	if checkErr := as.checkAndHashPassword(storedUser, &newUser); checkErr != nil {
+		return checkErr
+	}
+	newUser.PasswordResetSecret = ""
+	return as.users.Update(newUser)
 }
 
 func (as *authService) ViewUser(key, userID string) (User, error) {

@@ -1,0 +1,71 @@
+<div class="wrapper animated fadeIn">
+
+   <div class="logo"></div>
+
+   <div class="box" *ngIf="!tokenSent && !tokenReceived">
+      <p class="box__title">
+         Recover Password
+         <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
+      </p>
+      <form [formGroup]="recoveryForm" (ngSubmit)="onRecoverySubmit()">
+      <div class="form-group row">
+         <label class="col-sm-2 col-form-label">Email*</label>
+         <div class="col-sm-10">
+            <input type="email" formControlName="email" class="form-control"
+               [ngClass]="{ 'is-invalid': emailSubmitted && recoveryForm.controls.email.errors }" />
+            <div *ngIf="emailSubmitted && recoveryForm.controls.email.errors" class="invalid-feedback">
+               <div *ngIf="recoveryForm.controls.email.errors.email">Email must be a valid email address.</div>
+               <div *ngIf="recoveryForm.controls.email.errors.maxlength">The maximum length is 32 characters.</div>
+            </div>
+         </div>
+      </div>
+      <div class="form-group row">
+         <div class="col-sm-12">
+            Recovery link will be sent to your email.
+         </div>
+      </div>
+      <button class="btn btn-block btn-primary">Recover Password</button>
+      </form>
+      <p class="box__action">
+         Don't have an account? <a routerLink="/signup" class="box__action-link">Sign up now!</a>
+      </p>
+   </div>
+
+  <div class="box" *ngIf="tokenSent && !tokenReceived">
+    <p class="box__title">
+      Check your email!
+    </p>
+    <p class="box__action">
+      Password recovery instructions have been sent to your mailbox!
+    </p>
+  </div>
+
+  <div class="box" *ngIf="tokenReceived">
+    <p class="box__title">
+      <span *ngIf="tokenChecking">Checking password recovery token ...</span>
+      <span *ngIf="errorMsg" class="error-message text-center">{{errorMsg}}</span>
+      <span *ngIf="tokenValid && !passwordChanged">Please enter the new password.</span>
+    </p>
+    <form *ngIf="tokenValid && !passwordChanged" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">New Password*</label>
+        <div class="col-sm-10">
+          <input type="password" formControlName="password" class="form-control"
+                 [ngClass]="{ 'is-invalid': passwordSubmitted && passwordForm.controls.password.errors }" />
+          <div *ngIf="passwordSubmitted && passwordForm.controls.password.errors" class="invalid-feedback">
+            <div *ngIf="passwordForm.controls.password.errors.minlength">Minimum password length is 8 characters.</div>
+            <div *ngIf="passwordForm.controls.password.errors.maxlength">Maximum password length is 32 characters.</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-block btn-primary">Set New Password</button>
+    </form>
+    <p class="box__action" *ngIf="!tokenValid && tokenChecked && !passwordChanged">
+      To request another password recovery link <a (click)="resetPage()" routerLink="/recover" class="box__action-link">click here</a>
+    </p>
+    <p class="box__action" *ngIf="passwordChanged">
+      Password has been successfully changed!<br> Use new password to <a routerLink="/login" class="box__action-link">login here</a>
+    </p>
+  </div>
+
+</div>

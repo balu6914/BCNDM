@@ -4,12 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/datapace/datapace"
+	"github.com/datapace/datapace/auth"
 	"io"
 	"net/http"
-
-	"github.com/datapace/datapace"
-
-	"github.com/datapace/datapace/auth"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -57,6 +55,27 @@ func MakeHandler(svc auth.Service) http.Handler {
 	r.Patch("/users/:id", kithttp.NewServer(
 		updateUserEndpoint(svc),
 		decodeUpdate,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Post("/users/recover", kithttp.NewServer(
+		recoverPasswordEndpoint(svc),
+		decodeRecover,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/users/recover/:token/:id", kithttp.NewServer(
+		validateRecoveryTokenEndpoint(svc),
+		decodeRecoveryToken,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Patch("/users/recover/:token/:id", kithttp.NewServer(
+		updatePasswordEndpoint(svc),
+		decodeRecoveryPassword,
 		encodeResponse,
 		opts...,
 	))
@@ -148,6 +167,45 @@ func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
 		id:  bone.GetValue(r, "id"),
 		key: r.Header.Get("Authorization"),
 	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+func decodeRecover(_ context.Context, r *http.Request) (interface{}, error) {
+	var req recoverReq
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+func decodeRecoveryToken(_ context.Context, r *http.Request) (interface{}, error) {
+	req := recoveryTokenReq{
+		token: bone.GetValue(r, "token"),
+		id:    bone.GetValue(r, "id"),
+	}
+
+	return req, nil
+}
+
+func decodeRecoveryPassword(_ context.Context, r *http.Request) (interface{}, error) {
+	if r.Header.Get("Content-Type") != contentType {
+		return nil, errUnsupportedContentType
+	}
+
+	req := recoveryPasswordReq{
+		token: bone.GetValue(r, "token"),
+		id:    bone.GetValue(r, "id"),
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}

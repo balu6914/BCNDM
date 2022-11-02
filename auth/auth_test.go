@@ -7,7 +7,6 @@ import (
 
 	"github.com/datapace/datapace/auth"
 	"github.com/datapace/datapace/auth/mocks"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -152,7 +151,10 @@ func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
 	policies := mocks.NewPolicyRepository(policies, &policiesMu)
-	svc := auth.New(users, policies, hasher, idp, ts, ac)
+	rc := mocks.NewRecoveryService()
+	mailsvc := mocks.NewMailService()
+
+	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,
@@ -318,22 +320,26 @@ func TestUpdatePassword(t *testing.T) {
 		key  string
 		user auth.User
 		err  error
+		pass string
 	}{
 		{
 			desc: "update user password",
 			key:  key,
 			user: user,
 			err:  nil,
+			pass: "Pass2222!1",
 		},
 		{
 			desc: "update user password invalid credentials",
 			key:  "",
 			user: user,
 			err:  auth.ErrUnauthorizedAccess,
+			pass: "Pass2222!2",
 		},
 	}
 
 	for _, tc := range cases {
+		tc.user.Password = tc.pass
 		err := svc.UpdateUser(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
