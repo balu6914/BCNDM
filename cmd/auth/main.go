@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/datapace/datapace/auth/mail"
-	"github.com/datapace/datapace/auth/recovery"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/datapace/datapace/auth/mail"
+	"github.com/datapace/datapace/auth/recovery"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -51,6 +52,7 @@ const (
 	envSmtpIdentity     = "DATAPACE_SMTP_IDENTITY"
 	envSmtpURL          = "DATAPACE_SMTP_URL"
 	envSmtpHost         = "DATAPACE_SMTP_HOST"
+	envSmtpPort         = "DATAPACE_SMTP_PORT"
 	envSmtpUser         = "DATAPACE_SMTP_USER"
 	envSmtpPassword     = "DATAPACE_SMTP_PASSWORD"
 	envSmtpFrom         = "DATAPACE_SMTP_FROM"
@@ -72,6 +74,7 @@ const (
 	defSmtpIdentity     = ""
 	defSmtpURL          = "smtp.mailtrap.io:25"
 	defSmtpHost         = "smtp.mailtrap.io"
+	defSmtpPort         = "465"
 	defSmtpUser         = "3b29d66d776ccc"
 	defSmtpPassword     = "8bfabd687f207b"
 	defSmtpFrom         = "noreply@datapace.io"
@@ -100,6 +103,7 @@ type config struct {
 	smtpIdentity     string
 	smtpURL          string
 	smtpHost         string
+	smtpPort         string
 	smtpUser         string
 	smtpPassword     string
 	smtpFrom         string
@@ -162,6 +166,7 @@ func loadConfig() config {
 		smtpIdentity:     datapace.Env(envSmtpIdentity, defSmtpIdentity),
 		smtpURL:          datapace.Env(envSmtpURL, defSmtpURL),
 		smtpHost:         datapace.Env(envSmtpHost, defSmtpHost),
+		smtpPort:         datapace.Env(envSmtpPort, defSmtpPort),
 		smtpUser:         datapace.Env(envSmtpUser, defSmtpUser),
 		smtpPassword:     datapace.Env(envSmtpPassword, defSmtpPassword),
 		smtpFrom:         datapace.Env(envSmtpFrom, defSmtpFrom),
@@ -434,7 +439,7 @@ func newService(cfg config, ms *mgo.Session, tc transactionsproto.TransactionsSe
 	ts := transactions.NewService(tc)
 	ac := access.New(asc)
 	rc := recovery.New()
-	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom, cfg.frontendURL, cfg.passRecoveryTpl)
+	mailsvc := mail.New(cfg.smtpIdentity, cfg.smtpURL, cfg.smtpHost, cfg.smtpPort, cfg.smtpUser, cfg.smtpPassword, cfg.smtpFrom, cfg.frontendURL, cfg.passRecoveryTpl)
 
 	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	svc = api.LoggingMiddleware(svc, logger)

@@ -21,6 +21,8 @@ services:
   datapace-auth:
     image: registry.gitlab.com/drasko/datapace-docker/auth
     container_name: datapace-auth
+    volumes:
+      - ../auth/mail/templates/passwordRecovery.html:/passwordRecovery.html
     restart: on-failure
     depends_on:
       - datapace-auth-db
@@ -36,6 +38,11 @@ services:
       - DATAPACE_AUTH_SECRET=datapace
       - DATAPACE_ADMIN_EMAIL=admin@datapace.com
       - DATAPACE_ADMIN_PASSWORD=admin
+      - DATAPACE_PASSWORD_RECOVERY_TPL=/passwordRecovery.html
+      - DATAPACE_SMTP_USER=674b9b94552180
+      - DATAPACE_SMTP_PASSWORD=5739c4c4edc756
+      - DATAPACE_SMTP_HOST=smtp.mailtrap.io
+      - DATAPACE_SMTP_PORT=2525
     networks:
       - datapace-net
 
