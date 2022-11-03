@@ -29,6 +29,7 @@ require (
 	google.golang.org/api v0.1.0
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.28.0
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 )
 

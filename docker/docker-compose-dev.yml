@@ -6,7 +6,7 @@ services:
   # Auth DB
   ###
   datapace-auth-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-auth-db
     command: --nojournal
     volumes:
@@ -21,6 +21,8 @@ services:
   datapace-auth:
     image: registry.gitlab.com/drasko/datapace-docker/auth
     container_name: datapace-auth
+    volumes:
+      - ../auth/mail/templates/passwordRecovery.html:/passwordRecovery.html
     restart: on-failure
     depends_on:
       - datapace-auth-db
@@ -36,6 +38,11 @@ services:
       - DATAPACE_AUTH_SECRET=datapace
       - DATAPACE_ADMIN_EMAIL=admin@datapace.com
       - DATAPACE_ADMIN_PASSWORD=admin
+      - DATAPACE_PASSWORD_RECOVERY_TPL=/passwordRecovery.html
+      - DATAPACE_SMTP_USER=674b9b94552180
+      - DATAPACE_SMTP_PASSWORD=5739c4c4edc756
+      - DATAPACE_SMTP_HOST=smtp.mailtrap.io
+      - DATAPACE_SMTP_PORT=2525
     networks:
       - datapace-net
 
@@ -43,7 +50,7 @@ services:
   # Transactions DB
   ###
   datapace-transactions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-transactions-db
     command: --nojournal
     volumes:
@@ -86,7 +93,7 @@ services:
   # Streams DB
   ###
   datapace-streams-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-streams-db
     command: --nojournal
     volumes:
@@ -131,7 +138,7 @@ services:
   # Subscriptions DB
   ###
   datapace-subscriptions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-subscriptions-db
     command: --nojournal
     ports:
@@ -170,7 +177,7 @@ services:
   # Terms DB
   ###
   datapace-terms-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-terms-db
     command: --nojournal
     ports:
@@ -210,7 +217,7 @@ services:
   # Executions DB
   ###
   datapace-executions-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-executions-db
     command: --nojournal
     volumes:
@@ -255,7 +262,7 @@ services:
   # Access Control DB
   ###
   datapace-access-control-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-access-control-db
     command: --nojournal
     volumes:
@@ -313,7 +320,7 @@ services:
       - datapace-net
 
   datapace-dproxy-db:
-    image: mongo:latest
+    image: mongo:5.0.13
     container_name: datapace-dproxy-db
     command: --nojournal
     ports:

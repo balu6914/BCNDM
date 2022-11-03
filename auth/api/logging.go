@@ -74,6 +74,45 @@ func (lm *loggingMiddleware) UpdateUser(key string, user auth.User) (err error) 
 	return lm.svc.UpdateUser(key, user)
 }
 
+func (lm *loggingMiddleware) RecoverPassword(email string) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method recover_password for email %s took %s to complete", email, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.RecoverPassword(email)
+}
+
+func (lm *loggingMiddleware) ValidateRecoveryToken(token string, id string) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method validate_recovery_token for token %s took %s to complete", token, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.ValidateRecoveryToken(token, id)
+}
+
+func (lm *loggingMiddleware) UpdatePassword(token string, id string, password string) (err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method update_password for token %s took %s to complete", token, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.UpdatePassword(token, id, password)
+}
+
 func (lm *loggingMiddleware) ViewUser(key, ID string) (user auth.User, err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method view_user for key %s and ID %s and took %s to complete", key, ID, time.Since(begin))

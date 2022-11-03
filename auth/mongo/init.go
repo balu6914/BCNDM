@@ -6,8 +6,9 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+// dbName - If name is empty, the database name provided in DialInfo is used instead
 const (
-	dbName             = "datapace-auth"
+	dbName             = ""
 	usersCollection    = "users"
 	policiesCollection = "policies"
 )

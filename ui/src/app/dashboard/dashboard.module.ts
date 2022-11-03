@@ -14,6 +14,7 @@ import { SharedModule } from 'app/shared/shared.module';
 
 import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
+import { RecoverComponent } from './recover/recover.component';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { LoginComponent } from './login/login.component';
   declarations: [
     SignupComponent,
     LoginComponent,
+    RecoverComponent,
     DashboardComponent,
     DashboardMainComponent,
     DashboardMainStreamsComponent,

@@ -95,7 +95,8 @@ export class DashboardAiAddComponent implements OnInit {
           this.alertService.success(`${this.streamType} successfully added!`);
         },
         err => {
-          this.alertService.error(`Status: ${err.status} - ${err.statusText}`);
+          console.log(err);
+          this.alertService.error(`Status: ${err.status} - ${err.error.error}`);
         }
       );
 

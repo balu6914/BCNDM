@@ -64,6 +64,45 @@ func updateUserEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
+func recoverPasswordEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(recoverReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		if err := svc.RecoverPassword(req.Email); err != nil {
+			return nil, err
+		}
+		return okRes{}, nil
+	}
+}
+
+func validateRecoveryTokenEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(recoveryTokenReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		if err := svc.ValidateRecoveryToken(req.token, req.id); err != nil {
+			return nil, err
+		}
+		return okRes{}, nil
+	}
+}
+
+func updatePasswordEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(recoveryPasswordReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		if err := svc.UpdatePassword(req.token, req.id, req.Password); err != nil {
+			return nil, err
+		}
+		return okRes{}, nil
+	}
+}
+
 func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)

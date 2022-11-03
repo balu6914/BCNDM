@@ -37,6 +37,13 @@
       </div>
     </div>
     <div class="form-group row">
+      <label class="col-sm-3">E-mail Address</label>
+      <div ngxClipboard [cbContent]="user.email" class="col-sm-9 text-secondary"
+        data-toggle="tooltip" data-placement="top" title="Click to copy email" style="cursor:pointer">
+        {{user.email}}
+      </div>
+    </div>
+    <div class="form-group row">
       <label for="staticEmail" class="col-sm-3 col-form-label">Contact E-mail Address</label>
       <div class="col-sm-9">
         <input type="email" class="form-control" formControlName="contact_email"

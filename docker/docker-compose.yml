@@ -215,7 +215,7 @@ services:
       - DATAPACE_DPROXY_DB_PORT=5432
       - DATAPACE_DPROXY_DB_USER=dproxy
       - DATAPACE_DPROXY_DB_PASS=dproxy
-      - DATAPACE_DPROXY_DB_=dproxy
+      - DATAPACE_DPROXY_DB_NAME_=dproxy
     depends_on:
       - datapace-dproxy-db
     ports:

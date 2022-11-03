@@ -19,10 +19,11 @@
                 <div class="modal__ratio">
                   1EUR = 1 DPC
                 </div>
-                <form [formGroup]="form" class="form-inline float-right buy-dpc needs-validation" novalidate>
+                <form [formGroup]="form" class="float-right buy-dpc needs-validation">
                   <div class="form-group">
                     <label for="tokenAmount" class="form-label mr-2">Token amount</label>
-                    <input type="number"  formControlName="amount" class="form-control buy-dpc__input" id="tokenAmount" min="0">
+                    <input type="number" formControlName="amount" aria-describedby="ammountHelp" class="form-control buy-dpc__input" id="tokenAmount" min="0" max="1000000">
+                    <small id="ammountHelp" class="form-text text-muted">Maximum 1,000,000 DPC</small>
                   </div>
                 </form>
               </div>

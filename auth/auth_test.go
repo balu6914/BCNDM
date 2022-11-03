@@ -7,7 +7,6 @@ import (
 
 	"github.com/datapace/datapace/auth"
 	"github.com/datapace/datapace/auth/mocks"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -152,7 +151,10 @@ func newServiceWithAdmin() (auth.Service, string, auth.User) {
 	ts := mocks.NewTransactionsService()
 	ac := mocks.NewAccessControl()
 	policies := mocks.NewPolicyRepository(policies, &policiesMu)
-	svc := auth.New(users, policies, hasher, idp, ts, ac)
+	rc := mocks.NewRecoveryService()
+	mailsvc := mocks.NewMailService()
+
+	svc := auth.New(users, policies, hasher, idp, ts, ac, rc, mailsvc)
 	key, _ := svc.Login(auth.User{
 		Email:    admin.Email,
 		Password: admin.Password,
@@ -274,7 +276,9 @@ func TestUpdate(t *testing.T) {
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, _ := svc.Login(user)
-	user.ContactEmail = "new@email.com"
+	user2 := user
+	user2.ContactEmail = "new@email.com"
+	user2.Password = ""
 
 	cases := []struct {
 		desc string
@@ -285,13 +289,13 @@ func TestUpdate(t *testing.T) {
 		{
 			desc: "update user contact email",
 			key:  key,
-			user: user,
+			user: user2,
 			err:  nil,
 		},
 		{
 			desc: "update user with invalid credentials",
 			key:  "",
-			user: user,
+			user: user2,
 			err:  auth.ErrUnauthorizedAccess,
 		},
 	}
@@ -305,33 +309,37 @@ func TestUpdate(t *testing.T) {
 func TestUpdatePassword(t *testing.T) {
 	svc, k := newService()
 
-	user.Password = "Pass2222!"
 	_, err := svc.Register(k, user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while registering user %s", err, user.ID))
 	key, err := svc.Login(user)
 	assert.Nil(t, err, fmt.Sprintf("%s: unexpected error while login user %s", err, user.ID))
+	user.Password = "Pass2222!"
 
 	cases := []struct {
 		desc string
 		key  string
 		user auth.User
 		err  error
+		pass string
 	}{
 		{
 			desc: "update user password",
 			key:  key,
 			user: user,
 			err:  nil,
+			pass: "Pass2222!1",
 		},
 		{
 			desc: "update user password invalid credentials",
 			key:  "",
 			user: user,
 			err:  auth.ErrUnauthorizedAccess,
+			pass: "Pass2222!2",
 		},
 	}
 
 	for _, tc := range cases {
+		tc.user.Password = tc.pass
 		err := svc.UpdateUser(tc.key, tc.user)
 		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 	}
