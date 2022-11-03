@@ -116,7 +116,7 @@ paths:
       description: Initiate password request procedure. Generates a reset token and sends an email with link for resetting password.
       tags:
         - users
-        - reset password
+        - password recovery
       parameters:
         - name: email
           description: JSON-formatted email
@@ -141,7 +141,7 @@ paths:
       description: Validates recovery token and user's ID
       tags:
         - users
-        - reset password
+        - password recovery
       parameters:
         - name: token
           description: Recovery token from reset email.
@@ -167,7 +167,7 @@ paths:
       description: When user gets reset token in email posting password to this endpoint will change password.
       tags:
         - users
-        - reset password
+        - password recovery
       parameters:
         - name: token
           description: Recovery token from reset email.
