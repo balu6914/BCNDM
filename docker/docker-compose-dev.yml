@@ -43,6 +43,7 @@ services:
       - DATAPACE_SMTP_PASSWORD=5739c4c4edc756
       - DATAPACE_SMTP_HOST=smtp.mailtrap.io
       - DATAPACE_SMTP_PORT=2525
+      - DATAPACE_FRONTEND_URL=http://localhost
     networks:
       - datapace-net
 
