@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/datapace/datapace"
-	"github.com/datapace/datapace/auth"
 	"io"
 	"net/http"
+
+	"github.com/datapace/datapace"
+	"github.com/datapace/datapace/auth"
+	"github.com/datapace/datapace/auth/recovery"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -274,7 +276,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case errInvalidEmail, errInvalidPassword, errInvalidFirstName,
 		errInvalidLastName, errInvalidCompany, errInvalidAddress,
-		errInvalidPolicyRules, errInvalidPolicyVersion:
+		errInvalidPolicyRules, errInvalidPolicyVersion, recovery.ErrTokenParsingFailed:
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		// Add new error status user locked, password history presence

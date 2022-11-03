@@ -110,6 +110,94 @@ paths:
           description: Missing or invalid access token provided.
         500:
           $ref: "#/responses/ServiceError"
+  /users/recover:
+    post:
+      summary: User password reset request
+      description: Initiate password request procedure. Generates a reset token and sends an email with link for resetting password.
+      tags:
+        - users
+        - password recovery
+      parameters:
+        - name: email
+          description: JSON-formatted email
+          in: body
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: Sent email with link for reseting password.
+        403:
+          description: Missing or invalid email provided
+        500:
+          $ref: "#/responses/ServiceError"
+  /users/recover/{token}/{id}:
+    get:
+      summary: Validate recovery token and user's ID
+      description: Validates recovery token and user's ID
+      tags:
+        - users
+        - password recovery
+      parameters:
+        - name: token
+          description: Recovery token from reset email.
+          in: path
+          type: string
+          required: true
+        - name: id
+          description: User ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Token and user ID are valid
+        400:
+          description: Token validation failed
+        404:
+          description: User not found
+        500:
+          $ref: "#/responses/ServiceError"
+    patch:
+      summary: Update password
+      description: When user gets reset token in email posting password to this endpoint will change password.
+      tags:
+        - users
+        - password recovery
+      parameters:
+        - name: token
+          description: Recovery token from reset email.
+          in: path
+          type: string
+          required: true
+        - name: id
+          description: User ID.
+          in: path
+          type: string
+          required: true
+        - name: password
+          description: JSON-formatted password
+          in: body
+          schema:
+            type: object
+            required:
+              - password
+            properties:
+              password:
+                type: string
+      responses:
+        200:
+          description: Password succsesfully updated
+        400:
+          description: Token validation failed
+        404:
+          description: User not found
+        500:
+          $ref: "#/responses/ServiceError"
   /tokens:
     post:
       summary: User authentication

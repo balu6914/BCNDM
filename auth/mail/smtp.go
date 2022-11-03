@@ -3,7 +3,6 @@ package mail
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"html/template"
 	"strconv"
 
@@ -46,15 +45,12 @@ func (ms *mailService) SendRecoveryEmail(to string, subject string, templateData
 	}
 	dial := gomail.NewDialer(ms.smtpHost, port, ms.smtpUser, ms.smtpPassword)
 	dial.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	header := "To:" + to + "\r\n" + "From:" + ms.smtpFrom + "\r\n" + "Subject:" + subject
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
 	mailTemplate, parsingErr := template.ParseFiles(ms.passRecoveryTpl)
 	if parsingErr != nil {
 		return parsingErr
 	}
 
 	body := bytes.Buffer{}
-	body.Write([]byte(fmt.Sprintf("%s\n%s\n\n", header, mime)))
 	templateData["FrontendURL"] = ms.frontendURL
 	templateErr := mailTemplate.Execute(&body, templateData)
 	if templateErr != nil {
@@ -65,7 +61,7 @@ func (ms *mailService) SendRecoveryEmail(to string, subject string, templateData
 	m.SetHeader("From", ms.smtpFrom)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
-	m.SetBody("text/plain", body.String())
+	m.SetBody("text/html", body.String())
 
 	if err := dial.DialAndSend(m); err != nil {
 		return err
