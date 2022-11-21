@@ -207,21 +207,22 @@ func (as *authService) Login(user User) (string, error) {
 	if dbu.Locked {
 		return "", ErrUserAccountLocked
 	}
-	if dbu.Attempt >= nbAttempet && dbu.Locked != true {
-		dbu.Locked = true
-		as.users.Update(dbu)
-		return "", ErrUserAccountLocked
-	}
-	if err := as.hasher.Compare(user.Password, dbu.Password); err != nil {
-		dbu.Attempt = dbu.Attempt + 1
-		as.users.Update(dbu)
-		return "", ErrUnauthorizedAccess
-	}
+
 	if dbu.Disabled {
 		return "", ErrUserAccountDisabled
 	}
+
+	if err := as.hasher.Compare(user.Password, dbu.Password); err != nil {
+		dbu.Attempt = dbu.Attempt + 1
+		if dbu.Attempt >= nbAttempet {
+			dbu.Locked = true
+		}
+		as.users.Update(dbu)
+		return "", ErrUnauthorizedAccess
+	}
+
 	// Reset number of attempt with wrong password
-	dbu.Attempt = 0
+	dbu.Attempt = 1
 	as.users.Update(dbu)
 	return as.idp.TemporaryKey(dbu.ID, dbu.Role)
 }
