@@ -25,6 +25,7 @@ func registerEndpoint(svc auth.Service) endpoint.Endpoint {
 			Address:      req.Address,
 			Phone:        req.Phone,
 			Role:         req.Role,
+			Metadata:     req.Metadata,
 		}
 		id, err := svc.Register(req.key, user)
 		return createRes{ID: id}, err
@@ -129,7 +130,9 @@ func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 			Address:      user.Address,
 			Phone:        user.Phone,
 			Role:         user.Role,
+			CreatedDate:  user.CreatedDate,
 			Policies:     policies,
+			Metadata:     user.Metadata,
 		}
 
 		return res, nil
@@ -164,6 +167,8 @@ func listUsersEndpoint(svc auth.Service) endpoint.Endpoint {
 				Disabled:     user.Disabled,
 				Locked:       user.Locked,
 				Role:         user.Role,
+				CreatedDate:  user.CreatedDate,
+				Metadata:     user.Metadata,
 			})
 		}
 

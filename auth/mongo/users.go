@@ -1,6 +1,8 @@
 package mongo
 
 import (
+	"time"
+
 	"github.com/datapace/datapace/auth"
 
 	mgo "gopkg.in/mgo.v2"
@@ -302,22 +304,24 @@ func (ur *userRepository) listPolicies(ids []string) ([]auth.Policy, error) {
 }
 
 type mongoUser struct {
-	Email               string        `bson:"email,omitempty"`
-	Password            string        `bson:"password,omitempty"`
-	ContactEmail        string        `bson:"contact_email,omitempty"`
-	ID                  bson.ObjectId `bson:"_id,omitempty"`
-	FirstName           string        `bson:"first_name,omitempty"`
-	LastName            string        `bson:"last_name,omitempty"`
-	Company             string        `bson:"company,omitempty"`
-	Address             string        `bson:"address,omitempty"`
-	Phone               string        `bson:"phone,omitempty"`
-	Role                string        `bson:"role,omitempty"`
-	Disabled            *bool         `bson:"disabled,omitempty"`
-	Policies            []string      `bson:"policies,omitempty"`
-	Attempt             int           `bson:"attempt,omitempty"`
-	Locked              *bool         `bson:"locked,omitempty"`
-	PasswordHistory     []string      `bson:"password_history,omitempty"`
-	PasswordResetSecret string        `bson:"password_reset_secret"`
+	Email               string                 `bson:"email,omitempty"`
+	Password            string                 `bson:"password,omitempty"`
+	ContactEmail        string                 `bson:"contact_email,omitempty"`
+	ID                  bson.ObjectId          `bson:"_id,omitempty"`
+	FirstName           string                 `bson:"first_name,omitempty"`
+	LastName            string                 `bson:"last_name,omitempty"`
+	Company             string                 `bson:"company,omitempty"`
+	Address             string                 `bson:"address,omitempty"`
+	Phone               string                 `bson:"phone,omitempty"`
+	Role                string                 `bson:"role,omitempty"`
+	Disabled            *bool                  `bson:"disabled,omitempty"`
+	Policies            []string               `bson:"policies,omitempty"`
+	Attempt             int                    `bson:"attempt,omitempty"`
+	Locked              *bool                  `bson:"locked,omitempty"`
+	PasswordHistory     []string               `bson:"password_history,omitempty"`
+	PasswordResetSecret string                 `bson:"password_reset_secret"`
+	CreatedDate         *time.Time             `bson:"created_date,omitempty"`
+	Metadata            map[string]interface{} `bson:"metadata,omitempty"`
 }
 
 func toMongoUser(user auth.User) (mongoUser, error) {
@@ -347,6 +351,8 @@ func toMongoUser(user auth.User) (mongoUser, error) {
 		Attempt:             user.Attempt,
 		PasswordHistory:     user.PasswordHistory,
 		PasswordResetSecret: user.PasswordResetSecret,
+		CreatedDate:         user.CreatedDate,
+		Metadata:            user.Metadata,
 	}
 	if user.ID == "" {
 		mu.ID = bson.NewObjectId()
@@ -387,5 +393,7 @@ func (user mongoUser) toUser() auth.User {
 		Attempt:             user.Attempt,
 		PasswordHistory:     user.PasswordHistory,
 		PasswordResetSecret: user.PasswordResetSecret,
+		CreatedDate:         user.CreatedDate,
+		Metadata:            user.Metadata,
 	}
 }

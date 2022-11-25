@@ -184,6 +184,8 @@ func (as *authService) Register(key string, user User) (string, error) {
 		}
 		user.Policies = append(user.Policies, policy)
 	}
+	now := time.Now()
+	user.CreatedDate = &now
 
 	id, err := as.users.Save(user)
 	if err != nil {

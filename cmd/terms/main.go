@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+
 	"github.com/datapace/datapace"
 	authapi "github.com/datapace/datapace/auth/api/grpc"
 	log "github.com/datapace/datapace/logger"
@@ -19,9 +23,6 @@ import (
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	"gopkg.in/mgo.v2"
-	"net"
-	"net/http"
-	"os"
 )
 
 const (
@@ -184,7 +185,7 @@ func startGRPCServer(svc terms.Service, port string, logger log.Logger, errs cha
 
 func startHTTPServer(svc terms.Service, auth authproto.AuthServiceClient, port string, logger log.Logger, errs chan error) {
 	p := fmt.Sprintf(":%s", port)
-	logger.Info(fmt.Sprintf("Streams service started, exposed port %s", port))
+	logger.Info(fmt.Sprintf("Terms service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, auth))
 }
 
