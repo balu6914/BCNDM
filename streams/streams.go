@@ -125,6 +125,7 @@ func (s Stream) Attributes() map[string]string {
 		"url":         s.URL,
 		"price":       strconv.FormatUint(s.Price, 10),
 		"terms":       s.Terms,
+		"maxCalls":    strconv.FormatUint(s.MaxCalls, 10),
 		"external":    strconv.FormatBool(s.External),
 	}
 }

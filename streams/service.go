@@ -126,6 +126,8 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 	if stream.External {
 		return ss.addBqStream(stream)
 	}
+	now := time.Now()
+	stream.StartDate = &now
 
 	id, err := ss.streams.Save(stream)
 	if err != nil {

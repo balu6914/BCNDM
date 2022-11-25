@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"strings"
+	"time"
 
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
@@ -268,6 +269,9 @@ type dbStream struct {
 	Price       uint64             `bson:"price,omitempty"`
 	Location    dbLocation         `bson:"location,omitempty"`
 	Terms       string             `bson:"terms,omitempty"`
+	MaxCalls    uint64             `bson:"max_calls,omitempty"`
+	StartDate   *time.Time         `bson:"start_date,omitempty"`
+	EndDate     *time.Time         `bson:"end_date,omitempty"`
 	External    bool               `bson:"external"`
 	BQ          dbBigQuery         `bson:"big_query,omitempty"`
 	AccessType  streams.AccessType `bson:"accessType,omitempty"`
@@ -316,6 +320,9 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		Price:       stream.Price,
 		Location:    dbl,
 		Terms:       stream.Terms,
+		MaxCalls:    stream.MaxCalls,
+		StartDate:   stream.StartDate,
+		EndDate:     stream.EndDate,
 		External:    stream.External,
 		BQ:          dbBQ,
 		AccessType:  stream.AccessType,
@@ -356,6 +363,9 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		Price:       dbs.Price,
 		Location:    dbl,
 		Terms:       dbs.Terms,
+		MaxCalls:    dbs.MaxCalls,
+		StartDate:   dbs.StartDate,
+		EndDate:     dbs.EndDate,
 		External:    dbs.External,
 		BQ:          dbBQ,
 		AccessType:  dbs.AccessType,
