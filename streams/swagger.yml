@@ -378,16 +378,19 @@ definitions:
       data_format:
         type: string
         description: Format of data
+      limit_format:
+        type: string
+        enum: [hourly, daily]
       usage_limit:
         type: number
         format: float
-        description: Data allowed per day in Megabytes. Omit or 0 means unlimited
+        description: Data allowed per limit_format in Megabytes. Omit or 0 means unlimited
       access_limit:
         type: integer
-        description: Number of times data access per day. Omit or 0 means unlimited
+        description: Number of times data access per limit_format. Omit or 0 means unlimited
       transaction_limit:
         type: integer
-        description: Number of transactions per day. Omit or 0 means unlimited
+        description: Number of transactions per limit_format. Omit or 0 means unlimited
     example: #sample metadata
       catalog: 814a6f30-6ea5-11ed-a1eb-0242ac120002
       data_format: "pdf"
