@@ -35,7 +35,7 @@ export class DashboardAdminSignupComponent implements OnInit {
     this.form = this.formBuilder.group({
       role:       ['user', [Validators.required]],
       email:      ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
-      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32),
+      password:   ['', [Validators.required, Validators.minLength(9), Validators.maxLength(32),
         // 2. check whether the entered password has a number
         CustomValidators.patternValidator(/\d/, { hasNumber: true }),
         // 3. check whether the entered password has upper case letter

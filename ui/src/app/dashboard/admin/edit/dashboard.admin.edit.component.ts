@@ -36,7 +36,7 @@ export class DashboardAdminEditComponent implements OnInit {
       company:       [this.user.company, [Validators.maxLength(32)]],
       address:       [this.user.address, [Validators.maxLength(128)]],
       phone:         [this.user.phone, [Validators.maxLength(32)]],
-      password:      ['', [Validators.minLength(8), Validators.maxLength(32),
+      password:      ['', [Validators.minLength(9), Validators.maxLength(32),
         // 2. check whether the entered password has a number
         CustomValidators.patternValidator(/\d/, { hasNumber: true }),
         // 3. check whether the entered password has upper case letter

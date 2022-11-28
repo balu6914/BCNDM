@@ -35,7 +35,7 @@ export class SignupComponent implements OnInit {
     this.errorMsg = null;
     this.form = this.fb.group({
       email:      ['', [Validators.required, Validators.email, Validators.maxLength(32)]],
-      password:   ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32),
+      password:   ['', [Validators.required, Validators.minLength(9), Validators.maxLength(32),
                 // 2. check whether the entered password has a number
                 CustomValidators.patternValidator(/\d/, { hasNumber: true }),
                 // 3. check whether the entered password has upper case letter

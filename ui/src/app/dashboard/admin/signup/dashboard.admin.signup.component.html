@@ -40,7 +40,7 @@
           <div *ngIf="submitted && form.controls.password.errors" class="invalid-feedback">
             <div *ngIf="form.controls.password.errors.required">Password must be provided.</div>
             <div *ngIf="form.controls.password.errors.minlength || form.controls.password.errors.maxlength">
-              Password must be 8-16 characters.
+              Password must be 9-32 characters.
             </div>
             <div *ngIf="form.controls.password.errors.hasNumber">
               Password must contain at least 1 Number.
