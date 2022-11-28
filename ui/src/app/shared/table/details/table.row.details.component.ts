@@ -43,6 +43,7 @@ export class TableRowDetailsComponent implements OnInit {
       editData: {
         name:        this.row.name,
         type:        this.row.type,
+				visibility: this.row.visibility,
         description: this.row.description,
         url:         this.row.url,
         price:       this.dpcPipe.transform(this.row.price),
