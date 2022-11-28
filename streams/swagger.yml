@@ -349,6 +349,51 @@ definitions:
         description: Indicates whether stream data is from external service or not.
       bq:
         $ref: '#/definitions/BigQuery'
+      visibility:
+        type: string
+        enum: [public, protected, private]
+        description: Stream visibility
+      start_date:
+        type: string
+        format: date-time
+        description: Time when stream was created
+      end_date:
+        type: string
+        format: date-time
+        description: Time to which stream is valid
+      status:
+        type: string
+        enum: [pending, approved, rejected, published, disabled, expired]
+      metadata:
+        $ref: '#/definitions/Metadata'
+
+  Metadata:
+    type: object
+    description: Metadata constraint
+    properties:
+      catalog:
+        type: string
+        format: uuid
+        description: ID of catalog which this stream belongs to
+      data_format:
+        type: string
+        description: Format of data
+      usage_limit:
+        type: number
+        format: float
+        description: Data allowed per day in Megabytes. Omit or 0 means unlimited
+      access_limit:
+        type: integer
+        description: Number of times data access per day. Omit or 0 means unlimited
+      transaction_limit:
+        type: integer
+        description: Number of transactions per day. Omit or 0 means unlimited
+    example: #sample metadata
+      catalog: 814a6f30-6ea5-11ed-a1eb-0242ac120002
+      data_format: "pdf"
+      usage_limit: 100
+      access_limit: 5
+      transaction_limit: 1000
 
   BigQuery:
     type: object
