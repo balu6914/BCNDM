@@ -96,7 +96,7 @@ paths:
     get:
       summary: List finds and returns page of contracts by contract owner or partner, depending on role.
       tags:
-        - contracts
+        - revenue sharing
       parameters:
         - $ref: "#/parameters/Authorization"
         - in: query
@@ -141,7 +141,7 @@ paths:
     post:
       summary: Creates contract and stores it into datastore.
       tags:
-        - contracts
+        - revenue sharing
       parameters:
         - $ref: "#/parameters/Authorization"
         - $ref: "#/parameters/Contract"
@@ -154,7 +154,7 @@ paths:
     patch:
       summary: Signs contract.
       tags:
-        - contracts
+        - revenue sharing
       parameters:
         - $ref: "#/parameters/Authorization"
         - $ref: "#/parameters/Sign"
