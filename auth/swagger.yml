@@ -37,7 +37,7 @@ paths:
           description: JSON-formatted document describing the new user.
           in: body
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserRegister"
           required: true
       responses:
         201:
@@ -84,7 +84,7 @@ paths:
           description: JSON-formatted document describing the updated user fields.
           in: body
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserUpdate"
           required: true
       responses:
         200:
@@ -371,7 +371,7 @@ responses:
     description: Unexpected server-side error ocurred.
 
 definitions:
-  User:
+  UserRegister:
     type: object
     properties:
       email:
@@ -379,6 +379,53 @@ definitions:
         format: email
         example: "test@example.com"
         description: User's email address will be used as its unique identifier
+      contact_email:
+        type: string
+        format: email
+        example: "test@example.com"
+      company:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      password:
+        type: string
+        format: password
+        description: Free-form account password used for acquiring auth token(s).
+      metadata:
+        $ref: '#/definitions/Metadata'
+
+  UserUpdate:
+    type: object
+    properties:
+      email:
+        type: string
+        format: email
+        example: "test@example.com"
+        description: User's email address will be used as its unique identifier
+      contact_email:
+        type: string
+        format: email
+        example: "test@example.com"
+      company:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
       password:
         type: string
         format: password
@@ -386,9 +433,41 @@ definitions:
       disabled:
         type: boolean
         description: When set to true, prevents user from logging in.
+      locked:
+        type: boolean
+        description: When set to true, prevents user from logging in.
+      metadata:
+        $ref: '#/definitions/Metadata'
     required:
       - email
       - password
+
+  Metadata:
+    type: object
+    description: Metadata constraint
+    properties:
+      url:
+        type: string
+        format: URL
+        description: user's website
+      logo:
+        type: string
+        format: URL
+        description: user's profile picture or logo
+      description:
+        type: string
+        description: more info about user
+      wishlist:
+        type: array
+        items:
+          type: string
+        description: whishlist - array of stream IDs
+    example: #sample metadata
+      url: http://example.com
+      logo: https://freesvg.org/img/nicubunu_Dog_head_1.png
+      description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      whishlist: [5bf142459b72e12b2b1b2cd, 5bf142459b72e12b2b1b2d0]
+
   Credentials:
     type: object
     properties:
