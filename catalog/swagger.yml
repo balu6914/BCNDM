@@ -1,0 +1,192 @@
+swagger: 2.0
+info:
+  title: Catalogs - OpenAPI 3.0
+  termsOfService: http://swagger.io/terms/
+  version: 1.0.0
+tags:
+  - name: catalog
+    description: NDM Catalogs
+paths:
+  /catalog:
+    post:
+      tags:
+        - catalog
+      summary: Add a new catalog
+      description: Add a new catalog
+      operationId: addCatalog
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      requestBody:
+        description: Create a new catalog
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Catalog'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogRes'
+        '405':
+          description: Invalid input
+  /user/{userid}:
+    get:
+      tags:
+        - catalog
+      summary: Get all catalogs from the specified user
+      operationId: findCatalogsByUser
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - name: userid
+          in: path
+          description: The ID of the user to get catalogs
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogRes'
+        '400':
+          description: Invalid status value
+  /catalog/{catalogId}:
+    get:
+      tags:
+        - catalog
+      summary: Get catalog by ID
+      description: Returns a single catalog
+      operationId: getCatalogById
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - name: catalogId
+          in: path
+          description: ID of catalog to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Catalog not found
+    post:
+      tags:
+        - catalog
+      summary: Updates a catalog
+      description: ''
+      operationId: updateCatalog
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - name: catalogId
+          in: path
+          description: ID of catalog that needs to be updated
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog'
+      responses:
+        204:
+          description: Catalog removed
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/components/responses/ServiceError"
+    delete:
+      tags:
+        - catalog
+      summary: Deletes a catalog
+      description: delete a catalog
+      operationId: deleteCatalog
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - name: catalogId
+          in: path
+          description: Catalog ID to delete
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+            example: 5b683864ff4e8f9122fc1be2
+      responses:
+        204:
+          description: Catalog removed.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/components/responses/ServiceError"
+
+components:
+  parameters:
+    Authorization:
+      in: header
+      name: Authorization
+      required: true
+      description: User's access token.
+      schema:
+        type: string
+        format: JWT
+  responses:
+    ServiceError:
+      description: Unexpected server-side error occured.
+
+        
+  schemas:
+    Catalog:
+      additionalProperties: false        
+      type: object
+      properties:
+        name:
+          type: string
+          example: My catalog
+        category_id:
+          type: string
+          format: ObjectId
+          example: 5b683864ff4e8f9122fc1be2
+        streams_id:
+          type: array
+          items:
+            type: string
+            format: ObjectId
+            example: 5b683864ff4e8f9122fc1be2
+        user_id:
+          type: string
+          format: ObjectId
+          example: 5b683864ff4e8f9122fc1be2
+    CatalogRes:
+      properties:
+        id:
+          type: string
+          format: ObjectId 
+          description: The Catalog ID
+          example: 5b683864ff4e8f9122fc1be2
+      allOf:
+        - $ref: "#/components/schemas/Catalog"
+      required:
+        - id
+        - name
+        - category_id
+        - streams_id
+        - user_id
+
