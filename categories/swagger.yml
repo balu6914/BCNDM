@@ -1,0 +1,148 @@
+swagger: "2.0"
+info:
+  title: NDM categories service
+  version: 1.0.0
+paths:
+  /category:
+    post:
+      summary: Adds new category
+      description: |
+        Creates new category
+      tags:
+        - category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: stream
+          description: JSON-formatted document describing the new stream.
+          in: body
+          schema:
+            $ref: "#/definitions/CategoryReq"
+          required: true
+      responses:
+        201:
+          description: Category created.
+          schema:
+            $ref: '#/definitions/CategoryRes'
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Category already exists.
+        500:
+          $ref: "#/responses/ServiceError"
+    get:
+      summary: Retrieves all categories
+      tags:
+        - category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CategoryRes'
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /category/{categoryid}:
+    get:
+      summary: Get a category details by the category id
+      description: Get a category details by the category id
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: categoryid
+          description: Category Id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The category was found.
+          schema:
+            $ref: "#/definitions/Category"
+        400:
+          description: Failed due to malformed category id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified category was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Delete the specified category
+      description: Delete the specified category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: categoryid
+          description: category Id
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: The category was deleted.
+        400:
+          description: Failed due to malformed category id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified category was not found.
+        500:
+          $ref: "#/responses/ServiceError"          
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+  ID:
+    name: Location
+    description: URL location to of the created entity.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error ocurred.
+
+definitions:
+  Category:
+    type: object
+    properties:
+      id:
+        type: string
+        format: ObjectId 
+        description: The Catalog ID
+        example: 5b683864ff4e8f9122fc1be2
+      name:
+        type: string
+        description: Name of category
+        example: My category
+      parent:
+        type: string
+        format: ObjectId
+        description: ID of parent category (for subcategory)
+
+  CategoryReq:
+    allOf:
+      - $ref: '#/definitions/Category'
+    description: Represent request for creating or updating a Category.
+    required:
+      - name
+      - parent
+
+  CategoryRes:
+    allOf:
+      - $ref: '#/definitions/Category'
+    description: Represent response for single Stream create or update request.
+    required:
+      - id
+      - name     
+      - parent
