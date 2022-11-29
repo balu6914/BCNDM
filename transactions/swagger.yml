@@ -92,6 +92,77 @@ paths:
           description: Missing or invalid content type.
         500:
           $ref: "#/responses/ServiceError"
+  /contracts:
+    get:
+      summary: List finds and returns page of contracts by contract owner or partner, depending on role.
+      tags:
+        - contracts
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - in: query
+          name: page
+          type: number
+          minimum: 0
+          default: 0
+          required: false
+          description: Start page from which items will be included in the result set.
+        - in: query
+          name: limit
+          type: number
+          maximum: 100
+          default: 20
+          required: false
+          description: Number of items that will be taken starting from page parameter. The final result set is in range [page * limit, page * limit + limit).
+        - in: query
+          name: owner
+          type: boolean
+          default: false
+          required: false
+          description: List smart contracts where requester is owner
+        - in: query
+          name: partner
+          type: boolean
+          default: false
+          required: false
+          description: List smart contracts where requester is partner
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/Page'
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        415:
+          description: Missing or invalid content type.
+        500:
+          $ref: "#/responses/ServiceError"
+    post:
+      summary: Creates contract and stores it into datastore.
+      tags:
+        - contracts
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Contract"
+      responses:
+        200:
+          description: Contract created.
+        500:
+          $ref: "#/responses/ServiceError"
+  /contracts/sign:
+    patch:
+      summary: Signs contract.
+      tags:
+        - contracts
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Sign"
+      responses:
+        200:
+          description: Contract signed.
+        500:
+          $ref: "#/responses/ServiceError"
 parameters:
   Authorization:
     name: Authorization
@@ -99,6 +170,19 @@ parameters:
     in: header
     type: string
     required: true
+  Sign:
+    name: sign
+    description: signing smart contract
+    in: body
+    schema:
+      $ref: "#/definitions/SignReq"
+    required: true
+  Contract:
+    name: contract
+    description: creating smart contract
+    in: body
+    schema:
+      $ref: "#/definitions/ContractReq"
 
 responses:
   ServiceError:
@@ -124,3 +208,94 @@ definitions:
         description: Current balance.
     required:
       - balance
+
+  ContractRes:
+    type: object
+    properties:
+      stream_id:
+        type: string
+      stream_name:
+        type: string
+      start_time:
+        type: string
+        format: date-time
+      end_time:
+        type: string
+        format: date-time
+      owner_id:
+        type: string
+      partner_id:
+        type: string
+      share:
+        type: number
+        format: double
+      signed:
+        type: boolean
+        description: Contract is signed.
+
+  Page:
+    type: object
+    description: Represent paged response.
+    properties:
+      page:
+        type: number
+        minimum: 0
+        default: 0
+        description: Number of page returned by service.
+      limit:
+        type: number
+        default: 20
+        description: Preferred size of the page content. Size of returned set might be less than limit, but must not be more then limit.
+      total:
+        type: number
+        minimum: 0
+        description: Total number of elements satisfying query.
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/ContractRes'
+
+  SignReq:
+    type: object
+    description: Request for signing a smart contract
+    properties:
+      stream_id:
+        type: string
+        format: ObjectId
+        description: Stream ID for which contract is signing
+        example: 6386057b527c920001812766
+      end_time:
+        type: string
+        format: date-time
+        example: 2023-02-28T00:00:00Z
+
+  ContractItem:
+    type: object
+    description: partner ID and share offered to him
+    properties:
+      partner_id:
+        type: string
+        format: ObjectId
+        description: user ID of partner
+        example: 6386066ef6f406000109479f
+      share:
+        type: number
+        format: integer
+        description: percentage of revenue sharing
+        example: 15
+        minimum: 0
+        maximum: 100
+
+  ContractReq:
+    type: object
+    description: Payload for creating contract
+    properties:
+      stream_id:
+        type: string
+      end_time:
+        type: string
+        format: date-time
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/ContractItem'
