@@ -12,7 +12,7 @@ paths:
     get:
       summary: Validates terms hash for a given stream id
       parameters:
-        - $ref: '#/parameters/StreamId'
+        - $ref: '#/parameters/StreamID'
         - $ref: '#/parameters/TermsHash'
       responses:
         200:
