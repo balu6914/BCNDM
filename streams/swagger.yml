@@ -361,6 +361,10 @@ definitions:
         type: string
         format: date-time
         description: Time to which stream is valid
+      catalog:
+        type: string
+        format: uuid
+        description: ID of catalog which this stream belongs to
       status:
         type: string
         enum: [pending, approved, rejected, published, disabled, expired]
@@ -371,10 +375,6 @@ definitions:
     type: object
     description: Metadata constraint
     properties:
-      catalog:
-        type: string
-        format: uuid
-        description: ID of catalog which this stream belongs to
       data_format:
         type: array
         description: Formats of data
