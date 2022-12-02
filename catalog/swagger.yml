@@ -164,12 +164,6 @@ components:
           type: string
           format: ObjectId
           example: 5b683864ff4e8f9122fc1be2
-        streams_id:
-          type: array
-          items:
-            type: string
-            format: ObjectId
-            example: 5b683864ff4e8f9122fc1be2
         user_id:
           type: string
           format: ObjectId
@@ -187,6 +181,5 @@ components:
         - id
         - name
         - category_id
-        - streams_id
         - user_id
 
