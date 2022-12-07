@@ -214,23 +214,31 @@ definitions:
     properties:
       stream_id:
         type: string
+        example: 6386057b527c920001812766
       stream_name:
         type: string
+        example: Stream name
       start_time:
         type: string
         format: date-time
+        example: 2022-11-29T14:04:38.872Z
       end_time:
         type: string
         format: date-time
+        example: 2023-02-28T00:00:00Z
       owner_id:
         type: string
+        example: 6383c9d2f6f406000109475f
       partner_id:
         type: string
+        example: 6386066ef6f406000109479f
       share:
         type: number
         format: double
+        example: 10
       signed:
         type: boolean
+        example: true
         description: Contract is signed.
 
   Page:
