@@ -119,12 +119,12 @@ definitions:
       id:
         type: string
         format: ObjectId 
-        description: The Catalog ID
+        description: The Category ID
         example: 5b683864ff4e8f9122fc1be2
       name:
         type: string
-        description: Name of category
-        example: My category
+        description: Name of Category
+        example: My Category
       parent:
         type: string
         format: ObjectId
