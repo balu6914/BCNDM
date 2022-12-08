@@ -232,6 +232,9 @@ definitions:
       partner_id:
         type: string
         example: 6386066ef6f406000109479f
+      description:
+        type: string
+        example: This is revenue sharing contract
       share:
         type: number
         format: double
@@ -303,6 +306,9 @@ definitions:
       end_time:
         type: string
         format: date-time
+      descirption:
+        type: string
+        description: Description of contract
       content:
         type: array
         items:
