@@ -374,10 +374,10 @@ definitions:
         type: string
         format: date-time
         description: Time to which stream is valid
-      catalog:
+      category:
         type: string
         format: uuid
-        description: ID of catalog which this stream belongs to
+        description: ID of category which this stream belongs to
       status:
         type: string
         enum: [pending, approved, rejected, published, disabled, expired]
@@ -401,16 +401,9 @@ definitions:
       limit_unit:
         type: string
         enum: [hour, day]
-      usage_limit:
-        type: number
-        format: float
-        description: Data allowed per limit_unit in Bytes. Omit or 0 means unlimited
       access_limit:
         type: integer
         description: Number of times data access per limit_unit. Omit or 0 means unlimited
-      transaction_limit:
-        type: integer
-        description: Number of transactions per limit_unit. Omit or 0 means unlimited
       tags:
         type: array
         description: Meta tags describing the product
@@ -492,10 +485,10 @@ definitions:
         type: string
         format: date-time
         description: Time to which stream is valid
-      catalog:
+      category:
         type: string
         format: uuid
-        description: ID of catalog which this stream belongs to
+        description: ID of category which this stream belongs to
       offer:
         type: boolean
         description: Indicates whether stream can accepts price offers
