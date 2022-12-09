@@ -411,7 +411,6 @@ definitions:
           type: string
     additionalProperties: true
     example: #sample metadata
-      catalog: 814a6f30-6ea5-11ed-a1eb-0242ac120002
       data_format: ["pdf", "json"]
       limit_unit: day
       usage_limit: 100
