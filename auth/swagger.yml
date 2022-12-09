@@ -452,6 +452,10 @@ definitions:
         items:
           type: string
         description: wishlist - array of stream IDs
+      created_date:
+        type: string
+        format: date-time
+        description: User's created date          
       metadata:
         $ref: '#/definitions/Metadata'
 
@@ -509,6 +513,10 @@ definitions:
         items:
           type: string
         description: wishlist - array of stream IDs
+      created_date:
+        type: string
+        format: date-time
+        description: User's created date        
       metadata:
         $ref: '#/definitions/Metadata'
 
