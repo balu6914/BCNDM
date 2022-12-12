@@ -2,9 +2,10 @@ package http
 
 import (
 	"errors"
+	"regexp"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/datapace/datapace/auth"
-	"regexp"
 )
 
 // User validation errors
@@ -27,15 +28,16 @@ type apiReq interface {
 
 type registerReq struct {
 	key          string
-	Email        string `json:"email"`
-	Password     string `json:"password"`
-	ContactEmail string `json:"contact_email,omitempty"`
-	FirstName    string `json:"first_name,omitempty"`
-	LastName     string `json:"last_name,omitempty"`
-	Company      string `json:"company,omitempty"`
-	Address      string `json:"address,omitempty"`
-	Phone        string `json:"phone,omitempty"`
-	Role         string `json:"role,omitempty"`
+	Email        string                 `json:"email"`
+	Password     string                 `json:"password"`
+	ContactEmail string                 `json:"contact_email,omitempty"`
+	FirstName    string                 `json:"first_name,omitempty"`
+	LastName     string                 `json:"last_name,omitempty"`
+	Company      string                 `json:"company,omitempty"`
+	Address      string                 `json:"address,omitempty"`
+	Phone        string                 `json:"phone,omitempty"`
+	Role         string                 `json:"role,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 const (
@@ -178,16 +180,17 @@ func (req identityReq) validate() error {
 type updateReq struct {
 	key          string
 	id           string
-	ContactEmail *string `json:"contact_email,omitempty"`
-	FirstName    *string `json:"first_name,omitempty"`
-	LastName     *string `json:"last_name,omitempty"`
-	Company      *string `json:"company,omitempty"`
-	Address      *string `json:"address,omitempty"`
-	Phone        *string `json:"phone,omitempty"`
-	Role         *string `json:"role,omitempty"`
-	Password     *string `json:"password"`
-	Disabled     *bool   `json:"disabled"`
-	Locked       *bool   `json:"locked"`
+	ContactEmail *string                 `json:"contact_email,omitempty"`
+	FirstName    *string                 `json:"first_name,omitempty"`
+	LastName     *string                 `json:"last_name,omitempty"`
+	Company      *string                 `json:"company,omitempty"`
+	Address      *string                 `json:"address,omitempty"`
+	Phone        *string                 `json:"phone,omitempty"`
+	Role         *string                 `json:"role,omitempty"`
+	Password     *string                 `json:"password"`
+	Disabled     *bool                   `json:"disabled"`
+	Locked       *bool                   `json:"locked"`
+	Metadata     *map[string]interface{} `json:"metadata,omitempty"`
 }
 
 func (req updateReq) validate() error {
@@ -236,6 +239,9 @@ func (req updateReq) toUser() auth.User {
 	}
 	if req.Role != nil {
 		ret.Role = *req.Role
+	}
+	if req.Metadata != nil {
+		ret.Metadata = *req.Metadata
 	}
 	return ret
 }

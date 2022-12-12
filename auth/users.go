@@ -1,5 +1,7 @@
 package auth
 
+import "time"
+
 var _ Resource = (*User)(nil)
 
 // User represents a Datapace user account. Each user is identified given its
@@ -22,6 +24,8 @@ type User struct {
 	PasswordHistory           []string
 	PasswordResetSecret       string
 	PasswordResetTokenExpires int64
+	CreatedDate               *time.Time
+	Metadata                  map[string]interface{}
 }
 
 type AdminFilters struct {

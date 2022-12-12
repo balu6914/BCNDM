@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"time"
 )
 
 const contentType = "application/json"
@@ -61,18 +62,20 @@ func (res okRes) empty() bool {
 }
 
 type viewUserRes struct {
-	ID           string        `json:"id"`
-	Email        string        `json:"email,omitempty"`
-	ContactEmail string        `json:"contact_email,omitempty"`
-	FirstName    string        `json:"first_name"`
-	LastName     string        `json:"last_name"`
-	Company      string        `json:"company,omitempty"`
-	Address      string        `json:"address,omitempty"`
-	Phone        string        `json:"phone,omitempty"`
-	Disabled     bool          `json:"disabled,omitempty"`
-	Locked       bool          `json:"locked,omitempty"`
-	Role         string        `json:"role,omitempty"`
-	Policies     []interface{} `json:"policies,omitempty"`
+	ID           string                 `json:"id"`
+	Email        string                 `json:"email,omitempty"`
+	ContactEmail string                 `json:"contact_email,omitempty"`
+	FirstName    string                 `json:"first_name"`
+	LastName     string                 `json:"last_name"`
+	Company      string                 `json:"company,omitempty"`
+	Address      string                 `json:"address,omitempty"`
+	Phone        string                 `json:"phone,omitempty"`
+	Disabled     bool                   `json:"disabled,omitempty"`
+	Locked       bool                   `json:"locked,omitempty"`
+	Role         string                 `json:"role,omitempty"`
+	CreatedDate  *time.Time             `json:"created_date,omitempty"`
+	Policies     []interface{}          `json:"policies,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 func (res viewUserRes) code() int {
