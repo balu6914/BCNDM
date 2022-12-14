@@ -90,6 +90,7 @@ export class TableRowDetailsComponent implements OnInit {
         id:    this.row.id,
         name:  this.row.name,
         price: this.row.price,
+        terms: this.row.terms,
       },
     };
     // Open DashboardBuyAddComponent Modal
