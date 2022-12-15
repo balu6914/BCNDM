@@ -1,4 +1,5 @@
 FROM scratch
 ARG SVC_NAME
 COPY datapace-$SVC_NAME /exe
+COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENTRYPOINT ["/exe"]

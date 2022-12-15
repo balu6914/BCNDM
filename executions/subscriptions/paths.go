@@ -21,16 +21,19 @@ func New(subscriptionsURL string) executions.PathRepository {
 
 func (repo pathRepository) Current(owner, data string) (string, error) {
 	url := fmt.Sprintf("%s/owner/%s/stream/%s/subscriptions", repo.subscriptionsURL, owner, data)
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
+	resp, _ := http.Get(url)
 
-	var sub viewSubRes
-	if err := json.NewDecoder(resp.Body).Decode(&sub); err != nil {
-		return "", err
+	if resp.StatusCode == 200 {
+		defer resp.Body.Close()
+
+		var sub viewSubRes
+		if err := json.NewDecoder(resp.Body).Decode(&sub); err != nil {
+			return "", err
+		}
+
+		return sub.URL, nil
 	}
 
-	return sub.URL, nil
+	return "", nil
+
 }
