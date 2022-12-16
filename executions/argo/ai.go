@@ -3,12 +3,13 @@ package argo
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datapace/datapace/executions"
-	log "github.com/datapace/datapace/logger"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/datapace/datapace/executions"
+	log "github.com/datapace/datapace/logger"
 )
 
 var _ executions.AIService = (*aiService)(nil)
@@ -69,7 +70,8 @@ func (as aiService) Start(exec executions.Execution, algo executions.Algorithm, 
 	if !ok {
 		return executions.Execution{}, executions.ErrMalformedData
 	}
-	post := fmt.Sprintf("{\"workflow\":{\"metadata\":{\"generateName\":\"datapace-\",\"namespace\":\"default\"},\"spec\":{\"entrypoint\":\"datapace\",\"arguments\":{\"parameters\":[{\"name\":\"datapace_url\",\"value\":\"%s\"}]},\"workflowTemplateRef\":{\"name\":\"%s\"}}}}", dpath, algo.ExternalID)
+	//	fmt.Printf("the execution id is %s", exec.ID)
+	post := fmt.Sprintf("{\"workflow\":{\"metadata\":{\"generateName\":\"datapace-\",\"namespace\":\"default\"},\"spec\":{\"entrypoint\":\"datapace\",\"arguments\":{\"parameters\":[{\"name\":\"datapace_url\",\"value\":\"%s\"},{\"name\":\"execution_index\",\"value\":\"%s\"}]},\"workflowTemplateRef\":{\"name\":\"%s\"}}}}", dpath, exec.ID, algo.ExternalID)
 	buf := strings.NewReader(post)
 	res, err := http.Post(path, "", buf)
 	if err != nil {
