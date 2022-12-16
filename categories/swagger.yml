@@ -12,7 +12,7 @@ paths:
         - category
       parameters:
         - $ref: "#/parameters/Authorization"
-        - name: stream
+        - name: category
           description: JSON-formatted document describing the new stream.
           in: body
           schema:
@@ -44,6 +44,12 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CategoryRes'
+            example:
+              - id: 5b683864ff4e8f9122fc1be2
+                name: Sports
+              - id: 666f6f2d6261722d71757578
+                name: Cricket
+                parent: 5b683864ff4e8f9122fc1be2
         403:
           description: Missing or invalid access token provided.
         500:
@@ -136,7 +142,6 @@ definitions:
     description: Represent request for creating or updating a Category.
     required:
       - name
-      - parent
 
   CategoryRes:
     allOf:
@@ -145,4 +150,3 @@ definitions:
     required:
       - id
       - name     
-      - parent
