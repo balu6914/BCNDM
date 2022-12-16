@@ -163,6 +163,22 @@ paths:
           description: Contract signed.
         500:
           $ref: "#/responses/ServiceError"
+  /tokens/history:
+    get:
+      summary: Retrives list of deposit & withdrawals for a particular user.
+      tags:
+        - tokens
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Users balance retrieved.
+          schema:
+            $ref: "#/definitions/History"
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"          
 parameters:
   Authorization:
     name: Authorization
@@ -313,3 +329,21 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ContractItem'
+  History:
+    type: "object"
+    properties:
+      txList:
+        type: "array"
+        items:
+          $ref: "#/definitions/HistoryList"
+  HistoryList:
+    type: "object"
+    properties:
+      amount:
+        type: "integer"
+        description: "Amount of tokens deposited/ withdrawn"
+      txType:
+        type: "string"
+        enum:
+          - "DEPOSIT"
+          - "WITHDRAW"
