@@ -386,6 +386,15 @@ definitions:
         type: boolean
         description: Indicates whether stream can accepts price offers
         example: true
+      max_unit:
+        type: string
+        enum: [hour, day, month]
+        description: If present max_calls is for this period. Omit or empty means max_calls is for all time
+        example: day
+      max_calls:
+        type: integer
+        description: Number of times data access per max_unit. Omit or 0 means unlimited
+        example: 5
       metadata:
         $ref: '#/definitions/Metadata'
 
@@ -393,17 +402,6 @@ definitions:
     type: object
     description: Metadata constraint
     properties:
-      data_format:
-        type: array
-        description: Formats of data
-        items:
-          type: string
-      limit_unit:
-        type: string
-        enum: [hour, day]
-      access_limit:
-        type: integer
-        description: Number of times data access per limit_unit. Omit or 0 means unlimited
       tags:
         type: array
         description: Meta tags describing the product
@@ -411,11 +409,6 @@ definitions:
           type: string
     additionalProperties: true
     example: #sample metadata
-      data_format: ["pdf", "json"]
-      limit_unit: day
-      usage_limit: 100
-      access_limit: 5
-      transaction_limit: 1000
       tags: ["air", "polution", "pm2.5"]
 
   BigQuery:
@@ -476,10 +469,6 @@ definitions:
         enum: [public, protected, private]
         description: Stream visibility
         example: public
-      start_date:
-        type: string
-        format: date-time
-        description: Time when stream was created
       end_date:
         type: string
         format: date-time
@@ -492,6 +481,15 @@ definitions:
         type: boolean
         description: Indicates whether stream can accepts price offers
         example: true
+      max_unit:
+        type: string
+        enum: [hour, day, month]
+        description: If present max_calls is for this period. Omit or empty means max_calls is for all time
+        example: day
+      max_calls:
+        type: integer
+        description: Number of times data access per max_unit. Omit or 0 means unlimited
+        example: 5
       metadata:
         $ref: '#/definitions/Metadata'
 

@@ -2,6 +2,10 @@ swagger: "2.0"
 info:
   title: NDM categories service
   version: 1.0.0
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
 paths:
   /category:
     post:
@@ -41,15 +45,7 @@ paths:
         200:
           description: Data retrieved.
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/CategoryRes'
-            example:
-              - id: 5b683864ff4e8f9122fc1be2
-                name: Sports
-              - id: 666f6f2d6261722d71757578
-                name: Cricket
-                parent: 5b683864ff4e8f9122fc1be2
+            $ref: '#/definitions/CategoriesRes'
         403:
           description: Missing or invalid access token provided.
         500:
@@ -142,6 +138,35 @@ definitions:
     description: Represent request for creating or updating a Category.
     required:
       - name
+
+  CategoriesRes:
+    type: array
+    items:
+      $ref: '#/definitions/Category'
+    example:
+      - id: 5b683864ff4e8f9122fc1be2
+        name: Sports
+      - id: 666f6f2d6261722d71757578
+        name: Cricket
+        parent: 5b683864ff4e8f9122fc1be2
+      - id: 0123456789ab0123456789ab
+        name: Football
+        parent: 5b683864ff4e8f9122fc1be2
+      - id: 563479cc80804246bd27d784
+        name: HealthCare
+      - id: 563479cc80804246bd27d789
+        parent: 563479cc80804246bd27d784
+        name: Hearth
+      - id: 563479cc80804246bd27d785
+        name: Travel
+      - id: 563479cc80804246bd27d786
+        name: Media
+      - id: 563479cc80804246bd27d787
+        name: ESPN
+        parent: 563479cc80804246bd27d786
+      - id: 563479cc80804246bd27d788
+        name: Europe
+        parent: 563479cc80804246bd27d785
 
   CategoryRes:
     allOf:
