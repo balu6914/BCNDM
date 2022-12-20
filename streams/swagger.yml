@@ -336,11 +336,16 @@ definitions:
       type:
         type: string
         description: Type of the stream.
-        example: air
+        example: pdf
+        enum: [Algorithm, Dataset, json, pdf, txt, video, xls]
       description:
         type: string
         description: Description of the stream.
         example: air polution
+      snippet:
+        type: string
+        description: Snippet of the stream.
+        example: '{"pm2.5":"1.05"}'
       url:
         type: string
         description: URL of the stream.
@@ -374,6 +379,10 @@ definitions:
         type: string
         format: date-time
         description: Time to which stream is valid
+      published_date:
+        type: string
+        format: date-time
+        description: Time when stream is published
       category:
         type: string
         format: uuid
@@ -439,11 +448,16 @@ definitions:
       type:
         type: string
         description: Type of the stream.
-        example: air
+        example: pdf
+        enum: [Algorithm, Dataset, json, pdf, txt, video, xls]
       description:
         type: string
         description: Description of the stream.
         example: air polution
+      snippet:
+        type: string
+        description: Snippet of the stream.
+        example: '{"pm2.5":"1.05"}'
       url:
         type: string
         description: URL of the stream.
