@@ -548,7 +548,11 @@ definitions:
         type: string
       address:
         type: string
+      country:
+        type: string
       phone:
+        type: string
+      mobile:
         type: string
       role:
         type: string
