@@ -82,10 +82,7 @@ func (es executionsService) Start(exec Execution) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	if path != "" {
-		data.Metadata["path"] = path
-	}
+	data.Metadata["path"] = path
 
 	exec.State = InProgress
 	id, err := es.execs.Create(exec)

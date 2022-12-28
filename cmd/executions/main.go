@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/executions/argo"
 	"log"
 	"net"
 	"net/http"
@@ -10,8 +11,6 @@ import (
 	"strconv"
 	"syscall"
 	"time"
-
-	"github.com/datapace/datapace/executions/argo"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -43,7 +42,6 @@ const (
 	envDBName             = "DATAPACE_EXECUTIONS_DB_NAME"
 	envAuthURL            = "DATAPACE_AUTH_URL"
 	envSubscriptionsURL   = "DATAPACE_SUBSCRIPTIONS_URL"
-	envStreamsURL         = "DATAPACE_STREAMS_URL"
 	envWWHCatalogURL      = "DATAPACE_WWH_CATALOG_URL"
 	envWWHDaemonURL       = "DATAPACE_WWH_DAEMON_URL"
 	envWWHToken           = "DATAPACE_WWH_TOKEN"
@@ -63,7 +61,6 @@ const (
 	defDBName             = "executions"
 	defAuthURL            = "localhost:8081"
 	defSubscriptionsURL   = "localhost:8086"
-	defStreamsURL         = "localhost:8084"
 	defWWHCatalogURL      = "http://localhost:31222"
 	defWWHDaemonURL       = "http://localhost:32222"
 	defWWHToken           = ""
@@ -90,7 +87,6 @@ type config struct {
 	dbSocketTimeout  int
 	authURL          string
 	subscriptionsURL string
-	streamsURL       string
 	wwhCatalogURL    string
 	wwhDaemonURL     string
 	wwhToken         string
@@ -164,7 +160,6 @@ func loadConfig() config {
 		dbSocketTimeout:  dbSocketTimeout,
 		authURL:          datapace.Env(envAuthURL, defAuthURL),
 		subscriptionsURL: datapace.Env(envSubscriptionsURL, defSubscriptionsURL),
-		streamsURL:       datapace.Env(envStreamsURL, defStreamsURL),
 		wwhCatalogURL:    datapace.Env(envWWHCatalogURL, defWWHCatalogURL),
 		wwhDaemonURL:     datapace.Env(envWWHDaemonURL, defWWHDaemonURL),
 		wwhToken:         datapace.Env(envWWHToken, defWWHToken),
@@ -210,7 +205,6 @@ func newService(cfg config, ms *mgo.Session, logger logger.Logger) executions.Se
 	algos := mongo.NewAlgorithmRepository(ms)
 	data := mongo.NewDatasetRepository(ms)
 	paths := subscriptions.New(cfg.subscriptionsURL)
-	//paths := streams.New(cfg.streamsURL, cfg )
 	var ai executions.AIService
 	switch cfg.aiSystem {
 	case "kubeflow":
