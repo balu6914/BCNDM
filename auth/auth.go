@@ -393,7 +393,9 @@ func (as *authService) ListUsers(key string) ([]User, error) {
 	case AdminWalletRole:
 		filters.Roles = []string{UserRole}
 	default:
-		return []User{}, nil
+		filters.Roles = []string{UserRole}
+		filters.Locked = true
+		filters.Disabled = true
 	}
 
 	users, err := as.users.RetrieveAll(filters)
