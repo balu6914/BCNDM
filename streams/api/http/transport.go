@@ -137,6 +137,9 @@ func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, er
 		stream.Location.Type = defLocType
 	}
 
+	// To Decode Stream and Terms URL only if they are in base64 format
+	stream.DecodeURLs()
+
 	if stream.External {
 		token := r.Header.Get("Authorization")
 		ownerEmail, err := authService.Email(token)
@@ -273,6 +276,10 @@ func decodeJsonStreams(file multipart.File, owner string) ([]streams.Stream, err
 		if s.Location.Type == "" {
 			s.Location.Type = defLocType
 		}
+
+		// To Decode Stream and Terms URL only if they are in base64 format
+		s.DecodeURLs()
+
 		results = append(results, s)
 	}
 	return results, err
@@ -288,6 +295,9 @@ func decodeUpdateStreamRequest(_ context.Context, r *http.Request) (interface{},
 	if stream.Location.Type == "" {
 		stream.Location.Type = defLocType
 	}
+
+	// To Decode Stream and Terms URL only if they are in base64 format
+	stream.DecodeURLs()
 
 	req := updateStreamReq{
 		owner:  r.Header.Get("Authorization"),

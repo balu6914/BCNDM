@@ -58,7 +58,8 @@ export class DashboardSellEditComponent implements OnInit {
         type: this.form.value.type,
         description: this.form.value.description,
         snippet: this.form.value.snippet,
-        url: encodeURIComponent(this.form.value.url),
+        url: "",
+        encodedURL: this.streamService.encodeURL(this.form.value.url),
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
           'type': 'Point',
@@ -67,7 +68,8 @@ export class DashboardSellEditComponent implements OnInit {
             parseFloat(this.form.value.lat)
           ]
         },
-        terms: encodeURIComponent(this.form.value.terms),
+        terms: "",
+        encodedTerms: this.streamService.encodeURL(this.form.value.terms),
       };
 
       this.streamService.updateStream(this.streamID, stream).subscribe(

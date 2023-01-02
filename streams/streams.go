@@ -1,6 +1,7 @@
 package streams
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/url"
 	"strconv"
@@ -55,20 +56,40 @@ func (bq BigQuery) Validate() bool {
 
 // Stream represents data stream to be exchanged through platform.
 type Stream struct {
-	Owner       string                 `json:"owner,omitempty"`
-	ID          string                 `json:"id,omitempty"`
-	Visibility  Visibility             `json:"visibility,omitempty"`
-	Name        string                 `json:"name,omitempty"`
-	Type        string                 `json:"type,omitempty"`
-	Description string                 `json:"description,omitempty"`
-	Snippet     string                 `json:"snippet,omitempty"`
-	URL         string                 `json:"url,omitempty"`
-	Price       uint64                 `json:"price,omitempty"`
-	Location    Location               `json:"location,omitempty"`
-	Terms       string                 `json:"terms,omitempty"`
-	External    bool                   `json:"external,omitempty"`
-	BQ          BigQuery               `json:"bq,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Owner        string                 `json:"owner,omitempty"`
+	ID           string                 `json:"id,omitempty"`
+	Visibility   Visibility             `json:"visibility,omitempty"`
+	Name         string                 `json:"name,omitempty"`
+	Type         string                 `json:"type,omitempty"`
+	Description  string                 `json:"description,omitempty"`
+	Snippet      string                 `json:"snippet,omitempty"`
+	URL          string                 `json:"url,omitempty"`
+	EncodedURL   string                 `json:"encodedURL,omitempty" bson:"-"`
+	Price        uint64                 `json:"price,omitempty"`
+	Location     Location               `json:"location,omitempty"`
+	Terms        string                 `json:"terms,omitempty"`
+	EncodedTerms string                 `json:"encodedTerms,omitempty" bson:"-"`
+	External     bool                   `json:"external,omitempty"`
+	BQ           BigQuery               `json:"bq,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+}
+
+const EncodeURLPrefix string = "base64,"
+const EncodeURLPrefixLength int = len(EncodeURLPrefix)
+
+func (s *Stream) DecodeURLs() {
+	if len(s.EncodedURL) > 0 {
+		rawDecodedText, err := base64.StdEncoding.DecodeString(s.EncodedURL)
+		if err == nil {
+			s.URL = string(rawDecodedText)
+		}
+	}
+	if len(s.EncodedTerms) > 0 {
+		rawDecodedText, err := base64.StdEncoding.DecodeString(s.EncodedTerms)
+		if err == nil {
+			s.Terms = string(rawDecodedText)
+		}
+	}
 }
 
 var CsvHeader = []string{

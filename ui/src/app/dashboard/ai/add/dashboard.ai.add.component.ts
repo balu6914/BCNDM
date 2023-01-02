@@ -73,7 +73,8 @@ export class DashboardAiAddComponent implements OnInit {
         type: this.streamType,
         description: this.form.value.description,
         snippet: this.form.value.snippet,
-        url: encodeURIComponent(this.form.value.url || `http://www.localhost.com/${ts}`),
+        url: "",
+        encodedURL: this.streamService.encodeURL(this.form.value.url || `http://www.localhost.com/${ts}`),
         price: this.midpcPipe.transform(this.form.value.price),
         location: {
           type: 'Point',
@@ -83,7 +84,8 @@ export class DashboardAiAddComponent implements OnInit {
           ]
         },
         metadata: JSON.parse(this.form.value.metadata),
-        terms: encodeURIComponent(this.form.value.terms),
+        terms: "",
+        encodedTerms: this.streamService.encodeURL(this.form.value.terms),
       };
 
       this.streamService.addStream(stream).subscribe(

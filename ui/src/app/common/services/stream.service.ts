@@ -42,4 +42,8 @@ export class StreamService {
     return this.http.get(`${environment.API_STREAMS}/export`, {responseType: 'text'});
   }
 
+	encodeURL(url: string): string {
+		return btoa(url)
+	}
+
 }
