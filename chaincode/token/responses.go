@@ -7,3 +7,7 @@ type balanceRes struct {
 type allowanceRes struct {
 	Value uint64 `json:"value"`
 }
+
+type txHistoryRes struct {
+	TxList []TransferFrom `json:"txList"`
+}

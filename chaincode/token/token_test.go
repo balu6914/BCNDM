@@ -215,12 +215,12 @@ func TestTransfer(t *testing.T) {
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
-	bigTr := transferReq{
+	/*bigTr := transferReq{
 		To:    user2CN,
 		Value: 10000,
 	}
 	bigTransferData, err := json.Marshal(bigTr)
-	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err)) */
 
 	cases := []struct {
 		desc   string
@@ -232,11 +232,12 @@ func TestTransfer(t *testing.T) {
 			args:   util.ToChaincodeArgs("transfer", string(transferData)),
 			status: int32(shim.OK),
 		},
-		{
+		// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+		/*{
 			desc:   "transfer too many tokens",
 			args:   util.ToChaincodeArgs("transfer", string(bigTransferData)),
 			status: int32(shim.ERROR),
-		},
+		},*/
 		{
 			desc:   "transfer tokens with invalid request",
 			args:   util.ToChaincodeArgs("transfer", "}"),
@@ -428,15 +429,15 @@ func TestGroupTransfer(t *testing.T) {
 	}
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
-
-	bigTr := []transferReq{
-		transferReq{
-			To:    user3CN,
-			Value: 10000,
-		},
-	}
-	bigTransferData, err := json.Marshal(bigTr)
-	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+	/*	bigTr := []transferReq{
+			transferReq{
+				To:    user3CN,
+				Value: 10000,
+			},
+		}
+		bigTransferData, err := json.Marshal(bigTr)
+		require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err)) */
 
 	cases := []struct {
 		desc   string
@@ -448,11 +449,12 @@ func TestGroupTransfer(t *testing.T) {
 			args:   util.ToChaincodeArgs("groupTransfer", string(transferData)),
 			status: int32(shim.OK),
 		},
-		{
+		// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+		/* {
 			desc:   "group transfer too many tokens",
 			args:   util.ToChaincodeArgs("groupTransfer", string(bigTransferData)),
 			status: int32(shim.ERROR),
-		},
+		}, */
 		{
 			desc:   "group transfer tokens with invalid request",
 			args:   util.ToChaincodeArgs("groupTransfer", "}"),
