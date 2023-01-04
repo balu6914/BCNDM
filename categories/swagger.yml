@@ -1,0 +1,177 @@
+swagger: "2.0"
+info:
+  title: NDM categories service
+  version: 1.0.0
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /category:
+    post:
+      summary: Adds new category
+      description: |
+        Creates new category
+      tags:
+        - category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: category
+          description: JSON-formatted document describing the new stream.
+          in: body
+          schema:
+            $ref: "#/definitions/CategoryReq"
+          required: true
+      responses:
+        201:
+          description: Category created.
+          schema:
+            $ref: '#/definitions/CategoryRes'
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        409:
+          description: Category already exists.
+        500:
+          $ref: "#/responses/ServiceError"
+    get:
+      summary: Retrieves all categories
+      tags:
+        - category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: '#/definitions/CategoriesRes'
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          $ref: "#/responses/ServiceError"
+  /category/{categoryid}:
+    get:
+      summary: Get a category details by the category id
+      description: Get a category details by the category id
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: categoryid
+          description: Category Id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The category was found.
+          schema:
+            $ref: "#/definitions/Category"
+        400:
+          description: Failed due to malformed category id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified category was not found.
+        500:
+          $ref: "#/responses/ServiceError"
+    delete:
+      summary: Delete the specified category
+      description: Delete the specified category
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: categoryid
+          description: category Id
+          in: path
+          type: string
+          required: true
+      responses:
+        204:
+          description: The category was deleted.
+        400:
+          description: Failed due to malformed category id parameter.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: The specified category was not found.
+        500:
+          $ref: "#/responses/ServiceError"          
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User access token.
+    in: header
+    type: string
+    required: true
+  ID:
+    name: Location
+    description: URL location to of the created entity.
+    in: header
+    type: string
+    required: true
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error ocurred.
+
+definitions:
+  Category:
+    type: object
+    properties:
+      id:
+        type: string
+        format: ObjectId 
+        description: The Category ID
+        example: 5b683864ff4e8f9122fc1be2
+      name:
+        type: string
+        description: Name of Category
+        example: My Category
+      parent:
+        type: string
+        format: ObjectId
+        description: ID of parent category (for subcategory)
+
+  CategoryReq:
+    allOf:
+      - $ref: '#/definitions/Category'
+    description: Represent request for creating or updating a Category.
+    required:
+      - name
+
+  CategoriesRes:
+    type: array
+    items:
+      $ref: '#/definitions/Category'
+    example:
+      - id: 5b683864ff4e8f9122fc1be2
+        name: Sports
+      - id: 666f6f2d6261722d71757578
+        name: Cricket
+        parent: 5b683864ff4e8f9122fc1be2
+      - id: 0123456789ab0123456789ab
+        name: Football
+        parent: 5b683864ff4e8f9122fc1be2
+      - id: 563479cc80804246bd27d784
+        name: HealthCare
+      - id: 563479cc80804246bd27d789
+        parent: 563479cc80804246bd27d784
+        name: Hearth
+      - id: 563479cc80804246bd27d785
+        name: Travel
+      - id: 563479cc80804246bd27d786
+        name: Media
+      - id: 563479cc80804246bd27d787
+        name: ESPN
+        parent: 563479cc80804246bd27d786
+      - id: 563479cc80804246bd27d788
+        name: Europe
+        parent: 563479cc80804246bd27d785
+
+  CategoryRes:
+    allOf:
+      - $ref: '#/definitions/Category'
+    description: Represent response for single Stream create or update request.
+    required:
+      - id
+      - name     
