@@ -270,6 +270,7 @@ type dbStream struct {
 	Terms       string             `bson:"terms,omitempty"`
 	External    bool               `bson:"external"`
 	BQ          dbBigQuery         `bson:"big_query,omitempty"`
+	AccessType  streams.AccessType `bson:"accessType,omitempty"`
 	Metadata    bson.M             `bson:"metadata,omitempty"`
 }
 
@@ -317,6 +318,7 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		Terms:       stream.Terms,
 		External:    stream.External,
 		BQ:          dbBQ,
+		AccessType:  stream.AccessType,
 		Metadata:    stream.Metadata,
 	}
 
@@ -356,6 +358,7 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		Terms:       dbs.Terms,
 		External:    dbs.External,
 		BQ:          dbBQ,
+		AccessType:  dbs.AccessType,
 		Metadata:    dbs.Metadata,
 	}
 }
