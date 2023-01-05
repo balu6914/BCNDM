@@ -35,7 +35,7 @@ func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
 
 func (c *serviceClient) Get(ctx context.Context, in *Key, opts ...grpc.CallOption) (*Access, error) {
 	out := new(Access)
-	err := c.cc.Invoke(ctx, "/datapace.Service/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/access.Service/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _Service_Get_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/datapace.Service/Get",
+		FullMethod: "/access.Service/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ServiceServer).Get(ctx, req.(*Key))
@@ -92,7 +92,7 @@ func _Service_Get_Handler(srv interface{}, ctx context.Context, dec func(interfa
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Service_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "datapace.Service",
+	ServiceName: "access.Service",
 	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

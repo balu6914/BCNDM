@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package datapace;
+package access;
 
 option go_package = "github.com/datapace/datapace/proto/accessv2";
 
