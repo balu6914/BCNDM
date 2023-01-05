@@ -288,23 +288,9 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return Subscription{}, fmt.Errorf("%w: non-own private stream subscription is forbidden", ErrFailedCreateSub)
 	}
 
-	if userID != stream.Owner && stream.AccessType == streams.AccessTypeProtected {
-		k := accessv2.Key{
-			ConsumerId: userID,
-			ProviderId: stream.Owner,
-			ProductId:  stream.ID,
-		}
-		a, err := ss.accessV2Svc.Get(context.TODO(), k)
-		switch {
-		case errors.Is(err, accessv2.ErrNotFound):
-			return Subscription{}, fmt.Errorf("%w: access is not requested", ErrStreamAccess)
-		case errors.Is(err, accessv2.ErrNotAvailable):
-			// access service is not available, do nothing
-		case err != nil:
-			return Subscription{}, fmt.Errorf("%w: failed to check whether access is granted", ErrStreamAccess)
-		case a.State != accessv2.StateApproved:
-			return Subscription{}, fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
-		}
+	err = ss.checkStreamAccess(userID, stream)
+	if err != nil {
+		return Subscription{}, err
 	}
 
 	sub.StreamOwner = stream.Owner
@@ -390,14 +376,39 @@ func (ss subscriptionsService) ViewSubByUserAndStream(userID, streamID string) (
 }
 
 func (ss subscriptionsService) isStreamSharedTo(streamId, rcvUserId string) bool {
-	sharings, err := ss.sharingSvc.GetSharings(rcvUserId, []string{})
-	if err != nil {
-		return false
-	}
-	for _, s := range sharings {
-		if string(s.StreamId) == streamId {
-			return true
+	if ss.sharingSvc != nil {
+		sharings, err := ss.sharingSvc.GetSharings(rcvUserId, []string{})
+		if err != nil {
+			return false
+		}
+		for _, s := range sharings {
+			if string(s.StreamId) == streamId {
+				return true
+			}
 		}
 	}
 	return false
+}
+
+func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (err error) {
+	if ss.accessV2Svc != nil && userId != stream.Owner && stream.AccessType == streams.AccessTypeProtected {
+		k := accessv2.Key{
+			ConsumerId: userId,
+			ProviderId: stream.Owner,
+			ProductId:  stream.ID,
+		}
+		var a accessv2.Access
+		a, err = ss.accessV2Svc.Get(context.TODO(), k)
+		switch {
+		case errors.Is(err, accessv2.ErrNotFound):
+			err = fmt.Errorf("%w: access is not requested", ErrStreamAccess)
+		case errors.Is(err, accessv2.ErrNotAvailable):
+			err = nil // access service is not available, do nothing
+		case err != nil:
+			err = fmt.Errorf("%w: failed to check whether access is granted", ErrStreamAccess)
+		case a.State != accessv2.StateApproved:
+			err = fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
+		}
+	}
+	return
 }

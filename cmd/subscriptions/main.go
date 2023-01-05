@@ -111,13 +111,19 @@ func main() {
 	defer streamsConn.Close()
 	sc := streamsapi.NewClient(streamsConn)
 
-	sharingConn := newGRPCConn(cfg.SharingUrl, logger)
-	defer sharingConn.Close()
-	sharingClient := sharingApi.NewClient(sharingConn)
+	sharingConn := newOptionalGrpcConn(cfg.SharingUrl, logger)
+	var sharingClient sharingProto.SharingServiceClient = nil
+	if sharingConn != nil {
+		defer sharingConn.Close()
+		sharingClient = sharingApi.NewClient(sharingConn)
+	}
 
-	accessV2Conn := newGRPCConn(cfg.AccessV2Url, logger)
-	defer accessV2Conn.Close()
-	accessV2Client := accessProtoV2.NewServiceClient(accessV2Conn)
+	accessV2Conn := newOptionalGrpcConn(cfg.AccessV2Url, logger)
+	var accessV2Client accessProtoV2.ServiceClient = nil
+	if accessV2Conn != nil {
+		defer accessV2Conn.Close()
+		accessV2Client = accessProtoV2.NewServiceClient(accessV2Conn)
+	}
 
 	svc := newService(ac, ms, sc, tc, sharingClient, accessV2Client, cfg.ProxyURL, logger)
 
@@ -192,6 +198,16 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
+// tries to start the optional connection (no fatal failure, if it can not connect, returns nil)
+func newOptionalGrpcConn(url string, logger log.Logger) *grpc.ClientConn {
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Failed to connect to grpc service: %s", err))
+		conn = nil
+	}
+	return conn
+}
+
 func newService(
 	ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
 	tc transactionsproto.TransactionsServiceClient, sharingClient sharingProto.SharingServiceClient,
@@ -199,10 +215,16 @@ func newService(
 ) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
-	sharingSvc := sharing.NewService(sharingClient)
-	sharingSvc = sharing.NewLoggingMiddleware(sharingSvc, logger)
-	accessV2Svc := accessv2.NewService(accessV2Client)
-	accessV2Svc = accessv2.NewLoggingMiddleware(accessV2Svc, logger)
+	var sharingSvc sharing.Service = nil
+	if sharingClient != nil {
+		sharingSvc = sharing.NewService(sharingClient)
+		sharingSvc = sharing.NewLoggingMiddleware(sharingSvc, logger)
+	}
+	var accessV2Svc accessv2.Service = nil
+	if accessV2Client != nil {
+		accessV2Svc = accessv2.NewService(accessV2Client)
+		accessV2Svc = accessv2.NewLoggingMiddleware(accessV2Svc, logger)
+	}
 	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewSubscriptionRepository(ms)
