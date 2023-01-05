@@ -118,7 +118,7 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if ok := cr.svc.Transfer(stub, transfer.To, transfer.Value); !ok {
+	if ok := cr.svc.Transfer(stub, transfer.To, transfer.DateTime, transfer.Value); !ok {
 		return shim.Error(errFailedTransfer.Error())
 	}
 
@@ -201,7 +201,7 @@ func (cr chaincodeRouter) transferFrom(stub shim.ChaincodeStubInterface, args []
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if ok := cr.svc.TransferFrom(stub, req.From, req.To, req.Value); !ok {
+	if ok := cr.svc.TransferFrom(stub, req.From, req.To, req.DateTime, req.Value); !ok {
 		return shim.Error(errFailedTransfer.Error())
 	}
 
@@ -234,12 +234,20 @@ func (cr chaincodeRouter) groupTransfer(stub shim.ChaincodeStubInterface, args [
 }
 
 func (cr chaincodeRouter) txHistory(stub shim.ChaincodeStubInterface) pb.Response {
-	txList, err := cr.svc.TxHistory(stub)
+	txList, ti, err := cr.svc.TxHistory(stub)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	txHistory := txHistoryRes{TxList: txList}
+	txHistory := txHistoryRes{
+		TInfo: TokenInfo{
+			Name:          ti.Name,
+			Symbol:        ti.Symbol,
+			Decimals:      ti.Decimals,
+			ContractOwner: ti.ContractOwner,
+		},
+		TxList: txList,
+	}
 	payload, err := json.Marshal(txHistory)
 	if err != nil {
 		return shim.Error(ErrFailedSerialization.Error())

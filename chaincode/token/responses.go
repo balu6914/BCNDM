@@ -9,5 +9,6 @@ type allowanceRes struct {
 }
 
 type txHistoryRes struct {
+	TInfo  TokenInfo      `json:"tokenInfo"`
 	TxList []TransferFrom `json:"txList"`
 }

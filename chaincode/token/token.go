@@ -130,16 +130,16 @@ func (tc tokenChaincode) BalanceOf(stub shim.ChaincodeStubInterface, owner strin
 	return balance, txDeltas, nil
 }
 
-func (tc tokenChaincode) Transfer(stub shim.ChaincodeStubInterface, to string, value uint64) bool {
+func (tc tokenChaincode) Transfer(stub shim.ChaincodeStubInterface, to, dateTime string, value uint64) bool {
 	from, err := callerCN(stub)
 	if err != nil {
 		return false
 	}
 
-	return tc.transfer(stub, from, to, value)
+	return tc.transfer(stub, from, to, dateTime, value)
 }
 
-func (tc tokenChaincode) TransferFrom(stub shim.ChaincodeStubInterface, from, to string, value uint64) bool {
+func (tc tokenChaincode) TransferFrom(stub shim.ChaincodeStubInterface, from, to, dateTime string, value uint64) bool {
 	spender, err := callerCN(stub)
 	if err != nil {
 		return false
@@ -159,7 +159,7 @@ func (tc tokenChaincode) TransferFrom(stub shim.ChaincodeStubInterface, from, to
 		return false
 	}
 
-	return tc.transfer(stub, from, to, value)
+	return tc.transfer(stub, from, to, dateTime, value)
 }
 
 func (tc tokenChaincode) Approve(stub shim.ChaincodeStubInterface, spender string, value uint64) bool {
@@ -267,9 +267,10 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 		}
 
 		t := TransferFrom{
-			From:  from,
-			To:    tr.To,
-			Value: tr.Value,
+			From:     from,
+			To:       tr.To,
+			Value:    tr.Value,
+			DateTime: tr.DateTime,
 		}
 		transferData, err := json.Marshal(t)
 		if err != nil {
@@ -295,7 +296,7 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 	return nil
 }
 
-func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to string, value uint64) bool {
+func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to, dateTime string, value uint64) bool {
 	if from == to {
 		return true
 	}
@@ -347,9 +348,10 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to str
 	}
 
 	t := TransferFrom{
-		From:  from,
-		To:    to,
-		Value: value,
+		From:     from,
+		To:       to,
+		Value:    value,
+		DateTime: dateTime,
 	}
 	transferData, err := json.Marshal(t)
 	if err != nil {
@@ -363,6 +365,78 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to str
 	// Transfer(msg.sender, _to, _value)
 	err = stub.SetEvent("Transfer", transferData)
 	return err == nil
+}
+
+func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface) ([]TransferFrom, *TokenInfo, error) {
+	txList := []TransferFrom{}
+
+	ti, err := getTokenInfo(stub)
+	if err != nil {
+		return txList, ti, err
+	}
+
+	// get caller CN from his certificate
+	caller, err := callerCN(stub)
+	if err != nil {
+		return txList, ti, ErrUnauthorized
+	}
+
+	resultsIterator, err := stub.GetStateByPartialCompositeKey(txHistoryIndex, []string{caller})
+	if err != nil {
+		return txList, ti, ErrFailedRichQuery
+	}
+	defer resultsIterator.Close()
+
+	var responseRange *queryresult.KV
+	for i := 0; resultsIterator.HasNext(); i++ {
+		if responseRange, err = resultsIterator.Next(); err != nil {
+			return txList, ti, err
+		}
+
+		jsonBytesJSON := responseRange.Value
+		tx := new(TransferFrom)
+		if err = json.Unmarshal([]byte(jsonBytesJSON), tx); err != nil {
+			return txList, ti, ErrFailedSerialization
+		}
+
+		txList = append(txList, *tx)
+	}
+
+	return txList, ti, nil
+}
+
+func (tc tokenChaincode) CollectDeltasForTreasury(stub shim.ChaincodeStubInterface) error {
+	// get caller CN from his certificate
+	caller, err := callerCN(stub)
+	if err != nil {
+		return ErrUnauthorized
+	}
+
+	ti, err := getTokenInfo(stub)
+	if err != nil {
+		return ErrGettingState
+	}
+
+	if ti.ContractOwner != caller {
+		return ErrUnauthorized
+	}
+
+	balance, txDeltas, err := tc.BalanceOf(stub, ti.ContractOwner)
+	if err != nil {
+		return err
+	}
+
+	// set the balance using a helper function
+	if err := setBalance(stub, ti.ContractOwner, balance); err != nil {
+		return ErrFailedBalanceSet
+	}
+
+	// delete all deltas
+	if err := deleteAllDeltas(stub, txDeltas); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func setBalance(stub shim.ChaincodeStubInterface, cn string, balance uint64) error {
@@ -465,71 +539,4 @@ func getTokenInfo(stub shim.ChaincodeStubInterface) (*TokenInfo, error) {
 	}
 
 	return ti, nil
-}
-
-func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface) ([]TransferFrom, error) {
-	txList := []TransferFrom{}
-
-	// get caller CN from his certificate
-	caller, err := callerCN(stub)
-	if err != nil {
-		return txList, ErrUnauthorized
-	}
-
-	resultsIterator, err := stub.GetStateByPartialCompositeKey(txHistoryIndex, []string{caller})
-	if err != nil {
-		return txList, ErrFailedRichQuery
-	}
-	defer resultsIterator.Close()
-
-	var responseRange *queryresult.KV
-	for i := 0; resultsIterator.HasNext(); i++ {
-		if responseRange, err = resultsIterator.Next(); err != nil {
-			return txList, err
-		}
-
-		jsonBytesJSON := responseRange.Value
-		tx := new(TransferFrom)
-		if err = json.Unmarshal([]byte(jsonBytesJSON), tx); err != nil {
-			return txList, ErrFailedSerialization
-		}
-
-		txList = append(txList, *tx)
-	}
-
-	return txList, nil
-}
-
-func (tc tokenChaincode) CollectDeltasForTreasury(stub shim.ChaincodeStubInterface) error {
-	// get caller CN from his certificate
-	caller, err := callerCN(stub)
-	if err != nil {
-		return ErrUnauthorized
-	}
-
-	ti, err := getTokenInfo(stub)
-	if err != nil {
-		return ErrGettingState
-	}
-
-	if ti.ContractOwner != caller {
-		return ErrUnauthorized
-	}
-
-	balance, txDeltas, err := tc.BalanceOf(stub, ti.ContractOwner)
-	if err != nil {
-		return err
-	}
-
-	// set the balance using a helper function
-	if err := setBalance(stub, ti.ContractOwner, balance); err != nil {
-		return ErrFailedBalanceSet
-	}
-
-	// delete all deltas
-	if err := deleteAllDeltas(stub, txDeltas); err != nil {
-		return err
-	}
-
-	return nil
 }

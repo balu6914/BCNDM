@@ -64,11 +64,11 @@ type Service interface {
 
 	// Transfer given amount from callers account to specified account. Returns
 	// true only if transaction can be executed.
-	Transfer(shim.ChaincodeStubInterface, string, uint64) bool
+	Transfer(shim.ChaincodeStubInterface, string, string, uint64) bool
 
 	// Transfer given amount from specified to specified account. Returns true
 	// only if transaction can be executed.
-	TransferFrom(shim.ChaincodeStubInterface, string, string, uint64) bool
+	TransferFrom(shim.ChaincodeStubInterface, string, string, string, uint64) bool
 
 	// Approve allows specified spender to withdraw from callers account
 	// multiple times up to specified value.
@@ -82,7 +82,7 @@ type Service interface {
 	GroupTransfer(shim.ChaincodeStubInterface, ...Transfer) error
 
 	// TxHistory returns list of transactions
-	TxHistory(shim.ChaincodeStubInterface) ([]TransferFrom, error)
+	TxHistory(shim.ChaincodeStubInterface) ([]TransferFrom, *TokenInfo, error)
 
 	// CollectDeltasForTreasury collects all deltas for treasury account and combines them
 	// it is recommended to execute this method at a regular interval depending upon tx load in the system
@@ -107,9 +107,10 @@ type Balance struct {
 }
 
 type TransferFrom struct {
-	From  string `json:"from"`
-	To    string `json:"to"`
-	Value uint64 `json:"value"`
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Value    uint64 `json:"value"`
+	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
 }
 
 type Approve struct {
@@ -119,6 +120,7 @@ type Approve struct {
 
 // Transfer contrains data necessary to transfer tokens.
 type Transfer struct {
-	To    string
-	Value uint64
+	To       string
+	Value    uint64
+	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
 }
