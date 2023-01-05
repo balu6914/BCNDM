@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package datapace;
+
+option go_package = "github.com/datapace/datapace/proto/accessv2";
+
+import "google/protobuf/timestamp.proto";
+
+service Service {
+  rpc Get(Key) returns (Access);
+}
+
+message Access {
+  Key key = 1;
+  State state = 2;
+  google.protobuf.Timestamp time = 3;
+}
+
+message Key {
+  string consumerId = 1;
+  string providerId = 2;
+  string productId = 3;
+}
+
+enum State {
+  PENDING = 0;
+  APPROVED = 1;
+  CANCELLED = 2;
+}

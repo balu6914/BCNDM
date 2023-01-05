@@ -58,6 +58,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		Table:      res.table,
 		Fields:     res.fields,
 		Visibility: res.visibility,
+		AccessType: res.accessType,
 	}
 
 	return &stream, nil

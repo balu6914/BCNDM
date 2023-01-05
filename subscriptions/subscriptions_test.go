@@ -2,6 +2,7 @@ package subscriptions_test
 
 import (
 	"fmt"
+	"github.com/datapace/datapace/subscriptions/accessv2"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -20,6 +21,7 @@ const (
 	stream1ID = "myStream1ID"
 	stream2ID = "myStream2ID"
 	stream3Id = "privateStream3"
+	streamId4 = "stream4"
 	wrong     = "wrong"
 	streamURL = "myUrl"
 	token     = "token"
@@ -42,12 +44,14 @@ func newService(tokens map[string]string) subscriptions.Service {
 		stream1ID: {Price: 10, Owner: user2ID},
 		stream2ID: {Price: 100, Owner: user1ID},
 		stream3Id: {Price: 1, Owner: user2ID, Visibility: "private"},
+		streamId4: {Price: 1, Owner: user2ID, AccessType: "PROTECTED"},
 	})
 	proxy := mocks.NewProxy()
 	transactions := mocks.NewTransactionsService(balance)
 	auth := mocks.NewAuthClient(tokens, nil)
 	sharingSvc := sharing.NewServiceMock()
-	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc)
+	accessV2Svc := accessv2.NewServiceMock()
+	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc, accessV2Svc)
 }
 
 func TestAddSubscription(t *testing.T) {
@@ -99,6 +103,72 @@ func TestAddSubscription(t *testing.T) {
 				Hours:       1,
 			},
 			err: subscriptions.ErrFailedCreateSub,
+		},
+		{
+			desc: "protected stream access type - fails when access is not granted",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      user1ID,
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: subscriptions.ErrStreamAccess,
+		},
+		{
+			desc: "protected stream access type - pass when accessv2 service is not available",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "unavailable",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: nil,
+		},
+		{
+			desc: "protected stream access type - fails when accessv2 service fails",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "fail",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: subscriptions.ErrStreamAccess,
+		},
+		{
+			desc: "protected stream access type - fails when access is pending",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "pending",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: subscriptions.ErrStreamAccess,
+		},
+		{
+			desc: "protected stream access type - fails when access is cancelled",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "cancelled",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: subscriptions.ErrStreamAccess,
+		},
+		{
+			desc: "protected stream access type - pass when access is approved",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "approved",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: nil,
 		},
 	}
 

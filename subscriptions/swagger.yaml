@@ -31,6 +31,8 @@ paths:
           description: Failed due to malformed JSON.
         402:
           description: Subscription already taken.
+        403:
+          description: Protected stream access - should be requested and approved first.
         500:
           $ref: "#/responses/ServiceError"
   /subscriptions/{id}:

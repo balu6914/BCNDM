@@ -13,5 +13,6 @@ type oneRes struct {
 	fields     string
 	terms      string
 	visibility string
+	accessType string
 	err        error
 }
