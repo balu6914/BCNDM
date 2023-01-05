@@ -405,7 +405,7 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 		case errors.Is(err, accessv2.ErrNotAvailable):
 			err = nil // access service is not available, do nothing
 		case err != nil:
-			err = fmt.Errorf("%w: failed to check whether access is granted", ErrStreamAccess)
+			err = fmt.Errorf("%w: failed to check whether access is granted: %s", ErrStreamAccess, err.Error())
 		case a.State != accessv2.StateApproved:
 			err = fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
 		}
