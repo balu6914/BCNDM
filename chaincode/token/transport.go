@@ -46,10 +46,9 @@ func (cr chaincodeRouter) Init(stub shim.ChaincodeStubInterface) pb.Response {
 	}
 
 	info := TokenInfo{
-		Name:        ti.Name,
-		Symbol:      ti.Symbol,
-		Decimals:    ti.Decimals,
-		TotalSupply: ti.TotalSupply,
+		Name:     ti.Name,
+		Symbol:   ti.Symbol,
+		Decimals: ti.Decimals,
 	}
 
 	if err := cr.svc.Init(stub, info); err != nil {
@@ -65,7 +64,7 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	// call routing
 	switch function {
-	// Returns a Token totalSupply
+	// Returns a Token totalSupply or current supply i.e how many total tokens have been minted/issued to users so far
 	case "totalSupply":
 		return cr.totalSupply(stub)
 	// Transfers _value amount of tokens to address _to
@@ -86,6 +85,10 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return cr.transferFrom(stub, args)
 	case "groupTransfer":
 		return cr.groupTransfer(stub, args)
+	case "txHistory":
+		return cr.txHistory(stub)
+	case "collectDeltasForTreasury":
+		return cr.collectDeltasForTreasury(stub)
 	}
 	return shim.Error(errIncorrectFunc.Error())
 }
@@ -115,7 +118,7 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if ok := cr.svc.Transfer(stub, transfer.To, transfer.Value); !ok {
+	if ok := cr.svc.Transfer(stub, transfer.To, transfer.DateTime, transfer.Value); !ok {
 		return shim.Error(errFailedTransfer.Error())
 	}
 
@@ -132,7 +135,7 @@ func (cr chaincodeRouter) balance(stub shim.ChaincodeStubInterface, args []strin
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	balance, err := cr.svc.BalanceOf(stub, req.Owner)
+	balance, _, err := cr.svc.BalanceOf(stub, req.Owner)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -198,7 +201,7 @@ func (cr chaincodeRouter) transferFrom(stub shim.ChaincodeStubInterface, args []
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if ok := cr.svc.TransferFrom(stub, req.From, req.To, req.Value); !ok {
+	if ok := cr.svc.TransferFrom(stub, req.From, req.To, req.DateTime, req.Value); !ok {
 		return shim.Error(errFailedTransfer.Error())
 	}
 
@@ -227,5 +230,35 @@ func (cr chaincodeRouter) groupTransfer(stub shim.ChaincodeStubInterface, args [
 		return shim.Error(err.Error())
 	}
 
+	return shim.Success(nil)
+}
+
+func (cr chaincodeRouter) txHistory(stub shim.ChaincodeStubInterface) pb.Response {
+	txList, ti, err := cr.svc.TxHistory(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	txHistory := txHistoryRes{
+		TInfo: TokenInfo{
+			Name:          ti.Name,
+			Symbol:        ti.Symbol,
+			Decimals:      ti.Decimals,
+			ContractOwner: ti.ContractOwner,
+		},
+		TxList: txList,
+	}
+	payload, err := json.Marshal(txHistory)
+	if err != nil {
+		return shim.Error(ErrFailedSerialization.Error())
+	}
+
+	return shim.Success(payload)
+}
+
+func (cr chaincodeRouter) collectDeltasForTreasury(stub shim.ChaincodeStubInterface) pb.Response {
+	if err := cr.svc.CollectDeltasForTreasury(stub); err != nil {
+		return shim.Error(err.Error())
+	}
 	return shim.Success(nil)
 }
