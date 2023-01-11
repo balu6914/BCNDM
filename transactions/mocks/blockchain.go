@@ -22,10 +22,13 @@ type mockNetwork struct {
 
 // NewTokenLedger returns mock instance of blockchain network.
 func NewTokenLedger(users map[string]uint64, remaining uint64) transactions.TokenLedger {
-	txHistory := new(map[string][]transactions.TransferFrom)
+	txHistory := make(map[string][]transactions.TransferFrom)
+	for user, _ := range users {
+		txHistory[user] = []transactions.TransferFrom{}
+	}
 	return &mockNetwork{
 		users:     users,
-		txHistory: *txHistory,
+		txHistory: txHistory,
 		remaining: remaining,
 		mutex:     &sync.Mutex{},
 	}
