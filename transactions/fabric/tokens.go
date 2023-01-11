@@ -16,10 +16,12 @@ import (
 )
 
 const (
-	affiliation = "org1"
-	balanceFcn  = "balanceOf"
-	transferFcn = "transfer"
-	chanID      = "datapacechannel"
+	affiliation    = "org1"
+	balanceFcn     = "balanceOf"
+	transferFcn    = "transfer"
+	chanID         = "datapacechannel"
+	txHistoryFcn   = "txHistory"
+	dateTimeFormat = "02-01-2006 15:04:05"
 )
 
 var _ transactions.TokenLedger = (*tokenLedger)(nil)
@@ -129,6 +131,7 @@ func (tl tokenLedger) Transfer(stream, from, to string, value uint64) error {
 		To:       to,
 		Time:     time.Now(),
 		Value:    value,
+		DateTime: time.Now().Format(dateTimeFormat),
 	}
 
 	data, err := json.Marshal(req)
@@ -176,8 +179,9 @@ func (tl tokenLedger) transfer(from, to string, value uint64) error {
 	}
 
 	req := transferReq{
-		To:    to,
-		Value: value,
+		To:       to,
+		Value:    value,
+		DateTime: time.Now().Format(dateTimeFormat),
 	}
 
 	data, err := json.Marshal(req)
@@ -201,4 +205,45 @@ func (tl tokenLedger) transfer(from, to string, value uint64) error {
 	}
 
 	return nil
+}
+
+func (tl tokenLedger) TxHistory(userID string) (transactions.TokenTxHistory, error) {
+	txHis := new(transactions.TokenTxHistory)
+	ctx := tl.sdk.ChannelContext(
+		chanID,
+		fabsdk.WithUser(tl.admin),
+		fabsdk.WithOrg(tl.org),
+	)
+
+	client, err := channel.New(ctx)
+	if err != nil {
+		tl.logger.Warn(fmt.Sprintf("failed to create channel client: %s", err))
+		return *txHis, err
+	}
+
+	req := txHistoryReq{Owner: userID}
+
+	data, err := json.Marshal(req)
+	if err != nil {
+		tl.logger.Warn(fmt.Sprintf("failed to serialize balance request: %s", err))
+		return *txHis, err
+	}
+
+	txHistoryBytes, err := client.Query(channel.Request{
+		ChaincodeID: tl.tokenChaincode,
+		Fcn:         txHistoryFcn,
+		Args:        [][]byte{data},
+	})
+
+	if err != nil {
+		tl.logger.Warn(fmt.Sprintf("failed to query blockchain for tx history: %s", err))
+		return *txHis, err
+	}
+
+	if err := json.Unmarshal(txHistoryBytes.Payload, txHis); err != nil {
+		tl.logger.Warn(fmt.Sprintf("failed to deserialize balance payload: %s", err))
+		return *txHis, err
+	}
+
+	return *txHis, nil
 }

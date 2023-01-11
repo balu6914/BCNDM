@@ -163,7 +163,7 @@ paths:
           description: Contract signed.
         500:
           $ref: "#/responses/ServiceError"
-  /tokens/history:
+  /tokens/tokens-history:
     get:
       summary: Retrives list of deposit & withdrawals for a particular user.
       tags:
@@ -332,6 +332,9 @@ definitions:
   History:
     type: "object"
     properties:
+      tokeInfo:
+        type: "object"
+        $ref: "#/definitions/History_TokenInfo"
       txList:
         type: "array"
         items:
@@ -339,11 +342,26 @@ definitions:
   HistoryList:
     type: "object"
     properties:
-      amount:
-        type: "integer"
-        description: "Amount of tokens deposited/ withdrawn"
-      txType:
+      from:
         type: "string"
-        enum:
-          - "DEPOSIT"
-          - "WITHDRAW"
+      to:
+        type: "string"
+      value:
+        type: "number"
+      dateTime: 
+        type: "string"  
+  History_TokenInfo:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "token name"
+      symbol:
+        type: "string"
+        description: "token symbol"
+      decimals:
+        type: "number"
+        description: "token base decimals"
+      contractOwner:
+        type: "string"
+        description: "contract owner or treasury account"

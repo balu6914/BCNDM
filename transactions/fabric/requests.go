@@ -6,11 +6,16 @@ type balanceReq struct {
 	Owner string `json:"owner"`
 }
 
+type txHistoryReq struct {
+	Owner string `json:"owner"`
+}
+
 type transferReq struct {
 	StreamID string    `json:"stream_id"`
 	To       string    `json:"to"`
 	Time     time.Time `json:"time"`
 	Value    uint64    `json:"value"`
+	DateTime string    `json:"dateTime"`
 }
 
 type createContractReq struct {

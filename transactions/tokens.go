@@ -16,4 +16,7 @@ type TokenLedger interface {
 
 	// WithdrawTokens transfers tokens from account to coin base.
 	WithdrawTokens(string, uint64) error
+
+	// TxHistory gives transaction history for a user.
+	TxHistory(string) (TokenTxHistory, error)
 }
