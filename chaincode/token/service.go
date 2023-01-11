@@ -82,7 +82,7 @@ type Service interface {
 	GroupTransfer(shim.ChaincodeStubInterface, ...Transfer) error
 
 	// TxHistory returns list of transactions
-	TxHistory(shim.ChaincodeStubInterface) ([]TransferFrom, *TokenInfo, error)
+	TxHistory(shim.ChaincodeStubInterface, string) ([]TransferFrom, *TokenInfo, error)
 
 	// CollectDeltasForTreasury collects all deltas for treasury account and combines them
 	// it is recommended to execute this method at a regular interval depending upon tx load in the system

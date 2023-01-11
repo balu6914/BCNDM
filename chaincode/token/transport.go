@@ -86,7 +86,7 @@ func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	case "groupTransfer":
 		return cr.groupTransfer(stub, args)
 	case "txHistory":
-		return cr.txHistory(stub)
+		return cr.txHistory(stub, args)
 	case "collectDeltasForTreasury":
 		return cr.collectDeltasForTreasury(stub)
 	}
@@ -233,8 +233,17 @@ func (cr chaincodeRouter) groupTransfer(stub shim.ChaincodeStubInterface, args [
 	return shim.Success(nil)
 }
 
-func (cr chaincodeRouter) txHistory(stub shim.ChaincodeStubInterface) pb.Response {
-	txList, ti, err := cr.svc.TxHistory(stub)
+func (cr chaincodeRouter) txHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error(ErrInvalidNumOfArgs.Error())
+	}
+
+	var req txHistoryReq
+	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
+		return shim.Error(ErrInvalidArgument.Error())
+	}
+
+	txList, ti, err := cr.svc.TxHistory(stub, req.Owner)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

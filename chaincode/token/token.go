@@ -367,7 +367,7 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to, da
 	return err == nil
 }
 
-func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface) ([]TransferFrom, *TokenInfo, error) {
+func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface, owner string) ([]TransferFrom, *TokenInfo, error) {
 	txList := []TransferFrom{}
 
 	ti, err := getTokenInfo(stub)
@@ -375,13 +375,7 @@ func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface) ([]Transfer
 		return txList, ti, err
 	}
 
-	// get caller CN from his certificate
-	caller, err := callerCN(stub)
-	if err != nil {
-		return txList, ti, ErrUnauthorized
-	}
-
-	resultsIterator, err := stub.GetStateByPartialCompositeKey(txHistoryIndex, []string{caller})
+	resultsIterator, err := stub.GetStateByPartialCompositeKey(txHistoryIndex, []string{owner})
 	if err != nil {
 		return txList, ti, ErrFailedRichQuery
 	}
