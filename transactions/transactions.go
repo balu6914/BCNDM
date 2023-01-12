@@ -10,6 +10,25 @@ const (
 	secretLen = 64
 )
 
+type TokenInfo struct {
+	Name          string `json:"name"`
+	Symbol        string `json:"symbol"`
+	Decimals      uint8  `json:"decimals"`
+	ContractOwner string `json:"contractOwner"`
+}
+
+type TransferFrom struct {
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Value    uint64 `json:"value"`
+	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
+}
+
+type TokenTxHistory struct {
+	TokenInfo TokenInfo      `json:"tokenInfo"`
+	TxList    []TransferFrom `json:"txList"`
+}
+
 var _ Service = (*transactionService)(nil)
 
 type transactionService struct {
@@ -86,6 +105,15 @@ func (ts transactionService) WithdrawTokens(account string, value uint64) error 
 	}
 
 	return nil
+}
+
+func (ts transactionService) TxHistory(userID string) (TokenTxHistory, error) {
+	txHistory, err := ts.tokens.TxHistory(userID)
+	if err != nil {
+		return txHistory, ErrFailedTxHistoryFetch
+	}
+
+	return txHistory, nil
 }
 
 func (ts transactionService) CreateContracts(contracts ...Contract) error {

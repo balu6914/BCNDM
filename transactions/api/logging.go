@@ -85,6 +85,19 @@ func (lm *loggingMiddleware) WithdrawTokens(account string, value uint64) (err e
 	return lm.svc.WithdrawTokens(account, value)
 }
 
+func (lm *loggingMiddleware) TxHistory(userID string) (txHistory transactions.TokenTxHistory, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method txHistory for user %s took %s to complete", userID, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.TxHistory(userID)
+}
+
 func (lm *loggingMiddleware) CreateContracts(contracts ...transactions.Contract) (err error) {
 	defer func(begin time.Time) {
 		message := fmt.Sprintf("Method create_contracts took %s to complete", time.Since(begin))

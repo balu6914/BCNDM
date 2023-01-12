@@ -35,6 +35,10 @@ var (
 
 	// ErrNotEnoughTokens indicates that spender doesn't have enough tokens.
 	ErrNotEnoughTokens = errors.New("not enough tokens")
+
+	ErrFailedTxHistoryFetch = errors.New("failed to fetch tx history")
+
+	ErrFailedSerialization = errors.New("failed while object serialization")
 )
 
 // Role represents enumeration for user roles.
@@ -60,6 +64,9 @@ type Service interface {
 
 	// WithdrawTokens exchanges tokens for real money.
 	WithdrawTokens(string, uint64) error
+
+	// TxHistory gives transaction history for a user.
+	TxHistory(string) (TokenTxHistory, error)
 
 	// CreateContracts creates multiple contracts at once.
 	CreateContracts(...Contract) error
