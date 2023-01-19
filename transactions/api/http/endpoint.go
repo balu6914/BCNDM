@@ -45,6 +45,22 @@ func balanceEndpoint(svc transactions.Service) endpoint.Endpoint {
 	}
 }
 
+func txHistoryEndpoint(svc transactions.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(txHistoryReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		txHistory, err := svc.TxHistory(req.userID)
+		if err != nil {
+			return nil, err
+		}
+
+		return txHistory, nil
+	}
+}
+
 func withdrawEndpoint(svc transactions.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(withdrawReq)

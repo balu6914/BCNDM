@@ -78,6 +78,12 @@ func MakeHandler(svc transactions.Service, ac authproto.AuthServiceClient) http.
 		encodeResponse,
 		opts...,
 	))
+	r.Get("/tokens-history", kithttp.NewServer(
+		txHistoryEndpoint(svc),
+		decodeTxHistoryReq,
+		encodeResponse,
+		opts...,
+	))
 	r.Post("/contracts", kithttp.NewServer(
 		createContractsEndpoint(svc),
 		decodeCreateContractsReq,
@@ -117,6 +123,23 @@ func decodeBalanceReq(_ context.Context, r *http.Request) (interface{}, error) {
 
 	req := balanceReq{userID: id.GetValue()}
 	req.ID = bone.GetValue(r, "id")
+
+	return req, nil
+}
+
+func decodeTxHistoryReq(_ context.Context, r *http.Request) (interface{}, error) {
+	ar := &authproto.AuthRequest{
+		Action: int64(auth.Read),
+		Type:   tokenType,
+		Token:  r.Header.Get("Authorization"),
+	}
+
+	id, err := authClient.Authorize(context.Background(), ar)
+	if err != nil {
+		return nil, errUnauthorizedAccess
+	}
+
+	req := txHistoryReq{userID: id.GetValue()}
 
 	return req, nil
 }

@@ -19,6 +19,18 @@ func (req balanceReq) validate() error {
 	return nil
 }
 
+type txHistoryReq struct {
+	userID string
+}
+
+func (req txHistoryReq) validate() error {
+	if req.userID == "" {
+		return errMalformedEntity
+	}
+
+	return nil
+}
+
 type buyReq struct {
 	userID string
 	FundID string `json:"fund_id"`

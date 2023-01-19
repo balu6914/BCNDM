@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/datapace/datapace/chaincode/mocks"
 	token "github.com/datapace/datapace/chaincode/token"
@@ -15,9 +16,10 @@ import (
 )
 
 const (
-	user1CN = "testUser"
-	user2CN = "testUser2"
-	user3CN = "testUser3"
+	user1CN        = "testUser"
+	user2CN        = "testUser2"
+	user3CN        = "testUser3"
+	dateTimeLayout = "02-01-2006 15:04:05"
 
 	user1Cert = `
 -----BEGIN CERTIFICATE-----
@@ -209,18 +211,19 @@ func TestTransfer(t *testing.T) {
 	createToken(t, stub)
 
 	tr := transferReq{
-		To:    user2CN,
-		Value: 100,
+		To:       user2CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
-	bigTr := transferReq{
+	/*bigTr := transferReq{
 		To:    user2CN,
 		Value: 10000,
 	}
 	bigTransferData, err := json.Marshal(bigTr)
-	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err)) */
 
 	cases := []struct {
 		desc   string
@@ -232,11 +235,12 @@ func TestTransfer(t *testing.T) {
 			args:   util.ToChaincodeArgs("transfer", string(transferData)),
 			status: int32(shim.OK),
 		},
-		{
+		// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+		/*{
 			desc:   "transfer too many tokens",
 			args:   util.ToChaincodeArgs("transfer", string(bigTransferData)),
 			status: int32(shim.ERROR),
-		},
+		},*/
 		{
 			desc:   "transfer tokens with invalid request",
 			args:   util.ToChaincodeArgs("transfer", "}"),
@@ -268,17 +272,19 @@ func TestTransferFrom(t *testing.T) {
 	stub.MockCreator(mspID, user1Cert)
 
 	tr := transferFromReq{
-		From:  user2CN,
-		To:    user3CN,
-		Value: 100,
+		From:     user2CN,
+		To:       user3CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
 
 	noAllowanceTr := transferFromReq{
-		From:  user3CN,
-		To:    user2CN,
-		Value: 100,
+		From:     user3CN,
+		To:       user2CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	noAllowanceTd, err := json.Marshal(noAllowanceTr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
@@ -418,25 +424,27 @@ func TestGroupTransfer(t *testing.T) {
 
 	tr := []transferReq{
 		transferReq{
-			To:    user1CN,
-			Value: 100,
+			To:       user1CN,
+			Value:    100,
+			DateTime: time.Now().Format(dateTimeLayout),
 		},
 		transferReq{
-			To:    user3CN,
-			Value: 100,
+			To:       user3CN,
+			Value:    100,
+			DateTime: time.Now().Format(dateTimeLayout),
 		},
 	}
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
-
-	bigTr := []transferReq{
-		transferReq{
-			To:    user3CN,
-			Value: 10000,
-		},
-	}
-	bigTransferData, err := json.Marshal(bigTr)
-	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
+	// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+	/*	bigTr := []transferReq{
+			transferReq{
+				To:    user3CN,
+				Value: 10000,
+			},
+		}
+		bigTransferData, err := json.Marshal(bigTr)
+		require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err)) */
 
 	cases := []struct {
 		desc   string
@@ -448,11 +456,12 @@ func TestGroupTransfer(t *testing.T) {
 			args:   util.ToChaincodeArgs("groupTransfer", string(transferData)),
 			status: int32(shim.OK),
 		},
-		{
+		// commenting below test case as it is not required in delta implementation of chaincode, which has unlimited supply of tokens
+		/* {
 			desc:   "group transfer too many tokens",
 			args:   util.ToChaincodeArgs("groupTransfer", string(bigTransferData)),
 			status: int32(shim.ERROR),
-		},
+		}, */
 		{
 			desc:   "group transfer tokens with invalid request",
 			args:   util.ToChaincodeArgs("groupTransfer", "}"),
@@ -483,14 +492,16 @@ type balanceReq struct {
 }
 
 type transferReq struct {
-	To    string `json:"to"`
-	Value uint64 `json:"value"`
+	To       string `json:"to"`
+	Value    uint64 `json:"value"`
+	DateTime string `json:"dateTime"`
 }
 
 type transferFromReq struct {
-	From  string `json:"from"`
-	To    string `json:"to"`
-	Value uint64 `json:"value"`
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Value    uint64 `json:"value"`
+	DateTime string `json:"dateTime"`
 }
 
 type approveReq struct {
@@ -514,8 +525,9 @@ func createToken(t *testing.T, stub *mocks.FullMockStub) {
 
 func setupTransfers(t *testing.T, stub *mocks.FullMockStub) {
 	firstTr := transferReq{
-		To:    user2CN,
-		Value: 100,
+		To:       user2CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	firstTransferData, err := json.Marshal(firstTr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
@@ -523,8 +535,9 @@ func setupTransfers(t *testing.T, stub *mocks.FullMockStub) {
 	require.Equal(t, int32(shim.OK), res.Status, fmt.Sprintf("expected %d got %d", int32(shim.OK), res.Status))
 
 	otherTr := transferReq{
-		To:    user3CN,
-		Value: 100,
+		To:       user3CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	otherTransferData, err := json.Marshal(otherTr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
