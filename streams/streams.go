@@ -19,10 +19,15 @@ const (
 	Protected Visibility = "protected"
 	// Private streams are only visible to owner
 	Private Visibility = "private"
+
+	AccessTypePublic    = "PUBLIC"
+	AccessTypeProtected = "PROTECTED"
 )
 
 // Visibility of streams
 type Visibility string
+
+type AccessType string
 
 // Location represents Stream location to enable geo
 // search streams. Official MongoDB docs could be found here
@@ -64,13 +69,14 @@ type Stream struct {
 	Description  string                 `json:"description,omitempty"`
 	Snippet      string                 `json:"snippet,omitempty"`
 	URL          string                 `json:"url,omitempty"`
-	EncodedURL   string                 `json:"encodedURL,omitempty" bson:"-"`
+	EncodedURL   string                 `json:"encodedURL,omitempty"`
 	Price        uint64                 `json:"price,omitempty"`
 	Location     Location               `json:"location,omitempty"`
 	Terms        string                 `json:"terms,omitempty"`
-	EncodedTerms string                 `json:"encodedTerms,omitempty" bson:"-"`
+	EncodedTerms string                 `json:"encodedTerms,omitempty"`
 	External     bool                   `json:"external,omitempty"`
 	BQ           BigQuery               `json:"bq,omitempty"`
+	AccessType   AccessType             `json:"accessType,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -257,9 +263,10 @@ func NewFromCsv(record []string, keys map[string]int) (*Stream, error) {
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL:      record[keys["url"]],
-		Terms:    record[keys["terms"]],
-		Metadata: metadata,
+		URL:        record[keys["url"]],
+		Terms:      record[keys["terms"]],
+		AccessType: AccessType(record[keys["accessType"]]),
+		Metadata:   metadata,
 	}
 	return stream, nil
 }

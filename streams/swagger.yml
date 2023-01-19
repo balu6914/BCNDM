@@ -404,6 +404,11 @@ definitions:
         type: integer
         description: Number of times data access per max_unit. Omit or 0 means unlimited
         example: 5
+      accessType:
+        type: string
+        enum: [PUBLIC, PROTECTED]
+        description: New access control mechanism support, protected stream can not be bought directly w/o granting an access
+        example: PUBLIC
       metadata:
         $ref: '#/definitions/Metadata'
 
@@ -504,6 +509,11 @@ definitions:
         type: integer
         description: Number of times data access per max_unit. Omit or 0 means unlimited
         example: 5
+      accessType:
+        type: string
+        enum: [ PUBLIC, PROTECTED ]
+        description: New access control mechanism support, protected stream can not be bought directly w/o granting an access
+        example: PUBLIC
       metadata:
         $ref: '#/definitions/Metadata'
 

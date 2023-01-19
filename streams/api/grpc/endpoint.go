@@ -33,6 +33,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			fields:     stream.BQ.Fields,
 			terms:      stream.Terms,
 			visibility: string(stream.Visibility),
+			accessType: string(stream.AccessType),
 		}
 
 		return res, nil

@@ -65,6 +65,7 @@ func stream() streams.Stream {
 			},
 		},
 		Visibility: streams.Public,
+		AccessType: streams.AccessTypeProtected,
 	}
 }
 
@@ -356,6 +357,7 @@ func TestSearchStreamsShared(t *testing.T) {
 		ID:         "stream0",
 		Visibility: "protected",
 		URL:        "url0",
+		AccessType: streams.AccessTypeProtected,
 	}
 	_, _ = svc.AddStream(stream0)
 	stream1 := streams.Stream{
@@ -363,6 +365,7 @@ func TestSearchStreamsShared(t *testing.T) {
 		ID:         "stream1",
 		Visibility: "protected",
 		URL:        "url1",
+		AccessType: streams.AccessTypePublic,
 	}
 	_, _ = svc.AddStream(stream1)
 	cases := []struct {
@@ -453,6 +456,7 @@ func TestSearchStreamsByMetadata(t *testing.T) {
 		ID:         "stream0",
 		Visibility: "protected",
 		URL:        "url0",
+		AccessType: streams.AccessTypePublic,
 		Metadata: map[string]interface{}{
 			"Ends": "2022-05-31T09:54:15Z",
 		},
@@ -463,6 +467,7 @@ func TestSearchStreamsByMetadata(t *testing.T) {
 		ID:         "stream1",
 		Visibility: "protected",
 		URL:        "url1",
+		AccessType: streams.AccessTypePublic,
 	}
 	_, _ = svc.AddStream(stream1)
 	stream2 := streams.Stream{
@@ -470,6 +475,7 @@ func TestSearchStreamsByMetadata(t *testing.T) {
 		ID:         "stream2",
 		Visibility: "protected",
 		URL:        "url2",
+		AccessType: streams.AccessTypeProtected,
 		Metadata: map[string]interface{}{
 			"Starts": "2022-05-30T09:54:15Z",
 			"Ends":   "2022-05-31T09:54:15Z",

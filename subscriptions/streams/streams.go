@@ -41,6 +41,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		Table:      s.GetTable(),
 		Fields:     s.GetFields(),
 		Visibility: s.GetVisibility(),
+		AccessType: s.GetAccessType(),
 	}
 
 	return stream, nil
