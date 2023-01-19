@@ -263,9 +263,10 @@ func NewFromCsv(record []string, keys map[string]int) (*Stream, error) {
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL:      record[keys["url"]],
-		Terms:    record[keys["terms"]],
-		Metadata: metadata,
+		URL:        record[keys["url"]],
+		Terms:      record[keys["terms"]],
+		AccessType: AccessType(record[keys["accessType"]]),
+		Metadata:   metadata,
 	}
 	return stream, nil
 }
