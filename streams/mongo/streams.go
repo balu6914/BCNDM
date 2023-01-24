@@ -258,24 +258,25 @@ func (sr streamRepository) Remove(owner, id string) error {
 }
 
 type dbStream struct {
-	Owner       string             `bson:"owner,omitempty"`
-	ID          bson.ObjectId      `bson:"_id,omitempty"`
-	Visibility  streams.Visibility `bson:"visibility,omitempty"`
-	Name        string             `bson:"name,omitempty"`
-	Type        string             `bson:"type,omitempty"`
-	Description string             `bson:"description,omitempty"`
-	Snippet     string             `bson:"snippet,omitempty"`
-	URL         string             `bson:"url,omitempty"`
-	Price       uint64             `bson:"price,omitempty"`
-	Location    dbLocation         `bson:"location,omitempty"`
-	Terms       string             `bson:"terms,omitempty"`
-	MaxCalls    uint64             `bson:"max_calls,omitempty"`
-	StartDate   *time.Time         `bson:"start_date,omitempty"`
-	EndDate     *time.Time         `bson:"end_date,omitempty"`
-	External    bool               `bson:"external"`
-	BQ          dbBigQuery         `bson:"big_query,omitempty"`
-	AccessType  streams.AccessType `bson:"accessType,omitempty"`
-	Metadata    bson.M             `bson:"metadata,omitempty"`
+	Owner       string              `bson:"owner,omitempty"`
+	ID          bson.ObjectId       `bson:"_id,omitempty"`
+	Visibility  streams.Visibility  `bson:"visibility,omitempty"`
+	Name        string              `bson:"name,omitempty"`
+	Type        string              `bson:"type,omitempty"`
+	Description string              `bson:"description,omitempty"`
+	Snippet     string              `bson:"snippet,omitempty"`
+	URL         string              `bson:"url,omitempty"`
+	Price       uint64              `bson:"price,omitempty"`
+	Location    dbLocation          `bson:"location,omitempty"`
+	Terms       string              `bson:"terms,omitempty"`
+	MaxCalls    uint64              `bson:"max_calls,omitempty"`
+	StartDate   *time.Time          `bson:"start_date,omitempty"`
+	EndDate     *time.Time          `bson:"end_date,omitempty"`
+	External    bool                `bson:"external"`
+	BQ          dbBigQuery          `bson:"big_query,omitempty"`
+	AccessType  streams.AccessType  `bson:"accessType,omitempty"`
+	Metadata    bson.M              `bson:"metadata,omitempty"`
+	MaxUnit     streams.MaxUnitType `bson:"max_unit,omitempty"`
 }
 
 type dbBigQuery struct {
@@ -321,6 +322,7 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		Location:    dbl,
 		Terms:       stream.Terms,
 		MaxCalls:    stream.MaxCalls,
+		MaxUnit:     stream.MaxUnit,
 		StartDate:   stream.StartDate,
 		EndDate:     stream.EndDate,
 		External:    stream.External,
@@ -364,6 +366,7 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		Location:    dbl,
 		Terms:       dbs.Terms,
 		MaxCalls:    dbs.MaxCalls,
+		MaxUnit:     dbs.MaxUnit,
 		StartDate:   dbs.StartDate,
 		EndDate:     dbs.EndDate,
 		External:    dbs.External,

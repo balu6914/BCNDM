@@ -81,10 +81,10 @@ definitions:
         type: string
         description: url of the proxied resource.
       ttl:
-        type: int
+        type: integer
         description: number of hours for which JWT will be valid.
       max_calls:
-        type: int
+        type: integer
         description: maximum number of proxy calls using issued token (0 or absent means unlimited).
   RegisterRes:
     type: object

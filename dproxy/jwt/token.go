@@ -6,12 +6,13 @@ type token struct {
 	url      string
 	uid      string
 	maxCalls int
+	maxUnit  string
 }
 
 var _ dproxy.Token = (*token)(nil)
 
-func NewToken(uid, url string, maxCalls int) dproxy.Token {
-	return &token{uid: uid, url: url, maxCalls: maxCalls}
+func NewToken(uid, url string, maxCalls int, maxUnit string) dproxy.Token {
+	return &token{uid: uid, url: url, maxCalls: maxCalls, maxUnit: maxUnit}
 }
 
 func (t token) Url() string {
@@ -24,4 +25,8 @@ func (t token) Uid() string {
 
 func (t token) MaxCalls() int {
 	return t.maxCalls
+}
+
+func (t token) MaxUnit() string {
+	return t.maxUnit
 }

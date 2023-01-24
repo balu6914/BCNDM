@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/datapace/datapace/streams"
 	"github.com/datapace/datapace/subscriptions/accessv2"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"gopkg.in/mgo.v2/bson"
-	"net/http"
-	"strings"
-	"time"
 
 	authproto "github.com/datapace/datapace/proto/auth"
 
@@ -310,8 +311,10 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return Subscription{}, err
 		}
 	}
+	fmt.Println("strim iz subscriptiona:")
+	fmt.Printf("%+v\n", stream)
 
-	hash, err := ss.proxy.Register(sub.Hours, url)
+	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit)
 	if err != nil {
 		if ds != nil {
 			// Ignore if deletion fails, table will be removed after expiration anyway.

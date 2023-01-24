@@ -34,6 +34,8 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			terms:      stream.Terms,
 			visibility: string(stream.Visibility),
 			accessType: string(stream.AccessType),
+			maxCalls:   stream.MaxCalls,
+			maxUnit:    string(stream.MaxUnit),
 		}
 
 		return res, nil
