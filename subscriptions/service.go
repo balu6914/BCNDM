@@ -311,8 +311,6 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return Subscription{}, err
 		}
 	}
-	fmt.Println("strim iz subscriptiona:")
-	fmt.Printf("%+v\n", stream)
 
 	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit)
 	if err != nil {
