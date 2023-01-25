@@ -21,15 +21,16 @@ const (
 	// Private streams are only visible to owner
 	Private Visibility = "private"
 
-	AccessTypePublic                = "PUBLIC"
-	AccessTypeProtected             = "PROTECTED"
-	Second              MaxUnitType = "second"
-	Minute              MaxUnitType = "minute"
-	Hour                MaxUnitType = "hour"
-	Day                 MaxUnitType = "day"
-	Week                MaxUnitType = "week"
-	Month               MaxUnitType = "month"
-	Year                MaxUnitType = "year"
+	AccessTypePublic    = "PUBLIC"
+	AccessTypeProtected = "PROTECTED"
+
+	Second MaxUnitType = "second"
+	Minute MaxUnitType = "minute"
+	Hour   MaxUnitType = "hour"
+	Day    MaxUnitType = "day"
+	Week   MaxUnitType = "week"
+	Month  MaxUnitType = "month"
+	Year   MaxUnitType = "year"
 )
 
 // Visibility of streams
