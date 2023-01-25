@@ -53,7 +53,7 @@ func randomString(n int) string {
 
 func genStream() streams.Stream {
 	counter++
-	now := time.Now().Round(time.Hour)
+	now := time.Now().UTC().Round(time.Hour)
 
 	return streams.Stream{
 		ID:          bson.NewObjectId().Hex(),

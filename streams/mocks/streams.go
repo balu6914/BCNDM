@@ -39,7 +39,7 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 			return "", streams.ErrConflict
 		}
 	}
-	now := time.Now().Round(time.Hour)
+	now := time.Now().UTC().Round(time.Hour)
 	stream.StartDate = &now
 	srm.streams[dbKey] = stream
 
