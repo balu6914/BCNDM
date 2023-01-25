@@ -4,7 +4,7 @@ alertmanagerFiles:
       resolve_timeout: 5m
       slack_api_url: 'https://hooks.slack.com/services/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'
     route:
-      group_by: ['alertname']
+      group_by: ['cluster','alertname']
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 24h
@@ -25,17 +25,7 @@ alertmanagerFiles:
         send_resolved: true
         icon_url: https://avatars3.githubusercontent.com/u/3380462
         title: |-
-          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
-          {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
-            {{" "}}(
-            {{- with .CommonLabels.Remove .GroupLabels.Names }}
-              {{- range $index, $label := .SortedPairs -}}
-                {{ if $index }}, {{ end }}
-                {{- $label.Name }}="{{ $label.Value -}}"
-              {{- end }}
-            {{- end -}}
-            )
-          {{- end }}
+          ndm.datapace.local [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
         text: >-
           {{ range .Alerts -}}
           *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
@@ -47,8 +37,53 @@ alertmanagerFiles:
     - name: 'NHC'
       email_configs:
       - to: 'i_ext_nhc_support@nokia.com'
-        from: 'p.sukumar@nokia.com'
+        from: 'no-reply@datamarketplace.nokia.com'
         smarthost: smtp-relay.sendinblue.com:587
         auth_username: 'p.sukumar@nokia.com'
         auth_identity: 'NDM Alerting'
         auth_password: 'BRb1kNq3WwspdQZ4'
+        headers:
+          Subject: ndm.datapace.local [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+        html: |
+          <h1>NDM Alert Notification</h1>
+          <h2>You have {{ .Alerts | len }} alert{{ if gt (len .Alerts) 1 }}s{{ end }} : {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }} </h2>
+          <br>
+          {{ range .Alerts.Firing }}       
+          <table cellspacing = "3", bgcolor = "#151B54">            
+            <tr>
+              <td colspan="2", bgcolor = "#151B54"><strong>Labels</strong></td>
+            </tr>
+            {{ range .Labels.SortedPairs }}
+            <tr bgcolor = "#ffffff">
+              <td>{{ .Name }}</td><td>{{ .Value }}</td>
+            </tr>
+            {{ end }}
+            <tr>
+              <td colspan="2", bgcolor = "#151B54">{{ if gt (len .Annotations) 0 }}<strong>Annotations</strong>{{ end }}</td>
+            </tr>
+            {{ range .Annotations.SortedPairs }} 
+              {{ if ne .Name "runbook_url" }} 
+                <tr bgcolor = "#ffffff">
+                  <td>{{ .Name }}</td><td>{{ .Value }}</td>
+                </tr> 
+              {{ end }} 
+            {{ end }}  
+            <tr bgcolor = "#ffffff">                
+              <td colspan="2"><a href="{{ .GeneratorURL }}">Prometheus Alert Source</a></td>
+            </tr>                                   
+          </table>   
+          <br>                          
+          {{ end }}    
+          <br>      
+          <table cellspacing = "3"> 
+            <tr>
+              <td><strong>Quick Access URLs:</strong></td>
+            </tr>
+            <tr>
+              <td><a href="https://ndm.datapace.local/">NDM Application</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://ndm.datapace.local/grafana/">Grafana Dashboard</a></td>
+            </tr>                         
+          </table>
+          
