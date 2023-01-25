@@ -5,8 +5,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/datapace/datapace/streams/groups"
-	"github.com/datapace/datapace/streams/sharing"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -15,6 +13,10 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 
 	"github.com/datapace/datapace/streams"
 	httpapi "github.com/datapace/datapace/streams/api/http"
@@ -51,6 +53,8 @@ func randomString(n int) string {
 
 func genStream() streams.Stream {
 	counter++
+	now := time.Now().Round(time.Hour)
+
 	return streams.Stream{
 		ID:          bson.NewObjectId().Hex(),
 		Visibility:  streams.Public,
@@ -73,7 +77,8 @@ func genStream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
-		Terms: fmt.Sprintf("https://myStream%d.com", counter),
+		Terms:     fmt.Sprintf("https://myStream%d.com", counter),
+		StartDate: &now,
 	}
 }
 
