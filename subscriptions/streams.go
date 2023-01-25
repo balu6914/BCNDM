@@ -19,4 +19,5 @@ type Stream struct {
 	Table      string
 	Fields     string
 	Visibility string
+	AccessType string
 }

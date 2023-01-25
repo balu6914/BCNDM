@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	accessProtoV2 "github.com/datapace/datapace/proto/accessv2"
+	"github.com/datapace/datapace/subscriptions/accessv2"
 	"github.com/datapace/datapace/subscriptions/pub"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"github.com/datapace/events/pubsub"
@@ -43,6 +45,7 @@ const (
 	envSharingUrl      = "DATAPACE_SHARING_URL"
 	envMsgBusUrl       = "DATAPACE_MSG_BUS_URL"
 	envSubjFmtCreate   = "DATAPACE_SUBSCRIPTIONS_SUBJ_FMT_CREATE"
+	envAccessV2Url     = "DATAPACE_ACCESS_V2_URL"
 
 	// HTTP prefixed, because all others are gRPC.
 	envProxyURL      = "DATAPACE_PROXY_URL"
@@ -64,6 +67,7 @@ const (
 	defMongoUser       = ""
 	defMongoPass       = ""
 	defMongoDatabase   = "subscriptions"
+	defAccessV2Url     = "localhost:8081"
 
 	defMongoConnectTimeout = 5000
 	defMongoSocketTimeout  = 5000
@@ -84,6 +88,7 @@ type config struct {
 	MongoSocketTimeout  int
 	MsgBusUrl           string
 	SubjFmt             pub.SubjectFormat
+	AccessV2Url         string
 }
 
 func main() {
@@ -106,11 +111,21 @@ func main() {
 	defer streamsConn.Close()
 	sc := streamsapi.NewClient(streamsConn)
 
-	sharingConn := newGRPCConn(cfg.SharingUrl, logger)
-	defer sharingConn.Close()
-	sharingClient := sharingApi.NewClient(sharingConn)
+	sharingConn := newOptionalGrpcConn(cfg.SharingUrl, logger)
+	var sharingClient sharingProto.SharingServiceClient = nil
+	if sharingConn != nil {
+		defer sharingConn.Close()
+		sharingClient = sharingApi.NewClient(sharingConn)
+	}
 
-	svc := newService(ac, ms, sc, tc, sharingClient, cfg.ProxyURL, logger)
+	accessV2Conn := newOptionalGrpcConn(cfg.AccessV2Url, logger)
+	var accessV2Client accessProtoV2.ServiceClient = nil
+	if accessV2Conn != nil {
+		defer accessV2Conn.Close()
+		accessV2Client = accessProtoV2.NewServiceClient(accessV2Conn)
+	}
+
+	svc := newService(ac, ms, sc, tc, sharingClient, accessV2Client, cfg.ProxyURL, logger)
 
 	pubSubSvc, msgBusConnErr := pubsub.NewService(cfg.MsgBusUrl)
 	if msgBusConnErr != nil {
@@ -152,6 +167,7 @@ func loadConfig() config {
 		SubjFmt: pub.SubjectFormat{
 			SubscriptionCreate: datapace.Env(envSubjFmtCreate, defSubjFmtCreate),
 		},
+		AccessV2Url: datapace.Env(envAccessV2Url, defAccessV2Url),
 	}
 }
 
@@ -182,19 +198,37 @@ func newGRPCConn(url string, logger log.Logger) *grpc.ClientConn {
 	return conn
 }
 
+// tries to start the optional connection (no fatal failure, if it can not connect, returns nil)
+func newOptionalGrpcConn(url string, logger log.Logger) *grpc.ClientConn {
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Failed to connect to grpc service: %s", err))
+		conn = nil
+	}
+	return conn
+}
+
 func newService(
 	ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
 	tc transactionsproto.TransactionsServiceClient, sharingClient sharingProto.SharingServiceClient,
-	proxyURL string, logger log.Logger,
+	accessV2Client accessProtoV2.ServiceClient, proxyURL string, logger log.Logger,
 ) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
-	sharingSvc := sharing.NewService(sharingClient)
-	sharingSvc = sharing.NewLoggingMiddleware(sharingSvc, logger)
+	var sharingSvc sharing.Service = nil
+	if sharingClient != nil {
+		sharingSvc = sharing.NewService(sharingClient)
+		sharingSvc = sharing.NewLoggingMiddleware(sharingSvc, logger)
+	}
+	var accessV2Svc accessv2.Service = nil
+	if accessV2Client != nil {
+		accessV2Svc = accessv2.NewService(accessV2Client)
+		accessV2Svc = accessv2.NewLoggingMiddleware(accessV2Svc, logger)
+	}
 	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewSubscriptionRepository(ms)
-	svc := subscriptions.New(ac, repo, ss, ps, ts, sharingSvc)
+	svc := subscriptions.New(ac, repo, ss, ps, ts, sharingSvc, accessV2Svc)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(

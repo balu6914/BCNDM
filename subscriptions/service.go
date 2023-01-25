@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/datapace/datapace/streams"
+	"github.com/datapace/datapace/subscriptions/accessv2"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
@@ -44,6 +45,9 @@ var (
 	// ErrFailedCreateSub indicates that creation of subscription failed.
 	ErrFailedCreateSub = errors.New("failed to create subscription")
 
+	// ErrStreamAccess indicates that the stream requires the access to be approved to create a subscription.
+	ErrStreamAccess = errors.New("the stream needs access approval by the stream owner")
+
 	// ErrNotEnoughTokens indicates that spender doesn't have enough tokens.
 	ErrNotEnoughTokens = errors.New("not enough tokens")
 )
@@ -77,10 +81,11 @@ type subscriptionsService struct {
 	proxy         Proxy
 	transactions  TransactionsService
 	sharingSvc    sharing.Service
+	accessV2Svc   accessv2.Service
 }
 
 // New instantiates the domain service implementation.
-func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService, sharingSvc sharing.Service) Service {
+func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService, sharingSvc sharing.Service, accessV2Svc accessv2.Service) Service {
 	return &subscriptionsService{
 		auth:          auth,
 		subscriptions: subs,
@@ -88,6 +93,7 @@ func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams 
 		proxy:         proxy,
 		transactions:  transactions,
 		sharingSvc:    sharingSvc,
+		accessV2Svc:   accessV2Svc,
 	}
 }
 
@@ -282,6 +288,11 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return Subscription{}, fmt.Errorf("%w: non-own private stream subscription is forbidden", ErrFailedCreateSub)
 	}
 
+	err = ss.checkStreamAccess(userID, stream)
+	if err != nil {
+		return Subscription{}, err
+	}
+
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
@@ -365,14 +376,39 @@ func (ss subscriptionsService) ViewSubByUserAndStream(userID, streamID string) (
 }
 
 func (ss subscriptionsService) isStreamSharedTo(streamId, rcvUserId string) bool {
-	sharings, err := ss.sharingSvc.GetSharings(rcvUserId, []string{})
-	if err != nil {
-		return false
-	}
-	for _, s := range sharings {
-		if string(s.StreamId) == streamId {
-			return true
+	if ss.sharingSvc != nil {
+		sharings, err := ss.sharingSvc.GetSharings(rcvUserId, []string{})
+		if err != nil {
+			return false
+		}
+		for _, s := range sharings {
+			if string(s.StreamId) == streamId {
+				return true
+			}
 		}
 	}
 	return false
+}
+
+func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (err error) {
+	if ss.accessV2Svc != nil && userId != stream.Owner && stream.AccessType == streams.AccessTypeProtected {
+		k := accessv2.Key{
+			ConsumerId: userId,
+			ProviderId: stream.Owner,
+			ProductId:  stream.ID,
+		}
+		var a accessv2.Access
+		a, err = ss.accessV2Svc.Get(context.TODO(), k)
+		switch {
+		case errors.Is(err, accessv2.ErrNotFound):
+			err = fmt.Errorf("%w: access is not requested", ErrStreamAccess)
+		case errors.Is(err, accessv2.ErrNotAvailable):
+			err = nil // access service is not available, do nothing
+		case err != nil:
+			err = fmt.Errorf("%w: failed to check whether access is granted: %s", ErrStreamAccess, err.Error())
+		case a.State != accessv2.StateApproved:
+			err = fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
+		}
+	}
+	return
 }
