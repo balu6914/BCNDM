@@ -5,7 +5,7 @@ import (
 )
 
 type EventRepository interface {
-	Accumulate(event Event) (int, error)
+	Accumulate(event Event, unit string) (int, error)
 }
 
 type Event struct {

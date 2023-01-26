@@ -3,6 +3,7 @@ package mocks
 import (
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/datapace/datapace/streams"
 
@@ -38,7 +39,8 @@ func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 			return "", streams.ErrConflict
 		}
 	}
-
+	now := time.Now().UTC().Round(time.Hour)
+	stream.StartDate = &now
 	srm.streams[dbKey] = stream
 
 	return stream.ID, nil

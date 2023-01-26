@@ -50,6 +50,8 @@ func (client grpcClient) One(ctx context.Context, id *commonproto.ID, _ ...grpc.
 		Fields:     sr.fields,
 		Visibility: sr.visibility,
 		AccessType: sr.accessType,
+		MaxCalls:   sr.maxCalls,
+		MaxUnit:    sr.maxUnit,
 	}
 
 	return &stream, sr.err
@@ -75,6 +77,8 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		fields:     res.GetFields(),
 		visibility: res.GetVisibility(),
 		accessType: res.GetAccessType(),
+		maxCalls:   res.GetMaxCalls(),
+		maxUnit:    res.GetMaxUnit(),
 	}
 
 	return stream, nil

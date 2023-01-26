@@ -42,6 +42,8 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		Fields:     s.GetFields(),
 		Visibility: s.GetVisibility(),
 		AccessType: s.GetAccessType(),
+		MaxCalls:   s.GetMaxCalls(),
+		MaxUnit:    s.GetMaxUnit(),
 	}
 
 	return stream, nil

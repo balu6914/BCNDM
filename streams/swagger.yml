@@ -397,7 +397,7 @@ definitions:
         example: true
       max_unit:
         type: string
-        enum: [hour, day, month]
+        enum: [second, minute, hour, day, week, month, year]
         description: If present max_calls is for this period. Omit or empty means max_calls is for all time
         example: day
       max_calls:

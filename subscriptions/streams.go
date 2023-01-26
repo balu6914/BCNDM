@@ -20,4 +20,6 @@ type Stream struct {
 	Fields     string
 	Visibility string
 	AccessType string
+	MaxCalls   uint64
+	MaxUnit    string
 }
