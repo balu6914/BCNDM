@@ -294,6 +294,16 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 		return Subscription{}, err
 	}
 
+	// check if stream is expired
+	if isExpired := ss.isExpired(stream); isExpired {
+		return Subscription{}, errors.New("subscription is expired")
+	}
+
+	// check if stream is expiring within requested time
+	if ok := ss.isWithinExpiry(stream, sub); !ok {
+		return Subscription{}, errors.New("subscription is set to expire within requested time frame")
+	}
+
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
@@ -411,5 +421,18 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 			err = fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
 		}
 	}
+	return
+}
+
+func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
+	now := time.Now()
+
+	if now.After(*stream.EndDate) {
+		isExpired = true
+	}
+	return
+}
+
+func (ss subscriptionsService) isWithinExpiry(stream Stream, sub Subscription) (isAllowed bool) {
 	return
 }

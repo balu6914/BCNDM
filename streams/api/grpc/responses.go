@@ -1,5 +1,7 @@
 package grpc
 
+import "time"
+
 type oneRes struct {
 	id         string
 	name       string
@@ -16,5 +18,6 @@ type oneRes struct {
 	accessType string
 	maxCalls   uint64
 	maxUnit    string
+	endDate    *time.Time
 	err        error
 }

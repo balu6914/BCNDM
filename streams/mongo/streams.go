@@ -7,6 +7,8 @@ import (
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
 
+	"time"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

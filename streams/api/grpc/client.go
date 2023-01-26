@@ -79,6 +79,7 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		accessType: res.GetAccessType(),
 		maxCalls:   res.GetMaxCalls(),
 		maxUnit:    res.GetMaxUnit(),
+		endDate:    res.GetEndDate(),
 	}
 
 	return stream, nil
