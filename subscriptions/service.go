@@ -434,5 +434,8 @@ func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
 }
 
 func (ss subscriptionsService) isWithinExpiry(stream Stream, sub Subscription) (isAllowed bool) {
+	if sub.EndDate.Before(*stream.EndDate) {
+		isAllowed = true
+	}
 	return
 }
