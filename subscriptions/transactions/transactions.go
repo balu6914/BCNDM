@@ -11,6 +11,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const (
+	dateTimeFormat = "02-01-2006 15:04:05"
+)
+
 var _ subscriptions.TransactionsService = (*transactionsService)(nil)
 
 type transactionsService struct {
@@ -31,6 +35,7 @@ func (ts transactionsService) Transfer(streamID, from, to string, value uint64) 
 		From:     from,
 		To:       to,
 		Value:    value,
+		DateTime: time.Now().Format(dateTimeFormat),
 	}
 	if _, err := ts.client.Transfer(ctx, td); err != nil {
 		e, ok := status.FromError(err)
