@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	objectType = "contract"
-	format     = "2006-01-02T15:04:05"
-	decimals   = 5
+	objectType     = "contract"
+	format         = "2006-01-02T15:04:05"
+	decimals       = 5
+	dateTimeFormat = "02-01-2006 15:04:05"
 )
 
 var _ Service = (*contractChaincode)(nil)
@@ -86,7 +87,7 @@ func (cc contractChaincode) SignContract(stub shim.ChaincodeStubInterface, signe
 	return nil
 }
 
-func (cc contractChaincode) Transfer(stub shim.ChaincodeStubInterface, stream string, owner string, currentTime time.Time, value uint64) error {
+func (cc contractChaincode) Transfer(stub shim.ChaincodeStubInterface, stream string, owner string, dateTime string, currentTime time.Time, value uint64) error {
 	iter, err := stub.GetStateByPartialCompositeKey(objectType, []string{stream})
 	if err != nil {
 		return ErrGettingState
@@ -125,12 +126,13 @@ func (cc contractChaincode) Transfer(stub shim.ChaincodeStubInterface, stream st
 		}
 
 		transfer := Transfer{
-			To:    contract.PartnerID,
-			Value: contract.Share * value / wholeValue,
+			To:       contract.PartnerID,
+			Value:    contract.Share * value / wholeValue,
+			DateTime: dateTime,
 		}
 		transfers = append(transfers, transfer)
 		ownerValue -= transfer.Value
 	}
 
-	return cc.ts.Transfer(stub, owner, ownerValue, transfers...)
+	return cc.ts.Transfer(stub, owner, dateTime, ownerValue, transfers...)
 }

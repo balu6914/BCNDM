@@ -40,13 +40,15 @@ type Service interface {
 	// Transfer given amount from callers account to specified account and
 	// fee to platform owner account. Returns error only if transaction can't be
 	// executed.
-	Transfer(shim.ChaincodeStubInterface, string, uint64, ...Transfer) error
+	Transfer(shim.ChaincodeStubInterface, string, string, uint64, ...Transfer) error
 }
 
 // Transfer contains transfer data.
 type Transfer struct {
-	To    string
-	Value uint64
+	To       string
+	Value    uint64
+	DateTime string
+	TxType   string
 }
 
 // Fee contains system owner CN and fee value that will go to owner.

@@ -37,7 +37,6 @@ func (cr chaincodeRouter) Init(stub shim.ChaincodeStubInterface) pb.Response {
 // Invoke is called per transaction on the chaincode.
 func (cr chaincodeRouter) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
-
 	// call routing
 	switch function {
 	case "createContracts":
@@ -118,7 +117,7 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	if err := cr.svc.Transfer(stub, req.StreamID, req.To, req.Time, req.Value); err != nil {
+	if err := cr.svc.Transfer(stub, req.StreamID, req.To, req.DateTime, req.Time, req.Value); err != nil {
 		return shim.Error(err.Error())
 	}
 

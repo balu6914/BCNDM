@@ -36,10 +36,13 @@ func (ts transferService) Transfer(stub shim.ChaincodeStubInterface, transfers .
 	req := []transferReq{}
 	for _, tr := range transfers {
 		req = append(req, transferReq{
-			To:    tr.To,
-			Value: tr.Value,
+			To:       tr.To,
+			Value:    tr.Value,
+			DateTime: tr.DateTime,
+			TxType:   tr.TxType,
 		})
 	}
+
 
 	payload, err := json.Marshal(req)
 	if err != nil {

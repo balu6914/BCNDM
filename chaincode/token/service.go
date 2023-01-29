@@ -111,6 +111,7 @@ type TransferFrom struct {
 	To       string `json:"to"`
 	Value    uint64 `json:"value"`
 	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
+	TxType   string `json:"txType"`
 }
 
 type Approve struct {
@@ -123,4 +124,5 @@ type Transfer struct {
 	To       string
 	Value    uint64
 	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
+	TxType   string `json:"txType"`
 }
