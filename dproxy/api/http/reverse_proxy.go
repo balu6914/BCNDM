@@ -51,6 +51,14 @@ func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(http.StatusText(http.StatusNotFound)))
 		return
+	case dproxy.ErrTokenExpired:
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+		return
+	case dproxy.ErrQuotaExceeded:
+		w.WriteHeader(http.StatusTooManyRequests)
+		w.Write([]byte(http.StatusText(http.StatusTooManyRequests)))
+		return
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(http.StatusText(http.StatusInternalServerError)))

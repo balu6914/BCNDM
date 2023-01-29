@@ -11,6 +11,6 @@ func NewProxy() subscriptions.Proxy {
 	return mockProxy{}
 }
 
-func (mp mockProxy) Register(ttl uint64, url string) (string, error) {
+func (mp mockProxy) Register(ttl uint64, url string, maxCalls uint64, maxUnit string) (string, error) {
 	return "", nil
 }

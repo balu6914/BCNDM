@@ -1,10 +1,11 @@
 package mongo
 
 import (
+	"time"
+
 	"github.com/datapace/datapace/dproxy/persistence"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"time"
 )
 
 type eventRepository struct {
@@ -20,30 +21,59 @@ func NewEventsRepository(db *mgo.Session) *eventRepository {
 }
 
 // Accumulate updates event count for event initiator and returns total count for specific initiator
-func (er *eventRepository) Accumulate(event persistence.Event) (int, error) {
+func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int, error) {
 	s := er.db.Copy()
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
-	query := bson.M{"initiator": event.Initiator}
-	d := bson.M{
-		"$set": bson.M{
-			"last_request": time.Now(),
-		},
-		"$inc": bson.M{
-			"count": 1,
-		},
+	dbEvent, _ := toDBEvent(event)
+
+	if err := c.Insert(dbEvent); err != nil {
+		return 0, err
 	}
-	_, err := c.Upsert(query, d)
+	var period time.Duration
+	switch unit {
+	case "second":
+		period = time.Second
+	case "minute":
+		period = time.Minute
+	case "hour":
+		period = time.Hour
+	case "day":
+		period = 24 * time.Hour
+	case "month":
+		period = 30 * 24 * time.Hour
+	case "year":
+		period = 365 * 24 * time.Hour
+	default:
+		period = 0 //nije nula vec beskonacno, sredi ovo
+	}
+	now := time.Now()
+
+	filter := bson.M{"initiator": event.Initiator}
+
+	if period != 0 {
+		since := now.Add(-period)
+		filter["request_time"] = bson.M{"$gte": since, "$lt": now}
+	}
+
+	// Count the number of documents that match the filter
+	cnt, err := c.Find(filter).Count()
 	if err != nil {
 		return 0, err
 	}
-	var dbEvent dbEvent
-	if err = c.Find(query).One(&dbEvent); err != nil {
-		return 0, err
-	}
-	return dbEvent.Count, nil
+	return cnt, nil
+
 }
 
 type dbEvent struct {
-	Count int `bson:"count"`
+	Initiator   string     `bson:"initiator,omitempty"`
+	RequestTime *time.Time `bson:"request_time,omitempty"`
+}
+
+func toDBEvent(event persistence.Event) (dbEvent, error) {
+	dbe := dbEvent{
+		Initiator:   event.Initiator,
+		RequestTime: &event.Time,
+	}
+	return dbe, nil
 }

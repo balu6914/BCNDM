@@ -24,10 +24,12 @@ func New(url string) subscriptions.Proxy {
 	}
 }
 
-func (p proxy) Register(ttl uint64, url string) (string, error) {
+func (p proxy) Register(ttl uint64, url string, maxCalls uint64, maxUnit string) (string, error) {
 	req := registerReq{
-		TTL: ttl,
-		URL: url,
+		TTL:      ttl,
+		URL:      url,
+		MaxCalls: maxCalls,
+		MaxUnit:  maxUnit,
 	}
 
 	body, err := json.Marshal(req)

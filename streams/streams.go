@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"gopkg.in/mgo.v2/bson"
@@ -22,6 +23,14 @@ const (
 
 	AccessTypePublic    = "PUBLIC"
 	AccessTypeProtected = "PROTECTED"
+
+	Second MaxUnitType = "second"
+	Minute MaxUnitType = "minute"
+	Hour   MaxUnitType = "hour"
+	Day    MaxUnitType = "day"
+	Week   MaxUnitType = "week"
+	Month  MaxUnitType = "month"
+	Year   MaxUnitType = "year"
 )
 
 // Visibility of streams
@@ -50,6 +59,9 @@ type BigQuery struct {
 	Fields  string `json:"fields,omitempty"`
 }
 
+// MaxUnitType represents units for MaxCalls limitation (per day, per week...)
+type MaxUnitType string
+
 // Validate provides basic checks of parameters related to the Big Query.
 func (bq BigQuery) Validate() bool {
 	return bq.Email != "" &&
@@ -74,6 +86,10 @@ type Stream struct {
 	Location     Location               `json:"location,omitempty"`
 	Terms        string                 `json:"terms,omitempty"`
 	EncodedTerms string                 `json:"encodedTerms,omitempty"`
+	MaxCalls     uint64                 `json:"max_calls,omitempty"`
+	MaxUnit      MaxUnitType            `json:"max_unit,omitempty"`
+	StartDate    *time.Time             `json:"start_date,omitempty"`
+	EndDate      *time.Time             `json:"end_date,omitempty"`
 	External     bool                   `json:"external,omitempty"`
 	BQ           BigQuery               `json:"bq,omitempty"`
 	AccessType   AccessType             `json:"accessType,omitempty"`
@@ -125,6 +141,8 @@ func (s Stream) Attributes() map[string]string {
 		"url":         s.URL,
 		"price":       strconv.FormatUint(s.Price, 10),
 		"terms":       s.Terms,
+		"maxCalls":    strconv.FormatUint(s.MaxCalls, 10),
+		"maxUnit":     string(s.MaxUnit),
 		"external":    strconv.FormatBool(s.External),
 	}
 }

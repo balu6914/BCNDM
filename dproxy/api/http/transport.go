@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/datapace/datapace"
 	"io"
 	"net/http"
+
+	"github.com/datapace/datapace"
 
 	"github.com/datapace/datapace/access-control"
 	"github.com/datapace/datapace/dproxy"

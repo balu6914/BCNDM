@@ -18,15 +18,17 @@ func NewService(jwtSecret string) dproxy.TokenService {
 	return &jwtService{jwtSecret: jwtSecret}
 }
 
-func (d *jwtService) Create(url string, ttl int, maxCalls int) (string, error) {
+func (d *jwtService) Create(url string, ttl int, maxCalls int, maxUnit string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, DproxyClaims{
 		StandardClaims: jwt.StandardClaims{
 			Id:        uuid.NewV4().String(),
+			IssuedAt:  time.Now().Unix(),
 			NotBefore: time.Now().Unix(),
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(ttl)).Unix(),
 		},
 		URL:      url,
 		MaxCalls: maxCalls,
+		MaxUnit:  maxUnit,
 	})
 	tokenString, err := token.SignedString([]byte(d.jwtSecret))
 	if err != nil {
@@ -42,11 +44,23 @@ func (d *jwtService) Parse(tokenString string) (dproxy.Token, error) {
 		}
 		return []byte(d.jwtSecret), nil
 	})
+
+	if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+			return nil, dproxy.ErrInvalidToken
+		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+			// Token is either expired or not active yet
+			return nil, dproxy.ErrTokenExpired
+		} else {
+			return nil, err
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*DproxyClaims); ok && token.Valid {
-		return NewToken(claims.StandardClaims.Id, claims.URL, claims.MaxCalls), nil
+		return NewToken(claims.StandardClaims.Id, claims.URL, claims.MaxCalls, claims.MaxUnit), nil
 	}
 	return nil, dproxy.ErrTokenParsingFailed
 }

@@ -14,5 +14,7 @@ type oneRes struct {
 	terms      string
 	visibility string
 	accessType string
+	maxCalls   uint64
+	maxUnit    string
 	err        error
 }
