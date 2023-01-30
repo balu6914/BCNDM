@@ -36,6 +36,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			accessType: string(stream.AccessType),
 			maxCalls:   stream.MaxCalls,
 			maxUnit:    string(stream.MaxUnit),
+			endDate:    stream.EndDate,
 		}
 
 		return res, nil

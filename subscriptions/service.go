@@ -281,6 +281,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
 
 	stream, err := ss.streams.One(sub.StreamID)
+	fmt.Printf("In AddSubscription: %+v\n", stream)
 	if err != nil {
 		return Subscription{}, ErrNotFound
 	}
@@ -426,15 +427,16 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 
 func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
 	now := time.Now()
-
-	if now.After(*stream.EndDate) {
+	fmt.Println("In isExpired: ", stream.EndDate, "-", now)
+	if stream.EndDate != nil && now.After(*stream.EndDate) {
 		isExpired = true
 	}
 	return
 }
 
 func (ss subscriptionsService) isWithinExpiry(stream Stream, sub Subscription) (isAllowed bool) {
-	if sub.EndDate.Before(*stream.EndDate) {
+	fmt.Println("In isWithinExpiry: ", stream.EndDate, "-", sub.EndDate)
+	if stream.EndDate != nil && sub.EndDate.Before(*stream.EndDate) {
 		isAllowed = true
 	}
 	return

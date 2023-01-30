@@ -61,6 +61,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		AccessType: res.accessType,
 		MaxCalls:   res.maxCalls,
 		MaxUnit:    res.maxUnit,
+		EndDate:    res.endDate,
 	}
 
 	return &stream, nil

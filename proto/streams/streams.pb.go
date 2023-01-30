@@ -36,7 +36,7 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 	Fields     string `protobuf:"bytes,10,opt,name=fields,proto3" json:"fields,omitempty"`
 	Visibility string `protobuf:"bytes,11,opt,name=visibility,proto3" json:"visibility,omitempty"`
 	AccessType string `protobuf:"bytes,12,opt,name=accessType,proto3" json:"accessType,omitempty"`
-	EndDate string `protobuf:"bytes,13,opt,name=endDate,proto3" json:"end_date,omitempty"`
+	EndDate *time.Time `protobuf:"bytes,13,opt,name=endDate,proto3" json:"end_date,omitempty"`
 }
 
 func (m *Stream) XXX_Unmarshal(b []byte) error {
@@ -143,9 +143,7 @@ func (m *Stream) GetAccessType() string {
 
 func (x *Stream) GetEndDate() *time.Time {
 	if x != nil {
-		if tm, ok := time.Parse(time.Now().UTC().String(), x.EndDate); ok == nil {
-			return &tm
-		}
+		return x.EndDate
 	}
 	return nil
 }

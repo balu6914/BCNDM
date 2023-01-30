@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -237,8 +238,8 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 		}
 		return streams.Stream{}, err
 	}
-
 	stream := fromDBStream(dbs)
+	fmt.Printf("In One: %+v\n", stream)
 	return stream, nil
 }
 
