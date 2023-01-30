@@ -60,6 +60,7 @@ func (client grpcClient) Transfer(ctx context.Context, td *transactionsproto.Tra
 		from:     td.GetFrom(),
 		to:       td.GetTo(),
 		value:    td.GetValue(),
+		DateTime: td.DateTime,
 	}
 
 	res, err := client.transfer(ctx, req)
@@ -86,6 +87,7 @@ func encodeTransferRequest(_ context.Context, grpcReq interface{}) (interface{},
 		From:     req.from,
 		To:       req.to,
 		Value:    req.value,
+		DateTime: req.DateTime,
 	}, nil
 }
 

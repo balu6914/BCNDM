@@ -349,7 +349,12 @@ definitions:
       value:
         type: "number"
       dateTime: 
-        type: "string"  
+        type: "string"
+      txType:
+        type: "string"
+        enum:
+          - "FEE"
+          - "TRANSFER"    
   History_TokenInfo:
     type: "object"
     properties:

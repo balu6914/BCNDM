@@ -114,6 +114,7 @@ func (tl tokenLedger) Balance(userID string) (uint64, error) {
 }
 
 func (tl tokenLedger) Transfer(stream, from, to string, value uint64) error {
+
 	ctx := tl.sdk.ChannelContext(
 		chanID,
 		fabsdk.WithUser(from),
@@ -133,6 +134,7 @@ func (tl tokenLedger) Transfer(stream, from, to string, value uint64) error {
 		Value:    value,
 		DateTime: time.Now().Format(dateTimeFormat),
 	}
+
 
 	data, err := json.Marshal(req)
 	if err != nil {
@@ -166,6 +168,7 @@ func (tl tokenLedger) WithdrawTokens(account string, value uint64) error {
 }
 
 func (tl tokenLedger) transfer(from, to string, value uint64) error {
+
 	ctx := tl.sdk.ChannelContext(
 		chanID,
 		fabsdk.WithUser(from),

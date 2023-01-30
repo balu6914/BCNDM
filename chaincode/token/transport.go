@@ -221,8 +221,10 @@ func (cr chaincodeRouter) groupTransfer(stub shim.ChaincodeStubInterface, args [
 	transfers := []Transfer{}
 	for _, tr := range req {
 		transfers = append(transfers, Transfer{
-			To:    tr.To,
-			Value: tr.Value,
+			To:       tr.To,
+			Value:    tr.Value,
+			DateTime: tr.DateTime,
+			TxType:   tr.TxType,
 		})
 	}
 

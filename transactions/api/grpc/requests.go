@@ -17,6 +17,7 @@ type transferReq struct {
 	from     string
 	to       string
 	value    uint64
+	DateTime string
 }
 
 func (req transferReq) validate() error {

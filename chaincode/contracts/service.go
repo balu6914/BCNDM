@@ -42,7 +42,7 @@ type Service interface {
 	SignContract(shim.ChaincodeStubInterface, Contract) error
 
 	// Transfers tokens and applies user defined contract.
-	Transfer(shim.ChaincodeStubInterface, string, string, time.Time, uint64) error
+	Transfer(shim.ChaincodeStubInterface, string, string, string, time.Time, uint64) error
 }
 
 // Contract contains user defined contract data.

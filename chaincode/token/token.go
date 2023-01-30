@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"encoding/json"
+	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/ledger/queryresult"
@@ -13,7 +14,7 @@ const (
 	indexBalance   = "cn~balance"
 	indexAllowance = "cn~allowance"
 	txKeyIndex     = "cn~txId"
-	txHistoryIndex = "tx~cn~txId"
+	txHistoryIndex = "tx~txId~txCount"
 )
 
 var _ Service = (*tokenChaincode)(nil)
@@ -257,7 +258,7 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 
 	events := []TransferFrom{}
 
-	for _, tr := range transfers {
+	for trNo, tr := range transfers {
 		if from == tr.To {
 			continue
 		}
@@ -271,13 +272,14 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 			To:       tr.To,
 			Value:    tr.Value,
 			DateTime: tr.DateTime,
+			TxType:   tr.TxType,
 		}
 		transferData, err := json.Marshal(t)
 		if err != nil {
 			return ErrFailedSerialization
 		}
 
-		if err := recordTxForHistory(stub, from, tr.To, transferData); err != nil {
+		if err := recordTxForHistory(stub, trNo, transferData); err != nil {
 			return err
 		}
 
@@ -352,13 +354,14 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to, da
 		To:       to,
 		Value:    value,
 		DateTime: dateTime,
+		TxType:   "TRANSFER",
 	}
 	transferData, err := json.Marshal(t)
 	if err != nil {
 		return false
 	}
 
-	if err := recordTxForHistory(stub, from, to, transferData); err != nil {
+	if err := recordTxForHistory(stub, 0, transferData); err != nil {
 		return false
 	}
 
@@ -374,8 +377,8 @@ func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface, owner strin
 	if err != nil {
 		return txList, ti, err
 	}
-
-	resultsIterator, err := stub.GetStateByPartialCompositeKey(txHistoryIndex, []string{owner})
+	queryString := "{\"selector\":{\"$or\":[{\"from\":\"" + owner + "\"},{\"to\":\"" + owner + "\"}]}}"
+	resultsIterator, err := stub.GetQueryResult(queryString)
 	if err != nil {
 		return txList, ti, ErrFailedRichQuery
 	}
@@ -498,23 +501,14 @@ func deleteAllDeltas(stub shim.ChaincodeStubInterface, txDeltas []string) error 
 	return nil
 }
 
-func recordTxForHistory(stub shim.ChaincodeStubInterface, from, to string, txBytes []byte) error {
+func recordTxForHistory(stub shim.ChaincodeStubInterface, txNo int, txBytes []byte) error {
 	txId := stub.GetTxID()
-	fromKey, err := getCompositeKey(stub, txHistoryIndex, from, txId)
+	key, err := getCompositeKey(stub, txHistoryIndex, txId, strconv.Itoa(txNo))
 	if err != nil {
 		return ErrFailedKeyCreation
 	}
 
-	if err := stub.PutState(fromKey, txBytes); err != nil {
-		return ErrSettingState
-	}
-
-	toKey, err := getCompositeKey(stub, txHistoryIndex, to, txId)
-	if err != nil {
-		return ErrFailedKeyCreation
-	}
-
-	if err := stub.PutState(toKey, txBytes); err != nil {
+	if err := stub.PutState(key, txBytes); err != nil {
 		return ErrSettingState
 	}
 

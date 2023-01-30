@@ -22,4 +22,5 @@ type transferReq struct {
 	Time     time.Time `json:"time,omitempty"`
 	To       string    `json:"to"`
 	Value    uint64    `json:"value"`
+	DateTime string    `json:"dateTime"`
 }

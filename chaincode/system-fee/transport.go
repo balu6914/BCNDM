@@ -110,6 +110,7 @@ func (cr chaincodeRouter) setFee(stub shim.ChaincodeStubInterface, args []string
 }
 
 func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
 	if len(args) != 1 {
 		return shim.Error(ErrInvalidNumOfArgs.Error())
 	}
@@ -122,13 +123,14 @@ func (cr chaincodeRouter) transfer(stub shim.ChaincodeStubInterface, args []stri
 	transfers := []Transfer{}
 	for _, val := range req.Transfers {
 		t := Transfer{
-			To:    val.To,
-			Value: val.Value,
+			To:       val.To,
+			Value:    val.Value,
+			DateTime: val.DateTime,
 		}
 		transfers = append(transfers, t)
 	}
 
-	if err := cr.svc.Transfer(stub, req.Owner, req.Value, transfers...); err != nil {
+	if err := cr.svc.Transfer(stub, req.Owner, req.DateTime, req.Value, transfers...); err != nil {
 		return shim.Error(err.Error())
 	}
 
