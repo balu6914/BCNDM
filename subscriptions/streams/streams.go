@@ -29,6 +29,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		return subscriptions.Stream{}, err
 	}
 
+	parsedEndDate, _ := time.Parse(time.UTC.String(), s.GetEndDate())
 	stream := subscriptions.Stream{
 		ID:         s.GetId(),
 		Name:       s.GetName(),
@@ -44,7 +45,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		AccessType: s.GetAccessType(),
 		MaxCalls:   s.GetMaxCalls(),
 		MaxUnit:    s.GetMaxUnit(),
-		EndDate:    s.GetEndDate(),
+		EndDate:    &parsedEndDate,
 	}
 
 	return stream, nil

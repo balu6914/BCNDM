@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"runtime/debug"
+	"time"
 
 	commonproto "github.com/datapace/datapace/proto/common"
 	streamsproto "github.com/datapace/datapace/proto/streams"
@@ -54,8 +54,9 @@ func (client grpcClient) One(ctx context.Context, id *commonproto.ID, _ ...grpc.
 		AccessType: sr.accessType,
 		MaxCalls:   sr.maxCalls,
 		MaxUnit:    sr.maxUnit,
-		EndDate:    sr.endDate,
+		EndDate:    sr.endDate.String(),
 	}
+	fmt.Printf("\n\n--In grpcClient.One \n stream: %+v\n\nres: %+v\n\nsr: %+v\n\n", stream, res, sr.endDate)
 	return &stream, sr.err
 }
 
@@ -66,6 +67,8 @@ func encodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 
 func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*streamsproto.Stream)
+	parsedEndDate, _ := time.Parse(time.UTC.String(), res.GetEndDate())
+
 	stream := oneRes{
 		id:         res.GetId(),
 		name:       res.GetName(),
@@ -81,11 +84,9 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		accessType: res.GetAccessType(),
 		maxCalls:   res.GetMaxCalls(),
 		maxUnit:    res.GetMaxUnit(),
-		endDate:    res.GetEndDate(),
+		endDate:    &parsedEndDate,
 	}
-
-	fmt.Printf("\n\n--In decodeOneResponse: %v\n\n%v\n", stream, grpcRes)
-	debug.PrintStack()
+	fmt.Printf("\n\n--In decodeOneResponse \n stream: %+v\n\nres: %+v\ngrpcRes: %+v\n\n", stream, res, grpcRes)
 
 	return stream, nil
 }
