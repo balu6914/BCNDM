@@ -427,7 +427,7 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 
 func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
 	now := time.Now()
-	fmt.Println("In isExpired: ", stream.EndDate, "-", now)
+	fmt.Println("\nIn isExpired: ", stream.EndDate, "-", now)
 	if stream.EndDate != nil && now.After(*stream.EndDate) {
 		isExpired = true
 	}

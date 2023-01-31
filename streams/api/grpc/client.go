@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"fmt"
+	"runtime/debug"
 
 	commonproto "github.com/datapace/datapace/proto/common"
 	streamsproto "github.com/datapace/datapace/proto/streams"
@@ -52,8 +54,8 @@ func (client grpcClient) One(ctx context.Context, id *commonproto.ID, _ ...grpc.
 		AccessType: sr.accessType,
 		MaxCalls:   sr.maxCalls,
 		MaxUnit:    sr.maxUnit,
+		EndDate:    sr.endDate,
 	}
-
 	return &stream, sr.err
 }
 
@@ -81,6 +83,9 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		maxUnit:    res.GetMaxUnit(),
 		endDate:    res.GetEndDate(),
 	}
+
+	fmt.Printf("\n\n--In decodeOneResponse: %v\n\n%v\n", stream, grpcRes)
+	debug.PrintStack()
 
 	return stream, nil
 }
