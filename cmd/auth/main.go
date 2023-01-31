@@ -395,6 +395,173 @@ func initAdmin(svc auth.Service, adminEmail, adminPassword string, logger log.Lo
 						Key: "ownerID",
 					},
 				},
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "user",
+					Condition: auth.SimpleCondition{
+						Key: "id",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "token",
+				},
+			},
+		},
+		"buyer": {
+			Name:    "buyer",
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Create,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Create,
+					Type:   "contract",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "stream",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.List,
+					Type:   "stream",
+				},
+				{
+					Action: auth.List,
+					Type:   "contract",
+				},
+				{
+					Action: auth.List,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.List,
+					Type:   "user",
+				},
+				{
+					Action: auth.Sign,
+					Type:   "contract",
+				},
+				{
+					Action: auth.Read,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Read,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+
+				{
+					Action: auth.Any,
+					Type:   "subscription",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "user",
+					Condition: auth.SimpleCondition{
+						Key: "id",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "token",
+				},
+			},
+		},
+		"seller": {
+			Name:    "seller",
+			Owner:   user.ID,
+			Version: "1.0.0",
+			Rules: []auth.Rule{
+				{
+					Action: auth.Create,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Create,
+					Type:   "contract",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "stream",
+				},
+				{
+					Action: auth.CreateBulk,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.List,
+					Type:   "stream",
+				},
+				{
+					Action: auth.List,
+					Type:   "contract",
+				},
+				{
+					Action: auth.List,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.List,
+					Type:   "user",
+				},
+				{
+					Action: auth.Sign,
+					Type:   "contract",
+				},
+				{
+					Action: auth.Read,
+					Type:   "stream",
+				},
+				{
+					Action: auth.Read,
+					Type:   "subscription",
+				},
+				{
+					Action: auth.Any,
+					Type:   "stream",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
+				{
+					Action: auth.Any,
+					Type:   "contract",
+					Condition: auth.SimpleCondition{
+						Key: "ownerID",
+					},
+				},
 
 				{
 					Action: auth.Any,
