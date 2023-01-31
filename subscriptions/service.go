@@ -427,7 +427,6 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 
 func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
 	now := time.Now()
-	fmt.Println("\nIn isExpired: ", stream.EndDate, "-", now)
 	if stream.EndDate != nil && now.After(*stream.EndDate) {
 		isExpired = true
 	}
@@ -435,7 +434,6 @@ func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
 }
 
 func (ss subscriptionsService) isWithinExpiry(stream Stream, sub Subscription) (isAllowed bool) {
-	fmt.Println("In isWithinExpiry: ", stream.EndDate, "-", sub.EndDate)
 	if stream.EndDate != nil && sub.EndDate.Before(*stream.EndDate) {
 		isAllowed = true
 	}

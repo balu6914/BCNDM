@@ -29,7 +29,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		return subscriptions.Stream{}, err
 	}
 
-	parsedEndDate, _ := time.Parse(time.UTC.String(), s.GetEndDate())
+	parsedEndDate, _ := time.Parse(time.RFC3339, s.GetEndDate())
 	stream := subscriptions.Stream{
 		ID:         s.GetId(),
 		Name:       s.GetName(),

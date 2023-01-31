@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/datapace/datapace/streams"
 
@@ -36,7 +36,6 @@ func (s grpcServer) One(ctx context.Context, id *commonproto.ID) (*streamsproto.
 	if err != nil {
 		return nil, encodeError(err)
 	}
-	fmt.Printf("\n\n--In server.One\n\nres: %+v\n\n", res)
 
 	return res.(*streamsproto.Stream), nil
 }
@@ -63,7 +62,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		AccessType: res.accessType,
 		MaxCalls:   res.maxCalls,
 		MaxUnit:    res.maxUnit,
-		EndDate:    res.endDate.String(),
+		EndDate:    res.endDate.Format(time.RFC3339),
 	}
 
 	return &stream, nil
