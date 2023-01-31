@@ -36,7 +36,7 @@ type registerReq struct {
 	Company      string                 `json:"company,omitempty"`
 	Address      string                 `json:"address,omitempty"`
 	Phone        string                 `json:"phone,omitempty"`
-	Role         string                 `json:"role,omitempty"`
+	Role         string                 `json:"role"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -81,7 +81,8 @@ func (req registerReq) validate() error {
 	}
 
 	if req.Role != auth.UserRole && req.Role != auth.AdminRole &&
-		req.Role != auth.AdminWalletRole && req.Role != auth.AdminUserRole {
+		req.Role != auth.AdminWalletRole && req.Role != auth.AdminUserRole &&
+		req.Role != auth.SellerRole && req.Role != auth.BuyerRole {
 		return errInvalidRole
 	}
 

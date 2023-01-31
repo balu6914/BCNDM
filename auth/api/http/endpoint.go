@@ -27,6 +27,7 @@ func registerEndpoint(svc auth.Service) endpoint.Endpoint {
 			Role:         req.Role,
 			Metadata:     req.Metadata,
 		}
+
 		id, err := svc.Register(req.key, user)
 		return createRes{ID: id}, err
 	}
