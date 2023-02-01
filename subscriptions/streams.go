@@ -1,5 +1,7 @@
 package subscriptions
 
+import "time"
+
 // StreamsService contains API for fetching stream data.
 type StreamsService interface {
 	// One returns specified stream by its id.
@@ -22,4 +24,5 @@ type Stream struct {
 	AccessType string
 	MaxCalls   uint64
 	MaxUnit    string
+	EndDate    *time.Time
 }

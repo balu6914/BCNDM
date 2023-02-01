@@ -375,7 +375,7 @@ definitions:
         type: string
         format: date-time
         description: Time when stream was created
-      end_date:
+      endDate:
         type: string
         format: date-time
         description: Time to which stream is valid
@@ -488,7 +488,7 @@ definitions:
         enum: [public, protected, private]
         description: Stream visibility
         example: public
-      end_date:
+      endDate:
         type: string
         format: date-time
         description: Time to which stream is valid

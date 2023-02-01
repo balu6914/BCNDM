@@ -235,7 +235,6 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 		}
 		return streams.Stream{}, err
 	}
-
 	stream := fromDBStream(dbs)
 	return stream, nil
 }
@@ -271,7 +270,7 @@ type dbStream struct {
 	Terms       string              `bson:"terms,omitempty"`
 	MaxCalls    uint64              `bson:"max_calls,omitempty"`
 	StartDate   *time.Time          `bson:"start_date,omitempty"`
-	EndDate     *time.Time          `bson:"end_date,omitempty"`
+	EndDate     *time.Time          `bson:"endDate,omitempty"`
 	External    bool                `bson:"external"`
 	BQ          dbBigQuery          `bson:"big_query,omitempty"`
 	AccessType  streams.AccessType  `bson:"accessType,omitempty"`

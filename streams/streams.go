@@ -85,11 +85,11 @@ type Stream struct {
 	Price        uint64                 `json:"price,omitempty"`
 	Location     Location               `json:"location,omitempty"`
 	Terms        string                 `json:"terms,omitempty"`
+	EndDate      *time.Time             `json:"endDate,omitempty"`
 	EncodedTerms string                 `json:"encodedTerms,omitempty"`
 	MaxCalls     uint64                 `json:"max_calls,omitempty"`
 	MaxUnit      MaxUnitType            `json:"max_unit,omitempty"`
 	StartDate    *time.Time             `json:"start_date,omitempty"`
-	EndDate      *time.Time             `json:"end_date,omitempty"`
 	External     bool                   `json:"external,omitempty"`
 	BQ           BigQuery               `json:"bq,omitempty"`
 	AccessType   AccessType             `json:"accessType,omitempty"`

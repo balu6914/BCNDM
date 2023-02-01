@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	commonproto "github.com/datapace/datapace/proto/common"
 	streamsproto "github.com/datapace/datapace/proto/streams"
@@ -53,7 +54,9 @@ func (client grpcClient) One(ctx context.Context, id *commonproto.ID, _ ...grpc.
 		MaxCalls:   sr.maxCalls,
 		MaxUnit:    sr.maxUnit,
 	}
-
+	if sr.endDate != nil {
+		stream.EndDate = sr.endDate.Format(time.RFC3339)
+	}
 	return &stream, sr.err
 }
 
@@ -64,6 +67,7 @@ func encodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 
 func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*streamsproto.Stream)
+
 	stream := oneRes{
 		id:         res.GetId(),
 		name:       res.GetName(),
@@ -80,6 +84,10 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		maxCalls:   res.GetMaxCalls(),
 		maxUnit:    res.GetMaxUnit(),
 	}
-
+	endDateString := res.GetEndDate()
+	if endDateString != "" {
+		parsedEndDate, _ := time.Parse(time.RFC3339, endDateString)
+		stream.endDate = &parsedEndDate
+	}
 	return stream, nil
 }

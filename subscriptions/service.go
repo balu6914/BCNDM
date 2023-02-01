@@ -281,6 +281,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
 
 	stream, err := ss.streams.One(sub.StreamID)
+	fmt.Printf("In AddSubscription: %+v\n", stream)
 	if err != nil {
 		return Subscription{}, ErrNotFound
 	}
@@ -292,6 +293,16 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	err = ss.checkStreamAccess(userID, stream)
 	if err != nil {
 		return Subscription{}, err
+	}
+
+	// check if stream is expired
+	if isExpired := ss.isExpired(stream); isExpired {
+		return Subscription{}, errors.New("subscription is expired")
+	}
+
+	// check if stream is expiring within requested time
+	if ok := ss.isWithinExpiry(stream, sub); !ok {
+		return Subscription{}, errors.New("subscription is set to expire within requested time frame")
 	}
 
 	sub.StreamOwner = stream.Owner
@@ -410,6 +421,23 @@ func (ss subscriptionsService) checkStreamAccess(userId string, stream Stream) (
 		case a.State != accessv2.StateApproved:
 			err = fmt.Errorf("%w: access request state: %s", ErrStreamAccess, a.State.String())
 		}
+	}
+	return
+}
+
+func (ss subscriptionsService) isExpired(stream Stream) (isExpired bool) {
+	now := time.Now()
+	if stream.EndDate != nil && !stream.EndDate.IsZero() && now.After(*stream.EndDate) {
+		fmt.Printf("isZero: %+v", stream.EndDate.IsZero())
+		isExpired = true
+	}
+	return
+}
+
+func (ss subscriptionsService) isWithinExpiry(stream Stream, sub Subscription) (isAllowed bool) {
+	isAllowed = true
+	if stream.EndDate != nil && !stream.EndDate.IsZero() && sub.EndDate.After(*stream.EndDate) {
+		isAllowed = false
 	}
 	return
 }
