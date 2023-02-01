@@ -6,6 +6,8 @@ const (
 	AdminUserRole   = "admin_user"
 	AdminWalletRole = "admin_wallet"
 	UserRole        = "user"
+	BuyerRole       = "buyer"
+	SellerRole      = "seller"
 )
 
 // Policy consists of rules and constranits to validate Resource against.

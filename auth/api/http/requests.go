@@ -81,7 +81,8 @@ func (req registerReq) validate() error {
 	}
 
 	if req.Role != auth.UserRole && req.Role != auth.AdminRole &&
-		req.Role != auth.AdminWalletRole && req.Role != auth.AdminUserRole {
+		req.Role != auth.AdminWalletRole && req.Role != auth.AdminUserRole &&
+		req.Role != auth.SellerRole && req.Role != auth.BuyerRole {
 		return errInvalidRole
 	}
 
