@@ -90,7 +90,6 @@ type Stream struct {
 	MaxCalls     uint64                 `json:"max_calls,omitempty"`
 	MaxUnit      MaxUnitType            `json:"max_unit,omitempty"`
 	StartDate    *time.Time             `json:"start_date,omitempty"`
-	EndDate      *time.Time             `json:"end_date,omitempty"`
 	External     bool                   `json:"external,omitempty"`
 	BQ           BigQuery               `json:"bq,omitempty"`
 	AccessType   AccessType             `json:"accessType,omitempty"`

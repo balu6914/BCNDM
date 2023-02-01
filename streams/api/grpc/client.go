@@ -53,7 +53,9 @@ func (client grpcClient) One(ctx context.Context, id *commonproto.ID, _ ...grpc.
 		AccessType: sr.accessType,
 		MaxCalls:   sr.maxCalls,
 		MaxUnit:    sr.maxUnit,
-		EndDate:    sr.endDate.Format(time.RFC3339),
+	}
+	if sr.endDate != nil {
+		stream.EndDate = sr.endDate.Format(time.RFC3339)
 	}
 	return &stream, sr.err
 }
@@ -65,7 +67,6 @@ func encodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 
 func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(*streamsproto.Stream)
-	parsedEndDate, _ := time.Parse(time.RFC3339, res.GetEndDate())
 
 	stream := oneRes{
 		id:         res.GetId(),
@@ -82,7 +83,11 @@ func decodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		accessType: res.GetAccessType(),
 		maxCalls:   res.GetMaxCalls(),
 		maxUnit:    res.GetMaxUnit(),
-		endDate:    &parsedEndDate,
+	}
+	endDateString := res.GetEndDate()
+	if endDateString != "" {
+		parsedEndDate, _ := time.Parse(time.RFC3339, endDateString)
+		stream.endDate = &parsedEndDate
 	}
 	return stream, nil
 }

@@ -47,6 +47,10 @@ func decodeOneRequest(_ context.Context, grpcReq interface{}) (interface{}, erro
 
 func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, error) {
 	res := grpcRes.(oneRes)
+	var endDateString string
+	if res.endDate != nil {
+		endDateString = res.endDate.Format(time.RFC3339)
+	}
 	stream := streamsproto.Stream{
 		Id:         res.id,
 		Name:       res.name,
@@ -62,7 +66,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		AccessType: res.accessType,
 		MaxCalls:   res.maxCalls,
 		MaxUnit:    res.maxUnit,
-		EndDate:    res.endDate.Format(time.RFC3339),
+		EndDate:    endDateString,
 	}
 
 	return &stream, nil

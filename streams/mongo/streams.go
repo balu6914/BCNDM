@@ -7,8 +7,6 @@ import (
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/streams"
 
-	"time"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -272,7 +270,7 @@ type dbStream struct {
 	Terms       string              `bson:"terms,omitempty"`
 	MaxCalls    uint64              `bson:"max_calls,omitempty"`
 	StartDate   *time.Time          `bson:"start_date,omitempty"`
-	EndDate     *time.Time          `bson:"end_date,omitempty"`
+	EndDate     *time.Time          `bson:"endDate,omitempty"`
 	External    bool                `bson:"external"`
 	BQ          dbBigQuery          `bson:"big_query,omitempty"`
 	AccessType  streams.AccessType  `bson:"accessType,omitempty"`
