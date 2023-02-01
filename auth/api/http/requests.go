@@ -36,7 +36,7 @@ type registerReq struct {
 	Company      string                 `json:"company,omitempty"`
 	Address      string                 `json:"address,omitempty"`
 	Phone        string                 `json:"phone,omitempty"`
-	Role         string                 `json:"role"`
+	Role         string                 `json:"role,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
