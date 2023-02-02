@@ -272,6 +272,7 @@ type dbStream struct {
 	StartDate   *time.Time          `bson:"start_date,omitempty"`
 	EndDate     *time.Time          `bson:"endDate,omitempty"`
 	External    bool                `bson:"external"`
+	Offer       bool                `bson:"offer"`
 	BQ          dbBigQuery          `bson:"big_query,omitempty"`
 	AccessType  streams.AccessType  `bson:"accessType,omitempty"`
 	Metadata    bson.M              `bson:"metadata,omitempty"`
@@ -325,6 +326,7 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		StartDate:   stream.StartDate,
 		EndDate:     stream.EndDate,
 		External:    stream.External,
+		Offer:       stream.Offer,
 		BQ:          dbBQ,
 		AccessType:  stream.AccessType,
 		Metadata:    stream.Metadata,
@@ -369,6 +371,7 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		StartDate:   dbs.StartDate,
 		EndDate:     dbs.EndDate,
 		External:    dbs.External,
+		Offer:       dbs.Offer,
 		BQ:          dbBQ,
 		AccessType:  dbs.AccessType,
 		Metadata:    dbs.Metadata,

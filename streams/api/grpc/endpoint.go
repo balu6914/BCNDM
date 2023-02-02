@@ -27,6 +27,7 @@ func oneEndpoint(svc streams.Service) endpoint.Endpoint {
 			url:        stream.URL,
 			price:      stream.Price,
 			external:   stream.External,
+			offer:      stream.Offer,
 			project:    stream.BQ.Project,
 			dataset:    stream.BQ.Dataset,
 			table:      stream.BQ.Table,

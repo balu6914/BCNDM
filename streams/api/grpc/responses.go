@@ -9,6 +9,7 @@ type oneRes struct {
 	url        string
 	price      uint64
 	external   bool
+	offer      bool
 	project    string
 	dataset    string
 	table      string
