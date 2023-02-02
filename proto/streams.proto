@@ -25,4 +25,5 @@ message Stream {
     uint64 maxCalls = 13;
     string maxUnit = 14;
     string endDate = 15;
+    bool offer = 16;
 }

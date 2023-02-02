@@ -91,6 +91,7 @@ type Stream struct {
 	MaxUnit      MaxUnitType            `json:"max_unit,omitempty"`
 	StartDate    *time.Time             `json:"start_date,omitempty"`
 	External     bool                   `json:"external,omitempty"`
+	Offer        bool                   `json:"offer,omitempty"`
 	BQ           BigQuery               `json:"bq,omitempty"`
 	AccessType   AccessType             `json:"accessType,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
@@ -144,6 +145,7 @@ func (s Stream) Attributes() map[string]string {
 		"maxCalls":    strconv.FormatUint(s.MaxCalls, 10),
 		"maxUnit":     string(s.MaxUnit),
 		"external":    strconv.FormatBool(s.External),
+		"offer":       strconv.FormatBool(s.Offer),
 	}
 }
 

@@ -58,6 +58,7 @@ func encodeOneResponse(_ context.Context, grpcRes interface{}) (interface{}, err
 		Url:        res.url,
 		Price:      res.price,
 		External:   res.external,
+		Offer:      res.offer,
 		Project:    res.project,
 		Dataset:    res.dataset,
 		Table:      res.table,
