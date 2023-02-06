@@ -138,6 +138,8 @@ func encodeUserResponse(_ context.Context, grpcRes interface{}) (interface{}, er
 		LastName:  resp.lastName,
 		Company:   resp.company,
 		Address:   resp.address,
+		Country:   resp.country,
+		Mobile:    resp.mobile,
 		Phone:     resp.phone,
 		Role:      resp.role,
 	}

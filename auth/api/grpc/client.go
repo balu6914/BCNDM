@@ -115,6 +115,8 @@ func (client grpcClient) UserById(ctx context.Context, id *commonproto.ID, _ ...
 		LastName:  u.lastName,
 		Company:   u.company,
 		Address:   u.address,
+		Country:   u.country,
+		Mobile:    u.mobile,
 		Phone:     u.phone,
 		Role:      u.role,
 	}, nil
@@ -177,6 +179,8 @@ func decodeUserResponse(_ context.Context, grpcRes interface{}) (interface{}, er
 		lastName:     resp.GetLastName(),
 		company:      resp.GetCompany(),
 		address:      resp.GetAddress(),
+		country:      resp.GetCountry(),
+		mobile:       resp.GetMobile(),
 		phone:        resp.GetPhone(),
 		role:         resp.GetRole(),
 		err:          nil,

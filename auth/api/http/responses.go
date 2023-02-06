@@ -69,6 +69,8 @@ type viewUserRes struct {
 	LastName     string                 `json:"last_name"`
 	Company      string                 `json:"company,omitempty"`
 	Address      string                 `json:"address,omitempty"`
+	Country      string                 `json:"country,omitempty"`
+	Mobile       string                 `json:"mobile,omitempty"`
 	Phone        string                 `json:"phone,omitempty"`
 	Disabled     bool                   `json:"disabled,omitempty"`
 	Locked       bool                   `json:"locked,omitempty"`

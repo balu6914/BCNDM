@@ -23,6 +23,8 @@ type userResp struct {
 	lastName     string
 	company      string
 	address      string
+	country      string
+	mobile       string
 	phone        string
 	role         string
 	err          error

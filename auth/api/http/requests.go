@@ -17,6 +17,8 @@ var (
 	errInvalidCompany       = errors.New("invalid company name length")
 	errInvalidPhone         = errors.New("invalid phone number length")
 	errInvalidAddress       = errors.New("invalid address length")
+	errInvalidMobile        = errors.New("invalid mobile number length")
+	errInvalidCountry       = errors.New("invalid country length")
 	errInvalidRole          = errors.New("invalid role")
 	errInvalidPolicyRules   = errors.New("invalid policy rules list")
 	errInvalidPolicyVersion = errors.New("invalid policy version")
@@ -35,6 +37,8 @@ type registerReq struct {
 	LastName     string                 `json:"last_name,omitempty"`
 	Company      string                 `json:"company,omitempty"`
 	Address      string                 `json:"address,omitempty"`
+	Country      string                 `json:"country,omitempty"`
+	Mobile       string                 `json:"mobile,omitempty"`
 	Phone        string                 `json:"phone,omitempty"`
 	Role         string                 `json:"role,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
@@ -47,6 +51,8 @@ const (
 	maxNameLength     = 32
 	maxCompanyLength  = 32
 	maxPhoneLength    = 32
+	maxMobileLength   = 32
+	maxCountryLength  = 128
 	maxAddressLength  = 128
 )
 
@@ -74,6 +80,14 @@ func (req registerReq) validate() error {
 
 	if len(req.Phone) > maxPhoneLength {
 		return errInvalidPhone
+	}
+
+	if len(req.Mobile) > maxMobileLength {
+		return errInvalidMobile
+	}
+
+	if len(req.Country) > maxCountryLength {
+		return errInvalidCountry
 	}
 
 	if len(req.Address) > maxAddressLength {
@@ -186,6 +200,8 @@ type updateReq struct {
 	LastName     *string                 `json:"last_name,omitempty"`
 	Company      *string                 `json:"company,omitempty"`
 	Address      *string                 `json:"address,omitempty"`
+	Country      *string                 `json:"country,omitempty"`
+	Mobile       *string                 `json:"mobile,omitempty"`
 	Phone        *string                 `json:"phone,omitempty"`
 	Role         *string                 `json:"role,omitempty"`
 	Password     *string                 `json:"password"`
@@ -214,6 +230,9 @@ func (req updateReq) toUser() auth.User {
 	if req.Address != nil {
 		ret.Address = *req.Address
 	}
+	if req.Country != nil {
+		ret.Country = *req.Country
+	}
 	if req.Company != nil {
 		ret.Company = *req.Company
 	}
@@ -237,6 +256,9 @@ func (req updateReq) toUser() auth.User {
 	}
 	if req.Phone != nil {
 		ret.Phone = *req.Phone
+	}
+	if req.Mobile != nil {
+		ret.Mobile = *req.Mobile
 	}
 	if req.Role != nil {
 		ret.Role = *req.Role

@@ -15,6 +15,8 @@ type User struct {
 	LastName                  string
 	Company                   string
 	Address                   string
+	Country                   string
+	Mobile                    string
 	Phone                     string
 	Role                      string
 	Disabled                  bool
@@ -43,6 +45,8 @@ func (u User) Attributes() map[string]string {
 		"firstName":    u.FirstName,
 		"lastName":     u.LastName,
 		"address":      u.Address,
+		"country":      u.Country,
+		"mobile":       u.Mobile,
 		"phone":        u.Phone,
 		"contactEmail": u.ContactEmail,
 		"role":         u.Role,

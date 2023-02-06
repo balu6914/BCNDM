@@ -3,10 +3,11 @@ package grpc_test
 import (
 	"context"
 	"fmt"
-	commonproto "github.com/datapace/datapace/proto/common"
 	"sync"
 	"testing"
 	"time"
+
+	commonproto "github.com/datapace/datapace/proto/common"
 
 	"github.com/datapace/datapace/auth"
 	grpcapi "github.com/datapace/datapace/auth/api/grpc"
@@ -128,6 +129,8 @@ var admin = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.AdminRole,
 	Policies:  []auth.Policy{policies["admin"]},

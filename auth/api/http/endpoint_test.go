@@ -130,6 +130,8 @@ var user = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
@@ -143,6 +145,8 @@ var userForUpdate = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
@@ -156,6 +160,8 @@ var nonAdminForUpdate = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
@@ -169,6 +175,8 @@ var admin = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.AdminRole,
 	Policies:  []auth.Policy{policies["admin"]},
@@ -182,6 +190,8 @@ var nonadmin = auth.User{
 	LastName:  "Doe",
 	Company:   "company",
 	Address:   "address",
+	Country:   "Jamaica",
+	Mobile:    "+0123456789",
 	Phone:     "+1234567890",
 	Role:      auth.UserRole,
 	Policies:  []auth.Policy{policies["user"]},
@@ -259,6 +269,8 @@ func TestRegister(t *testing.T) {
 		LastName:     user.LastName,
 		Company:      user.Company,
 		Address:      user.Address,
+		Country:      user.Country,
+		Mobile:       user.Mobile,
 		Phone:        user.Phone,
 	})
 
@@ -635,5 +647,7 @@ type testRegisterReq struct {
 	LastName     string `json:"last_name,omitempty"`
 	Company      string `json:"company,omitempty"`
 	Address      string `json:"address,omitempty"`
+	Country      string `json:"country,omitempty"`
+	Mobile       string `json:"mobile,omitempty"`
 	Phone        string `json:"phone,omitempty"`
 }

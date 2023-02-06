@@ -39,4 +39,6 @@ message User {
     string address = 6;
     string phone = 7;
     string role = 8;
+    string mobile = 9;
+    string country = 10;
 }

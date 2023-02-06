@@ -55,6 +55,8 @@ func userByEndpoint(svc auth.Service) endpoint.Endpoint {
 			lastName:     u.LastName,
 			company:      u.Company,
 			address:      u.Address,
+			country:      u.Country,
+			mobile:       u.Mobile,
 			phone:        u.Phone,
 			role:         u.Role,
 			err:          nil,
