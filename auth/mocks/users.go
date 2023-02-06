@@ -117,6 +117,12 @@ func (urm *userRepositoryMock) Update(user auth.User) error {
 	if user.Address != "" {
 		u.Address = user.Address
 	}
+	if user.Country != "" {
+		u.Country = user.Country
+	}
+	if user.Mobile != "" {
+		u.Mobile = user.Mobile
+	}
 	if user.Phone != "" {
 		u.Phone = user.Phone
 	}

@@ -108,6 +108,8 @@ var user = auth.User{
 	LastName:     "last",
 	Company:      "company",
 	Address:      "address",
+	Country:      "Jamaica",
+	Mobile:       "+0123456789",
 	Phone:        "+1234567890",
 	Policies:     []auth.Policy{policies["user"]},
 }
@@ -121,6 +123,8 @@ var admin = auth.User{
 	LastName:     "last",
 	Company:      "company",
 	Address:      "address",
+	Country:      "Jamaica",
+	Mobile:       "+0123456789",
 	Phone:        "+1234567890",
 	Role:         "admin",
 	Policies:     []auth.Policy{policies["admin"]},
@@ -135,6 +139,8 @@ var noAdmin = auth.User{
 	LastName:     "last",
 	Company:      "company",
 	Address:      "address",
+	Country:      "Jamaica",
+	Mobile:       "+0123456789",
 	Phone:        "+1234567890",
 	Policies:     []auth.Policy{policies["user"]},
 }

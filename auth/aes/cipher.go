@@ -45,6 +45,14 @@ func (cipher aesCipher) Encrypt(user auth.User) (auth.User, error) {
 		user.Address = base64.StdEncoding.EncodeToString(gcm.Seal(nonce, nonce, []byte(user.Address), nil))
 	}
 
+	if user.Country != "" {
+		user.Country = base64.StdEncoding.EncodeToString(gcm.Seal(nonce, nonce, []byte(user.Country), nil))
+	}
+
+	if user.Mobile != "" {
+		user.Mobile = base64.StdEncoding.EncodeToString(gcm.Seal(nonce, nonce, []byte(user.Mobile), nil))
+	}
+
 	if user.Phone != "" {
 		user.Phone = base64.StdEncoding.EncodeToString(gcm.Seal(nonce, nonce, []byte(user.Phone), nil))
 	}
@@ -69,8 +77,20 @@ func (cipher aesCipher) Decrypt(user auth.User) (auth.User, error) {
 		}
 	}
 
+	if user.Country != "" {
+		if user.Country, err = decrypt(user.Country, gcm); err != nil {
+			return auth.User{}, err
+		}
+	}
+
 	if user.Company != "" {
 		if user.Company, err = decrypt(user.Company, gcm); err != nil {
+			return auth.User{}, err
+		}
+	}
+
+	if user.Mobile != "" {
+		if user.Mobile, err = decrypt(user.Mobile, gcm); err != nil {
 			return auth.User{}, err
 		}
 	}
