@@ -54,6 +54,13 @@ func MakeHandler(svc auth.Service) http.Handler {
 		opts...,
 	))
 
+	r.Head("/users/:id", kithttp.NewServer(
+		viewPublicUserDataEndpoint(svc),
+		decodeIdentity,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Patch("/users/:id", kithttp.NewServer(
 		updateUserEndpoint(svc),
 		decodeUpdate,

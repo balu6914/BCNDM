@@ -144,6 +144,28 @@ func viewUserEndpoint(svc auth.Service) endpoint.Endpoint {
 	}
 }
 
+func viewPublicUserDataEndpoint(svc auth.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(identityReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+		// TODO implement policy validation
+		user, err := svc.ViewUserById(req.ID)
+		if err != nil {
+			return nil, err
+		}
+		res := viewPublicUserDataRes{
+			FirstName:   user.FirstName,
+			LastName:    user.LastName,
+			Company:     user.Company,
+			CreatedDate: user.CreatedDate,
+			Metadata:    user.Metadata,
+		}
+		return res, nil
+	}
+}
+
 func listUsersEndpoint(svc auth.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(identityReq)

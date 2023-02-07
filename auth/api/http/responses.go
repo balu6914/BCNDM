@@ -92,6 +92,26 @@ func (res viewUserRes) empty() bool {
 	return false
 }
 
+type viewPublicUserDataRes struct {
+	FirstName   string                 `json:"first_name"`
+	LastName    string                 `json:"last_name"`
+	Company     string                 `json:"company,omitempty"`
+	CreatedDate *time.Time             `json:"created_date,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+func (res viewPublicUserDataRes) code() int {
+	return http.StatusOK
+}
+
+func (res viewPublicUserDataRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res viewPublicUserDataRes) empty() bool {
+	return false
+}
+
 type listUsersRes struct {
 	Users []viewUserRes `json:"users"`
 }

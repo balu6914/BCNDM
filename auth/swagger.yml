@@ -51,6 +51,28 @@ paths:
         500:
           $ref: "#/responses/ServiceError"
   /users/{id}:
+    head:
+      summary: Returns public user info (name, creation date, metadata). Users having policy "seller" or "buyer" are able to get this public info for another user.
+      tags:
+        - users
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - name: id
+          description: User ID.
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: User data retrieved.
+          schema:
+            $ref: '#/definitions/UserPublicRes'
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: User does not exist.
+        500:
+          $ref: "#/responses/ServiceError"
     get:
       summary: Retrieves user info. User can retrieve info for it's own ID contained in token. Admin can retrieve infor for any ID.
       tags:
@@ -407,6 +429,20 @@ definitions:
         type: string
         format: password
         description: Free-form account password used for acquiring auth token(s).
+      metadata:
+        $ref: '#/definitions/Metadata'
+
+  UserPublicRes:
+    type: object
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      created_date:
+        type: string
+        format: date-time
+        description: User's created date
       metadata:
         $ref: '#/definitions/Metadata'
 

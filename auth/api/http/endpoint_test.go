@@ -1,4 +1,4 @@
-package http_test
+package http
 
 import (
 	"encoding/json"
@@ -14,14 +14,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/datapace/datapace/auth"
-	httpapi "github.com/datapace/datapace/auth/api/http"
 	"github.com/datapace/datapace/auth/mocks"
 
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	contentType  = "application/json"
 	token        = "token"
 	email        = "john.doe@email.com"
 	contactEmail = "john.doe@email.com"
@@ -221,7 +219,7 @@ func newService() (auth.Service, string) {
 }
 
 func newServer(svc auth.Service) *httptest.Server {
-	mux := httpapi.MakeHandler(svc)
+	mux := MakeHandler(svc)
 	return httptest.NewServer(mux)
 }
 
@@ -624,6 +622,46 @@ func TestView(t *testing.T) {
 		req := testRequest{
 			client: ts.Client(),
 			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/users/%s", ts.URL, tc.id),
+			token:  tc.token,
+		}
+		res, err := req.make()
+		assert.Nil(t, err, fmt.Sprintf("%s: unexpected error %s", desc, err))
+		assert.Equal(t, tc.status, res.StatusCode, fmt.Sprintf("%s: expected status code %d got %d", desc, tc.status, res.StatusCode))
+	}
+}
+
+func TestViewPublic(t *testing.T) {
+	svc, k := newService()
+	ts := newServer(svc)
+	defer ts.Close()
+
+	id, err := svc.Register(k, user)
+	require.Nil(t, err, "unexpected error registering user: %s", err)
+	key, err := svc.Login(user)
+	require.Nil(t, err, "unexpected error logging in user: %s", err)
+
+	cases := map[string]struct {
+		token  string
+		id     string
+		status int
+	}{
+		"view existing user": {
+			token:  key,
+			id:     id,
+			status: http.StatusOK,
+		},
+		"view user with empty token": {
+			token:  "",
+			id:     id,
+			status: http.StatusForbidden,
+		},
+	}
+
+	for desc, tc := range cases {
+		req := testRequest{
+			client: ts.Client(),
+			method: http.MethodHead,
 			url:    fmt.Sprintf("%s/users/%s", ts.URL, tc.id),
 			token:  tc.token,
 		}
