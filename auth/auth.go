@@ -347,11 +347,7 @@ func (as *authService) ViewUser(key, userID string) (User, error) {
 	if _, err := as.Authorize(key, Read, User{ID: userID}); err != nil {
 		return User{}, ErrUnauthorizedAccess
 	}
-	user, err := as.users.OneByID(userID)
-	if err != nil {
-		return User{}, ErrUnauthorizedAccess
-	}
-	return user, nil
+	return as.ViewUserById(userID)
 }
 
 func (as *authService) ViewUserById(id string) (User, error) {
