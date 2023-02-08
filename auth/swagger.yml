@@ -50,8 +50,8 @@ paths:
           description: Email is already taken.
         500:
           $ref: "#/responses/ServiceError"
-  /users/{id}:
-    head:
+  /users/public/{id}:
+    get:
       summary: Returns public user info (name, creation date, metadata). Users having policy "seller" or "buyer" are able to get this public info for another user.
       tags:
         - users
@@ -73,6 +73,7 @@ paths:
           description: User does not exist.
         500:
           $ref: "#/responses/ServiceError"
+  /users/{id}:
     get:
       summary: Retrieves user info. User can retrieve info for it's own ID contained in token. Admin can retrieve infor for any ID.
       tags:
