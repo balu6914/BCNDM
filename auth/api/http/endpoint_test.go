@@ -661,8 +661,8 @@ func TestViewPublic(t *testing.T) {
 	for desc, tc := range cases {
 		req := testRequest{
 			client: ts.Client(),
-			method: http.MethodHead,
-			url:    fmt.Sprintf("%s/users/%s", ts.URL, tc.id),
+			method: http.MethodGet,
+			url:    fmt.Sprintf("%s/users/public/%s", ts.URL, tc.id),
 			token:  tc.token,
 		}
 		res, err := req.make()
