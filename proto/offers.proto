@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package offers;
+
+option go_package = "github.com/datapace/datapace/proto/offers";
+
+service OffersService {
+    rpc GetOfferPrice(GetOfferPriceRequest) returns (GetOfferPriceResponse) {}
+}
+
+message GetOfferPriceRequest {
+    string streamId = 1;
+    string buyerId = 2;
+  }
+  
+  message GetOfferPriceResponse {
+    uint64 offerPrice = 1;
+  }
