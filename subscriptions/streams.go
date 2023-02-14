@@ -16,6 +16,7 @@ type Stream struct {
 	URL        string
 	Price      uint64
 	External   bool
+	Offer      bool
 	Project    string
 	Dataset    string
 	Table      string
