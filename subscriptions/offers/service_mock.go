@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-const price uint64 = 63
+const price uint64 = 15
 
 type serviceMock struct {
 }
@@ -14,6 +14,13 @@ func NewServiceMock() Service {
 }
 
 func (sm serviceMock) GetPrice(ctx context.Context, k OfferKey) (p OfferPrice, err error) {
-	p.Price = price
+	switch k.StreamId {
+	case "offer_accepted":
+		p.Price = price
+	case "unavailable":
+		err = ErrNotAvailable
+	default:
+		err = ErrNotAvailable
+	}
 	return
 }

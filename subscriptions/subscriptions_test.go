@@ -130,6 +130,17 @@ func TestAddSubscription(t *testing.T) {
 			err: nil,
 		},
 		{
+			desc: "pass when offers service is not available",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "unavailable",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: nil,
+		},
+		{
 			desc: "protected stream access type - fails when accessv2 service fails",
 			sub: subscriptions.Subscription{
 				ID:          bson.NewObjectId(),
