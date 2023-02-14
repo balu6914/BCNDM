@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	accessProtoV2 "github.com/datapace/datapace/proto/accessv2"
+	offersProto "github.com/datapace/datapace/proto/offers"
 	"github.com/datapace/datapace/subscriptions/accessv2"
+	"github.com/datapace/datapace/subscriptions/offers"
 	"github.com/datapace/datapace/subscriptions/pub"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"github.com/datapace/events/pubsub"
 	sharingApi "github.com/datapace/sharing/api/grpc"
 	sharingProto "github.com/datapace/sharing/proto"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/datapace/datapace"
 
@@ -46,6 +49,7 @@ const (
 	envMsgBusUrl       = "DATAPACE_MSG_BUS_URL"
 	envSubjFmtCreate   = "DATAPACE_SUBSCRIPTIONS_SUBJ_FMT_CREATE"
 	envAccessV2Url     = "DATAPACE_ACCESS_V2_URL"
+	envOffersUrl       = "DATAPACE_OFFERS_URL"
 
 	// HTTP prefixed, because all others are gRPC.
 	envProxyURL      = "DATAPACE_PROXY_URL"
@@ -68,6 +72,7 @@ const (
 	defMongoPass       = ""
 	defMongoDatabase   = "subscriptions"
 	defAccessV2Url     = "localhost:8081"
+	defOffersUrl       = "localhost:8081"
 
 	defMongoConnectTimeout = 5000
 	defMongoSocketTimeout  = 5000
@@ -89,6 +94,7 @@ type config struct {
 	MsgBusUrl           string
 	SubjFmt             pub.SubjectFormat
 	AccessV2Url         string
+	OffersUrl           string
 }
 
 func main() {
@@ -125,7 +131,14 @@ func main() {
 		accessV2Client = accessProtoV2.NewServiceClient(accessV2Conn)
 	}
 
-	svc := newService(ac, ms, sc, tc, sharingClient, accessV2Client, cfg.ProxyURL, logger)
+	offersConn := newOptionalGrpcConn(cfg.OffersUrl, logger)
+	var offersClient offersProto.OffersServiceClient = nil
+	if offersConn != nil {
+		defer offersConn.Close()
+		offersClient = offersProto.NewOffersServiceClient(offersConn)
+	}
+
+	svc := newService(ac, ms, sc, tc, sharingClient, accessV2Client, offersClient, cfg.ProxyURL, logger)
 
 	pubSubSvc, msgBusConnErr := pubsub.NewService(cfg.MsgBusUrl)
 	if msgBusConnErr != nil {
@@ -168,6 +181,7 @@ func loadConfig() config {
 			SubscriptionCreate: datapace.Env(envSubjFmtCreate, defSubjFmtCreate),
 		},
 		AccessV2Url: datapace.Env(envAccessV2Url, defAccessV2Url),
+		OffersUrl:   datapace.Env(envOffersUrl, defOffersUrl),
 	}
 }
 
@@ -211,7 +225,8 @@ func newOptionalGrpcConn(url string, logger log.Logger) *grpc.ClientConn {
 func newService(
 	ac authproto.AuthServiceClient, ms *mgo.Session, sc streamsproto.StreamsServiceClient,
 	tc transactionsproto.TransactionsServiceClient, sharingClient sharingProto.SharingServiceClient,
-	accessV2Client accessProtoV2.ServiceClient, proxyURL string, logger log.Logger,
+	accessV2Client accessProtoV2.ServiceClient, offersClient offersProto.OffersServiceClient,
+	proxyURL string, logger log.Logger,
 ) subscriptions.Service {
 	ss := streams.NewService(sc)
 	ts := transactions.NewService(tc)
@@ -225,10 +240,15 @@ func newService(
 		accessV2Svc = accessv2.NewService(accessV2Client)
 		accessV2Svc = accessv2.NewLoggingMiddleware(accessV2Svc, logger)
 	}
+	var offersSvc offers.Service = nil
+	if offersClient != nil {
+		offersSvc = offers.NewService(offersClient)
+		offersSvc = offers.NewLoggingMiddleware(offersSvc, logger)
+	}
 	ps := proxy.New(proxyURL)
 
 	repo := mongo.NewSubscriptionRepository(ms)
-	svc := subscriptions.New(ac, repo, ss, ps, ts, sharingSvc, accessV2Svc)
+	svc := subscriptions.New(ac, repo, ss, ps, ts, sharingSvc, accessV2Svc, offersSvc)
 
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(

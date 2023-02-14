@@ -2,10 +2,12 @@ package subscriptions_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/datapace/datapace/subscriptions/accessv2"
+	"github.com/datapace/datapace/subscriptions/offers"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2/bson"
@@ -51,7 +53,8 @@ func newService(tokens map[string]string) subscriptions.Service {
 	auth := mocks.NewAuthClient(tokens, nil)
 	sharingSvc := sharing.NewServiceMock()
 	accessV2Svc := accessv2.NewServiceMock()
-	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc, accessV2Svc)
+	offersSvc := offers.NewServiceMock()
+	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc, accessV2Svc, offersSvc)
 }
 
 func TestAddSubscription(t *testing.T) {
@@ -117,6 +120,17 @@ func TestAddSubscription(t *testing.T) {
 		},
 		{
 			desc: "protected stream access type - pass when accessv2 service is not available",
+			sub: subscriptions.Subscription{
+				ID:          bson.NewObjectId(),
+				UserID:      "unavailable",
+				StreamID:    streamId4,
+				StreamOwner: user2ID,
+				Hours:       1,
+			},
+			err: nil,
+		},
+		{
+			desc: "pass when offers service is not available",
 			sub: subscriptions.Subscription{
 				ID:          bson.NewObjectId(),
 				UserID:      "unavailable",

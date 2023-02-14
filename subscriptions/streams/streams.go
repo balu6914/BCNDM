@@ -37,6 +37,7 @@ func (ss streamsService) One(id string) (subscriptions.Stream, error) {
 		URL:        s.GetUrl(),
 		Price:      s.GetPrice(),
 		External:   s.GetExternal(),
+		Offer:      s.GetOffer(),
 		Project:    s.GetProject(),
 		Dataset:    s.GetDataset(),
 		Table:      s.GetTable(),

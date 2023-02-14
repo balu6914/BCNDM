@@ -10,6 +10,7 @@ import (
 
 	"github.com/datapace/datapace/streams"
 	"github.com/datapace/datapace/subscriptions/accessv2"
+	"github.com/datapace/datapace/subscriptions/offers"
 	"github.com/datapace/datapace/subscriptions/sharing"
 	"gopkg.in/mgo.v2/bson"
 
@@ -83,10 +84,11 @@ type subscriptionsService struct {
 	transactions  TransactionsService
 	sharingSvc    sharing.Service
 	accessV2Svc   accessv2.Service
+	offersSvc     offers.Service
 }
 
 // New instantiates the domain service implementation.
-func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService, sharingSvc sharing.Service, accessV2Svc accessv2.Service) Service {
+func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams StreamsService, proxy Proxy, transactions TransactionsService, sharingSvc sharing.Service, accessV2Svc accessv2.Service, offersSvc offers.Service) Service {
 	return &subscriptionsService{
 		auth:          auth,
 		subscriptions: subs,
@@ -95,6 +97,7 @@ func New(auth authproto.AuthServiceClient, subs SubscriptionRepository, streams 
 		transactions:  transactions,
 		sharingSvc:    sharingSvc,
 		accessV2Svc:   accessV2Svc,
+		offersSvc:     offersSvc,
 	}
 }
 
@@ -281,7 +284,6 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.EndDate = time.Now().Add(time.Hour * time.Duration(sub.Hours))
 
 	stream, err := ss.streams.One(sub.StreamID)
-	fmt.Printf("In AddSubscription: %+v\n", stream)
 	if err != nil {
 		return Subscription{}, ErrNotFound
 	}
@@ -308,6 +310,16 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.StreamOwner = stream.Owner
 	sub.StreamName = stream.Name
 	sub.StreamPrice = stream.Price
+
+	k := offers.OfferKey{
+		StreamId: sub.StreamID,
+		BuyerId:  userID,
+	}
+	offPrice, err := ss.offersSvc.GetPrice(context.TODO(), k)
+	if err == nil {
+		sub.StreamPrice = offPrice.Price
+	}
+
 	url := stream.URL
 
 	var ds *bigquery.Dataset
@@ -349,7 +361,7 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 
 	// do not invoke transactions if the stream is shared to the current user
 	if !ss.isStreamSharedTo(stream.ID, userID) {
-		if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, stream.Price*sub.Hours); err != nil {
+		if err := ss.transactions.Transfer(stream.ID, userID, stream.Owner, sub.StreamPrice*sub.Hours); err != nil {
 			if ds != nil {
 				ds.Delete(context.Background())
 			}
