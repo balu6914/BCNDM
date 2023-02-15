@@ -11,10 +11,15 @@ import (
 )
 
 var _ streams.StreamRepository = (*streamRepositoryMock)(nil)
+var _ streams.CategoryRepository = (*categoryRepositoryMock)(nil)
 
 type streamRepositoryMock struct {
 	mu      sync.Mutex
 	streams map[string]streams.Stream
+}
+
+type categoryRepositoryMock struct {
+	mu sync.Mutex
 }
 
 // NewStreamRepository creates in-memory stream repository.
@@ -24,6 +29,11 @@ func NewStreamRepository() streams.StreamRepository {
 	}
 }
 
+func NewCategoryRepository() streams.StreamRepository {
+	return &streamRepositoryMock{
+		streams: make(map[string]streams.Stream),
+	}
+}
 func (srm *streamRepositoryMock) Save(stream streams.Stream) (string, error) {
 	srm.mu.Lock()
 	defer srm.mu.Unlock()

@@ -63,7 +63,7 @@ func pointer(val uint64) *uint64 {
 
 func TestSearch(t *testing.T) {
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	partners := []string{}
 	all := []streams.Stream{}
@@ -98,7 +98,7 @@ func TestSearch(t *testing.T) {
 	all = append(all, s1, s2)
 	partners = append(partners, s1.Owner, s2.Owner)
 
-	val, _ := db.DB(dbName).C(collection).Count()
+	val, _ := db.DB(dbName).C(streamCollection).Count()
 	total := uint64(val)
 
 	cases := []struct {
@@ -282,7 +282,7 @@ func TestSearch(t *testing.T) {
 func TestSearchShared(t *testing.T) {
 
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	all := []streams.Stream{}
 	s0 := stream()
@@ -360,7 +360,7 @@ func TestSearchShared(t *testing.T) {
 func TestSearchByMetadata(t *testing.T) {
 
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	all := []streams.Stream{}
 	s0 := stream()
@@ -482,7 +482,7 @@ func TestSave(t *testing.T) {
 	db.ResetIndexCache()
 	db.Refresh()
 
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	s := stream()
 	s1 := stream()
@@ -518,7 +518,7 @@ func TestSaveAll(t *testing.T) {
 	db.ResetIndexCache()
 	db.Refresh()
 
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	validBulk := []streams.Stream{}
 	conflictBulk := []streams.Stream{}
@@ -563,7 +563,7 @@ func TestSaveAll(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	s := stream()
 	id, err := repo.Save(s)
@@ -601,7 +601,7 @@ func TestUpdate(t *testing.T) {
 
 func TestOne(t *testing.T) {
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	s := stream()
 	id, err := repo.Save(stream())
@@ -636,7 +636,7 @@ func TestOne(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	db.DB(dbName).DropDatabase()
-	repo := New(db)
+	repo := NewStreamRepo(db)
 
 	s := stream()
 	id, err := repo.Save(s)

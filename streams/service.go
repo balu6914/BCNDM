@@ -3,12 +3,13 @@ package streams
 import (
 	"context"
 	"fmt"
-	"github.com/datapace/datapace/streams/groups"
-	"github.com/datapace/datapace/streams/sharing"
 	"math"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 
 	"github.com/datapace/datapace/errors"
 
@@ -96,6 +97,7 @@ type Service interface {
 
 type streamService struct {
 	streams       StreamRepository
+	categories    CategoryRepository
 	accessControl AccessControl
 	ai            AIService
 	terms         TermsService
@@ -106,6 +108,7 @@ type streamService struct {
 // NewService instantiates the domain service implementation.
 func NewService(
 	streams StreamRepository,
+	categories CategoryRepository,
 	accessControl AccessControl,
 	ai AIService,
 	terms TermsService,

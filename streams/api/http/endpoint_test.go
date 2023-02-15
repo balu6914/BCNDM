@@ -109,14 +109,15 @@ func (tr testRequest) make() (*http.Response, error) {
 }
 
 func newService() streams.Service {
-	repo := mocks.NewStreamRepository()
+	streamRepo := mocks.NewStreamRepository()
+	categoryRepo := mocks.NewCategoryRepository()
 	ac := mocks.NewAccessControl([]string{})
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
 	groupsSvc := groups.NewServiceMock()
 	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
+	return streams.NewService(streamRepo, categoryRepo, ac, ai, terms, groupsSvc, sharingSvc)
 }
 
 func newServer(svc streams.Service) *httptest.Server {

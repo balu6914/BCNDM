@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	accessproto "github.com/datapace/datapace/proto/access"
-	"github.com/datapace/datapace/streams/groups"
-	"github.com/datapace/datapace/streams/sharing"
-	"github.com/datapace/datapace/streams/terms"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	accessproto "github.com/datapace/datapace/proto/access"
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
+	"github.com/datapace/datapace/streams/terms"
 
 	"github.com/datapace/datapace"
 
@@ -175,7 +176,8 @@ func newServices(
 	sharingConn *grpc.ClientConn,
 	logger log.Logger,
 ) (streams.Service, streams.Authorization, streams.AccessControl) {
-	repo := mongo.New(ms)
+	streamRepo := mongo.NewStreamRepo(ms)
+	categoryRepo := mongo.NewCategoryRepo(ms)
 	acc := accessapi.NewClient(accessConn)
 	accessControl := access.New(acc)
 
@@ -191,7 +193,7 @@ func newServices(
 	sharingClient := sharingApi.NewClient(sharingConn)
 	sharingSvc := sharing.NewService(sharingClient)
 
-	svc := streams.NewService(repo, accessControl, ai, terms, groupsSvc, sharingSvc)
+	svc := streams.NewService(streamRepo, categoryRepo, accessControl, ai, terms, groupsSvc, sharingSvc)
 	svc = api.LoggingMiddleware(svc, logger)
 	svc = api.MetricsMiddleware(
 		svc,

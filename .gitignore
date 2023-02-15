@@ -11,6 +11,7 @@ datapace-service-msp/
 elasticsearch-data/
 docker/expgdata/
 docker/walletstore/
+vendor/
 
 # System Files
 .DS_Store
