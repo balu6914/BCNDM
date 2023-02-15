@@ -97,6 +97,13 @@ func MakeHandler(svc streams.Service, auth streams.Authorization, accessSvc stre
 		opts...,
 	))
 
+	r.Post("/categories", kithttp.NewServer(
+		addCategoryEndpoint(svc),
+		decodeAddCategoryRequest,
+		encodeResponse,
+		opts...,
+	))
+
 	r.GetFunc("/version", datapace.Version())
 
 	return r
@@ -392,6 +399,19 @@ func decodeSearchStreamsJsonRequest(_ context.Context, r *http.Request) (interfa
 	req.user = owner
 
 	return req, nil
+}
+
+func decodeAddCategoryRequest(_ context.Context, r *http.Request) (interface{}, error) {
+
+	var req addCategoryReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	req.key = r.Header.Get("Authorization")
+
+	return req, nil
+
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {

@@ -93,6 +93,9 @@ type Service interface {
 
 	// ExportStreams returns all streams available to the specified owner
 	ExportStreams(string) ([]Stream, error)
+
+	//Add category/subcategory endpoint
+	AddCategory(string, []string) (string, error)
 }
 
 type streamService struct {
@@ -350,4 +353,8 @@ func (ss streamService) arePartners(owner, userId string) bool {
 func (ss streamService) isShared(id string, userId string) bool {
 	ids := ss.resolveSharedStreams(userId)
 	return ids[id]
+}
+
+func (ss streamService) AddCategory(string, []string) (string, error) {
+	return "123456", nil
 }

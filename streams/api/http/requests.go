@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+
 	"github.com/datapace/datapace/errors"
 	"gopkg.in/mgo.v2/bson"
 
@@ -154,5 +155,19 @@ func (req exportStreamsReq) validate() error {
 	if !bson.IsObjectIdHex(req.owner) {
 		return streams.ErrMalformedData
 	}
+	return nil
+}
+
+type addCategoryReq struct {
+	key              string
+	CategoryName     string   `json:"categoryname"`
+	SubCategoryNames []string `json:"subcategorynames"`
+}
+
+func (req addCategoryReq) validate() error {
+	if req.CategoryName == "" {
+		return streams.ErrMalformedData
+	}
+
 	return nil
 }

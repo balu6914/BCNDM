@@ -125,3 +125,17 @@ func (lm *loggingMiddleware) ExportStreams(owner string) (results []streams.Stre
 	}(time.Now())
 	return lm.svc.ExportStreams(owner)
 }
+
+func (lm *loggingMiddleware) AddCategory(categoryname string, subcategories []string) (id string, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method add_category for category %s took %s to complete", categoryname, time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.AddCategory(categoryname, subcategories)
+}
