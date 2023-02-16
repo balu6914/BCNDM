@@ -442,14 +442,14 @@ serverFiles:
         - alert: VeleroBackupFailures
           annotations:
             summary: Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} failed backups.
-          expr: sum(velero_backup_failure_total{schedule!=""} offset 24h)/sum(velero_backup_attempt_total{schedule!=""} offset 24h) > 0 
+          expr: sum(velero_backup_failure_total{schedule!=""} offset 1h)/sum(velero_backup_attempt_total{schedule!=""} offset 1h) > 0 
           for: 15m
           labels:
             severity: critical
         - alert: VeleroBackupPartialFailures
           annotations:
             summary: Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} partialy failed backups.
-          expr: sum(velero_backup_partial_failure_total{schedule!=""} offset 24h)/sum(velero_backup_attempt_total{schedule!=""} offset 24h) > 0
+          expr: sum(velero_backup_partial_failure_total{schedule!=""} offset 1h)/sum(velero_backup_attempt_total{schedule!=""} offset 1h) > 0
           for: 15m
           labels:
             severity: warning
