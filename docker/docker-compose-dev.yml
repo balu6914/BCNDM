@@ -169,6 +169,7 @@ services:
       - DATAPACE_TRANSACTIONS_URL=datapace-transactions:8083
       - DATAPACE_PROXY_URL=http://datapace-dproxy:8087
       - GOOGLE_APPLICATION_CREDENTIALS=/big-query/DigiSense-1987a4981f2e.json
+      - DATAPACE_OFFERS_URL=datapace-offers:8081
     volumes:
       - ../config/big-query:/big-query
     networks:

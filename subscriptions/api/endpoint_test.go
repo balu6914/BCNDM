@@ -3,11 +3,13 @@ package api_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datapace/datapace/subscriptions/accessv2"
-	"github.com/datapace/datapace/subscriptions/sharing"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	"github.com/datapace/datapace/subscriptions/accessv2"
+	"github.com/datapace/datapace/subscriptions/offers"
+	"github.com/datapace/datapace/subscriptions/sharing"
 
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/subscriptions"
@@ -71,7 +73,8 @@ func newService() subscriptions.Service {
 	auth := mocks.NewAuthClient(nil, nil)
 	sharingSvc := sharing.NewServiceMock()
 	accessV2Svc := accessv2.NewServiceMock()
-	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc, accessV2Svc)
+	offersSvc := offers.NewServiceMock()
+	return subscriptions.New(auth, subs, streams, proxy, transactions, sharingSvc, accessV2Svc, offersSvc)
 }
 
 func newServer(svc subscriptions.Service, ac authproto.AuthServiceClient) *httptest.Server {
