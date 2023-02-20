@@ -54,6 +54,7 @@ func stream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{long, lat},
 		},
+		SubCategory: bson.NewObjectId().Hex(),
 	}
 }
 

@@ -55,15 +55,16 @@ type searchStreamsReq struct {
 	// It's important to note what the order of coordinates is.
 	// Fields `Owner` and `user` represent owner of the Stream and
 	// the user who sent request respectively.
-	user       string
-	Name       string      `alias:"name" json:"name"`
-	Owner      string      `alias:"owner" json:"owner"`
-	StreamType string      `alias:"type" json:"type"`
-	Coords     [][]float64 `alias:"coords" json:"coords"`
-	Page       uint64      `alias:"page" json:"page"`
-	Limit      uint64      `alias:"limit" json:"limit"`
-	MinPrice   *uint64     `alias:"minPrice" json:"minPrice"`
-	MaxPrice   *uint64     `alias:"maxPrice" json:"maxPrice"`
+	user        string
+	Name        string      `alias:"name" json:"name"`
+	Owner       string      `alias:"owner" json:"owner"`
+	StreamType  string      `alias:"type" json:"type"`
+	Coords      [][]float64 `alias:"coords" json:"coords"`
+	Page        uint64      `alias:"page" json:"page"`
+	Limit       uint64      `alias:"limit" json:"limit"`
+	MinPrice    *uint64     `alias:"minPrice" json:"minPrice"`
+	MaxPrice    *uint64     `alias:"maxPrice" json:"maxPrice"`
+	SubCategory string      `alias:"subcategory" json:"subcategory"`
 
 	// Metadata is the stream metadata constraint
 	Metadata map[string]interface{} `json:"metadata"`

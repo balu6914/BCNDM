@@ -72,7 +72,7 @@ func stream() streams.Stream {
 
 func newService(partners ...string) streams.Service {
 	streamRepo := mocks.NewStreamRepository()
-	categoryRepo := mocks.NewStreamRepository()
+	categoryRepo := mocks.NewCategoryRepository()
 	ac := mocks.NewAccessControl(partners)
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()

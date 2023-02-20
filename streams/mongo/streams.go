@@ -277,6 +277,7 @@ type dbStream struct {
 	AccessType  streams.AccessType  `bson:"accessType,omitempty"`
 	Metadata    bson.M              `bson:"metadata,omitempty"`
 	MaxUnit     streams.MaxUnitType `bson:"max_unit,omitempty"`
+	SubCategory string              `bson:"subcategory,omitempty"`
 }
 
 type dbBigQuery struct {
@@ -330,6 +331,7 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		BQ:          dbBQ,
 		AccessType:  stream.AccessType,
 		Metadata:    stream.Metadata,
+		SubCategory: stream.SubCategory,
 	}
 
 	if ok := bson.IsObjectIdHex(stream.ID); !ok {
@@ -375,5 +377,6 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		BQ:          dbBQ,
 		AccessType:  dbs.AccessType,
 		Metadata:    dbs.Metadata,
+		SubCategory: dbs.SubCategory,
 	}
 }

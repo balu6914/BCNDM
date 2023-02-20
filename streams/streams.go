@@ -95,6 +95,7 @@ type Stream struct {
 	BQ           BigQuery               `json:"bq,omitempty"`
 	AccessType   AccessType             `json:"accessType,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	SubCategory  string                 `json:"subcategory,omitempty"`
 }
 
 type Category struct {
@@ -132,6 +133,7 @@ var CsvHeader = []string{
 	"latitude",
 	"url",
 	"terms",
+	"subcategory",
 	"metadata",
 }
 
@@ -152,6 +154,7 @@ func (s Stream) Attributes() map[string]string {
 		"maxUnit":     string(s.MaxUnit),
 		"external":    strconv.FormatBool(s.External),
 		"offer":       strconv.FormatBool(s.Offer),
+		"subcategory": s.SubCategory,
 	}
 }
 
@@ -186,7 +189,7 @@ const (
 func (s *Stream) Validate() error {
 	if s.Name == "" || (len(s.Name) > maxNameLength) ||
 		s.Type == "" || (len(s.Type) > maxTypeLength) ||
-		s.Description == "" || (len(s.Description) > maxDescriptionLength) ||
+		s.Description == "" || (len(s.Description) > maxDescriptionLength) || s.SubCategory == "" ||
 		(len(s.Snippet) > maxSnippetLength) ||
 		s.Price <= minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
@@ -223,6 +226,10 @@ func (s *Stream) Validate() error {
 		return ErrMalformedData
 	}
 
+	if s.SubCategory != "" && !bson.IsObjectIdHex(s.SubCategory) {
+		return ErrMalformedData
+	}
+
 	return nil
 }
 
@@ -249,6 +256,7 @@ func (s Stream) Csv() ([]string, error) {
 		strconv.FormatFloat(lat, 'f', -1, 64),
 		s.URL,
 		s.Terms,
+		s.SubCategory,
 		string(jsonMd),
 	}
 	return csvRec, nil
@@ -289,10 +297,11 @@ func NewFromCsv(record []string, keys map[string]int) (*Stream, error) {
 			Type:        "Point",
 			Coordinates: [2]float64{longitude, latitude},
 		},
-		URL:        record[keys["url"]],
-		Terms:      record[keys["terms"]],
-		AccessType: AccessType(record[keys["accessType"]]),
-		Metadata:   metadata,
+		URL:         record[keys["url"]],
+		Terms:       record[keys["terms"]],
+		AccessType:  AccessType(record[keys["accessType"]]),
+		SubCategory: record[keys["subcategory"]],
+		Metadata:    metadata,
 	}
 	return stream, nil
 }
