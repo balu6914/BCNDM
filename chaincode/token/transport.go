@@ -241,11 +241,12 @@ func (cr chaincodeRouter) txHistory(stub shim.ChaincodeStubInterface, args []str
 	}
 
 	var req txHistoryReq
+
 	if err := json.Unmarshal([]byte(args[0]), &req); err != nil {
 		return shim.Error(ErrInvalidArgument.Error())
 	}
 
-	txList, ti, err := cr.svc.TxHistory(stub, req.Owner)
+	txList, ti, err := cr.svc.TxHistory(stub, req.Owner, req.FromDateTime, req.ToDateTime, req.TxType)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

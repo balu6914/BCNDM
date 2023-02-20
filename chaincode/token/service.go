@@ -82,7 +82,7 @@ type Service interface {
 	GroupTransfer(shim.ChaincodeStubInterface, ...Transfer) error
 
 	// TxHistory returns list of transactions
-	TxHistory(shim.ChaincodeStubInterface, string) ([]TransferFrom, *TokenInfo, error)
+	TxHistory(shim.ChaincodeStubInterface, string, string, string, string) ([]TransferFrom, *TokenInfo, error)
 
 	// CollectDeltasForTreasury collects all deltas for treasury account and combines them
 	// it is recommended to execute this method at a regular interval depending upon tx load in the system
@@ -107,11 +107,12 @@ type Balance struct {
 }
 
 type TransferFrom struct {
-	From     string `json:"from"`
-	To       string `json:"to"`
-	Value    uint64 `json:"value"`
-	DateTime string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
-	TxType   string `json:"txType"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Value     uint64 `json:"value"`
+	DateTime  string `json:"dateTime"` // dateTime should be added at middleware level in format: DD-MM-YYYY hh:mm:ss
+	TxType    string `json:"txType"`
+	EpochTime int64  `json:"epochTime"`
 }
 
 type Approve struct {
