@@ -249,3 +249,19 @@ func addCategoryEndpoint(svc streams.Service) endpoint.Endpoint {
 		return id, nil
 	}
 }
+
+func listCategoryEndpoint(svc streams.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(listCategoryReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		categoriesList, err := svc.ListCatgeories(req.key)
+		if err != nil {
+			return nil, err
+		}
+
+		return categoriesList, nil
+	}
+}

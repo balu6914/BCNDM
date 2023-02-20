@@ -97,6 +97,12 @@ type Stream struct {
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type Category struct {
+	ID       bson.ObjectId `bson:"_id"`
+	Name     string        `bson:"name"`
+	ParentID string        `bson:"parentid"`
+}
+
 const EncodeURLPrefix string = "base64,"
 const EncodeURLPrefixLength int = len(EncodeURLPrefix)
 

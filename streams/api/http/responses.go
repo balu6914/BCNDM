@@ -28,16 +28,6 @@ func (res addStreamRes) headers() map[string]string {
 	}
 }
 
-type addCategoryRes struct {
-	ID string `json:"id"`
-}
-
-func (res addCategoryRes) headers() map[string]string {
-	return map[string]string{
-		"location": res.ID,
-	}
-}
-
 func (res addStreamRes) code() int {
 	return http.StatusCreated
 }
@@ -154,4 +144,22 @@ func (res exportStreamsResp) empty() bool {
 
 type errorRes struct {
 	Err string `json:"error"`
+}
+
+type addCategoryRes struct {
+	ID string `json:"id"`
+}
+
+func (res addCategoryRes) headers() map[string]string {
+	return map[string]string{
+		"location": res.ID,
+	}
+}
+
+type listCategoriesRes struct {
+	Categories []streams.Category
+}
+
+func (res listCategoriesRes) headers() map[string]string {
+	return map[string]string{}
 }

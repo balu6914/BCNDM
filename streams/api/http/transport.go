@@ -104,6 +104,12 @@ func MakeHandler(svc streams.Service, auth streams.Authorization, accessSvc stre
 		opts...,
 	))
 
+	r.Get("/categories", kithttp.NewServer(
+		listCategoryEndpoint(svc),
+		decodeListCategoryRequest,
+		encodeResponse,
+		opts...,
+	))
 	r.GetFunc("/version", datapace.Version())
 
 	return r
@@ -412,6 +418,15 @@ func decodeAddCategoryRequest(_ context.Context, r *http.Request) (interface{}, 
 
 	return req, nil
 
+}
+
+func decodeListCategoryRequest(_ context.Context, r *http.Request) (interface{}, error) {
+
+	req := listCategoryReq{
+		key: r.Header.Get("Authorization"),
+	}
+
+	return req, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {

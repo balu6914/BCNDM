@@ -171,3 +171,15 @@ func (req addCategoryReq) validate() error {
 
 	return nil
 }
+
+type listCategoryReq struct {
+	key string
+}
+
+func (req listCategoryReq) validate() error {
+	if req.key == "" {
+		return streams.ErrMalformedData
+	}
+
+	return nil
+}

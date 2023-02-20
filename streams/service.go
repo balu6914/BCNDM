@@ -96,6 +96,9 @@ type Service interface {
 
 	//Add category/subcategory endpoint
 	AddCategory(string, []string) (string, error)
+
+	//List all the categories and subcategories
+	ListCatgeories(string) ([]Category, error)
 }
 
 type streamService struct {
@@ -120,6 +123,7 @@ func NewService(
 ) Service {
 	return streamService{
 		streams:       streams,
+		categories:    categories,
 		accessControl: accessControl,
 		ai:            ai,
 		terms:         terms,
@@ -355,6 +359,20 @@ func (ss streamService) isShared(id string, userId string) bool {
 	return ids[id]
 }
 
-func (ss streamService) AddCategory(string, []string) (string, error) {
-	return "123456", nil
+func (ss streamService) AddCategory(categoryName string, subCategoryNames []string) (string, error) {
+	id, err := ss.categories.Save(categoryName, subCategoryNames)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
+}
+
+func (ss streamService) ListCatgeories(key string) ([]Category, error) {
+	categoriesList, err := ss.categories.List(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return categoriesList, nil
 }

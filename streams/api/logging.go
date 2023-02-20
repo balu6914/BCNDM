@@ -139,3 +139,17 @@ func (lm *loggingMiddleware) AddCategory(categoryname string, subcategories []st
 
 	return lm.svc.AddCategory(categoryname, subcategories)
 }
+
+func (lm *loggingMiddleware) ListCatgeories(key string) (categoriesList []streams.Category, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method List_category took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+
+	}(time.Now())
+
+	return lm.svc.ListCatgeories(key)
+}
