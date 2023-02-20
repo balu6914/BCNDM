@@ -774,6 +774,7 @@ func TestExportStream(t *testing.T) {
 				"latitude",
 				"url",
 				"terms",
+				"subcategory",
 				"metadata",
 			},
 			respCsvRecords: [][]string{
@@ -788,6 +789,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream1.com",
 					"https://myStream1.com",
+					"123456789",
 					"",
 				},
 				{
@@ -801,6 +803,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream2.com",
 					"https://myStream2.com",
+					"123456789",
 					"",
 				},
 			},
