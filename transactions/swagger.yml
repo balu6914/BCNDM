@@ -163,13 +163,32 @@ paths:
           description: Contract signed.
         500:
           $ref: "#/responses/ServiceError"
-  /tokens/tokens-history:
+  /transactions/tokens-history:
     get:
       summary: Retrives list of deposit & withdrawals for a particular user.
       tags:
         - tokens
       parameters:
         - $ref: "#/parameters/Authorization"
+        - in: query
+          name: fromDateTime
+          type: string
+          required: true          
+          description: Time in format DD-MM-YYYY hh:mm:ss, e.g. 20-02-2023 18:49:45, if fromDateTime is empty from UI, set it to 01-01-1970 00:00:01
+        - in: query
+          name: toDateTime
+          type: string
+          required: true          
+          description: Time in format DD-MM-YYYY hh:mm:ss, e.g. 20-02-2023 18:49:45, if toDateTime is empty from UI, set it to current timestamp in given format.
+        - in: query
+          name: txType
+          type: string
+          required: true
+          description: txType, it can be either TRANSFER or FEE. you can set it to empty string too, if you want to get tx of both types.
+          enum:
+            - "TRANSFER"
+            - "FEE"
+            - ""
       responses:
         200:
           description: Users balance retrieved.
@@ -199,7 +218,7 @@ parameters:
     in: body
     schema:
       $ref: "#/definitions/ContractReq"
-
+    
 responses:
   ServiceError:
     description: Unexpected server-side error occured.
@@ -332,7 +351,7 @@ definitions:
   History:
     type: "object"
     properties:
-      tokeInfo:
+      tokenInfo:
         type: "object"
         $ref: "#/definitions/History_TokenInfo"
       txList:

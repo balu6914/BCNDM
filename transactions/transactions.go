@@ -108,8 +108,8 @@ func (ts transactionService) WithdrawTokens(account string, value uint64) error 
 	return nil
 }
 
-func (ts transactionService) TxHistory(userID string) (TokenTxHistory, error) {
-	txHistory, err := ts.tokens.TxHistory(userID)
+func (ts transactionService) TxHistory(userID, fromDateTime, toDateTime, txType string) (TokenTxHistory, error) {
+	txHistory, err := ts.tokens.TxHistory(userID, fromDateTime, toDateTime, txType)
 	if err != nil {
 		return txHistory, ErrFailedTxHistoryFetch
 	}

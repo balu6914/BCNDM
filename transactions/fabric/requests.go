@@ -7,7 +7,10 @@ type balanceReq struct {
 }
 
 type txHistoryReq struct {
-	Owner string `json:"owner"`
+	Owner        string `json:"owner"`
+	FromDateTime string `json:"fromDateTime"`
+	ToDateTime   string `json:"toDateTime"`
+	TxType       string `json:"txType"`
 }
 
 type transferReq struct {

@@ -128,7 +128,7 @@ func (mn *mockNetwork) WithdrawTokens(account string, value uint64) error {
 	return nil
 }
 
-func (mn *mockNetwork) TxHistory(name string) (transactions.TokenTxHistory, error) {
+func (mn *mockNetwork) TxHistory(name, fromDateTime, toDateTime, txType string) (transactions.TokenTxHistory, error) {
 	txHis := new(transactions.TokenTxHistory)
 	mn.mutex.Lock()
 	defer mn.mutex.Unlock()

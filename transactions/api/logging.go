@@ -85,9 +85,9 @@ func (lm *loggingMiddleware) WithdrawTokens(account string, value uint64) (err e
 	return lm.svc.WithdrawTokens(account, value)
 }
 
-func (lm *loggingMiddleware) TxHistory(userID string) (txHistory transactions.TokenTxHistory, err error) {
+func (lm *loggingMiddleware) TxHistory(userID, fromDateTime, toDateTime, txType string) (txHistory transactions.TokenTxHistory, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method txHistory for user %s took %s to complete", userID, time.Since(begin))
+		message := fmt.Sprintf("Method txHistory for user %s, fromDateTime %s, toDateTime %s, txType %s, took %s to complete", userID, fromDateTime, toDateTime, txType, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -95,7 +95,7 @@ func (lm *loggingMiddleware) TxHistory(userID string) (txHistory transactions.To
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.TxHistory(userID)
+	return lm.svc.TxHistory(userID, fromDateTime, toDateTime, txType)
 }
 
 func (lm *loggingMiddleware) CreateContracts(contracts ...transactions.Contract) (err error) {

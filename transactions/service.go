@@ -66,7 +66,7 @@ type Service interface {
 	WithdrawTokens(string, uint64) error
 
 	// TxHistory gives transaction history for a user.
-	TxHistory(string) (TokenTxHistory, error)
+	TxHistory(string, string, string, string) (TokenTxHistory, error)
 
 	// CreateContracts creates multiple contracts at once.
 	CreateContracts(...Contract) error
