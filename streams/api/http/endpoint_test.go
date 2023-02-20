@@ -77,8 +77,9 @@ func genStream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
-		Terms:     fmt.Sprintf("https://myStream%d.com", counter),
-		StartDate: &now,
+		Terms:       fmt.Sprintf("https://myStream%d.com", counter),
+		StartDate:   &now,
+		SubCategory: "63ef6ecd5f3e0d00014d8505",
 	}
 }
 
@@ -789,7 +790,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream1.com",
 					"https://myStream1.com",
-					"123456789",
+					"63ef6ecd5f3e0d00014d8505",
 					"",
 				},
 				{
@@ -803,7 +804,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream2.com",
 					"https://myStream2.com",
-					"123456789",
+					"63ef6ecd5f3e0d00014d8505",
 					"",
 				},
 			},
