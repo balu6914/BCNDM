@@ -79,7 +79,7 @@ func genStream() streams.Stream {
 		},
 		Terms:       fmt.Sprintf("https://myStream%d.com", counter),
 		StartDate:   &now,
-		SubCategory: "63ef6ecd5f3e0d00014d8505",
+		SubCategory: bson.NewObjectId().Hex(),
 	}
 }
 
