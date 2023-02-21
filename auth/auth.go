@@ -379,17 +379,17 @@ func (as *authService) ListUsers(key string) ([]User, error) {
 	var filters AdminFilters
 	switch role {
 	case AdminRole:
-		filters.Roles = []string{UserRole, AdminUserRole, AdminWalletRole}
+		filters.Roles = []string{UserRole, BuyerRole, SellerRole, AdminUserRole, AdminWalletRole}
 		filters.Locked = true
 		filters.Disabled = true
 	case AdminUserRole:
-		filters.Roles = []string{UserRole}
+		filters.Roles = []string{UserRole, BuyerRole, SellerRole}
 		filters.Locked = true
 		filters.Disabled = true
 	case AdminWalletRole:
-		filters.Roles = []string{UserRole}
+		filters.Roles = []string{UserRole, BuyerRole, SellerRole}
 	default:
-		filters.Roles = []string{UserRole}
+		filters.Roles = []string{UserRole, BuyerRole, SellerRole}
 		filters.Locked = true
 		filters.Disabled = true
 	}
