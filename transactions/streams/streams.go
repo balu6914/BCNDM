@@ -30,9 +30,10 @@ func (ss streamsService) One(id string) (transactions.Stream, error) {
 	}
 
 	stream := transactions.Stream{
-		ID:    s.GetId(),
-		Name:  s.GetName(),
-		Owner: s.GetOwner(),
+		ID:          s.GetId(),
+		Name:        s.GetName(),
+		Owner:       s.GetOwner(),
+		SubCategory: s.GetSubCategory(),
 	}
 
 	return stream, nil

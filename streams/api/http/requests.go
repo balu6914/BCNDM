@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+
 	"github.com/datapace/datapace/errors"
 	"gopkg.in/mgo.v2/bson"
 
@@ -54,15 +55,16 @@ type searchStreamsReq struct {
 	// It's important to note what the order of coordinates is.
 	// Fields `Owner` and `user` represent owner of the Stream and
 	// the user who sent request respectively.
-	user       string
-	Name       string      `alias:"name" json:"name"`
-	Owner      string      `alias:"owner" json:"owner"`
-	StreamType string      `alias:"type" json:"type"`
-	Coords     [][]float64 `alias:"coords" json:"coords"`
-	Page       uint64      `alias:"page" json:"page"`
-	Limit      uint64      `alias:"limit" json:"limit"`
-	MinPrice   *uint64     `alias:"minPrice" json:"minPrice"`
-	MaxPrice   *uint64     `alias:"maxPrice" json:"maxPrice"`
+	user        string
+	Name        string      `alias:"name" json:"name"`
+	Owner       string      `alias:"owner" json:"owner"`
+	StreamType  string      `alias:"type" json:"type"`
+	Coords      [][]float64 `alias:"coords" json:"coords"`
+	Page        uint64      `alias:"page" json:"page"`
+	Limit       uint64      `alias:"limit" json:"limit"`
+	MinPrice    *uint64     `alias:"minPrice" json:"minPrice"`
+	MaxPrice    *uint64     `alias:"maxPrice" json:"maxPrice"`
+	SubCategory string      `alias:"subcategory" json:"subcategory"`
 
 	// Metadata is the stream metadata constraint
 	Metadata map[string]interface{} `json:"metadata"`
@@ -154,5 +156,31 @@ func (req exportStreamsReq) validate() error {
 	if !bson.IsObjectIdHex(req.owner) {
 		return streams.ErrMalformedData
 	}
+	return nil
+}
+
+type addCategoryReq struct {
+	key              string
+	CategoryName     string   `json:"categoryname"`
+	SubCategoryNames []string `json:"subcategorynames"`
+}
+
+func (req addCategoryReq) validate() error {
+	if req.CategoryName == "" {
+		return streams.ErrMalformedData
+	}
+
+	return nil
+}
+
+type listCategoryReq struct {
+	key string
+}
+
+func (req listCategoryReq) validate() error {
+	if req.key == "" {
+		return streams.ErrMalformedData
+	}
+
 	return nil
 }

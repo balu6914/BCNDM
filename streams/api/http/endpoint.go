@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+
 	"github.com/datapace/datapace/auth"
 	authproto "github.com/datapace/datapace/proto/auth"
 	"github.com/datapace/datapace/streams"
@@ -230,5 +231,37 @@ func exportStreamsEndpoint(svc streams.Service) endpoint.Endpoint {
 		}
 		res := exportStreamsResp{results}
 		return res, nil
+	}
+}
+
+func addCategoryEndpoint(svc streams.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(addCategoryReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		id, err := svc.AddCategory(req.CategoryName, req.SubCategoryNames)
+		if err != nil {
+			return nil, err
+		}
+
+		return id, nil
+	}
+}
+
+func listCategoryEndpoint(svc streams.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(listCategoryReq)
+		if err := req.validate(); err != nil {
+			return nil, err
+		}
+
+		categoriesList, err := svc.ListCatgeories(req.key)
+		if err != nil {
+			return nil, err
+		}
+
+		return categoriesList, nil
 	}
 }

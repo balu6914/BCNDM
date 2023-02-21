@@ -17,7 +17,6 @@ type streamRepositoryMock struct {
 	streams map[string]streams.Stream
 }
 
-// NewStreamRepository creates in-memory stream repository.
 func NewStreamRepository() streams.StreamRepository {
 	return &streamRepositoryMock{
 		streams: make(map[string]streams.Stream),

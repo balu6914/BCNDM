@@ -3,12 +3,13 @@ package streams
 import (
 	"context"
 	"fmt"
-	"github.com/datapace/datapace/streams/groups"
-	"github.com/datapace/datapace/streams/sharing"
 	"math"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 
 	"github.com/datapace/datapace/errors"
 
@@ -92,10 +93,17 @@ type Service interface {
 
 	// ExportStreams returns all streams available to the specified owner
 	ExportStreams(string) ([]Stream, error)
+
+	//Add category/subcategory endpoint
+	AddCategory(string, []string) (string, error)
+
+	//List all the categories and subcategories
+	ListCatgeories(string) ([]Category, error)
 }
 
 type streamService struct {
 	streams       StreamRepository
+	categories    CategoryRepository
 	accessControl AccessControl
 	ai            AIService
 	terms         TermsService
@@ -106,6 +114,7 @@ type streamService struct {
 // NewService instantiates the domain service implementation.
 func NewService(
 	streams StreamRepository,
+	categories CategoryRepository,
 	accessControl AccessControl,
 	ai AIService,
 	terms TermsService,
@@ -114,6 +123,7 @@ func NewService(
 ) Service {
 	return streamService{
 		streams:       streams,
+		categories:    categories,
 		accessControl: accessControl,
 		ai:            ai,
 		terms:         terms,
@@ -347,4 +357,22 @@ func (ss streamService) arePartners(owner, userId string) bool {
 func (ss streamService) isShared(id string, userId string) bool {
 	ids := ss.resolveSharedStreams(userId)
 	return ids[id]
+}
+
+func (ss streamService) AddCategory(categoryName string, subCategoryNames []string) (string, error) {
+	id, err := ss.categories.Save(categoryName, subCategoryNames)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
+}
+
+func (ss streamService) ListCatgeories(key string) ([]Category, error) {
+	categoriesList, err := ss.categories.List(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return categoriesList, nil
 }

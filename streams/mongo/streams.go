@@ -13,11 +13,11 @@ import (
 
 // dbName - If name is empty, the database name provided in DialInfo is used instead
 const (
-	dbName     = ""
-	collection = "streams"
-	unknown    = "unknown conflict"
-	errMsg     = "Some of the URLs already exist in the database."
-	msgMark    = "\""
+	dbName           = ""
+	streamCollection = "streams"
+	unknown          = "unknown conflict"
+	errMsg           = "Some of the URLs already exist in the database."
+	msgMark          = "\""
 )
 
 var errFormatUUID = errors.New("invalid uuid format")
@@ -45,8 +45,8 @@ func parseError(err error) string {
 
 // New instantiates a Mongo implementation of streams
 // repository.
-func New(db *mgo.Session) streams.StreamRepository {
-	c := db.DB(dbName).C(collection)
+func NewStreamRepo(db *mgo.Session) streams.StreamRepository {
+	c := db.DB(dbName).C(streamCollection)
 	indices := []mgo.Index{
 		mgo.Index{
 			Name: "owners",
@@ -97,7 +97,7 @@ func (sr streamRepository) Save(stream streams.Stream) (string, error) {
 	s := sr.db.Copy()
 	defer s.Close()
 
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 	// ignore error because invalid ID should be ignored in this case
 	dbs, _ := toDBStream(stream)
 	dbs.ID = bson.NewObjectId()
@@ -119,7 +119,7 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 	bulk := c.Bulk()
 	bulk.Unordered()
 
@@ -155,7 +155,7 @@ func (sr streamRepository) SaveAll(blk []streams.Stream) error {
 func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 	limit := int(query.Limit)
 	page := int(query.Page)
 
@@ -196,7 +196,7 @@ func (sr streamRepository) Search(query streams.Query) (streams.Page, error) {
 func (sr streamRepository) Update(stream streams.Stream) error {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 
 	dbs, err := toDBStream(stream)
 	if err != nil {
@@ -218,7 +218,7 @@ func (sr streamRepository) Update(stream streams.Stream) error {
 func (sr streamRepository) One(id string) (streams.Stream, error) {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 
 	dbs := dbStream{}
 
@@ -242,7 +242,7 @@ func (sr streamRepository) One(id string) (streams.Stream, error) {
 func (sr streamRepository) Remove(owner, id string) error {
 	s := sr.db.Copy()
 	defer s.Close()
-	c := s.DB(dbName).C(collection)
+	c := s.DB(dbName).C(streamCollection)
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	removeID := bson.ObjectIdHex(id)
@@ -277,6 +277,7 @@ type dbStream struct {
 	AccessType  streams.AccessType  `bson:"accessType,omitempty"`
 	Metadata    bson.M              `bson:"metadata,omitempty"`
 	MaxUnit     streams.MaxUnitType `bson:"max_unit,omitempty"`
+	SubCategory string              `bson:"subcategory,omitempty"`
 }
 
 type dbBigQuery struct {
@@ -330,6 +331,7 @@ func toDBStream(stream streams.Stream) (dbStream, error) {
 		BQ:          dbBQ,
 		AccessType:  stream.AccessType,
 		Metadata:    stream.Metadata,
+		SubCategory: stream.SubCategory,
 	}
 
 	if ok := bson.IsObjectIdHex(stream.ID); !ok {
@@ -375,5 +377,6 @@ func fromDBStream(dbs dbStream) streams.Stream {
 		BQ:          dbBQ,
 		AccessType:  dbs.AccessType,
 		Metadata:    dbs.Metadata,
+		SubCategory: dbs.SubCategory,
 	}
 }

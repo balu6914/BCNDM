@@ -96,3 +96,21 @@ func (ms *metricsMiddleware) ExportStreams(owner string) ([]streams.Stream, erro
 	}(time.Now())
 	return ms.svc.ExportStreams(owner)
 }
+
+func (ms *metricsMiddleware) AddCategory(category string, subcategories []string) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "add_catgeory").Add(1)
+		ms.latency.With("method", "add_category").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.AddCategory(category, subcategories)
+}
+
+func (ms *metricsMiddleware) ListCatgeories(key string) ([]streams.Category, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "list_catgeory").Add(1)
+		ms.latency.With("method", "lis_category").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.ListCatgeories(key)
+}

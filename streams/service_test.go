@@ -2,10 +2,11 @@ package streams_test
 
 import (
 	"fmt"
-	"github.com/datapace/datapace/streams/groups"
-	"github.com/datapace/datapace/streams/sharing"
 	"math/rand"
 	"testing"
+
+	"github.com/datapace/datapace/streams/groups"
+	"github.com/datapace/datapace/streams/sharing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,14 +71,15 @@ func stream() streams.Stream {
 }
 
 func newService(partners ...string) streams.Service {
-	repo := mocks.NewStreamRepository()
+	streamRepo := mocks.NewStreamRepository()
+	categoryRepo := mocks.NewCategoryRepository()
 	ac := mocks.NewAccessControl(partners)
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
 	groupsSvc := groups.NewServiceMock()
 	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
+	return streams.NewService(streamRepo, categoryRepo, ac, ai, terms, groupsSvc, sharingSvc)
 }
 
 func pointer(val uint64) *uint64 {

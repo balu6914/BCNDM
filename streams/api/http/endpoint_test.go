@@ -77,8 +77,9 @@ func genStream() streams.Stream {
 			Type:        "Point",
 			Coordinates: [2]float64{50, 50},
 		},
-		Terms:     fmt.Sprintf("https://myStream%d.com", counter),
-		StartDate: &now,
+		Terms:       fmt.Sprintf("https://myStream%d.com", counter),
+		StartDate:   &now,
+		SubCategory: bson.NewObjectId().Hex(),
 	}
 }
 
@@ -109,14 +110,15 @@ func (tr testRequest) make() (*http.Response, error) {
 }
 
 func newService() streams.Service {
-	repo := mocks.NewStreamRepository()
+	streamRepo := mocks.NewStreamRepository()
+	categoryRepo := mocks.NewCategoryRepository()
 	ac := mocks.NewAccessControl([]string{})
 	ai := mocks.NewAIService()
 	terms := mocks.NewTermsService()
 	groupsSvc := groups.NewServiceMock()
 	sharingSvc := sharing.NewServiceMock()
 
-	return streams.NewService(repo, ac, ai, terms, groupsSvc, sharingSvc)
+	return streams.NewService(streamRepo, categoryRepo, ac, ai, terms, groupsSvc, sharingSvc)
 }
 
 func newServer(svc streams.Service) *httptest.Server {
@@ -773,6 +775,7 @@ func TestExportStream(t *testing.T) {
 				"latitude",
 				"url",
 				"terms",
+				"subcategory",
 				"metadata",
 			},
 			respCsvRecords: [][]string{
@@ -787,6 +790,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream1.com",
 					"https://myStream1.com",
+					"63ef6ecd5f3e0d00014d8505",
 					"",
 				},
 				{
@@ -800,6 +804,7 @@ func TestExportStream(t *testing.T) {
 					"50",
 					"https://myStream2.com",
 					"https://myStream2.com",
+					"63ef6ecd5f3e0d00014d8505",
 					"",
 				},
 			},

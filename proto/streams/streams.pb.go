@@ -42,6 +42,7 @@ type Stream struct {
 	MaxUnit    string `protobuf:"bytes,14,opt,name=maxUnit,proto3" json:"maxUnit,omitempty"`
 	EndDate    string `protobuf:"bytes,15,opt,name=endDate,proto3" json:"endDate,omitempty"`
 	Offer      bool   `protobuf:"varint,16,opt,name=offer,proto3" json:"offer,omitempty"`
+	SubCategory string `protobuf:"bytes,17,opt,name=subCategory,proto3" json:"subCategory,omitempty"`
 }
 
 func (x *Stream) Reset() {
@@ -186,6 +187,13 @@ func (x *Stream) GetOffer() bool {
 		return x.Offer
 	}
 	return false
+}
+
+func (x *Stream) GetSubCategory() string {
+	if x != nil {
+		return x.SubCategory
+	}
+	return ""
 }
 
 var File_proto_streams_proto protoreflect.FileDescriptor
