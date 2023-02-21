@@ -10,7 +10,7 @@ import { UserService } from 'app/common/services/user.service';
 import * as jwt_decode from 'jwt-decode';
 
 const COOKIE_NAME: string = "token";
-const COOKIE_EXPIRY_IN_HOURS: number = 2;
+const COOKIE_EXPIRY_IN_HOURS: number = 3;
 
 @Injectable()
 export class AuthService {
@@ -71,11 +71,11 @@ export class AuthService {
   getCurrentUser() {
     if (this.user) {
       return of(this.user);
-    } else {
-      if (this.isLoggedin()) {
+    } else if (this.isLoggedin()) {
         return this.fetchCurrentUser();
-      }
-    }
+    } else {
+			console.error("Failed to set Cookies")
+		}
   }
 
   fetchCurrentUser() {
@@ -112,13 +112,13 @@ export class AuthService {
 		this.setCookie(name, '', -1);
 	}
 
-	private setCookie(name: string, value: string, expireDays: number, path: string = '') {
+	private setCookie(name: string, value: string, expireDays: number, path: string = '/') {
 		let d: Date = new Date();
 		d.setTime(d.getTime() + expireDays * 60 * 60 * 1000);
 		console.log(d);
-		let expires: string = `expires=${d.toString()}`;
+		let expires: string = `expires=${d.toUTCString()}`;
 		let cpath: string = path ? `; path=${path}` : '';
-		document.cookie = `${name}=${value}; ${expires}${cpath}`;
+		document.cookie = `${name}=${value};${expires}${cpath};`;
 	}
 
 }
