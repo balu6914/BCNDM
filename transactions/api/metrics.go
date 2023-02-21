@@ -71,13 +71,13 @@ func (mm *metricsMiddleware) WithdrawTokens(account string, value uint64) error 
 	return mm.svc.WithdrawTokens(account, value)
 }
 
-func (mm *metricsMiddleware) TxHistory(userID string) (transactions.TokenTxHistory, error) {
+func (mm *metricsMiddleware) TxHistory(userID, fromDateTime, toDateTime, txType string) (transactions.TokenTxHistory, error) {
 	defer func(begin time.Time) {
 		mm.counter.With("method", "txHistory").Add(1)
 		mm.latency.With("method", "txHistory").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return mm.svc.TxHistory(userID)
+	return mm.svc.TxHistory(userID, fromDateTime, toDateTime, txType)
 }
 
 func (mm *metricsMiddleware) CreateContracts(contracts ...transactions.Contract) (err error) {

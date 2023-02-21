@@ -152,8 +152,9 @@ func TestBalanceOf(t *testing.T) {
 	createToken(t, stub)
 
 	tr := transferReq{
-		To:    user2CN,
-		Value: 100,
+		To:       user2CN,
+		Value:    100,
+		DateTime: time.Now().Format(dateTimeLayout),
 	}
 	transferData, err := json.Marshal(tr)
 	require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))

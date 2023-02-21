@@ -20,7 +20,10 @@ func (req balanceReq) validate() error {
 }
 
 type txHistoryReq struct {
-	userID string
+	userID       string
+	fromDateTime string
+	toDateTime   string
+	txType       string
 }
 
 func (req txHistoryReq) validate() error {

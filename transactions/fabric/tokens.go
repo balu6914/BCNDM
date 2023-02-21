@@ -135,7 +135,6 @@ func (tl tokenLedger) Transfer(stream, from, to string, value uint64) error {
 		DateTime: time.Now().Format(dateTimeFormat),
 	}
 
-
 	data, err := json.Marshal(req)
 	if err != nil {
 		tl.logger.Warn(fmt.Sprintf("failed to serialize transfer request: %s", err))
@@ -210,7 +209,7 @@ func (tl tokenLedger) transfer(from, to string, value uint64) error {
 	return nil
 }
 
-func (tl tokenLedger) TxHistory(userID string) (transactions.TokenTxHistory, error) {
+func (tl tokenLedger) TxHistory(userID, fromDateTime, toDateTime, txType string) (transactions.TokenTxHistory, error) {
 	txHis := new(transactions.TokenTxHistory)
 	ctx := tl.sdk.ChannelContext(
 		chanID,
@@ -224,11 +223,16 @@ func (tl tokenLedger) TxHistory(userID string) (transactions.TokenTxHistory, err
 		return *txHis, err
 	}
 
-	req := txHistoryReq{Owner: userID}
+	req := txHistoryReq{
+		Owner:        userID,
+		FromDateTime: fromDateTime,
+		ToDateTime:   toDateTime,
+		TxType:       txType,
+	}
 
 	data, err := json.Marshal(req)
 	if err != nil {
-		tl.logger.Warn(fmt.Sprintf("failed to serialize balance request: %s", err))
+		tl.logger.Warn(fmt.Sprintf("failed to serialize request: %s", err))
 		return *txHis, err
 	}
 

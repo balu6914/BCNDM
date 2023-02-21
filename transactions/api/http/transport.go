@@ -139,7 +139,15 @@ func decodeTxHistoryReq(_ context.Context, r *http.Request) (interface{}, error)
 		return nil, errUnauthorizedAccess
 	}
 
-	req := txHistoryReq{userID: id.GetValue()}
+	fromDateTime := r.URL.Query().Get("fromDateTime")
+	toDateTime := r.URL.Query().Get("toDateTime")
+	txType := r.URL.Query().Get("txType")
+	req := txHistoryReq{
+		userID:       id.GetValue(),
+		fromDateTime: fromDateTime,
+		toDateTime:   toDateTime,
+		txType:       txType,
+	}
 
 	return req, nil
 }

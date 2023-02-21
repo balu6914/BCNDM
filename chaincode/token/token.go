@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/ledger/queryresult"
@@ -15,6 +16,7 @@ const (
 	indexAllowance = "cn~allowance"
 	txKeyIndex     = "cn~txId"
 	txHistoryIndex = "tx~txId~txCount"
+	dateTimeFormat = "02-01-2006 15:04:05"
 )
 
 var _ Service = (*tokenChaincode)(nil)
@@ -267,12 +269,18 @@ func (tc tokenChaincode) GroupTransfer(stub shim.ChaincodeStubInterface, transfe
 			return err
 		}
 
+		epochTime, err := getEpoch(tr.DateTime)
+		if err != nil {
+			return err
+		}
+
 		t := TransferFrom{
-			From:     from,
-			To:       tr.To,
-			Value:    tr.Value,
-			DateTime: tr.DateTime,
-			TxType:   tr.TxType,
+			From:      from,
+			To:        tr.To,
+			Value:     tr.Value,
+			DateTime:  tr.DateTime,
+			TxType:    tr.TxType,
+			EpochTime: epochTime,
 		}
 		transferData, err := json.Marshal(t)
 		if err != nil {
@@ -348,13 +356,18 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to, da
 			return false
 		}
 	}
+	epochTime, err := getEpoch(dateTime)
+	if err != nil {
+		return false
+	}
 
 	t := TransferFrom{
-		From:     from,
-		To:       to,
-		Value:    value,
-		DateTime: dateTime,
-		TxType:   "TRANSFER",
+		From:      from,
+		To:        to,
+		Value:     value,
+		DateTime:  dateTime,
+		TxType:    "TRANSFER",
+		EpochTime: epochTime,
 	}
 	transferData, err := json.Marshal(t)
 	if err != nil {
@@ -370,14 +383,31 @@ func (tc tokenChaincode) transfer(stub shim.ChaincodeStubInterface, from, to, da
 	return err == nil
 }
 
-func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface, owner string) ([]TransferFrom, *TokenInfo, error) {
+func (tc tokenChaincode) TxHistory(stub shim.ChaincodeStubInterface, owner, fromDateTime, toDateTime, txType string) ([]TransferFrom, *TokenInfo, error) {
 	txList := []TransferFrom{}
 
 	ti, err := getTokenInfo(stub)
 	if err != nil {
 		return txList, ti, err
 	}
-	queryString := "{\"selector\":{\"$or\":[{\"from\":\"" + owner + "\"},{\"to\":\"" + owner + "\"}]}}"
+
+	fromEpochTime, err := getEpoch(fromDateTime)
+	if err != nil {
+		return txList, ti, err
+	}
+
+	toEpochTime, err := getEpoch(toDateTime)
+	if err != nil {
+		return txList, ti, err
+	}
+
+	queryString := ""
+	if txType == "" {
+		queryString = "{\"selector\":{\"$or\":[{\"from\":\"" + owner + "\",\"epochTime\":{\"$gt\":" + strconv.FormatInt(fromEpochTime, 10) + ",\"$lt\":" + strconv.FormatInt(toEpochTime, 10) + "}},{\"to\":\"" + owner + "\",\"epochTime\":{\"$gt\":" + strconv.FormatInt(fromEpochTime, 10) + ",\"$lt\":" + strconv.FormatInt(toEpochTime, 10) + "}}]}}"
+	} else {
+		queryString = "{\"selector\":{\"$or\":[{\"from\":\"" + owner + "\",\"txType\":\"" + txType + "\",\"epochTime\":{\"$gt\":" + strconv.FormatInt(fromEpochTime, 10) + ",\"$lt\":" + strconv.FormatInt(toEpochTime, 10) + "}},{\"to\":\"" + owner + "\",\"txType\":\"" + txType + "\",\"epochTime\":{\"$gt\":" + strconv.FormatInt(fromEpochTime, 10) + ",\"$lt\":" + strconv.FormatInt(toEpochTime, 10) + "}}]}}"
+	}
+
 	resultsIterator, err := stub.GetQueryResult(queryString)
 	if err != nil {
 		return txList, ti, ErrFailedRichQuery
@@ -527,4 +557,13 @@ func getTokenInfo(stub shim.ChaincodeStubInterface) (*TokenInfo, error) {
 	}
 
 	return ti, nil
+}
+
+func getEpoch(timeStr string) (int64, error) {
+	t, err := time.Parse(dateTimeFormat, timeStr)
+	if err != nil {
+		return 0, err
+	}
+	epoch := t.Unix()
+	return epoch, nil
 }

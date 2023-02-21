@@ -52,7 +52,7 @@ func txHistoryEndpoint(svc transactions.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		txHistory, err := svc.TxHistory(req.userID)
+		txHistory, err := svc.TxHistory(req.userID, req.fromDateTime, req.toDateTime, req.txType)
 		if err != nil {
 			return nil, err
 		}
