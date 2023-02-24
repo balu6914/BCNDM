@@ -163,7 +163,7 @@ paths:
           description: Contract signed.
         500:
           $ref: "#/responses/ServiceError"
-  /transactions/tokens-history:
+  /tokens-history:
     get:
       summary: Retrives list of deposit & withdrawals for a particular user.
       tags:

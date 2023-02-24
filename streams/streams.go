@@ -191,7 +191,7 @@ func (s *Stream) Validate() error {
 		s.Type == "" || (len(s.Type) > maxTypeLength) ||
 		s.Description == "" || (len(s.Description) > maxDescriptionLength) || s.SubCategory == "" ||
 		(len(s.Snippet) > maxSnippetLength) ||
-		s.Price <= minPrice ||
+		s.Price < minPrice ||
 		s.Location.Coordinates[0] < minLongitude || s.Location.Coordinates[0] > maxLongitude ||
 		s.Location.Coordinates[1] < minLatitude || s.Location.Coordinates[1] > maxLatitude ||
 		// // TODO: Add Metadata length validation
