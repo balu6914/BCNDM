@@ -130,7 +130,7 @@ func checkEmail(userEmail *authproto.UserEmail) (string, error) {
 func decodeAddStreamRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var stream streams.Stream
 	if err := json.NewDecoder(r.Body).Decode(&stream); err != nil {
-		return nil, err
+		return nil, errors.Wrap(streams.ErrMalformedData, err)
 	}
 	defer r.Body.Close()
 
@@ -490,6 +490,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			w.WriteHeader(http.StatusUnsupportedMediaType)
 		case errors.Contains(errVal, streams.ErrConflict):
 			w.WriteHeader(http.StatusConflict)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 		if errVal.Msg() != "" {
 			json.NewEncoder(w).Encode(errorRes{Err: errVal.Msg()})

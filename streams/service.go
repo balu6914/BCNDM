@@ -44,6 +44,9 @@ var (
 	// ErrInvalidBQAccess indicates unauthorized user for accessing
 	// the Big Query API.
 	ErrInvalidBQAccess = errors.New("wrong user role")
+
+	// ErrCreateTerms indicates terms not created
+	ErrCreateTerms = errors.New("terms not created")
 )
 
 // ErrBulkConflict represents an error when saving bulk
@@ -159,7 +162,7 @@ func (ss streamService) AddStream(stream Stream) (string, error) {
 	}
 
 	if err := ss.terms.CreateTerms(stream); err != nil {
-		return "", err
+		return "", errors.Wrap(ErrCreateTerms, errors.Wrap(err, ss.RemoveStream(stream.Owner, id)))
 	}
 
 	return id, nil
