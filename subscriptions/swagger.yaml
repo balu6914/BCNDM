@@ -12,21 +12,30 @@ paths:
     post:
       summary: Create a subscription
       description: |
-        Subscription creation is performed with values provided in a request payload.
+        Subscriptions creation is performed with values provided in a request payload.
       tags:
         - subscriptions
       parameters:
         - $ref: "#/parameters/Authorization"
         - $ref: "#/parameters/Subscriptions"
       responses:
-        200:
-          description: Subscription created.
+        201:
+          description: Subscriptions created.
           schema:
             type: object
             properties:
-              id:
-                type: string
-                description: The Subscription ID.
+              Responses:
+                items:
+                  properties:
+                    streamID:
+                      type: string
+                      description: The Stream ID.
+                    subscriptionID:
+                      type: string
+                      description: The Subscription ID.
+                    errorMessage:
+                      type: string
+                      description: Error if subscription is not made
         400:
           description: Failed due to malformed JSON.
         402:
