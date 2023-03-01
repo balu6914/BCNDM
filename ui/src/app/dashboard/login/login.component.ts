@@ -27,12 +27,18 @@ export class LoginComponent implements OnInit {
     this.errorMsg = null;
     this.form = this.formBuilder.group({
       email:    ['', [<any>Validators.required, Validators.email]],
-      password: ['', [<any>Validators.required, <any>Validators.minLength(5)]]
+      password: ['', [<any>Validators.required, <any>Validators.minLength(5)]],
+      acceptterms: ['', [<any>Validators.required]]
     });
   }
 
   onSubmit(user: User, isValid: boolean) {
     this.errorMsg = null;
+		console.log(this.form.errors)
+		if (this.form.value.acceptterms !== true) {
+			this.errorMsg = "Accept terms & conditions"
+			return false
+		}
     if (isValid) {
       this.authService.login(user.email, user.password).subscribe(
         (token: any) => {
