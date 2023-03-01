@@ -4,6 +4,8 @@ import {Router} from '@angular/router';
 
 import { User } from 'app/common/interfaces/user.interface';
 import { AuthService } from 'app/auth/services/auth.service';
+import { TermsComponent } from './terms/terms.component';
+import { BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'dpc-login-form',
@@ -20,7 +22,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService
+		private modalService: BsModalService,
+		private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -34,7 +37,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit(user: User, isValid: boolean) {
     this.errorMsg = null;
-		console.log(this.form.errors)
+		console.log(this.form.value.acceptterms)
 		if (this.form.value.acceptterms !== true) {
 			this.errorMsg = "Accept terms & conditions"
 			return false
@@ -54,4 +57,10 @@ export class LoginComponent implements OnInit {
       );
     }
   }
+	
+	openModalAdd(e) {
+		// Show DashboardSellAddComponent as Modal
+		this.modalService.show(TermsComponent, { });
+		e.preventDefault()
+	}
 }
