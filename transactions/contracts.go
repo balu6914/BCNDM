@@ -39,26 +39,28 @@ type ContractPage struct {
 
 // Contract contains contract data.
 type Contract struct {
-	StreamID   string
-	StreamName string
-	StartTime  time.Time
-	EndTime    time.Time
-	OwnerID    string
-	PartnerID  string
-	Share      uint64
-	Signed     bool
+	StreamID    string
+	StreamName  string
+	Description string
+	StartTime   time.Time
+	EndTime     time.Time
+	OwnerID     string
+	PartnerID   string
+	Share       uint64
+	Signed      bool
 }
 
 // Attributes returns resource attributes.
 func (c Contract) Attributes() map[string]string {
 	return map[string]string{
-		"streamID":   c.StreamID,
-		"streamName": c.StreamName,
-		"startTime":  c.StartTime.String(),
-		"endTime":    c.EndTime.String(),
-		"ownerID":    c.OwnerID,
-		"partnerID":  c.PartnerID,
-		"signed":     strconv.FormatBool(c.Signed),
+		"streamID":    c.StreamID,
+		"streamName":  c.StreamName,
+		"description": c.Description,
+		"startTime":   c.StartTime.String(),
+		"endTime":     c.EndTime.String(),
+		"ownerID":     c.OwnerID,
+		"partnerID":   c.PartnerID,
+		"signed":      strconv.FormatBool(c.Signed),
 	}
 }
 

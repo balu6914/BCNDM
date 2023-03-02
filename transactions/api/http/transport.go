@@ -21,16 +21,17 @@ import (
 )
 
 const (
-	contentType = "application/json"
-	page        = "page"
-	limit       = "limit"
-	owner       = "owner"
-	partner     = "partner"
-	defPage     = 0
-	defLimit    = 10
-	defOwner    = false
-	defPartner  = false
-	shareScale  = 1000
+	contentType   = "application/json"
+	page          = "page"
+	limit         = "limit"
+	owner         = "owner"
+	partner       = "partner"
+	defPage       = 0
+	defLimit      = 10
+	defOwner      = false
+	defPartner    = false
+	shareScale    = 1000
+	maxDescLength = 1024
 )
 
 const (
@@ -39,6 +40,7 @@ const (
 )
 
 var (
+	errInvalidDescription     = errors.New("invalid description length")
 	errMalformedEntity        = errors.New("malformed entity")
 	errUnauthorizedAccess     = errors.New("missing or invalid credentials provided")
 	errUnsupportedContentType = errors.New("unsupported content type")
@@ -322,7 +324,7 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 	switch err {
-	case errMalformedEntity:
+	case errMalformedEntity, errInvalidDescription:
 		w.WriteHeader(http.StatusBadRequest)
 	case transactions.ErrNotFound:
 		w.WriteHeader(http.StatusNotFound)
