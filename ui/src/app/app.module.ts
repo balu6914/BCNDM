@@ -20,6 +20,7 @@ import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { BalanceComponent } from './shared/balance/balance.component';
+import { TermsComponent } from './dashboard/login/terms/terms.component';
 
 @NgModule({
   imports: [
@@ -41,10 +42,14 @@ import { BalanceComponent } from './shared/balance/balance.component';
     AppComponent,
     NoContentComponent,
     HeaderComponent,
+		TermsComponent
   ],
   exports: [
     BalanceComponent,
   ],
+	entryComponents: [
+		TermsComponent
+	],
   providers: [],
   bootstrap: [AppComponent]
 })

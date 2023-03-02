@@ -32,11 +32,18 @@
             required>
         </div>
       </div>
-      <p class="box__forgot">
-        <a href="/recover" class="box__forgot-link">
-            Forgot your password?
-        </a>
-      </p>
+			<p class="box__forgot mb-0">
+				<a href="/recover" class="box__forgot-link">
+					Forgot your password?
+				</a>
+			</p>
+
+			<div class="form-group form-check">
+				<input name="acceptterms" formControlName="acceptterms" type="checkbox" class="form-check-input" id="AgreeTerms">
+				<label class="form-check-label" for="AgreeTerms" style="cursor:pointer;" >Agree with <a href="#" target="_blank" (click)="openModalAdd($event)">Terms &
+						Conditions</a></label>
+			</div>
+      
       <button (click)="onSubmit(form.value, form.valid)"  class="btn btn-block btn-primary">Sign In</button>
     </form>
   </div>
