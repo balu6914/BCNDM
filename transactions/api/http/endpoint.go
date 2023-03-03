@@ -90,12 +90,13 @@ func createContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
 		contracts := []transactions.Contract{}
 		for _, item := range req.Items {
 			contracts = append(contracts, transactions.Contract{
-				StreamID:  req.StreamID,
-				OwnerID:   req.ownerID,
-				StartTime: now,
-				EndTime:   req.EndTime,
-				PartnerID: item.PartnerID,
-				Share:     item.Share,
+				StreamID:    req.StreamID,
+				OwnerID:     req.ownerID,
+				StartTime:   now,
+				EndTime:     req.EndTime,
+				PartnerID:   item.PartnerID,
+				Share:       item.Share,
+				Description: req.Description,
 			})
 		}
 		if err := svc.CreateContracts(contracts...); err != nil {
@@ -144,14 +145,15 @@ func listContractsEndpoint(svc transactions.Service) endpoint.Endpoint {
 
 		for _, contract := range page.Contracts {
 			res.Contracts = append(res.Contracts, contractView{
-				StreamID:   contract.StreamID,
-				StreamName: contract.StreamName,
-				StartTime:  contract.StartTime,
-				EndTime:    contract.EndTime,
-				OwnerID:    contract.OwnerID,
-				PartnerID:  contract.PartnerID,
-				Share:      float64(contract.Share) / shareScale,
-				Signed:     contract.Signed,
+				StreamID:    contract.StreamID,
+				StreamName:  contract.StreamName,
+				Description: contract.Description,
+				StartTime:   contract.StartTime,
+				EndTime:     contract.EndTime,
+				OwnerID:     contract.OwnerID,
+				PartnerID:   contract.PartnerID,
+				Share:       float64(contract.Share) / shareScale,
+				Signed:      contract.Signed,
 			})
 		}
 

@@ -63,16 +63,21 @@ func (req withdrawReq) validate() error {
 }
 
 type createContractsReq struct {
-	ownerID  string
-	StreamID string         `json:"stream_id"`
-	EndTime  time.Time      `json:"end_time"`
-	Items    []contractItem `json:"items"`
+	ownerID     string
+	StreamID    string         `json:"stream_id"`
+	EndTime     time.Time      `json:"end_time"`
+	Description string         `json:"description"`
+	Items       []contractItem `json:"items"`
 }
 
 func (req createContractsReq) validate() error {
 	if req.ownerID == "" || req.StreamID == "" ||
 		req.EndTime.Before(time.Now()) || len(req.Items) == 0 {
 		return errMalformedEntity
+	}
+
+	if len(req.Description) > maxDescLength {
+		return errInvalidDescription
 	}
 
 	for _, item := range req.Items {
