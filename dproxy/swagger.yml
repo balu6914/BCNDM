@@ -60,6 +60,18 @@ paths:
           description: Missing or invalid access token provided.
         500:
           $ref: "#/responses/ServiceError"
+  /access-logs:
+    get:
+      summary: Provide access logs for stream
+      description: |
+        Provide access logs for stream
+      tags:
+        - access-logs
+      responses:
+        201:
+          description: Access logs sent.
+
+
 
 parameters:
   Authorization:

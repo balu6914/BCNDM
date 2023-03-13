@@ -2,6 +2,7 @@ package dproxy
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/datapace/datapace/dproxy/persistence"
@@ -18,7 +19,7 @@ var (
 )
 
 type Service interface {
-	CreateToken(string, int, int, string) (string, error)
+	CreateToken(string, int, int, string, string) (string, error)
 	GetTargetURL(string) (string, error)
 }
 
@@ -27,10 +28,11 @@ type Token interface {
 	Uid() string
 	MaxCalls() int
 	MaxUnit() string
+	Subid() string
 }
 
 type TokenService interface {
-	Create(string, int, int, string) (string, error)
+	Create(string, int, int, string, string) (string, error)
 	Parse(string) (Token, error)
 }
 
@@ -50,12 +52,14 @@ func NewService(tokenService TokenService, eventsRepo persistence.EventRepositor
 	}
 }
 
-func (d *dService) CreateToken(url string, ttl, maxCalls int, maxUnit string) (string, error) {
+func (d *dService) CreateToken(url string, ttl, maxCalls int, maxUnit, subID string) (string, error) {
+	fmt.Println("CreateToken:")
+	fmt.Println(subID)
 	url, err := encrypt(d.aesKey, url)
 	if err != nil {
 		return "", err
 	}
-	return d.tokenService.Create(url, ttl, maxCalls, maxUnit)
+	return d.tokenService.Create(url, ttl, maxCalls, maxUnit, subID)
 }
 
 func (d *dService) GetTargetURL(tokenString string) (string, error) {
@@ -63,8 +67,7 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	calls, err := d.eventsRepo.Accumulate(persistence.Event{Time: time.Now(), Initiator: t.Uid()}, t.MaxUnit())
+	calls, err := d.eventsRepo.Accumulate(persistence.Event{Time: time.Now(), Initiator: t.Uid(), SubID: t.Subid()}, t.MaxUnit())
 	if err != nil {
 		return "", err
 	}

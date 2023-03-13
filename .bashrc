@@ -1,0 +1,3 @@
+export GIT_PROXY_COMMAND=proxy
+export GIT_PROXY_COMMAND=proxy
+export GIT_PROXY_COMMAND=proxy

@@ -18,7 +18,7 @@ func NewEventsRepository(db *sqlx.DB) *eventRepository {
 }
 
 // Accumulate saves new event and returns total number of events for specific initiator
-func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int, error) { //dodaj u upite unit uslov
+func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int, error) { //dodaj u upite unit uslov!
 	tx, err := er.db.Begin()
 	if err != nil {
 		return 0, err

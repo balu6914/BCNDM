@@ -20,9 +20,9 @@ func LoggingMiddleware(svc dproxy.Service, logger log.Logger) dproxy.Service {
 	return &loggingMiddleware{logger, svc}
 }
 
-func (lm *loggingMiddleware) CreateToken(url string, ttl, maxCalls int, maxUnit string) (token string, err error) {
+func (lm *loggingMiddleware) CreateToken(url string, ttl, maxCalls int, maxUnit, subID string) (token string, err error) {
 	defer func(begin time.Time) {
-		message := fmt.Sprintf("Method create_token for url %s ttl %d, max_calls %d, max_unit %s and took %s to complete", url, ttl, maxCalls, maxUnit, time.Since(begin))
+		message := fmt.Sprintf("Method create_token for url %s subscriptionID %s ttl %d, max_calls %d, max_unit %s and took %s to complete", url, subID, ttl, maxCalls, maxUnit, time.Since(begin))
 		if err != nil {
 			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
 			return
@@ -30,7 +30,7 @@ func (lm *loggingMiddleware) CreateToken(url string, ttl, maxCalls int, maxUnit 
 		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
 	}(time.Now())
 
-	return lm.svc.CreateToken(url, ttl, maxCalls, maxUnit)
+	return lm.svc.CreateToken(url, ttl, maxCalls, maxUnit, subID)
 }
 
 func (lm *loggingMiddleware) GetTargetURL(url string) (targeturl string, err error) {

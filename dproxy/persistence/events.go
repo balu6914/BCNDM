@@ -11,4 +11,5 @@ type EventRepository interface {
 type Event struct {
 	Time      time.Time
 	Initiator string
+	SubID     string
 }

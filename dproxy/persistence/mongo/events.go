@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/datapace/datapace/dproxy/persistence"
@@ -45,7 +46,7 @@ func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int
 	case "year":
 		period = 365 * 24 * time.Hour
 	default:
-		period = 0 //nije nula vec beskonacno, sredi ovo
+		period = 0 //nije nula vec beskonacno, sredi ovo!
 	}
 	now := time.Now()
 
@@ -68,12 +69,19 @@ func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int
 type dbEvent struct {
 	Initiator   string     `bson:"initiator,omitempty"`
 	RequestTime *time.Time `bson:"request_time,omitempty"`
+	SubID       string     `bson:"subscription_id,omitempty"`
 }
 
 func toDBEvent(event persistence.Event) (dbEvent, error) {
+	fmt.Println("event:")
+	fmt.Printf("%+v\n", event)
+
 	dbe := dbEvent{
 		Initiator:   event.Initiator,
 		RequestTime: &event.Time,
+		SubID:       event.SubID,
 	}
+	fmt.Println("dbevent:")
+	fmt.Printf("%+v\n", dbe)
 	return dbe, nil
 }

@@ -5,10 +5,11 @@ import (
 )
 
 type requestCreateToken struct {
-	URL      string `json:"url"`
-	TTL      int    `json:"ttl"`
-	MaxCalls int    `json:"max_calls,omitempty"`
-	MaxUnit  string `json:"max_unit,omitempty"`
+	URL            string `json:"url"`
+	TTL            int    `json:"ttl"`
+	MaxCalls       int    `json:"max_calls,omitempty"`
+	MaxUnit        string `json:"max_unit,omitempty"`
+	SubscriptionID string `json:"subscription_id"`
 }
 
 func (req requestCreateToken) validate() error {
