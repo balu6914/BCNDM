@@ -283,7 +283,10 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case errInvalidEmail, errInvalidPassword, errInvalidFirstName,
 		errInvalidLastName, errInvalidCompany, errInvalidAddress,
-		errInvalidPolicyRules, errInvalidPolicyVersion, recovery.ErrTokenParsingFailed:
+		errInvalidPolicyRules, errInvalidPolicyVersion,
+		auth.ErrPassLength, auth.ErrPassContainSymbol, auth.ErrPassContainLowCase,
+		auth.ErrPassContainUpCase,
+		recovery.ErrTokenParsingFailed, recovery.ErrTokenExpired:
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		// Add new error status user locked, password history presence
