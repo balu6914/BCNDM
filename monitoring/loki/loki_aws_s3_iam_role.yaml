@@ -1,0 +1,38 @@
+loki:
+  auth_enabled: false
+  serviceAccount:
+    create: true
+    name: loki-sa
+    annotations:
+       eks.amazonaws.com/role-arn: "" #set role-arn dynamically while deployment Ex: "arn:aws:iam::<account_id>:role/<role_name>"
+  compactor:
+    working_directory: /data/loki/boltdb-shipper-compactor
+    shared_store: s3    
+    compaction_interval: 10m
+    retention_enabled: true
+    retention_delete_delay: 1h
+    retention_delete_worker_count: 150
+    apply_retention_interval: 1h
+  config:
+    limits_config:
+      max_query_length: 2160h #90 days
+    schema_config:
+      configs:
+        - from: 2021-05-12
+          store: boltdb-shipper
+          object_store: s3
+          schema: v11
+          index:
+            prefix: loki_index_
+            period: 24h
+    storage_config:
+      aws:
+        s3forcepathstyle: false
+        bucketnames: #set bucket name dynamically while deployment
+        region: #set region of the bucket dynamically while deployment
+        insecure: false
+        sse_encryption: false
+      boltdb_shipper:
+        shared_store: s3
+        cache_ttl: 24h
+
