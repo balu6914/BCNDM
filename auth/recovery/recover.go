@@ -1,12 +1,13 @@
-//Package implements service that generates JWT password recovery tokens
+// Package implements service that generates JWT password recovery tokens
 package recovery
 
 import (
 	"errors"
+	"time"
+
 	"github.com/datapace/datapace/auth"
 	"github.com/dgrijalva/jwt-go"
 	uuid "github.com/satori/go.uuid"
-	"time"
 )
 
 const (
@@ -17,6 +18,7 @@ const (
 var (
 	ErrInvalidToken       = errors.New("invalid token")
 	ErrTokenParsingFailed = errors.New("token parsing failed")
+	ErrTokenExpired       = errors.New("reset link is expired")
 )
 
 var _ auth.RecoveryTokenProvider = (*RecoverTokenService)(nil)
@@ -62,8 +64,17 @@ func (r RecoverTokenService) ParseToken(tokenString string, storedSecret string)
 		}
 		return []byte(storedSecret), nil
 	})
-	if err != nil {
-		return nil, ErrTokenParsingFailed
+
+	if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+			// Token is either expired or not active yet
+			return nil, ErrTokenExpired
+		} else if ve.Errors != 0 {
+			return nil, ErrTokenParsingFailed
+		} else {
+			return nil, err
+		}
 	}
+
 	return token, nil
 }
