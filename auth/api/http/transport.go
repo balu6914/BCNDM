@@ -284,6 +284,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	case errInvalidEmail, errInvalidPassword, errInvalidFirstName,
 		errInvalidLastName, errInvalidCompany, errInvalidAddress,
 		errInvalidPolicyRules, errInvalidPolicyVersion,
+		auth.ErrPassLength, auth.ErrPassContainSymbol, auth.ErrPassContainLowCase,
+		auth.ErrPassContainUpCase,
 		recovery.ErrTokenParsingFailed, recovery.ErrTokenExpired:
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
