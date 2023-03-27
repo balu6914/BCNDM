@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package offers;
+package dproxy;
 
 option go_package = "github.com/datapace/datapace/proto/dproxy";
 import "google/protobuf/timestamp.proto";
