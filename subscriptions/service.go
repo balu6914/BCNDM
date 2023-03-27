@@ -336,9 +336,6 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	}
 	sub.ID = bson.NewObjectId()
 	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit, sub.ID.Hex())
-	fmt.Println("AddSubscription")
-	fmt.Printf("%+v\n", sub)
-	fmt.Println(sub.ID.Hex())
 	if err != nil {
 		if ds != nil {
 			// Ignore if deletion fails, table will be removed after expiration anyway.
@@ -349,13 +346,8 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 
 	sub.StreamURL = hash
 
-	fmt.Println("pre save u bazi id")
-	fmt.Println(sub.ID)
-
 	id, err := ss.subscriptions.Save(sub)
 
-	fmt.Println("posle save u bazi id")
-	fmt.Println(id)
 	if err != nil {
 		if ds != nil {
 			ds.Delete(context.Background())

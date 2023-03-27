@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/datapace/datapace/subscriptions"
@@ -177,8 +176,6 @@ type subscription struct {
 }
 
 func toDBSub(sub subscriptions.Subscription) (subscription, error) {
-	fmt.Println("todbsub")
-	fmt.Printf("%+v\n", sub)
 
 	dbSub := subscription{
 		ID:          sub.ID,
@@ -194,7 +191,6 @@ func toDBSub(sub subscriptions.Subscription) (subscription, error) {
 		Active:      false,
 	}
 	if sub.ID == "" {
-		fmt.Println("usao da napravi objecit u toDbsub")
 		dbSub.ID = bson.NewObjectId()
 	}
 	return dbSub, nil
