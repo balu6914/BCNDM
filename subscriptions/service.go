@@ -334,7 +334,9 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return Subscription{}, err
 		}
 	}
-	sub.ID = bson.NewObjectId()
+	if sub.ID == "" {
+		sub.ID = bson.NewObjectId()
+	}
 	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit, sub.ID.Hex())
 	if err != nil {
 		if ds != nil {
@@ -347,7 +349,6 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 	sub.StreamURL = hash
 
 	id, err := ss.subscriptions.Save(sub)
-
 	if err != nil {
 		if ds != nil {
 			ds.Delete(context.Background())
