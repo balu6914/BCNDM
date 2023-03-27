@@ -35,7 +35,7 @@ func NewDproxyServiceClient(cc grpc.ClientConnInterface) DproxyServiceClient {
 
 func (c *dproxyServiceClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
 	out := new(ListResponse)
-	err := c.cc.Invoke(ctx, "/offers.DproxyService/List", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dproxy.DproxyService/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _DproxyService_List_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/offers.DproxyService/List",
+		FullMethod: "/dproxy.DproxyService/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DproxyServiceServer).List(ctx, req.(*ListRequest))
@@ -92,7 +92,7 @@ func _DproxyService_List_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var DproxyService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "offers.DproxyService",
+	ServiceName: "dproxy.DproxyService",
 	HandlerType: (*DproxyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
