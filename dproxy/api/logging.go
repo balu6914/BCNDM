@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/datapace/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy/persistence"
 	log "github.com/datapace/datapace/logger"
 )
 
@@ -44,4 +45,17 @@ func (lm *loggingMiddleware) GetTargetURL(url string) (targeturl string, err err
 	}(time.Now())
 
 	return lm.svc.GetTargetURL(url)
+}
+
+func (lm *loggingMiddleware) List(q persistence.Query) (page []persistence.Event, err error) {
+	defer func(begin time.Time) {
+		message := fmt.Sprintf("Method list took %s to complete", time.Since(begin))
+		if err != nil {
+			lm.logger.Warn(fmt.Sprintf("%s with error: %s.", message, err))
+			return
+		}
+		lm.logger.Info(fmt.Sprintf("%s without errors.", message))
+	}(time.Now())
+
+	return lm.svc.List(q)
 }

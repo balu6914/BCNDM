@@ -1,8 +1,6 @@
 package jwt
 
 import (
-	"fmt"
-
 	"github.com/datapace/datapace/dproxy"
 )
 
@@ -37,7 +35,5 @@ func (t token) MaxUnit() string {
 }
 
 func (t token) Subid() string {
-	fmt.Println("provera fje subid()")
-	fmt.Println(t.subID)
 	return t.subID
 }

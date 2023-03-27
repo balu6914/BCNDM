@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -43,12 +42,6 @@ func MakeHandler(svc dproxy.Service, rp *ReverseProxy, fs *FsProxy, dProxyRootUr
 		decodeCreateUrl,
 		encodeUrlResponse,
 		opts...))
-	// r.Get("/access-logs", kithttp.NewServer(
-	// 	accessLogsEndpoint(svc),
-	// 	decodeIdentity,
-	// 	encodeResponse,
-	// 	opts...,
-	// ))
 	r.GetFunc("/version", datapace.Version())
 	return r
 }
@@ -58,8 +51,6 @@ func decodeCreateToken(_ context.Context, r *http.Request) (interface{}, error) 
 		return nil, errUnsupportedContentType
 	}
 	var req requestCreateToken
-	fmt.Println("decodeCreateToken")
-	fmt.Printf("%+v\n", req)
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}

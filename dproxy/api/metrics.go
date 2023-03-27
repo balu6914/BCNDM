@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/datapace/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy/persistence"
 	"github.com/go-kit/kit/metrics"
 )
 
@@ -41,4 +42,13 @@ func (ms *metricsMiddleware) GetTargetURL(url string) (string, error) {
 	}(time.Now())
 
 	return ms.svc.GetTargetURL(url)
+}
+
+func (ms *metricsMiddleware) List(q persistence.Query) (page []persistence.Event, err error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "get_target_url").Add(1)
+		ms.latency.With("method", "get_target_url").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.List(q)
 }

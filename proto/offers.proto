@@ -13,6 +13,6 @@ message GetOfferPriceRequest {
     string buyerId = 2;
   }
   
-  message GetOfferPriceResponse {
+message GetOfferPriceResponse {
     uint64 offerPrice = 1;
   }

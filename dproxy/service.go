@@ -2,7 +2,6 @@ package dproxy
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/datapace/datapace/dproxy/persistence"
@@ -21,6 +20,7 @@ var (
 type Service interface {
 	CreateToken(string, int, int, string, string) (string, error)
 	GetTargetURL(string) (string, error)
+	List(persistence.Query) (page []persistence.Event, err error)
 }
 
 type Token interface {
@@ -53,8 +53,6 @@ func NewService(tokenService TokenService, eventsRepo persistence.EventRepositor
 }
 
 func (d *dService) CreateToken(url string, ttl, maxCalls int, maxUnit, subID string) (string, error) {
-	fmt.Println("CreateToken:")
-	fmt.Println(subID)
 	url, err := encrypt(d.aesKey, url)
 	if err != nil {
 		return "", err
@@ -80,4 +78,9 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	}
 
 	return url, err
+}
+
+func (d *dService) List(q persistence.Query) (page []persistence.Event, err error) {
+	page, err = d.eventsRepo.List(q)
+	return
 }
