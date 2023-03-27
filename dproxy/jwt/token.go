@@ -1,18 +1,21 @@
 package jwt
 
-import "github.com/datapace/datapace/dproxy"
+import (
+	"github.com/datapace/datapace/dproxy"
+)
 
 type token struct {
 	url      string
 	uid      string
 	maxCalls int
 	maxUnit  string
+	subID    string
 }
 
 var _ dproxy.Token = (*token)(nil)
 
-func NewToken(uid, url string, maxCalls int, maxUnit string) dproxy.Token {
-	return &token{uid: uid, url: url, maxCalls: maxCalls, maxUnit: maxUnit}
+func NewToken(uid, url string, maxCalls int, maxUnit, subID string) dproxy.Token {
+	return &token{uid: uid, url: url, maxCalls: maxCalls, maxUnit: maxUnit, subID: subID}
 }
 
 func (t token) Url() string {
@@ -29,4 +32,8 @@ func (t token) MaxCalls() int {
 
 func (t token) MaxUnit() string {
 	return t.maxUnit
+}
+
+func (t token) Subid() string {
+	return t.subID
 }

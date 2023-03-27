@@ -18,8 +18,9 @@ var (
 )
 
 type Service interface {
-	CreateToken(string, int, int, string) (string, error)
+	CreateToken(string, int, int, string, string) (string, error)
 	GetTargetURL(string) (string, error)
+	List(persistence.Query) (page []persistence.Event, err error)
 }
 
 type Token interface {
@@ -27,10 +28,11 @@ type Token interface {
 	Uid() string
 	MaxCalls() int
 	MaxUnit() string
+	Subid() string
 }
 
 type TokenService interface {
-	Create(string, int, int, string) (string, error)
+	Create(string, int, int, string, string) (string, error)
 	Parse(string) (Token, error)
 }
 
@@ -50,12 +52,12 @@ func NewService(tokenService TokenService, eventsRepo persistence.EventRepositor
 	}
 }
 
-func (d *dService) CreateToken(url string, ttl, maxCalls int, maxUnit string) (string, error) {
+func (d *dService) CreateToken(url string, ttl, maxCalls int, maxUnit, subID string) (string, error) {
 	url, err := encrypt(d.aesKey, url)
 	if err != nil {
 		return "", err
 	}
-	return d.tokenService.Create(url, ttl, maxCalls, maxUnit)
+	return d.tokenService.Create(url, ttl, maxCalls, maxUnit, subID)
 }
 
 func (d *dService) GetTargetURL(tokenString string) (string, error) {
@@ -63,8 +65,7 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	calls, err := d.eventsRepo.Accumulate(persistence.Event{Time: time.Now(), Initiator: t.Uid()}, t.MaxUnit())
+	calls, err := d.eventsRepo.Accumulate(persistence.Event{Time: time.Now(), Initiator: t.Uid(), SubID: t.Subid()}, t.MaxUnit())
 	if err != nil {
 		return "", err
 	}
@@ -77,4 +78,9 @@ func (d *dService) GetTargetURL(tokenString string) (string, error) {
 	}
 
 	return url, err
+}
+
+func (d *dService) List(q persistence.Query) (page []persistence.Event, err error) {
+	page, err = d.eventsRepo.List(q)
+	return
 }

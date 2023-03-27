@@ -334,8 +334,10 @@ func (ss subscriptionsService) AddSubscription(userID, token string, sub Subscri
 			return Subscription{}, err
 		}
 	}
-
-	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit)
+	if sub.ID == "" {
+		sub.ID = bson.NewObjectId()
+	}
+	hash, err := ss.proxy.Register(sub.Hours, url, stream.MaxCalls, stream.MaxUnit, sub.ID.Hex())
 	if err != nil {
 		if ds != nil {
 			// Ignore if deletion fails, table will be removed after expiration anyway.

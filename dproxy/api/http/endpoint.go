@@ -15,7 +15,7 @@ func createTokenEndpoint(svc dproxy.Service, responseType, dProxyRootUrl, fsPref
 		if err := req.validate(); err != nil {
 			return nil, err
 		}
-		token, err := svc.CreateToken(req.URL, req.TTL, req.MaxCalls, req.MaxUnit)
+		token, err := svc.CreateToken(req.URL, req.TTL, req.MaxCalls, req.MaxUnit, req.SubscriptionID)
 		if err != nil {
 			return nil, err
 		}

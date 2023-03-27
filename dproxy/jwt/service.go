@@ -18,7 +18,7 @@ func NewService(jwtSecret string) dproxy.TokenService {
 	return &jwtService{jwtSecret: jwtSecret}
 }
 
-func (d *jwtService) Create(url string, ttl int, maxCalls int, maxUnit string) (string, error) {
+func (d *jwtService) Create(url string, ttl int, maxCalls int, maxUnit, subID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, DproxyClaims{
 		StandardClaims: jwt.StandardClaims{
 			Id:        uuid.NewV4().String(),
@@ -27,6 +27,7 @@ func (d *jwtService) Create(url string, ttl int, maxCalls int, maxUnit string) (
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(ttl)).Unix(),
 		},
 		URL:      url,
+		SubID:    subID,
 		MaxCalls: maxCalls,
 		MaxUnit:  maxUnit,
 	})
@@ -60,7 +61,7 @@ func (d *jwtService) Parse(tokenString string) (dproxy.Token, error) {
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*DproxyClaims); ok && token.Valid {
-		return NewToken(claims.StandardClaims.Id, claims.URL, claims.MaxCalls, claims.MaxUnit), nil
+		return NewToken(claims.StandardClaims.Id, claims.URL, claims.MaxCalls, claims.MaxUnit, claims.SubID), nil
 	}
 	return nil, dproxy.ErrTokenParsingFailed
 }

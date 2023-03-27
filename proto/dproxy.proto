@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package dproxy;
+
+option go_package = "github.com/datapace/datapace/proto/dproxy";
+import "google/protobuf/timestamp.proto";
+
+service DproxyService {
+    rpc List(ListRequest) returns (ListResponse) {}
+}
+
+ 
+message AccessLog {
+  string subId = 1;
+  google.protobuf.Timestamp time = 2;
+}
+
+message ListRequest {
+  uint32 limit = 1;
+  AccessLog cursor = 2;
+  Sort sort = 3;
+}
+
+message Sort {
+  SortOrder order = 1;
+  SortBy by = 2;
+}
+
+enum SortOrder {
+  ASC = 0;
+  DESC = 1;
+}
+
+enum SortBy {
+  DATE = 0;
+}
+
+message ListResponse {
+  repeated AccessLog page = 1;
+}  

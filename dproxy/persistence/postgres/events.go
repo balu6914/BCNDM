@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"errors"
+
 	"github.com/datapace/datapace/dproxy/persistence"
 	"github.com/jmoiron/sqlx"
 )
@@ -11,6 +13,8 @@ type eventRepository struct {
 
 var _ persistence.EventRepository = (*eventRepository)(nil)
 
+var ErrNotSupported = errors.New("feature not supported")
+
 func NewEventsRepository(db *sqlx.DB) *eventRepository {
 	return &eventRepository{
 		db: db,
@@ -18,7 +22,7 @@ func NewEventsRepository(db *sqlx.DB) *eventRepository {
 }
 
 // Accumulate saves new event and returns total number of events for specific initiator
-func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int, error) { //dodaj u upite unit uslov
+func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int, error) {
 	tx, err := er.db.Begin()
 	if err != nil {
 		return 0, err
@@ -52,4 +56,8 @@ func (er *eventRepository) Accumulate(event persistence.Event, unit string) (int
 	}
 	tx.Commit()
 	return cnt, nil
+}
+
+func (er *eventRepository) List(query persistence.Query) ([]persistence.Event, error) {
+	return []persistence.Event{}, ErrNotSupported
 }

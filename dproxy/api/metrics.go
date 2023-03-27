@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/datapace/datapace/dproxy"
+	"github.com/datapace/datapace/dproxy/persistence"
 	"github.com/go-kit/kit/metrics"
 )
 
@@ -25,13 +26,13 @@ func MetricsMiddleware(svc dproxy.Service, counter metrics.Counter, latency metr
 	}
 }
 
-func (ms *metricsMiddleware) CreateToken(url string, ttl, maxCalls int, maxUnit string) (string, error) {
+func (ms *metricsMiddleware) CreateToken(url string, ttl, maxCalls int, maxUnit, subID string) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "create_token").Add(1)
 		ms.latency.With("method", "create_token").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.svc.CreateToken(url, ttl, maxCalls, maxUnit)
+	return ms.svc.CreateToken(url, ttl, maxCalls, maxUnit, subID)
 }
 
 func (ms *metricsMiddleware) GetTargetURL(url string) (string, error) {
@@ -41,4 +42,13 @@ func (ms *metricsMiddleware) GetTargetURL(url string) (string, error) {
 	}(time.Now())
 
 	return ms.svc.GetTargetURL(url)
+}
+
+func (ms *metricsMiddleware) List(q persistence.Query) (page []persistence.Event, err error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "get_target_url").Add(1)
+		ms.latency.With("method", "get_target_url").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.svc.List(q)
 }

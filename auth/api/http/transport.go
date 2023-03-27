@@ -294,7 +294,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusLocked)
 		w.Write([]byte(err.Error()))
 	case auth.ErrUserPasswordHistory:
-		w.WriteHeader(http.StatusAlreadyReported)
+		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte(err.Error()))
 	case auth.ErrUserAccountDisabled:
 		w.WriteHeader(http.StatusForbidden)

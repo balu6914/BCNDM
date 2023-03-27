@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/datapace/datapace"
 	"github.com/datapace/datapace/dproxy"
 	"github.com/datapace/datapace/dproxy/api"
+	grpcapi "github.com/datapace/datapace/dproxy/api/grpc"
 	httpapi "github.com/datapace/datapace/dproxy/api/http"
 	"github.com/datapace/datapace/dproxy/jwt"
 	"github.com/datapace/datapace/dproxy/persistence"
@@ -20,14 +22,17 @@ import (
 	"github.com/datapace/datapace/errors"
 	"github.com/datapace/datapace/logger"
 	log "github.com/datapace/datapace/logger"
+	dproxyproto "github.com/datapace/datapace/proto/dproxy"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
 )
 
 const (
 	defHTTPProto         = "http"
 	defHTTPHost          = "localhost"
 	defHTTPPort          = "8087"
+	defGRPCPort          = "8094"
 	defJWTSecret         = "examplesecret"
 	defLocalFsRoot       = "/tmp/test"
 	defDBType            = "mongo"
@@ -49,6 +54,7 @@ const (
 	envHTTPProto         = "DATAPACE_PROXY_HTTP_PROTO"
 	envHTTPHost          = "DATAPACE_PROXY_HTTP_HOST"
 	envHTTPPort          = "DATAPACE_PROXY_HTTP_PORT"
+	envGRPCPort          = "DATAPACE_DPROXY_GRPC_PORT"
 	envJWTSecret         = "DATAPACE_JWT_SECRET"
 	envLocalFsRoot       = "DATAPACE_LOCAL_FS_ROOT"
 	envDBType            = "DATAPACE_DPROXY_DB_TYPE"
@@ -72,6 +78,7 @@ type config struct {
 	httpProto         string
 	httpHost          string
 	httpPort          string
+	grpcPort          string
 	jwtSecret         string
 	localFsRoot       string
 	dbConfig          postgres.Config
@@ -106,6 +113,7 @@ func main() {
 	}
 
 	go startHTTPServer(svc, r, f, cfg.httpPort, url, logger, errs)
+	go startGRPCServer(svc, cfg.grpcPort, logger, errs)
 
 	go func() {
 		c := make(chan os.Signal)
@@ -192,6 +200,7 @@ func loadConfig(logger log.Logger) config {
 		httpProto:         datapace.Env(envHTTPProto, defHTTPProto),
 		httpHost:          datapace.Env(envHTTPHost, defHTTPHost),
 		httpPort:          datapace.Env(envHTTPPort, defHTTPPort),
+		grpcPort:          datapace.Env(envGRPCPort, defGRPCPort),
 		jwtSecret:         datapace.Env(envJWTSecret, defJWTSecret),
 		localFsRoot:       datapace.Env(envLocalFsRoot, defLocalFsRoot),
 		fsPathPrefix:      datapace.Env(envFSPathPrefix, defFSPathPrefix),
@@ -206,4 +215,16 @@ func startHTTPServer(svc dproxy.Service, rp *httpapi.ReverseProxy, fs *httpapi.F
 	p := fmt.Sprintf(":%s", port)
 	logger.Info(fmt.Sprintf("Proxy HTTP service started, exposed port %s", port))
 	errs <- http.ListenAndServe(p, httpapi.MakeHandler(svc, rp, fs, dProxyRootUrl))
+}
+func startGRPCServer(svc dproxy.Service, port string, logger logger.Logger, errs chan error) {
+	p := fmt.Sprintf(":%s", port)
+	listener, err := net.Listen("tcp", p)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to listen on port %s: %s", port, err))
+	}
+
+	server := grpc.NewServer()
+	dproxyproto.RegisterDproxyServiceServer(server, grpcapi.NewServer(svc))
+	logger.Info(fmt.Sprintf("dProxy gRPC service started, exposed port %s", port))
+	errs <- server.Serve(listener)
 }

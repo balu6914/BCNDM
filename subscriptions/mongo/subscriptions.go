@@ -26,8 +26,10 @@ func (sr subscriptionRepository) Save(sub subscriptions.Subscription) (string, e
 	defer s.Close()
 	c := s.DB(dbName).C(collectionName)
 
-	sub.ID = bson.NewObjectId()
-	dbSub := toDBSub(sub)
+	dbSub, err := toDBSub(sub)
+	if err != nil {
+		return "", err
+	}
 
 	if err := c.Insert(dbSub); err != nil {
 		if mgo.IsDup(err) {
@@ -173,8 +175,9 @@ type subscription struct {
 	Active      bool          `bson:"active"`
 }
 
-func toDBSub(sub subscriptions.Subscription) subscription {
-	return subscription{
+func toDBSub(sub subscriptions.Subscription) (subscription, error) {
+
+	dbSub := subscription{
 		ID:          sub.ID,
 		UserID:      sub.UserID,
 		StreamID:    sub.StreamID,
@@ -187,6 +190,10 @@ func toDBSub(sub subscriptions.Subscription) subscription {
 		StreamName:  sub.StreamName,
 		Active:      false,
 	}
+	if sub.ID == "" {
+		dbSub.ID = bson.NewObjectId()
+	}
+	return dbSub, nil
 }
 
 func toSub(dbSub subscription) subscriptions.Subscription {

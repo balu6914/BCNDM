@@ -317,6 +317,7 @@ services:
 
     ports:
       - "8087:8087"
+      - "8094:8094"
     restart: on-failure
     networks:
       - datapace-net
