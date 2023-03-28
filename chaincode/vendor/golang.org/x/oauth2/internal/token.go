@@ -132,7 +132,7 @@ var brokenAuthHeaderProviders = []string{
 	"https://multisport.todaysplan.com.au/rest/oauth/access_token",
 	"https://whats.todaysplan.com.au/rest/oauth/access_token",
 	"https://stackoverflow.com/oauth/access_token",
-	"https://account.health.nokia.com",
+	"https://account.health.BCNDM.com",
 	"https://accounts.zoho.com",
 	"https://gitter.im/login/oauth/token",
 	"https://openid-connect.onelogin.com/oidc",

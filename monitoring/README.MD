@@ -1,4 +1,4 @@
-# Installing Monitoring Stack for NDM #
+# Installing Monitoring Stack for BCNDM #
 ## Configure Loki ##
 ### Configure AWS S3 as storage ###
 1. Create an IAM user. 2. Create a S3 bucket and provide access to the created IAM user. 3. Create a secret using IAM 
@@ -25,7 +25,7 @@ credential as secret ```javascript kubectl create secret generic prometheuspwd -
 ```javascript helm repo add prometheus-community https://prometheus-community.github.io/helm-charts helm repo update 
 helm install prometheus prometheus-community/prometheus -n monitoring -f prometheus/alerting_rules.yml -f 
 prometheus/alertmanager.yml -f prometheus/prometheus-ingress.yml -f prometheus/alertmanager-ingress.yml ``` This will 
-configure the prometheus by reading the yml files. Alert Manager setting has pre-defined NDM slack group as receiver. 
+configure the prometheus by reading the yml files. Alert Manager setting has pre-defined BCNDM slack group as receiver. 
 To login into prometheus, use the created secret.
 ## Configure Grafana ##
 ### Configure datasources ###

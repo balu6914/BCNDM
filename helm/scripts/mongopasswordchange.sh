@@ -1,7 +1,7 @@
 #########################################################################################################################
 # Prequisite      :                                                                                       				#
 # Access to the kubernetes cluster where password change has to be done. 								  				#
-# download the datapace helm chart from gitlab (ex: 	#https://artifactory-espoo1.int.net.nokia.com:443/artifactory/mn-hc-datapace-helm-local/datapace-xx.x-SNAPSHOT_xxx.tgz  #
+# download the datapace helm chart from gitlab (ex: 	#https://artifactory-espoo1.int.net.BCNDM.com:443/artifactory/mn-hc-datapace-helm-local/datapace-xx.x-SNAPSHOT_xxx.tgz  #
 # kubectl installation in the local/working machine.                                                      				#
 # --------------------------------------------------------------------------------------------------------				#
 # Usage           : mongopasswordchange.sh -n <namespace> -f <filepath>                                   				#

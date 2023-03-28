@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  title: NDM categories service
+  title: BCNDM categories service
   version: 1.0.0
 consumes:
   - "application/json"

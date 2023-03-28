@@ -36,7 +36,7 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "blocksense@nokia.com",
+					"name": "blocksense@BCNDM.com",
 					"item": [
 						{
 							"name": "blocksense token",
@@ -50,7 +50,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"email\": \"blocksense@nokia.com\",\n\t\"password\":\"nokiaSuperSecret\"\n}"
+									"raw": "{\n\t\"email\": \"blocksense@BCNDM.com\",\n\t\"password\":\"nokiaSuperSecret\"\n}"
 								},
 								"url": {
 									"raw": "localhost:8080/api/token",

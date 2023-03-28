@@ -10,7 +10,7 @@ alertmanagerFiles:
       repeat_interval: 24h
       receiver: 'NHC'
       routes:
-        - receiver: 'NDM-L4'
+        - receiver: 'BCNDM-L4'
           match_re:
             severity: critical|warning
           continue: true
@@ -19,7 +19,7 @@ alertmanagerFiles:
             severity: critical|warning
           continue: true
     receivers:
-    - name: 'NDM-L4'
+    - name: 'BCNDM-L4'
       slack_configs:
       - channel: '#monitoring'
         send_resolved: true
@@ -36,16 +36,16 @@ alertmanagerFiles:
           {{ end }}
     - name: 'NHC'
       email_configs:
-      - to: 'i_ext_nhc_support@nokia.com'
-        from: 'no-reply@datamarketplace.nokia.com'
+      - to: 'i_ext_nhc_support@BCNDM.com'
+        from: 'no-reply@datamarketplace.BCNDM.com'
         smarthost: smtp-relay.sendinblue.com:587
-        auth_username: 'p.sukumar@nokia.com'
-        auth_identity: 'NDM Alerting'
+        auth_username: 'p.sukumar@BCNDM.com'
+        auth_identity: 'BCNDM Alerting'
         auth_password: 'BRb1kNq3WwspdQZ4'
         headers:
           Subject: ndm.datapace.local [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
         html: |
-          <h1>NDM Alert Notification</h1>
+          <h1>BCNDM Alert Notification</h1>
           <h2>You have {{ .Alerts | len }} alert{{ if gt (len .Alerts) 1 }}s{{ end }} : {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }} </h2>
           <br>
           {{ range .Alerts.Firing }}       
@@ -80,7 +80,7 @@ alertmanagerFiles:
               <td><strong>Quick Access URLs:</strong></td>
             </tr>
             <tr>
-              <td><a href="https://ndm.datapace.local/">NDM Application</a></td>
+              <td><a href="https://ndm.datapace.local/">BCNDM Application</a></td>
             </tr>
             <tr>
               <td><a href="https://ndm.datapace.local/grafana/">Grafana Dashboard</a></td>

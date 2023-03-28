@@ -11,7 +11,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-kit/kit v0.9.0
 	github.com/go-zoo/bone v1.3.0
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.2r̥
 	github.com/gorilla/websocket v1.5.0
 	github.com/hyperledger/fabric v1.4.0
 	github.com/hyperledger/fabric-sdk-go v1.0.0-beta2
